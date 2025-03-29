@@ -1,0 +1,57 @@
+import { LucideIcon } from 'lucide-react';
+import type { Config } from 'ziggy-js';
+
+export interface Auth {
+    user: User;
+}
+
+export interface BreadcrumbItem {
+    title: string;
+    href: string;
+}
+
+export interface NavGroup {
+    title: string;
+    items: NavItem[];
+}
+
+export interface NavItem {
+    title: string;
+    href: string;
+    icon?: LucideIcon | null;
+    isActive?: boolean;
+}
+
+export interface SharedData {
+    name: string;
+    quote: { message: string; author: string };
+    auth: Auth;
+    ziggy: Config & { location: string };
+    [key: string]: unknown;
+}
+
+export interface User {
+    id: number;
+    last_name: string;
+    first_name: string;
+    middle_name?: string | null;
+    email: string;
+    student_id: string;
+    email_verified_at: string | null;
+    course: string;
+    major: string;
+    year_level: string;
+    civil_status: string;
+    sex: string;
+    date_of_birth: string;
+    place_of_birth: string;
+    address: string;
+    mobile_number: string | null;
+    is_pwd: string;
+    disability_type: string | null;
+    religion: string;
+    avatar?: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown; // This allows for additional properties
+}
