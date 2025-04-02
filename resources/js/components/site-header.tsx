@@ -119,9 +119,9 @@ export default function SiteHeader() {
                     <div className="flex flex-shrink-0 items-center">
                         <Link href="/" className="flex items-center">
                             <img
-                                src="https://imgs.search.brave.com/AAIrKVKSzRUC38f2iWNt5kMQEuJ1pJg_LK2Xr2I-sUI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvcHJldmll/dy0xeC84OS8zNy9v/Yy1sb2dvLW1vbm9n/cmFtLWRlc2lnbi10/ZW1wbGF0ZS12ZWN0/b3ItMzg1NTg5Mzcu/anBn"
+                                src={route('home') + '/images/logo.png'}
                                 alt="OSAS Connect Logo"
-                                className="mr-2 h-8 w-8 rounded-full object-cover"
+                                className="mr-2 h-8 w-8 rounded-full object-cover" 
                                 onError={(e) => {
                                     e.currentTarget.src = "https://placehold.co/32x32/005a2d/febd12?text=OC";
                                 }}

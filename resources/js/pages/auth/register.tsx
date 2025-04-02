@@ -16,7 +16,8 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip";
+import AddressForm from '@/components/address-form';
 
 type RegisterForm = {
     last_name: string;
@@ -33,11 +34,18 @@ type RegisterForm = {
     sex: string;
     date_of_birth: string;
     place_of_birth: string;
-    address: string;
+    street: string;
+    barangay: string;
+    city: string;
+    province: string;
     mobile_number: string;
+    telephone_number: string;
     is_pwd: string;
     disability_type: string;
     religion: string;
+    residence_type: string;
+    guardian_name: string;
+    scholarships: string;
     terms_agreement: boolean;
 };
 
@@ -57,11 +65,18 @@ export default function Register() {
         sex: 'Male',
         date_of_birth: '',
         place_of_birth: '',
-        address: '',
+        street: '',
+        barangay: '',
+        city: '',
+        province: '',
         mobile_number: '',
+        telephone_number: '',
         is_pwd: 'No',
         disability_type: '',
         religion: 'Prefer not to say',
+        residence_type: '',
+        guardian_name: '',
+        scholarships: '',
         terms_agreement: false,
     });
 
@@ -82,9 +97,13 @@ export default function Register() {
         switch (step) {
             case 1:
                 // Validate Personal Information fields
-                if (!data.first_name || !data.last_name || !data.sex ||
+                if (!data.first_name || !data.last_name || !data.middle_name || !data.sex ||
                     !data.civil_status || !data.date_of_birth || !data.place_of_birth ||
-                    !data.address || !data.religion) {
+                    !data.street || !data.barangay || !data.city || !data.province ||
+                    !data.mobile_number || !data.religion || !data.residence_type) {
+                    return false;
+                }
+                if (data.residence_type === 'With Guardian' && !data.guardian_name) {
                     return false;
                 }
                 if (data.is_pwd === 'Yes' && !data.disability_type) {
@@ -162,7 +181,7 @@ export default function Register() {
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="last_name">Last Name *</Label>
+                                    <Label htmlFor="last_name" className="text-base">Last Name *</Label>
                                     <Input
                                         id="last_name"
                                         type="text"
@@ -178,7 +197,7 @@ export default function Register() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="first_name">First Name *</Label>
+                                    <Label htmlFor="first_name" className="text-base">First Name *</Label>
                                     <Input
                                         id="first_name"
                                         type="text"
@@ -195,22 +214,23 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="middle_name">Middle Name</Label>
+                                <Label htmlFor="middle_name" className="text-base">Middle Name *</Label>
                                 <Input
                                     id="middle_name"
                                     type="text"
+                                    required
                                     tabIndex={3}
                                     value={data.middle_name}
                                     onChange={(e) => setData('middle_name', e.target.value)}
                                     disabled={processing}
-                                    placeholder="Michael (optional)"
+                                    placeholder="Enter your middle name"
                                 />
                                 <InputError message={errors.middle_name} />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label>Sex *</Label>
+                                    <Label className="text-base">Sex *</Label>
                                     <RadioGroup
                                         id="sex"
                                         name="sex"
@@ -232,7 +252,7 @@ export default function Register() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="civil_status">Civil Status *</Label>
+                                    <Label htmlFor="civil_status" className="text-base">Civil Status *</Label>
                                     <Select
                                         value={data.civil_status}
                                         onValueChange={(value) => setData('civil_status', value)}
@@ -254,7 +274,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="date_of_birth">Date of Birth *</Label>
+                                <Label htmlFor="date_of_birth" className="text-base">Date of Birth *</Label>
                                 <Input
                                     id="date_of_birth"
                                     type="date"
@@ -268,7 +288,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="place_of_birth">Place of Birth *</Label>
+                                <Label htmlFor="place_of_birth" className="text-base">Place of Birth *</Label>
                                 <Input
                                     id="place_of_birth"
                                     type="text"
@@ -282,24 +302,111 @@ export default function Register() {
                                 <InputError message={errors.place_of_birth} />
                             </div>
 
+                            <AddressForm
+                                data={{
+                                    street: data.street,
+                                    barangay: data.barangay,
+                                    city: data.city,
+                                    province: data.province,
+                                }}
+                                setData={(field, value) => setData(field, value)}
+                                errors={errors}
+                                processing={processing}
+                            />
+
                             <div className="grid gap-2">
-                                <Label htmlFor="address">Address *</Label>
-                                <Input
-                                    id="address"
-                                    type="text"
-                                    required
-                                    tabIndex={7}
-                                    autoComplete="street-address"
-                                    value={data.address}
-                                    onChange={(e) => setData('address', e.target.value)}
-                                    disabled={processing}
-                                    placeholder="Sitio/Street, Barangay, City/Municipality, Province"
+                                <Label className="text-base">Current Residence *</Label>
+                                <div className="rounded-md border p-4 space-y-3">
+                                    <RadioGroup
+                                        value={data.residence_type}
+                                        onValueChange={(value) => {
+                                            setData('residence_type', value);
+                                            // Set guardian_name to 'Not Applicable' if not With Guardian
+                                            setData('guardian_name', value === 'With Guardian' ? '' : 'Not Applicable');
+                                        }}
+                                        className="grid gap-3"
+                                        disabled={processing}
+                                    >
+                                        <Label
+                                            htmlFor="parents-house"
+                                            className={`flex items-center space-x-3 rounded-md border p-3 transition-colors hover:bg-muted cursor-pointer ${data.residence_type === "Parent's House" ? 'border-primary bg-muted/50' : ''}`}
+                                        >
+                                            <RadioGroupItem value="Parent's House" id="parents-house" />
+                                            <div className="grid gap-0.5">
+                                                <span className="font-medium">Parent's House</span>
+                                                <span className="text-sm text-muted-foreground">Living with parents at family residence</span>
+                                            </div>
+                                        </Label>
+                                        
+                                        <Label
+                                            htmlFor="boarding-house"
+                                            className={`flex items-center space-x-3 rounded-md border p-3 transition-colors hover:bg-muted cursor-pointer ${data.residence_type === "Boarding House" ? 'border-primary bg-muted/50' : ''}`}
+                                        >
+                                            <RadioGroupItem value="Boarding House" id="boarding-house" />
+                                            <div className="grid gap-0.5">
+                                                <span className="font-medium">Boarding House</span>
+                                                <span className="text-sm text-muted-foreground">Renting a room or apartment near campus</span>
+                                            </div>
+                                        </Label>
+                                        
+                                        <Label
+                                            htmlFor="with-guardian"
+                                            className={`flex items-center space-x-3 rounded-md border p-3 transition-colors hover:bg-muted cursor-pointer ${data.residence_type === "With Guardian" ? 'border-primary bg-muted/50' : ''}`}
+                                        >
+                                            <RadioGroupItem value="With Guardian" id="with-guardian" />
+                                            <div className="grid gap-0.5">
+                                                <span className="font-medium">With Guardian</span>
+                                                <span className="text-sm text-muted-foreground">Living with a legal guardian or relative</span>
+                                            </div>
+                                        </Label>
+                                    </RadioGroup>
+                                </div>
+                                <InputError message={errors.residence_type} />
+                            </div>
+
+                            {data.residence_type === "With Guardian" ? (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="guardian_name" className="text-base">Guardian's Full Name *</Label>
+                                    <Input
+                                        id="guardian_name"
+                                        type="text"
+                                        required
+                                        value={data.guardian_name}
+                                        onChange={(e) => setData('guardian_name', e.target.value)}
+                                        disabled={processing}
+                                        placeholder="Complete name of your guardian"
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        Enter the complete name of your legal guardian or relative
+                                    </p>
+                                    <InputError message={errors.guardian_name} />
+                                </div>
+                            ) : (
+                                <Input 
+                                    type="hidden" 
+                                    name="guardian_name" 
+                                    value="Not Applicable" 
                                 />
-                                <InputError message={errors.address} />
+                            )}
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="scholarships" className="text-base">Existing Scholarship/s</Label>
+                                <Input
+                                    id="scholarships"
+                                    type="text"
+                                    value={data.scholarships}
+                                    onChange={(e) => setData('scholarships', e.target.value)}
+                                    disabled={processing}
+                                    placeholder="Enter your scholarship/s (if any)"
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    If you have multiple scholarships, separate them with commas
+                                </p>
+                                <InputError message={errors.scholarships} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="mobile_number">Mobile Number</Label>
+                                <Label htmlFor="mobile_number" className="text-base">Mobile Number *</Label>
                                 <div className="flex">
                                     <div className="flex items-center justify-center px-3 border border-r-0 rounded-l-md bg-muted">
                                         +63
@@ -307,7 +414,8 @@ export default function Register() {
                                     <Input
                                         id="mobile_number"
                                         type="tel"
-                                        tabIndex={8}
+                                        required
+                                        tabIndex={11}
                                         className="rounded-l-none"
                                         value={data.mobile_number}
                                         onChange={(e) => {
@@ -320,7 +428,7 @@ export default function Register() {
                                             setData('mobile_number', value);
                                         }}
                                         disabled={processing}
-                                        placeholder="9123456789 (optional)"
+                                        placeholder="9123456789"
                                         maxLength={10}
                                     />
                                 </div>
@@ -329,7 +437,21 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="religion">Religion *</Label>
+                                <Label htmlFor="telephone_number" className="text-base">Telephone Number</Label>
+                                <Input
+                                    id="telephone_number"
+                                    type="tel"
+                                    tabIndex={12}
+                                    value={data.telephone_number}
+                                    onChange={(e) => setData('telephone_number', e.target.value)}
+                                    disabled={processing}
+                                    placeholder="Telephone number (optional)"
+                                />
+                                <InputError message={errors.telephone_number} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="religion" className="text-base">Religion *</Label>
                                 <Select
                                     value={data.religion}
                                     onValueChange={(value) => setData('religion', value)}
@@ -381,7 +503,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label>Person with Disability (PWD) *</Label>
+                                <Label className="text-base">Person with Disability (PWD) *</Label>
                                 <RadioGroup
                                     value={data.is_pwd}
                                     onValueChange={(value) => setData('is_pwd', value)}
@@ -402,7 +524,7 @@ export default function Register() {
 
                             {data.is_pwd === 'Yes' && (
                                 <div className="grid gap-2">
-                                    <Label htmlFor="disability_type">Type of Disability *</Label>
+                                    <Label htmlFor="disability_type" className="text-base">Type of Disability *</Label>
                                     <Input
                                         id="disability_type"
                                         type="text"
@@ -423,7 +545,7 @@ export default function Register() {
                     {currentStep === 2 && (
                         <div className="space-y-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="student_id">Student ID *</Label>
+                                <Label htmlFor="student_id" className="text-base">Student ID *</Label>
                                 <Input
                                     id="student_id"
                                     type="text"
@@ -442,7 +564,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="course">Course *</Label>
+                                <Label htmlFor="course" className="text-base">Course *</Label>
                                 <Select
                                     value={data.course}
                                     onValueChange={(value) => {
@@ -474,14 +596,16 @@ export default function Register() {
 
                             {(data.course === "Bachelor of Secondary Education" || data.course === "Bachelor of Elementary Education") && (
                                 <div className="grid gap-2">
-                                    <Label htmlFor="major">Major *</Label>
+                                    <Label htmlFor="major" className="text-base">Major *</Label>
                                     <Select
-                                        value={data.major}
+                                        value={data.major || (data.course === "Bachelor of Secondary Education" ? "English" : "General Education")}
                                         onValueChange={(value) => setData('major', value)}
                                         disabled={processing}
                                     >
                                         <SelectTrigger tabIndex={3} id="major">
-                                            <SelectValue placeholder="Select a major" />
+                                            <SelectValue>
+                                                Select a major
+                                            </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
                                             {data.course === "Bachelor of Secondary Education" ? (
@@ -506,7 +630,7 @@ export default function Register() {
                             )}
 
                             <div className="grid gap-2">
-                                <Label htmlFor="year_level">Year Level *</Label>
+                                <Label htmlFor="year_level" className="text-base">Year Level *</Label>
                                 <Select
                                     value={data.year_level}
                                     onValueChange={(value) => setData('year_level', value)}
@@ -531,7 +655,7 @@ export default function Register() {
                     {currentStep === 3 && (
                         <div className="space-y-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email Address *</Label>
+                                <Label htmlFor="email" className="text-base">Email Address *</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -562,7 +686,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">Password *</Label>
+                                <Label htmlFor="password" className="text-base">Password *</Label>
                                 <Input
                                     id="password"
                                     type="password"
@@ -582,7 +706,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">Confirm Password *</Label>
+                                <Label htmlFor="password_confirmation" className="text-base">Confirm Password *</Label>
                                 <Input
                                     id="password_confirmation"
                                     type="password"
@@ -621,22 +745,34 @@ export default function Register() {
                                         <p>{data.civil_status}</p>
 
                                         <p className="text-muted-foreground">Date of Birth:</p>
-                                        <p>{new Date(data.date_of_birth).toLocaleDateString()}</p>
+                                        <p>{new Date(data.date_of_birth).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
 
                                         <p className="text-muted-foreground">Place of Birth:</p>
                                         <p>{data.place_of_birth}</p>
 
                                         <p className="text-muted-foreground">Address:</p>
-                                        <p>{data.address}</p>
+                                        <p>{`${data.street}, ${data.barangay}, ${data.city}, ${data.province}`}</p>
+
+                                        <p className="text-muted-foreground">Residence Type:</p>
+                                        <p>{data.residence_type}</p>
+
+                                        <p className="text-muted-foreground">Guardian Name:</p>
+                                        <p>{data.guardian_name}</p>
 
                                         <p className="text-muted-foreground">Mobile Number:</p>
                                         <p>{data.mobile_number ? `+63${data.mobile_number}` : 'Not provided'}</p>
+
+                                        <p className="text-muted-foreground">Telephone Number:</p>
+                                        <p>{data.telephone_number ? `+63${data.telephone_number}` : 'Not provided'}</p>
 
                                         <p className="text-muted-foreground">Religion:</p>
                                         <p>{data.religion}</p>
 
                                         <p className="text-muted-foreground">PWD:</p>
                                         <p>{data.is_pwd} {data.is_pwd === 'Yes' && `(${data.disability_type})`}</p>
+
+                                        <p className="text-muted-foreground">Scholarships:</p>
+                                        <p>{data.scholarships || 'None'}</p>
                                     </div>
                                 </div>
 

@@ -31,11 +31,18 @@ class User extends Authenticatable implements MustVerifyEmail
         'sex',
         'date_of_birth',
         'place_of_birth',
-        'address',
+        'street',
+        'barangay',
+        'city',
+        'province',
         'mobile_number',
+        'telephone_number',
         'is_pwd',
         'disability_type',
         'religion',
+        'residence_type',
+        'guardian_name',
+        'scholarships',
     ];
 
     /**

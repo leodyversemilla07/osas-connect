@@ -34,10 +34,11 @@ export interface User {
     id: number;
     last_name: string;
     first_name: string;
-    middle_name?: string | null;
+    middle_name: string;
     email: string;
     student_id: string;
-    email_verified_at: string | null;
+    password?: string;
+    password_confirmation?: string;
     course: string;
     major: string;
     year_level: string;
@@ -45,13 +46,21 @@ export interface User {
     sex: string;
     date_of_birth: string;
     place_of_birth: string;
-    address: string;
-    mobile_number: string | null;
+    street: string;
+    barangay: string;
+    city: string;
+    province: string;
+    residence_type: string;
+    guardian_name: string;
+    scholarships?: string;
+    mobile_number: string;
+    telephone_number: string;
     is_pwd: string;
-    disability_type: string | null;
+    disability_type: string;
     religion: string;
     avatar?: string;
+    email_verified_at?: string | null;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties
+    [key: string]: unknown;
 }

@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import AddressForm from '@/components/address-form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -34,11 +35,18 @@ type ProfileForm = {
     sex: string;
     date_of_birth: string;
     place_of_birth: string;
-    address: string;
+    street: string;
+    barangay: string;
+    city: string;
+    province: string;
     mobile_number: string;
+    telephone_number: string;
     is_pwd: string;
     disability_type: string;
     religion: string;
+    residence_type: string;
+    guardian_name: string;
+    scholarships: string;
 }
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
@@ -57,11 +65,18 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
         sex: auth.user.sex,
         date_of_birth: auth.user.date_of_birth,
         place_of_birth: auth.user.place_of_birth,
-        address: auth.user.address,
+        street: auth.user.street || '',
+        barangay: auth.user.barangay || '',
+        city: auth.user.city || '',
+        province: auth.user.province || '',
         mobile_number: auth.user.mobile_number ? auth.user.mobile_number.replace('+63', '') : '',
+        telephone_number: auth.user.telephone_number || '',
         is_pwd: auth.user.is_pwd,
         disability_type: auth.user.disability_type || '',
         religion: auth.user.religion,
+        residence_type: auth.user.residence_type,
+        guardian_name: auth.user.guardian_name || '',
+        scholarships: auth.user.scholarships || '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -188,17 +203,105 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             <InputError message={errors.place_of_birth} />
                         </div>
 
+                        <AddressForm
+                            data={{
+                                street: data.street,
+                                barangay: data.barangay,
+                                city: data.city,
+                                province: data.province,
+                            }}
+                            setData={(field, value) => setData(field, value)}
+                            errors={errors}
+                            processing={processing}
+                        />
+
                         <div className="grid gap-2">
-                            <Label htmlFor="address">Address</Label>
-                            <Input
-                                id="address"
-                                type="text"
-                                required
-                                value={data.address}
-                                onChange={(e) => setData('address', e.target.value)}
-                                placeholder="Sitio/Street, Barangay, City/Municipality, Province"
+                            <Label className="text-base">Current Residence *</Label>
+                            <div className="rounded-md border p-4 space-y-3">
+                                <RadioGroup
+                                    value={data.residence_type}
+                                    onValueChange={(value) => {
+                                        setData('residence_type', value);
+                                        setData('guardian_name', value === 'With Guardian' ? '' : 'Not Applicable');
+                                    }}
+                                    className="grid gap-3"
+                                    disabled={processing}
+                                >
+                                    <Label
+                                        htmlFor="parents-house"
+                                        className={`flex items-center space-x-3 rounded-md border p-3 transition-colors hover:bg-muted cursor-pointer ${data.residence_type === "Parent's House" ? 'border-primary bg-muted/50' : ''}`}
+                                    >
+                                        <RadioGroupItem value="Parent's House" id="parents-house" />
+                                        <div className="grid gap-0.5">
+                                            <span className="font-medium">Parent's House</span>
+                                            <span className="text-sm text-muted-foreground">Living with parents at family residence</span>
+                                        </div>
+                                    </Label>
+
+                                    <Label
+                                        htmlFor="boarding-house"
+                                        className={`flex items-center space-x-3 rounded-md border p-3 transition-colors hover:bg-muted cursor-pointer ${data.residence_type === "Boarding House" ? 'border-primary bg-muted/50' : ''}`}
+                                    >
+                                        <RadioGroupItem value="Boarding House" id="boarding-house" />
+                                        <div className="grid gap-0.5">
+                                            <span className="font-medium">Boarding House</span>
+                                            <span className="text-sm text-muted-foreground">Renting a room or apartment near campus</span>
+                                        </div>
+                                    </Label>
+
+                                    <Label
+                                        htmlFor="with-guardian"
+                                        className={`flex items-center space-x-3 rounded-md border p-3 transition-colors hover:bg-muted cursor-pointer ${data.residence_type === "With Guardian" ? 'border-primary bg-muted/50' : ''}`}
+                                    >
+                                        <RadioGroupItem value="With Guardian" id="with-guardian" />
+                                        <div className="grid gap-0.5">
+                                            <span className="font-medium">With Guardian</span>
+                                            <span className="text-sm text-muted-foreground">Living with a legal guardian or relative</span>
+                                        </div>
+                                    </Label>
+                                </RadioGroup>
+                            </div>
+                            <InputError message={errors.residence_type} />
+                        </div>
+
+                        {data.residence_type === "With Guardian" ? (
+                            <div className="grid gap-2">
+                                <Label htmlFor="guardian_name" className="text-base">Guardian's Full Name *</Label>
+                                <Input
+                                    id="guardian_name"
+                                    type="text"
+                                    required
+                                    value={data.guardian_name}
+                                    onChange={(e) => setData('guardian_name', e.target.value)}
+                                    disabled={processing}
+                                    placeholder="Complete name of your guardian"
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Enter the complete name of your legal guardian or relative
+                                </p>
+                                <InputError message={errors.guardian_name} />
+                            </div>
+                        ) : (
+                            <Input 
+                                type="hidden" 
+                                name="guardian_name" 
+                                value="Not Applicable" 
                             />
-                            <InputError message={errors.address} />
+                        )}
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="scholarships">Existing Scholarship/s</Label>
+                            <Input
+                                id="scholarships"
+                                type="text"
+                                value={data.scholarships}
+                                onChange={(e) => setData('scholarships', e.target.value)}
+                                placeholder="Enter your scholarship/s (if any)"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                If you have multiple scholarships, separate them with commas
+                            </p>
+                            <InputError message={errors.scholarships} />
                         </div>
 
                         <div className="grid gap-2">
@@ -213,17 +316,29 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     className="rounded-l-none"
                                     value={data.mobile_number}
                                     onChange={(e) => {
-                                        // Remove any non-digit characters and ensure it doesn't start with 0
                                         let value = e.target.value.replace(/\D/g, '');
                                         if (value.startsWith('0')) value = value.substring(1);
-                                        // Store just the digits, the +63 will be added when submitting
+                                        if (value.length > 10) value = value.substring(0, 10);
                                         setData('mobile_number', value);
                                     }}
+                                    maxLength={10}
                                     placeholder="912 345 6789 (optional)"
                                 />
                             </div>
                             <p className="text-xs text-muted-foreground">Enter your number without the leading zero</p>
                             <InputError message={errors.mobile_number} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="telephone_number">Telephone Number</Label>
+                            <Input
+                                id="telephone_number"
+                                type="tel"
+                                value={data.telephone_number}
+                                onChange={(e) => setData('telephone_number', e.target.value)}
+                                placeholder="Telephone number (optional)"
+                            />
+                            <InputError message={errors.telephone_number} />
                         </div>
 
                         <div className="grid gap-2">
