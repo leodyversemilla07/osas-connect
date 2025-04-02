@@ -24,7 +24,7 @@ test('profile information can be updated', function () {
             'middle_name' => 'Doe',
             'last_name' => 'Smith',
             'email' => 'test@minsu.edu.ph',
-            'student_id' => 'MBC2023-1234', // Added missing student_id
+            'student_id' => 'MBC2023-1234',
             'course' => 'Bachelor of Science in Information Technology',
             'major' => 'None',
             'year_level' => '2nd Year',
@@ -33,10 +33,16 @@ test('profile information can be updated', function () {
             'date_of_birth' => '2000-01-01',
             'place_of_birth' => 'Mindoro City, Occidental Mindoro',
             'address' => '123 Main St, Mindoro City',
+            'street' => '123 Main St',
+            'barangay' => 'Barangay 1',
+            'city' => 'Mindoro City',
+            'province' => 'Occidental Mindoro',
             'mobile_number' => '9123456789',
             'is_pwd' => 'No',
             'disability_type' => null,
             'religion' => 'Roman Catholic',
+            'residence_type' => "Parent's House",
+            'guardian_name' => 'Not Applicable',
         ]);
 
     $response
@@ -62,7 +68,7 @@ test('email verification status is unchanged when the email address is unchanged
             'middle_name' => $user->middle_name,
             'last_name' => $user->last_name,
             'email' => $user->email,
-            'student_id' => $user->student_id, // Added missing student_id
+            'student_id' => $user->student_id,
             'course' => $user->course,
             'major' => $user->major,
             'year_level' => $user->year_level,
@@ -70,11 +76,16 @@ test('email verification status is unchanged when the email address is unchanged
             'sex' => $user->sex,
             'date_of_birth' => $user->date_of_birth,
             'place_of_birth' => $user->place_of_birth,
-            'address' => $user->address,
+            'street' => $user->street,
+            'barangay' => $user->barangay,
+            'city' => $user->city,
+            'province' => $user->province,
             'mobile_number' => $user->mobile_number ? str_replace('+63', '', $user->mobile_number) : '',
             'is_pwd' => $user->is_pwd,
             'disability_type' => $user->disability_type,
             'religion' => $user->religion,
+            'residence_type' => $user->residence_type,
+            'guardian_name' => $user->guardian_name,
         ]);
 
     $response

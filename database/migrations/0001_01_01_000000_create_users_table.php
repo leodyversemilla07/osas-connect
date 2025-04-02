@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('is_pwd');
             $table->string('disability_type')->nullable();
             $table->string('religion')->default('Prefer not to say');
-            $table->string('residence_type')->default("Parent\'s House");
+            $table->string('residence_type');
             $table->string('guardian_name')->default('Not Applicable');
             $table->string('scholarships')->nullable();
             $table->rememberToken();

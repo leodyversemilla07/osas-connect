@@ -46,6 +46,7 @@ class UserFactory extends Factory
         }
 
         $isPwd = fake()->randomElement(['Yes', 'No']);
+        $residenceType = fake()->randomElement(["Parent's House", "Boarding House", "With Guardian"]);
 
         return [
             'last_name' => fake()->lastName(),
@@ -62,8 +63,12 @@ class UserFactory extends Factory
             'sex' => fake()->randomElement(['Male', 'Female']),
             'date_of_birth' => fake()->dateTimeBetween('-25 years', '-17 years')->format('Y-m-d'),
             'place_of_birth' => fake()->city() . ', ' . fake()->state(),
-            'address' => fake()->address(),
+            'street' => fake()->streetAddress(),
+            'barangay' => fake()->word(),
+            'city' => fake()->city(),
+            'province' => fake()->state(),
             'mobile_number' => fake()->numerify('9#########'),
+            'telephone_number' => fake()->optional(0.3)->numerify('###-####'),
             'is_pwd' => $isPwd,
             'disability_type' => $isPwd === 'Yes' ? fake()->randomElement(['Visual Impairment', 'Hearing Impairment', 'Physical Disability', 'Learning Disability']) : null,
             'religion' => fake()->randomElement([
@@ -74,6 +79,16 @@ class UserFactory extends Factory
                 'Seventh Day Adventist',
                 'Baptist',
                 'Prefer not to say'
+            ]),
+            'residence_type' => $residenceType,
+            'guardian_name' => $residenceType === 'With Guardian' ? fake()->name() : 'Not Applicable',
+            'scholarships' => fake()->optional(0.4)->randomElement([
+                'TES',
+                'ESGP-PA',
+                'Tulong Dunong',
+                'Municipal Scholarship',
+                'Provincial Scholarship',
+                'DOST Scholarship'
             ]),
             'remember_token' => Str::random(10),
         ];

@@ -24,12 +24,19 @@ test('new users can register', function () {
         'sex' => 'Male',
         'date_of_birth' => '2000-01-01',
         'place_of_birth' => 'Mindoro City, Occidental Mindoro',
-        'address' => '123 Main St, Mindoro City',
+        'street' => '123 Main St',
+        'barangay' => 'Barangay 1',
+        'city' => 'Mindoro City',
+        'province' => 'Occidental Mindoro',
         'mobile_number' => '9123456789',
+        'telephone_number' => null,
         'is_pwd' => 'No',
         'disability_type' => null,
         'religion' => 'Roman Catholic',
-        'terms_agreement' => true,  // Added missing field
+        'residence_type' => "Parent's House",
+        'guardian_name' => 'Not Applicable',
+        'scholarships' => null,
+        'terms_agreement' => true,
     ]);
 
     $this->assertAuthenticated();
@@ -37,9 +44,7 @@ test('new users can register', function () {
 });
 
 test('registration validation errors are shown', function () {
-    $response = $this->post('/register', [
-        // Submit empty form
-    ]);
+    $response = $this->post('/register', []);
 
     $response->assertSessionHasErrors([
         'last_name',
@@ -48,17 +53,22 @@ test('registration validation errors are shown', function () {
         'student_id',
         'password',
         'course',
-        'major',  // Added missing field
+        'major',
         'year_level',
         'civil_status',
         'sex',
         'date_of_birth',
         'place_of_birth',
-        'address',
-        // 'mobile_number', - Removed as it's not showing as a validation error
+        'street',
+        'barangay',
+        'city',
+        'province',
+        'mobile_number',
         'is_pwd',
         'religion',
-        'terms_agreement'  // Added missing field
+        'residence_type',
+        'guardian_name',
+        'terms_agreement'
     ]);
 });
 
@@ -84,11 +94,18 @@ test('email must be unique', function () {
         'sex' => 'Female',
         'date_of_birth' => '2001-05-15',
         'place_of_birth' => 'Mindoro City, Occidental Mindoro',
-        'address' => '456 Other St, Mindoro City',
+        'street' => '456 Other St',
+        'barangay' => 'Barangay 2',
+        'city' => 'Mindoro City',
+        'province' => 'Occidental Mindoro',
         'mobile_number' => '9876543210',
+        'telephone_number' => null,
         'is_pwd' => 'No',
         'disability_type' => null,
         'religion' => 'Roman Catholic',
+        'residence_type' => "Parent's House",
+        'guardian_name' => 'Not Applicable',
+        'scholarships' => null,
         'terms_agreement' => true,
     ]);
 
