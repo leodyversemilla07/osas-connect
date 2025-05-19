@@ -17,7 +17,17 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import AddressForm from '@/components/address-form';
+import { VALIDATION } from '@/lib/validation';
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type RegisterForm = {
     last_name: string;
@@ -119,7 +129,7 @@ export default function Register() {
                     return false;
                 }
                 // Validate email format
-                if (!data.email.toLowerCase().endsWith('@minsu.edu.ph')) {
+                if (!data.email.toLowerCase().endsWith(VALIDATION.EMAIL.DOMAIN)) {
                     return false;
                 }
                 return true;
@@ -275,15 +285,35 @@ export default function Register() {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="date_of_birth" className="text-base">Date of Birth *</Label>
-                                <Input
-                                    id="date_of_birth"
-                                    type="date"
-                                    required
-                                    tabIndex={5}
-                                    value={data.date_of_birth}
-                                    onChange={(e) => setData('date_of_birth', e.target.value)}
-                                    disabled={processing}
-                                />
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal",
+                                                !data.date_of_birth && "text-muted-foreground"
+                                            )}
+                                        >
+                                            {data.date_of_birth ? (
+                                                format(new Date(data.date_of_birth), "PPP")
+                                            ) : (
+                                                <span>Pick a date</span>
+                                            )}
+                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={data.date_of_birth ? new Date(data.date_of_birth) : undefined}
+                                            onSelect={(date) => setData('date_of_birth', date ? date.toISOString().split('T')[0] : '')}
+                                            disabled={(date) =>
+                                                date > new Date() || date < new Date("1900-01-01")
+                                            }
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
                                 <InputError message={errors.date_of_birth} />
                             </div>
 
@@ -337,7 +367,7 @@ export default function Register() {
                                                 <span className="text-sm text-muted-foreground">Living with parents at family residence</span>
                                             </div>
                                         </Label>
-                                        
+
                                         <Label
                                             htmlFor="boarding-house"
                                             className={`flex items-center space-x-3 rounded-md border p-3 transition-colors hover:bg-muted cursor-pointer ${data.residence_type === "Boarding House" ? 'border-primary bg-muted/50' : ''}`}
@@ -348,7 +378,7 @@ export default function Register() {
                                                 <span className="text-sm text-muted-foreground">Renting a room or apartment near campus</span>
                                             </div>
                                         </Label>
-                                        
+
                                         <Label
                                             htmlFor="with-guardian"
                                             className={`flex items-center space-x-3 rounded-md border p-3 transition-colors hover:bg-muted cursor-pointer ${data.residence_type === "With Guardian" ? 'border-primary bg-muted/50' : ''}`}
@@ -382,10 +412,10 @@ export default function Register() {
                                     <InputError message={errors.guardian_name} />
                                 </div>
                             ) : (
-                                <Input 
-                                    type="hidden" 
-                                    name="guardian_name" 
-                                    value="Not Applicable" 
+                                <Input
+                                    type="hidden"
+                                    name="guardian_name"
+                                    value="Not Applicable"
                                 />
                             )}
 
@@ -409,7 +439,7 @@ export default function Register() {
                                 <Label htmlFor="mobile_number" className="text-base">Mobile Number *</Label>
                                 <div className="flex">
                                     <div className="flex items-center justify-center px-3 border border-r-0 rounded-l-md bg-muted">
-                                        +63
+                                        {VALIDATION.MOBILE_NUMBER.PREFIX}
                                     </div>
                                     <Input
                                         id="mobile_number"
@@ -422,14 +452,14 @@ export default function Register() {
                                             // Remove any non-digit characters and ensure it doesn't start with 0
                                             let value = e.target.value.replace(/\D/g, '');
                                             if (value.startsWith('0')) value = value.substring(1);
-                                            // Limit to 10 digits
-                                            if (value.length > 10) value = value.substring(0, 10);
-                                            // Store just the digits, the +63 will be added when submitting
+                                            // Limit to VALIDATION.MOBILE_NUMBER.LENGTH digits
+                                            if (value.length > VALIDATION.MOBILE_NUMBER.LENGTH) value = value.substring(0, VALIDATION.MOBILE_NUMBER.LENGTH);
+                                            // Store just the digits, the prefix will be added when submitting
                                             setData('mobile_number', value);
                                         }}
                                         disabled={processing}
                                         placeholder="9123456789"
-                                        maxLength={10}
+                                        maxLength={VALIDATION.MOBILE_NUMBER.LENGTH}
                                     />
                                 </div>
                                 <p className="text-xs text-muted-foreground">Enter your number without the leading zero</p>
@@ -555,10 +585,10 @@ export default function Register() {
                                     value={data.student_id}
                                     onChange={(e) => setData('student_id', e.target.value)}
                                     disabled={processing}
-                                    placeholder="MBC2025-0001"
+                                    placeholder={VALIDATION.STUDENT_ID.FORMAT}
                                 />
-                                <p className="text-xs text-amber-500 font-medium">
-                                    Important: Student ID cannot be changed once your account is created.
+                                <p className="text-xs text-muted-foreground">
+                                    Format: {VALIDATION.STUDENT_ID.FORMAT} (e.g., MBC2025-0001)
                                 </p>
                                 <InputError message={errors.student_id} />
                             </div>
@@ -668,19 +698,19 @@ export default function Register() {
                                         const value = e.target.value;
                                         setData('email', value);
                                         // Clear any manually set error if the email is now valid
-                                        if (value.toLowerCase().endsWith('@minsu.edu.ph') && errors.email) {
+                                        if (value.toLowerCase().endsWith(VALIDATION.EMAIL.DOMAIN) && errors.email) {
                                             errors.email = '';
                                         }
                                     }}
                                     disabled={processing}
                                     placeholder="doe.john@minsu.edu.ph"
-                                    className={data.email && !data.email.toLowerCase().endsWith('@minsu.edu.ph') ? 'border-red-500' : ''}
+                                    className={data.email && !data.email.toLowerCase().endsWith(VALIDATION.EMAIL.DOMAIN) ? 'border-red-500' : ''}
                                 />
-                                <p className={`text-xs ${data.email && !data.email.toLowerCase().endsWith('@minsu.edu.ph') ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
-                                    Must be your university email ending with @minsu.edu.ph
+                                <p className={`text-xs ${data.email && !data.email.toLowerCase().endsWith(VALIDATION.EMAIL.DOMAIN) ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
+                                    Must be your university email ending with {VALIDATION.EMAIL.DOMAIN}
                                 </p>
-                                {data.email && !data.email.toLowerCase().endsWith('@minsu.edu.ph') && (
-                                    <p className="text-xs text-red-500">Please use your @minsu.edu.ph email address</p>
+                                {data.email && !data.email.toLowerCase().endsWith(VALIDATION.EMAIL.DOMAIN) && (
+                                    <p className="text-xs text-red-500">Please use your {VALIDATION.EMAIL.DOMAIN} email address</p>
                                 )}
                                 <InputError message={errors.email} />
                             </div>
@@ -699,8 +729,8 @@ export default function Register() {
                                     placeholder="Password"
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Minimum 8 characters with at least one uppercase letter, one lowercase letter,
-                                    one number, and one special character
+                                    Minimum {VALIDATION.PASSWORD.MIN_LENGTH} characters with at least one uppercase letter, one lowercase letter,
+                                    one number, and one special character ({VALIDATION.PASSWORD.SPECIAL_CHARS})
                                 </p>
                                 <InputError message={errors.password} />
                             </div>
@@ -760,10 +790,10 @@ export default function Register() {
                                         <p>{data.guardian_name}</p>
 
                                         <p className="text-muted-foreground">Mobile Number:</p>
-                                        <p>{data.mobile_number ? `+63${data.mobile_number}` : 'Not provided'}</p>
+                                        <p>{data.mobile_number ? `${VALIDATION.MOBILE_NUMBER.PREFIX}${data.mobile_number}` : 'Not provided'}</p>
 
                                         <p className="text-muted-foreground">Telephone Number:</p>
-                                        <p>{data.telephone_number ? `+63${data.telephone_number}` : 'Not provided'}</p>
+                                        <p>{data.telephone_number ? `${VALIDATION.MOBILE_NUMBER.PREFIX}${data.telephone_number}` : 'Not provided'}</p>
 
                                         <p className="text-muted-foreground">Religion:</p>
                                         <p>{data.religion}</p>

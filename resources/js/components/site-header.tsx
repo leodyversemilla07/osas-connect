@@ -1,6 +1,7 @@
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
+import { Menu, X } from 'lucide-react';
 
 export default function SiteHeader() {
     const { auth } = usePage<SharedData>().props;
@@ -121,7 +122,7 @@ export default function SiteHeader() {
                             <img
                                 src={route('home') + '/images/logo.png'}
                                 alt="OSAS Connect Logo"
-                                className="mr-2 h-8 w-8 rounded-full object-cover" 
+                                className="mr-2 h-8 w-8 rounded-full object-cover"
                                 onError={(e) => {
                                     e.currentTarget.src = "https://placehold.co/32x32/005a2d/febd12?text=OC";
                                 }}
@@ -140,29 +141,44 @@ export default function SiteHeader() {
                             <li>
                                 <Link
                                     href="/"
-                                    className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#007a3d] hover:text-[#febd12]"
-                                    aria-current="page"
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('home') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    aria-current={route().current('home') ? 'page' : undefined}
                                 >
                                     Home
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/scholarships" className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#007a3d] hover:text-[#febd12]">
+                                <Link
+                                    href="/about"
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('about') || route().current('about.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    aria-current={route().current('about') || route().current('about.*') ? 'page' : undefined}
+                                >
+                                    About
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/scholarships"
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('scholarships') || route().current('scholarships.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    aria-current={route().current('scholarships') || route().current('scholarships.*') ? 'page' : undefined}
+                                >
                                     Scholarships
                                 </Link>
-                            </li>
-                            <li>
-                                <Link href="/resources" className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#007a3d] hover:text-[#febd12]">
-                                    Resources
+                            </li>                            <li>
+                                <Link
+                                    href="/announcements"
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('announcements') || route().current('announcements.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    aria-current={route().current('announcements') || route().current('announcements.*') ? 'page' : undefined}
+                                >
+                                    Announcements
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/faqs" className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#007a3d] hover:text-[#febd12]">
-                                    FAQs
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/contact" className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-[#007a3d] hover:text-[#febd12]">
+                                <Link
+                                    href="/contact"
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('contact') || route().current('contact.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    aria-current={route().current('contact') || route().current('contact.*') ? 'page' : undefined}
+                                >
                                     Contact
                                 </Link>
                             </li>
@@ -174,7 +190,7 @@ export default function SiteHeader() {
                         {auth.user ? (
                             <Link
                                 href={route('dashboard')}
-                                className="inline-block rounded-md bg-[#febd12] px-5 py-1.5 text-sm font-medium leading-normal text-[#010002] shadow-sm transition-all hover:bg-[#e5ab0e] hover:shadow-md"
+                                className="inline-block rounded-md bg-[#febd12] px-5 py-1.5 text-sm font-medium text-[#010002] shadow-md transition-all hover:bg-[#f5b400] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
                             >
                                 Dashboard
                             </Link>
@@ -182,14 +198,15 @@ export default function SiteHeader() {
                             <>
                                 <Link
                                     href={route('login')}
-                                    className="inline-block rounded-md px-5 py-1.5 text-sm font-medium leading-normal text-white transition-colors hover:text-[#febd12]"
+                                    className="inline-block rounded-md px-5 py-1.5 text-sm font-medium text-white transition-all duration-200 hover:bg-white/10 hover:text-[#febd12] focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
                                 >
                                     Log in
                                 </Link>
                                 <Link
                                     href={route('register')}
-                                    className="inline-block rounded-md bg-[#febd12] px-5 py-1.5 text-sm font-medium leading-normal text-[#010002] shadow-sm transition-all hover:bg-[#e5ab0e] hover:shadow-md"
+                                    className="inline-block rounded-md bg-[#febd12] px-5 py-1.5 text-sm font-medium text-[#010002] shadow-md transition-all hover:bg-[#f5b400] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
                                 >
+
                                     Register
                                 </Link>
                             </>
@@ -200,20 +217,16 @@ export default function SiteHeader() {
                     <div className="flex md:hidden">
                         <button
                             type="button"
-                            className="inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-[#007a3d] hover:text-[#febd12]"
+                            className="inline-flex items-center justify-center rounded-md p-2 text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             aria-controls="mobile-menu"
                             aria-expanded={isMenuOpen}
                         >
                             <span className="sr-only">{isMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
                             {isMenuOpen ? (
-                                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X className="h-6 w-6" />
                             ) : (
-                                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
+                                <Menu className="h-6 w-6" />
                             )}
                         </button>
                     </div>
@@ -225,19 +238,47 @@ export default function SiteHeader() {
                 className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'}`}
                 id="mobile-menu"
                 ref={mobileMenuRef}
-            >
-                <nav className="space-y-1 bg-[#004020] px-4 pb-3 pt-2 sm:px-6" aria-label="Mobile navigation">
-                    <Link href="/" className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12]" aria-current="page">Home</Link>
-                    <Link href="/scholarships" className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12]" aria-current="page">Scholarship</Link>
-                    <Link href="/resources" className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12]">Resources</Link>
-                    <Link href="/faq" className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12]">FAQ</Link>
-                    <Link href="/contact" className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12]">Contact</Link>
+            >                <nav className="space-y-1 bg-[#004020] px-4 pb-3 pt-2 sm:px-6" aria-label="Mobile navigation">
+                    <Link
+                        href="/"
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('home') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        aria-current={route().current('home') ? 'page' : undefined}
+                    >
+                        Home
+                    </Link>
+                    <Link
+                        href="/about"
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('about') || route().current('about.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        aria-current={route().current('about') || route().current('about.*') ? 'page' : undefined}
+                    >
+                        About
+                    </Link>
+                    <Link
+                        href="/scholarships"
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('scholarships') || route().current('scholarships.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        aria-current={route().current('scholarships') || route().current('scholarships.*') ? 'page' : undefined}
+                    >
+                        Scholarships
+                    </Link>                    <Link
+                        href="/announcements"
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('announcements') || route().current('announcements.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        aria-current={route().current('announcements') || route().current('announcements.*') ? 'page' : undefined}
+                    >
+                        Announcements
+                    </Link>
+                    <Link
+                        href="/contact"
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('contact') || route().current('contact.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        aria-current={route().current('contact') || route().current('contact.*') ? 'page' : undefined}
+                    >
+                        Contact
+                    </Link>
 
                     <div className="mt-4 border-t border-[#006a3d] pt-4">
                         {auth.user ? (
                             <Link
                                 href={route('dashboard')}
-                                className="block w-full rounded-md bg-[#febd12] px-5 py-2 text-center text-base font-medium text-[#010002] shadow-sm hover:bg-[#e5ab0e]"
+                                className="flex items-center w-full rounded-md bg-[#febd12] px-5 py-2 text-center text-base font-medium text-[#010002] shadow-sm hover:bg-[#e5ab0e]"
                             >
                                 Dashboard
                             </Link>
@@ -245,13 +286,13 @@ export default function SiteHeader() {
                             <div className="flex flex-col space-y-2">
                                 <Link
                                     href={route('login')}
-                                    className="block w-full rounded-md px-5 py-2 text-center text-base font-medium text-white hover:text-[#febd12]"
+                                    className="flex items-center justify-center w-full rounded-md px-5 py-2 text-center text-base font-medium text-white hover:text-[#febd12]"
                                 >
                                     Log in
                                 </Link>
                                 <Link
                                     href={route('register')}
-                                    className="block w-full rounded-md bg-[#febd12] px-5 py-2 text-center text-base font-medium text-[#010002] shadow-sm hover:bg-[#e5ab0e]"
+                                    className="flex items-center justify-center w-full rounded-md bg-[#febd12] px-5 py-2 text-center text-base font-medium text-[#010002] shadow-sm hover:bg-[#e5ab0e]"
                                 >
                                     Register
                                 </Link>

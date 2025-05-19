@@ -2,17 +2,86 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { BookOpen, Calendar, FileText, Folder, Home, Mail, UserPlus, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
+const allNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
+        href: route('admin.dashboard'),
+        icon: Home,
+        roles: ['admin'], // visible to all
     },
+    {
+        title: 'Manage Users',
+        href: route('admin.users'),
+        icon: Users,
+        roles: ['admin'], // only admin can see this
+    },
+    {
+        title: 'Invite Staff',
+        href: route('admin.invite'),   
+        icon: UserPlus,
+        roles: ['admin'], // only admin can invite
+    },
+    {
+        title: 'Invitations',
+        href: route('admin.invitations'),
+        icon: Mail,
+        roles: ['admin'], // only admin can see invitations
+    }
+];
+
+// OSAS Staff navigation items
+const osasNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: route('osas.dashboard'),
+        icon: Home,
+        roles: ['osas_staff']
+    },
+    {
+        title: 'Student Records',
+        href: route('osas.students'),
+        icon: Users,
+        roles: ['osas_staff']
+    },
+    {
+        title: 'Scholarships',
+        href: route('osas.manage.scholarships'),
+        icon: FileText, // Using FileText as a substitute for academic-cap
+        roles: ['osas_staff']
+    },
+    {
+        title: 'Events',
+        href: route('osas.events'),
+        icon: Calendar,
+        roles: ['osas_staff']
+    },
+    {
+        title: 'Reports',
+        href: route('osas.reports'),
+        icon: FileText,
+        roles: ['osas_staff']
+    }
+];
+
+// Student navigation items
+const studentNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: route('student.dashboard'),
+        icon: Home,
+        roles: ['student']
+    },
+    {
+        title: 'Scholarships',
+        href: route('student.scholarships'),
+        icon: FileText, // Using DocumentText as a substitute for academic-cap
+        roles: ['student']
+    }
 ];
 
 const footerNavItems: NavItem[] = [
@@ -29,6 +98,23 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props;
+    const userRole = auth.user.role;
+
+    // Determine which navigation items to show based on the user's role
+    let mainNavItems: NavItem[] = [];
+
+    if (userRole === 'osas_staff') {
+        mainNavItems = osasNavItems;
+    } else if (userRole === 'student') {
+        mainNavItems = studentNavItems;
+    } else {
+        // Filter regular navigation items for admin, staff, and user roles
+        mainNavItems = allNavItems.filter(item =>
+            item.roles?.includes(userRole)
+        );
+    }
+
     return (
         <Sidebar collapsible="icon" variant="floating">
             <SidebarHeader>

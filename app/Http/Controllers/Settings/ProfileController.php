@@ -18,9 +18,19 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+        
+        // Load the student profile with all related data
+        $user->load('studentProfile');
+
+        $photoUrl = $user->studentProfile && $user->studentProfile->photo_id 
+            ? asset('storage/' . $user->studentProfile->photo_id) 
+            : null;
+
         return Inertia::render('settings/profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'photoUrl' => $photoUrl,
         ]);
     }
 
@@ -30,13 +40,44 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        $user->fill($request->validated());
+        $validatedData = $request->validated();
 
+        if ($request->hasFile('photo_id')) {
+            $path = $request->file('photo_id')->store('photo-ids', 'public');
+            $user->studentProfile->photo_id = $path;
+            $user->studentProfile->save();
+        }
+
+        // Separate user data from student profile data
+        $userData = [
+            'first_name' => $validatedData['first_name'],
+            'middle_name' => $validatedData['middle_name'],
+            'last_name' => $validatedData['last_name'],
+            'email' => $validatedData['email'],
+        ];
+
+        // Update user model
+        $user->fill($userData);
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
-
         $user->save();
+
+        // Remove user and photo_id fields from student profile data
+        unset(
+            $validatedData['first_name'],
+            $validatedData['middle_name'],
+            $validatedData['last_name'],
+            $validatedData['email'],
+            $validatedData['photo_id']
+        );
+
+        // Add special handling for boolean fields
+        $validatedData['is_pwd'] = $validatedData['is_pwd'] === 'Yes';
+
+        // Update student profile
+        $user->studentProfile->fill($validatedData);
+        $user->studentProfile->save();
 
         return to_route('profile.edit');
     }

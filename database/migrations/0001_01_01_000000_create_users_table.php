@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,28 +16,11 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('email')->unique();
-            $table->string('student_id')->unique();
+            $table->enum('role', ['admin', 'osas_staff', 'student'])->default('student');
+            $table->timestamp('last_login_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('course');
-            $table->string('major')->default('None');
-            $table->string('year_level');
-            $table->string('civil_status');
-            $table->string('sex');
-            $table->date('date_of_birth');
-            $table->string('place_of_birth');
-            $table->string('street');
-            $table->string('barangay');
-            $table->string('city');
-            $table->string('province');
-            $table->string('mobile_number');
-            $table->string('telephone_number')->nullable();
-            $table->string('is_pwd');
-            $table->string('disability_type')->nullable();
-            $table->string('religion')->default('Prefer not to say');
-            $table->string('residence_type');
-            $table->string('guardian_name')->default('Not Applicable');
-            $table->string('scholarships')->nullable();
+            
             $table->rememberToken();
             $table->timestamps();
         });

@@ -22,27 +22,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'first_name',
         'middle_name',
         'email',
-        'student_id',
         'password',
-        'course',
-        'major',
-        'year_level',
-        'civil_status',
-        'sex',
-        'date_of_birth',
-        'place_of_birth',
-        'street',
-        'barangay',
-        'city',
-        'province',
-        'mobile_number',
-        'telephone_number',
-        'is_pwd',
-        'disability_type',
-        'religion',
-        'residence_type',
-        'guardian_name',
-        'scholarships',
+        'role',
+        'last_login_at',
     ];
 
     /**
@@ -65,6 +47,76 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_login_at' => 'datetime',
         ];
+    }
+    
+    /**
+     * Get the student profile associated with the user.
+     */
+    public function studentProfile()
+    {
+        return $this->hasOne(StudentProfile::class);
+    }
+    
+    /**
+     * Get the OSAS staff profile associated with the user.
+     */
+    public function osasStaffProfile()
+    {
+        return $this->hasOne(OsasStaffProfile::class);
+    }
+    
+    /**
+     * Get the admin profile associated with the user.
+     */
+    public function adminProfile()
+    {
+        return $this->hasOne(AdminProfile::class);
+    }
+    
+    /**
+     * Get the appropriate profile based on user role.
+     */
+    public function profile()
+    {
+        return match($this->role) {
+            'student' => $this->studentProfile,
+            'osas_staff' => $this->osasStaffProfile,
+            'admin' => $this->adminProfile,
+            default => null,
+        };
+    }
+    
+    /**
+     * Check if user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+    
+    /**
+     * Check if user is an OSAS staff.
+     */
+    public function isOsasStaff(): bool
+    {
+        return $this->role === 'osas_staff';
+    }
+    
+    /**
+     * Check if user is a student.
+     */
+    public function isStudent(): bool
+    {
+        return $this->role === 'student';
+    }
+    
+    /**
+     * Get the full name of the user.
+     */
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->first_name} " . ($this->middle_name ? $this->middle_name . ' ' : '') . "{$this->last_name}";
     }
 }
