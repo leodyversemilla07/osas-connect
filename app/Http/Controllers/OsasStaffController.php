@@ -60,21 +60,6 @@ class OsasStaffController extends Controller
             'middle_name' => ['nullable', 'string', 'max:255'],
             'staff_id' => ['required', 'string', 'max:255', 'unique:osas_staff_profiles'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'civil_status' => ['required', 'string', 'in:Single,Married,Widowed,Separated,Annulled'],
-            'sex' => ['required', 'string', 'in:Male,Female'],
-            'date_of_birth' => ['required', 'date'],
-            'place_of_birth' => ['required', 'string', 'max:255'],
-            'street' => ['required', 'string', 'max:255'],
-            'barangay' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'province' => ['required', 'string', 'max:255'],
-            'mobile_number' => ['required', 'string', 'regex:/^[0-9]{10}$/'],
-            'telephone_number' => ['nullable', 'string', 'max:255'],
-            'is_pwd' => ['required', 'string', 'in:Yes,No'],
-            'disability_type' => ['nullable', 'string', 'max:255', 'required_if:is_pwd,Yes'],
-            'religion' => ['required', 'string', 'max:255'],
-            'residence_type' => ['required', 'string', 'in:Own House,Renting,Company Provided'],
-            'office_location' => ['nullable', 'string', 'max:255'],
         ]);
         
         DB::beginTransaction();
@@ -88,27 +73,12 @@ class OsasStaffController extends Controller
                 'email' => $invitation->email,
                 'password' => Hash::make($request->password),
                 'role' => 'osas_staff',
-                'civil_status' => $request->civil_status,
-                'sex' => $request->sex,
-                'date_of_birth' => $request->date_of_birth,
-                'place_of_birth' => $request->place_of_birth,
-                'street' => $request->street,
-                'barangay' => $request->barangay,
-                'city' => $request->city,
-                'province' => $request->province,
-                'mobile_number' => '+63' . $request->mobile_number,
-                'telephone_number' => $request->telephone_number,
-                'is_pwd' => $request->is_pwd,
-                'disability_type' => $request->disability_type,
-                'religion' => $request->religion,
-                'residence_type' => $request->residence_type,
             ]);
             
             // Create the staff profile            
             OsasStaffProfile::create([
                 'user_id' => $user->id,
                 'staff_id' => $request->staff_id,
-                'office_location' => $request->office_location,
             ]);
               // Mark invitation as accepted
             $invitation->update([

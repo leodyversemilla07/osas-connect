@@ -4,33 +4,28 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Calendar, FileText, Folder, Home, Mail, UserPlus, Users } from 'lucide-react';
+import { BookOpen, FileText, Folder, Home, Users, GraduationCap, UserCog } from 'lucide-react';
 import AppLogo from './app-logo';
+
 
 const allNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: route('admin.dashboard'),
         icon: Home,
-        roles: ['admin'], // visible to all
+        roles: ['admin'],
     },
     {
-        title: 'Manage Users',
-        href: route('admin.users'),
-        icon: Users,
-        roles: ['admin'], // only admin can see this
+        title: 'Manage Students',
+        href: route('admin.students'),
+        icon: GraduationCap, // Changed to graduation cap for students
+        roles: ['admin'],
     },
     {
-        title: 'Invite Staff',
-        href: route('admin.invite'),   
-        icon: UserPlus,
-        roles: ['admin'], // only admin can invite
-    },
-    {
-        title: 'Invitations',
-        href: route('admin.invitations'),
-        icon: Mail,
-        roles: ['admin'], // only admin can see invitations
+        title: 'Manage Staff',
+        href: route('admin.staff'),
+        icon: UserCog, // Changed to user with settings for staff management
+        roles: ['admin'],
     }
 ];
 
@@ -52,18 +47,6 @@ const osasNavItems: NavItem[] = [
         title: 'Scholarships',
         href: route('osas.manage.scholarships'),
         icon: FileText, // Using FileText as a substitute for academic-cap
-        roles: ['osas_staff']
-    },
-    {
-        title: 'Events',
-        href: route('osas.events'),
-        icon: Calendar,
-        roles: ['osas_staff']
-    },
-    {
-        title: 'Reports',
-        href: route('osas.reports'),
-        icon: FileText,
         roles: ['osas_staff']
     }
 ];

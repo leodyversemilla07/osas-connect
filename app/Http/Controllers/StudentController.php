@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ScholarshipApplication;
+use App\Models\Scholarship;
 
 class StudentController extends Controller
 {
@@ -61,7 +62,7 @@ class StudentController extends Controller
             
         $studentData['scholarships'] = $existingScholarships + $approvedApplications;
 
-        return Inertia::render('student/scholarships', [
+        return Inertia::render('student/view-scholarships', [
             'student' => $studentData
         ]);
     }

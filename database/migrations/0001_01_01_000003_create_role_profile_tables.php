@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('existing_scholarships')->nullable();
             
             // Personal Information
-            $table->string('photo_id')->nullable();
             $table->string('civil_status');
             $table->enum('sex', ['Male', 'Female']);
             $table->date('date_of_birth');
@@ -160,9 +159,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('admin_id')->unique();
-            $table->string('department');
-            $table->string('position');
-            $table->string('access_level');
             $table->timestamps();
         });
     }

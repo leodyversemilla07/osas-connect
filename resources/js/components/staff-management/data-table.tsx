@@ -1,8 +1,8 @@
 import * as React from "react"
 import {
     ColumnDef,
-    ColumnFiltersState,
     SortingState,
+    ColumnFiltersState,
     VisibilityState,
     flexRender,
     getCoreRowModel,
@@ -29,15 +29,16 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
 import {
     Pagination,
     PaginationContent,
-    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -75,68 +76,64 @@ export function DataTable<TData, TValue>({
         },
     })
 
-    // Calculate pagination details
     const totalPages = table.getPageCount()
     const currentPage = table.getState().pagination.pageIndex + 1
-
+    
     type PageItem = number | 'ellipsis'
-
-    // Generate array of page numbers to display
+    
     const generatePagination = React.useCallback((): PageItem[] => {
         const pages: PageItem[] = []
-
+        
         if (totalPages <= maxVisiblePages) {
-            // Show all pages if total is less than max visible
             for (let i = 1; i <= totalPages; i++) {
                 pages.push(i)
             }
         } else {
-            // Always show first page
             pages.push(1)
-
-            // Calculate range around current page
-            const sidePages = Math.floor((maxVisiblePages - 3) / 2) // -3 accounts for first, last, and current page
+            const sidePages = Math.floor((maxVisiblePages - 3) / 2)
             let startPage = Math.max(2, currentPage - sidePages)
             let endPage = Math.min(totalPages - 1, currentPage + sidePages)
-
-            // Adjust range if we're near the beginning or end
+            
             if (currentPage <= sidePages + 2) {
                 endPage = Math.min(totalPages - 1, maxVisiblePages - 2)
             } else if (currentPage >= totalPages - (sidePages + 1)) {
                 startPage = Math.max(2, totalPages - (maxVisiblePages - 2))
             }
-
-            // Add ellipsis and range
+            
             if (startPage > 2) pages.push('ellipsis')
             for (let i = startPage; i <= endPage; i++) {
                 pages.push(i)
             }
             if (endPage < totalPages - 1) pages.push('ellipsis')
-
-            // Always show last page
+            
             if (totalPages > 1) pages.push(totalPages)
         }
-
+        
         return pages
     }, [currentPage, totalPages, maxVisiblePages])
 
+    const pageItems = generatePagination()
+
     return (
-        <div>
-            <div className="flex items-center justify-between gap-4 py-4">                <Input
-                    placeholder="Filter by name..."
-                    className="max-w-sm"
-                    value={table.getColumn("fullName")?.getFilterValue() as string}
-                    onChange={(event) =>
-                        table.getColumn("fullName")?.setFilterValue(event.target.value)
-                    }
-                />
+        <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <div className="flex flex-1 items-center space-x-2">
+                    <Input
+                        placeholder="Filter by name..."
+                        value={(table.getColumn("fullName")?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn("fullName")?.setFilterValue(event.target.value)
+                        }
+                        className="h-8 w-[250px]"
+                    />
+                </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            View
+                        <Button variant="outline" size="sm" className="ml-4 h-8">
+                            Columns
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="w-[150px]">
                         {table
                             .getAllColumns()
                             .filter((column) => column.getCanHide())
@@ -157,13 +154,16 @@ export function DataTable<TData, TValue>({
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="rounded-md border">
+            <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
+                                    <TableHead 
+                                        key={header.id}
+                                        className="whitespace-nowrap px-4 py-3 font-medium text-muted-foreground"
+                                    >
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
@@ -183,7 +183,7 @@ export function DataTable<TData, TValue>({
                                     data-state={row.getIsSelected() && "selected"}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="px-4 py-2">
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
@@ -191,60 +191,81 @@ export function DataTable<TData, TValue>({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center"
+                                >
+                                    <div className="flex flex-col items-center justify-center gap-1 text-muted-foreground">
+                                        <p>No staff members found</p>
+                                        <p className="text-sm">Try adjusting your filters</p>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center gap-2 py-4">
+            <div className="flex items-center justify-between space-x-2 py-4 px-2">
                 <div className="text-sm text-muted-foreground">
                     {table.getFilteredSelectedRowModel().rows.length} of{" "}
                     {table.getFilteredRowModel().rows.length} row(s) selected.
                 </div>
-                <div className="grow flex justify-center">
-                    <Pagination>
-                        <PaginationContent>
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
+                    <div className="flex items-center gap-2">
+                        <p className="text-sm text-muted-foreground">Rows per page</p>
+                        <Select
+                            value={table.getState().pagination.pageSize.toString()}
+                            onValueChange={(value) => {
+                                table.setPageSize(Number(value))
+                            }}
+                        >
+                            <SelectTrigger className="h-8 w-[70px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[10, 20, 30, 40, 50].map((pageSize) => (
+                                    <SelectItem key={pageSize} value={pageSize.toString()}>
+                                        {pageSize}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <Pagination className="justify-center">
+                        <PaginationContent className="shadow-sm rounded-lg">
                             <PaginationItem>
                                 <PaginationPrevious
                                     onClick={() => table.previousPage()}
-                                    className={!table.getCanPreviousPage() ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                                    aria-disabled={!table.getCanPreviousPage()}
+                                    className={`transition-all duration-200 ${!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : "hover:bg-accent"}`}
                                 />
                             </PaginationItem>
-
-                            {generatePagination().map((page, index) => (
-                                page === 'ellipsis' ? (
-                                    <PaginationItem key={`ellipsis-${index}`}>
-                                        <PaginationEllipsis />
-                                    </PaginationItem>
-                                ) : (
-                                    <PaginationItem key={page}>
+                            
+                            {pageItems.map((page, i) => (
+                                <PaginationItem key={i}>
+                                    {page === 'ellipsis' ? (
+                                        <span className="px-4 py-2 text-muted-foreground">•••</span>
+                                    ) : (
                                         <PaginationLink
-                                            onClick={() => table.setPageIndex((page as number) - 1)}
+                                            onClick={() => table.setPageIndex(page - 1)}
                                             isActive={currentPage === page}
-                                            className="cursor-pointer"
+                                            className={`min-w-[2.5rem] transition-colors duration-200 ${
+                                                currentPage === page ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+                                            }`}
                                         >
                                             {page}
                                         </PaginationLink>
-                                    </PaginationItem>
-                                )
+                                    )}
+                                </PaginationItem>
                             ))}
-
+                            
                             <PaginationItem>
                                 <PaginationNext
                                     onClick={() => table.nextPage()}
-                                    className={!table.getCanNextPage() ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                                    aria-disabled={!table.getCanNextPage()}
+                                    className={`transition-all duration-200 ${!table.getCanNextPage() ? "pointer-events-none opacity-50" : "hover:bg-accent"}`}
                                 />
                             </PaginationItem>
                         </PaginationContent>
                     </Pagination>
-                </div>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    Page {currentPage} of {totalPages}
                 </div>
             </div>
         </div>

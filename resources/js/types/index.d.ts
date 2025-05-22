@@ -40,7 +40,7 @@ export interface StudentProfile {
     course: string;
     major: string;
     year_level: string;
-    
+
     // Personal Information
     photo_id: string | null;
     civil_status: string;
@@ -167,6 +167,12 @@ export interface StudentProfile {
     updated_at: string;
 }
 
+export interface OsasStaffProfile {
+    id: number;
+    staff_id: string;
+}
+
+
 export interface User {
     id: number;
     last_name: string;
@@ -181,7 +187,7 @@ export interface User {
     remember_token?: string;
     created_at: string;
     updated_at: string;
-    
+
     // Relationships
     student_profile?: StudentProfile;
     osas_staff_profile?: OsasStaffProfile;

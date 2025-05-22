@@ -23,7 +23,6 @@ class StudentProfile extends Model
         'existing_scholarships',
         
         // Personal Information
-        'photo_id',
         'civil_status',
         'sex',
         'date_of_birth',
@@ -285,5 +284,111 @@ class StudentProfile extends Model
         return $this->scholarshipApplications()
             ->where('status', 'approved')
             ->count();
+    }
+
+    /**
+     * Check if student has no failing grades in the previous semester.
+     *
+     * @return bool
+     */
+    public function hasNoFailingGrades(): bool
+    {
+        // Implement grade checking logic based on your grading system
+        return true; // Placeholder
+    }
+
+    /**
+     * Check if student has a grade below the specified value.
+     *
+     * @param float $threshold
+     * @return bool
+     */
+    public function hasGradeBelow(float $threshold): bool
+    {
+        // Implement minimum grade checking logic
+        return false; // Placeholder
+    }
+
+    /**
+     * Get active scholarship applications.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function activeScholarshipApplications()
+    {
+        return $this->scholarshipApplications()
+            ->whereIn('status', [
+                ScholarshipApplication::STATUS_APPROVED,
+                ScholarshipApplication::STATUS_UNDER_EVALUATION,
+                ScholarshipApplication::STATUS_VERIFIED
+            ]);
+    }
+
+    /**
+     * Check if student is eligible for academic scholarship.
+     *
+     * @param string $type full|partial
+     * @return bool
+     */
+    public function isEligibleForAcademicScholarship(string $type = 'full'): bool
+    {
+        if (!$this->hasNoFailingGrades() || $this->units < 18) {
+            return false;
+        }
+
+        if ($type === 'full') {
+            return $this->gwa >= 1.000 && $this->gwa <= 1.450 && !$this->hasGradeBelow(1.75);
+        }
+
+        return $this->gwa >= 1.460 && $this->gwa <= 1.750 && !$this->hasGradeBelow(2.00);
+    }
+
+    /**
+     * Check if student is eligible for student assistantship.
+     *
+     * @return bool
+     */
+    public function isEligibleForStudentAssistantship(): bool
+    {
+        return $this->hasNoFailingGrades() && $this->units <= 21;
+    }
+
+    /**
+     * Check if student is eligible for economic assistance.
+     *
+     * @return bool
+     */
+    public function isEligibleForEconomicAssistance(): bool
+    {
+        return $this->gwa <= 2.25;
+    }
+
+    /**
+     * Get all scholarships that the student is eligible for.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getEligibleScholarships()
+    {
+        return Scholarship::where('status', 'open')
+            ->where('deadline', '>=', now())
+            ->get()
+            ->filter(function ($scholarship) {
+                switch ($scholarship->type) {
+                    case Scholarship::TYPE_ACADEMIC_FULL:
+                    case Scholarship::TYPE_ACADEMIC_PARTIAL:
+                        $isFullScholarship = str_contains(strtolower($scholarship->name), 'full');
+                        return $this->isEligibleForAcademicScholarship($isFullScholarship ? 'full' : 'partial');
+
+                    case Scholarship::TYPE_STUDENT_ASSISTANTSHIP:
+                        return $this->isEligibleForStudentAssistantship();
+
+                    case Scholarship::TYPE_ECONOMIC_ASSISTANCE:
+                        return $this->isEligibleForEconomicAssistance();
+
+                    default:
+                        return true;
+                }
+            });
     }
 }

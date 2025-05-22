@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('email')->unique();
+            $table->string('photo_id')->nullable();
             $table->enum('role', ['admin', 'osas_staff', 'student'])->default('student');
             $table->timestamp('last_login_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();

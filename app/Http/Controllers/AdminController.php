@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\RedirectResponse;
 
 class AdminController extends Controller
 {
@@ -35,57 +37,50 @@ class AdminController extends Controller
     }
 
     /**
-     * Display a listing of all users, including course, year level, and created date.
+     * Display a listing of all students.
      */
     public function users(Request $request): Response
     {
-        $role = $request->query('role', 'all');
         $search = $request->query('search');
         $currentUserId = Auth::id();
 
         // Always eager‐load the student profile
         $query = User::with('studentProfile')
+            ->where('role', '=', 'student')  // Only show students
+            ->where('id', '!=', $currentUserId)
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
+                          ->orWhere('last_name', 'like', "%{$search}%")
+                          ->orWhere('email', 'like', "%{$search}%")
+                          ->orWhereHas('studentProfile', function ($query) use ($search) {
+                              $query->where('student_id', 'like', "%{$search}%")
+                                  ->orWhere('course', 'like', "%{$search}%");
+                          });
                 });
-            })
-            ->when($role !== 'all', function ($query) use ($role) {
-                $query->where('role', $role);
-            })
-            ->where('id', '!=', $currentUserId); // Exclude the current user from the listing
+            });
 
         $users = $query->orderBy('last_name')
             ->paginate(10)
             ->withQueryString();
 
-        // Transform each user to include course, year_level, created_at and a human‑readable role
+        // Transform each user to include course, year_level, and created_at
         $users->getCollection()->transform(function ($user) {
-            $roleLabels = [
-                'admin' => 'Admin',
-                'osas_staff' => 'Osas Staff',
-                'student' => 'Student',
-            ];
-            $label = $roleLabels[$user->role] ?? ucfirst(str_replace('_', ' ', $user->role));
-
             return [
                 'id' => $user->id,
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'email' => $user->email,
-                'role' => $label,
+                'role' => 'Student',
                 'course' => $user->studentProfile->course ?? 'None',
                 'year_level' => $user->studentProfile->year_level ?? 'N/A',
-                'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                'created_at' => $user->created_at,
             ];
         });
 
-        return Inertia::render('admin/users', [
+        return Inertia::render('admin/students', [
             'users' => $users,
             'filters' => [
-                'role' => $role,
                 'search' => $search,
             ],
         ]);
@@ -105,41 +100,198 @@ class AdminController extends Controller
     }
 
     /**
+     * Show the form for editing a user.
+     */
+    public function editUser(User $user): Response
+    {
+        // Load the appropriate profile based on user role
+        $user->load($user->role . 'Profile');
+
+        // Make sure the profile exists
+        if (!$user->profile()) {
+            return Inertia::render('admin/users', [
+                'error' => 'User profile not found.'
+            ]);
+        }
+
+        // Redirect admin users back as they cannot be edited
+        if ($user->isAdmin()) {
+            return Inertia::render('admin/users', [
+                'error' => 'Admin profiles cannot be edited.'
+            ]);
+        }
+
+        return Inertia::render('admin/edit-user-profile', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Update the specified user.
+     */
+    public function updateUser(Request $request, User $user): RedirectResponse
+    {
+        // Don't allow updating admin users
+        if ($user->isAdmin()) {
+            return back()->withErrors(['error' => 'Admin profiles cannot be edited.']);
+        }
+
+        // Validate common user data
+        $commonRules = [
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'mobile_number' => ['nullable', 'string', 'max:255'],
+        ];
+
+        // Add role-specific validation rules
+        if ($user->role === 'student') {
+            $rules = array_merge($commonRules, [
+                'student_id' => ['required', 'string', 'max:255', 'unique:student_profiles,student_id,' . $user->studentProfile->id],
+                'course' => ['required', 'string', 'max:255'],
+                'major' => ['nullable', 'string', 'max:255'],
+                'year_level' => ['required', 'string', 'in:1st Year,2nd Year,3rd Year,4th Year'],
+                'civil_status' => ['required', 'string', 'in:Single,Married,Widowed,Separated,Annulled'],
+                'sex' => ['required', 'string', 'in:Male,Female'],
+                'street' => ['nullable', 'string', 'max:255'],
+                'barangay' => ['nullable', 'string', 'max:255'],
+                'city' => ['nullable', 'string', 'max:255'],
+            ]);
+        } elseif ($user->role === 'osas_staff') {
+            $rules = array_merge($commonRules, [
+                'staff_id' => ['required', 'string', 'max:255', 'unique:osas_staff_profiles,staff_id,' . $user->osasStaffProfile->id],
+            ]);
+        } else {
+            return back()->withErrors(['error' => 'Invalid user role.']);
+        }
+
+        // Validate request data
+        $validatedData = $request->validate($rules);
+
+        // Begin transaction
+        DB::beginTransaction();
+        try {
+            // Update user record
+            $user->update([
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'middle_name' => $validatedData['middle_name'] ?? null,
+                'email' => $validatedData['email'],
+            ]);
+
+            // Update profile record based on role
+            if ($user->role === 'student' && $user->studentProfile) {
+                $user->studentProfile->update([
+                    'student_id' => $validatedData['student_id'],
+                    'course' => $validatedData['course'],
+                    'major' => $validatedData['major'] ?? 'None',
+                    'year_level' => $validatedData['year_level'],
+                    'civil_status' => $validatedData['civil_status'],
+                    'sex' => $validatedData['sex'],
+                    'mobile_number' => $validatedData['mobile_number'],
+                    'street' => $validatedData['street'],
+                    'barangay' => $validatedData['barangay'],
+                    'city' => $validatedData['city'],
+                ]);
+            } elseif ($user->role === 'osas_staff' && $user->osasStaffProfile) {
+                $user->osasStaffProfile->update([
+                    'staff_id' => $validatedData['staff_id'],
+                    'mobile_number' => $validatedData['mobile_number'],
+                ]);
+            }
+
+            DB::commit();
+
+            // Redirect to the appropriate show route
+            $routeName = $user->role === 'student' ? 'admin.students.show' : 'admin.staff.show';
+            return redirect()->route($routeName, $user)
+                ->with('message', 'User profile updated successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withErrors(['error' => 'Failed to update user: ' . $e->getMessage()])
+                ->withInput();
+        }
+    }
+
+    /**
      * Remove a user from the system.
      */
     public function destroyUser(User $user)
     {
         $user->delete();
 
-        return redirect()->route('admin.users')
+        // Redirect to the appropriate page based on user role
+        $redirectRoute = $user->role === 'student' ? 'admin.students' : 'admin.staff';
+        return redirect()->route($redirectRoute)
             ->with('message', 'User successfully deleted.');
     }
 
     /**
-     * Show the staff invitation form.
+     * Display a listing of all OSAS staff members.
      */
-    public function showInvitationForm(): Response
+    public function staff(Request $request): Response
     {
-        return Inertia::render('admin/invite-staff', [
-            'departments' => [
-                'OSAS Main Office',
-                'Student Affairs',
-                'Guidance and Counseling',
-                'Health Services',
-                'Student Organizations',
-                'Scholarships and Financial Aid',
-                'Cultural Affairs',
-                'Sports and Recreation',
-            ],
-            'positions' => [
-                'Director',
-                'Assistant Director',
-                'Coordinator',
-                'Officer',
-                'Counselor',
-                'Staff',
-                'Secretary',
-                'Assistant',
+        $search = $request->query('search');
+        $currentUserId = Auth::id();
+
+        // Query for OSAS staff members
+        $query = User::with('osasStaffProfile')
+            ->where('role', '=', 'osas_staff')
+            ->where('id', '!=', $currentUserId)
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('first_name', 'like', "%{$search}%")
+                          ->orWhere('last_name', 'like', "%{$search}%")
+                          ->orWhere('email', 'like', "%{$search}%");
+                });
+            });
+
+        $staff = $query->orderBy('last_name')
+            ->paginate(10)
+            ->withQueryString();        // Transform each staff member to include relevant information
+        $staff->getCollection()->transform(function ($user) {
+            return [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'created_at' => $user->created_at,
+                'avatar' => $user->avatar,
+                'role' => 'OSAS Staff',
+                'osas_staff_profile' => [
+                    'staff_id' => $user->osasStaffProfile->staff_id ?? null
+                ]
+            ];
+        });        
+        
+        // Get active invitations with pagination
+        $invitations = StaffInvitation::with('inviter')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->through(function ($invitation) {
+                return [
+                    'id' => $invitation->id,
+                    'email' => $invitation->email,
+                    'role' => $invitation->role,
+                    'inviter' => [
+                        'id' => $invitation->inviter->id,
+                        'first_name' => $invitation->inviter->first_name,
+                        'last_name' => $invitation->inviter->last_name,
+                    ],
+                    'created_at' => $invitation->created_at,
+                    'expires_at' => $invitation->expires_at,
+                    'status' => $invitation->status
+                ];
+            });
+
+        return Inertia::render('admin/manage-staff', [
+            'staff' => $staff,
+            'invitations' => $invitations,
+            'filters' => [
+                'search' => $search,
             ],
         ]);
     }
@@ -170,9 +322,10 @@ class AdminController extends Controller
 
     /**
      * Display all active staff invitations.
-     */
+     */    
     public function viewInvitations(): Response
-    {        $invitations = StaffInvitation::with('inviter')
+    {        
+        $invitations = StaffInvitation::with('inviter')
             ->where('status', 'pending')
             ->where('accepted_at', null)
             ->where('expires_at', '>', Carbon::now())
@@ -182,11 +335,21 @@ class AdminController extends Controller
         return Inertia::render('admin/invitations', [
             'invitations' => $invitations,
         ]);
+    }    
+    
+    /**
+     * Permanently delete a staff invitation.
+     */
+    public function destroyInvitation(StaffInvitation $invitation)
+    {
+        $invitation->delete();
+        return back()->with('success', 'Invitation deleted successfully.');
     }
 
     /**
      * Revoke a staff invitation.
-     */    public function revokeInvitation(StaffInvitation $invitation)
+     */    
+    public function revokeInvitation(StaffInvitation $invitation)
     {
         $invitation->update(['status' => 'revoked']);
 

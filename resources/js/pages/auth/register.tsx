@@ -103,38 +103,80 @@ export default function Register() {
     ];
 
     // Validate current step before proceeding to next
-    const validateStep = (step: number) => {
-        switch (step) {
-            case 1:
-                // Validate Personal Information fields
-                if (!data.first_name || !data.last_name || !data.middle_name || !data.sex ||
-                    !data.civil_status || !data.date_of_birth || !data.place_of_birth ||
-                    !data.street || !data.barangay || !data.city || !data.province ||
-                    !data.mobile_number || !data.religion || !data.residence_type) {
-                    return false;
+    const validateStep = (step: number): boolean => {
+        try {
+            switch (step) {
+                case 1: {
+                    // Validate Personal Information fields
+                    const personalFields = [
+                        data.first_name,
+                        data.last_name,
+                        data.middle_name,
+                        data.sex,
+                        data.civil_status,
+                        data.date_of_birth,
+                        data.place_of_birth,
+                        data.street,
+                        data.barangay,
+                        data.city,
+                        data.province,
+                        data.mobile_number,
+                        data.religion,
+                        data.residence_type
+                    ];
+
+                    if (personalFields.some(field => !field)) {
+                        return false;
+                    }
+
+                    if (data.residence_type === 'With Guardian' && !data.guardian_name) {
+                        return false;
+                    }
+
+                    if (data.is_pwd === 'Yes' && !data.disability_type) {
+                        return false;
+                    }
+
+                    return true;
                 }
-                if (data.residence_type === 'With Guardian' && !data.guardian_name) {
-                    return false;
+
+                case 2: {
+                    // Validate Academic Information fields
+                    const academicFields = [data.student_id, data.course, data.year_level];
+                    return academicFields.every(field => !!field);
                 }
-                if (data.is_pwd === 'Yes' && !data.disability_type) {
-                    return false;
+
+                case 3: {
+                    // Validate Account Setup fields
+                    const accountFields = [data.email, data.password, data.password_confirmation];
+                    if (accountFields.some(field => !field)) {
+                        return false;
+                    }
+
+                    // Check email format
+                    if (!data.email.toLowerCase().endsWith(VALIDATION.EMAIL.DOMAIN)) {
+                        return false;
+                    }
+
+                    // Check password confirmation
+                    if (data.password !== data.password_confirmation) {
+                        return false;
+                    }
+
+                    return true;
                 }
-                return true;
-            case 2:
-                // Validate Academic Information fields
-                return !!data.student_id && !!data.course && !!data.year_level;
-            case 3:
-                // Validate Account Setup fields
-                if (!data.email || !data.password || !data.password_confirmation) {
-                    return false;
+
+                case 4: {
+                    // Validate final review and terms agreement
+                    return data.terms_agreement === true;
                 }
-                // Validate email format
-                if (!data.email.toLowerCase().endsWith(VALIDATION.EMAIL.DOMAIN)) {
-                    return false;
-                }
-                return true;
-            default:
-                return true;
+
+                default:
+                    return true;
+            }
+        } catch (error) {
+            console.error('Validation error:', error);
+            return false;
         }
     };
 
@@ -150,11 +192,50 @@ export default function Register() {
         }
     };
 
+    interface ValidationErrors {
+        [key: string]: string;
+    }
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
+
+        // Ensure we're on the final step
+        if (currentStep === totalSteps) {
+            // Validate all steps before submission
+            const allStepsValid = [1, 2, 3, 4].every(step => validateStep(step));
+
+            if (!allStepsValid) {
+                // Find the first invalid step and go there
+                for (let step = 1; step <= totalSteps; step++) {
+                    if (!validateStep(step)) {
+                        setCurrentStep(step);
+                        break;
+                    }
+                }
+                return;
+            }
+
+            // All validations passed, submit the form
+            post(route('register'), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    reset('password', 'password_confirmation');
+                },
+                onError: (errors: ValidationErrors) => {
+                    // Log errors for debugging
+                    console.error('Registration errors:', errors);
+
+                    // Navigate to the step with errors
+                    if (errors.email || errors.password || errors.password_confirmation) {
+                        setCurrentStep(3);
+                    } else if (errors.student_id || errors.course || errors.year_level) {
+                        setCurrentStep(2);
+                    } else {
+                        setCurrentStep(1);
+                    }
+                }
+            });
+        }
     };
 
     return (

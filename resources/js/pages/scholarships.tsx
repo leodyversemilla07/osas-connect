@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
 import { Button } from '@/components/ui/button';
@@ -53,7 +54,8 @@ const scholarships: Scholarship[] = [
         deadline: '2025-05-30',
         daysRemaining: 11,
         type: 'Academic Scholarship',
-        description: 'President\'s Lister Scholarship for exceptional academic achievement',        requirements: [
+        description: 'President\'s Lister Scholarship for exceptional academic achievement',        
+        requirements: [
             'GWA between 1.000 - 1.450',
             'No grade below 1.75 in any course',
             'No Dropped/Deferred/Failed marks',
@@ -67,7 +69,8 @@ const scholarships: Scholarship[] = [
         deadline: '2025-05-30',
         daysRemaining: 11,
         type: 'Academic Scholarship',
-        description: 'Dean\'s Lister Scholarship for outstanding academic performance',        requirements: [
+        description: 'Dean\'s Lister Scholarship for outstanding academic performance',        
+        requirements: [
             'GWA between 1.460 - 1.750',
             'No grade below 1.75 in any course',
             'No Dropped/Deferred/Failed marks',
@@ -81,7 +84,8 @@ const scholarships: Scholarship[] = [
         deadline: '2025-05-30',
         daysRemaining: 11,
         type: 'Student Assistantship Program',
-        description: 'Work opportunity for students to earn while studying',        requirements: [
+        description: 'Work opportunity for students to earn while studying',        
+        requirements: [
             'Maximum load of 21 units',
             'No failing grades from previous semester',
             'Must pass pre-hiring screening',
@@ -95,7 +99,8 @@ const scholarships: Scholarship[] = [
         deadline: '2025-05-30',
         daysRemaining: 11,
         type: 'Performing Arts Scholarship',
-        description: 'For active members of MinSU performing arts groups',        requirements: [
+        description: 'For active members of MinSU performing arts groups',        
+        requirements: [            
             'Active member for at least 1 year',
             'Participated in major local/regional/national events',
             'Must be recommended by coach/adviser'
@@ -150,16 +155,17 @@ function ScholarshipCard({ scholarship }: { scholarship: Scholarship }) {
                         <Calendar className="mr-1 h-4 w-4" />
                         {scholarship.daysRemaining} days left
                     </div>
-                </div>                <RequirementsList
+                </div>
+                <RequirementsList
                     title="Program Requirements"
                     requirements={scholarship.requirements}
                 />
-                <Button className="mt-4 w-full" variant="default" asChild>
-                    <a href={`/scholarships/${scholarship.id}/apply`}>
-                        Apply Now
+                <Link href={route('login')} className="block">
+                    <Button className="mt-4 w-full" variant="default">
+                        Login to Apply
                         <ArrowRight className="ml-2 h-4 w-4" />
-                    </a>
-                </Button>
+                    </Button>
+                </Link>
             </CardContent>
         </Card>
     );
@@ -180,19 +186,8 @@ export default function Scholarships() {
                     <div className="mx-auto max-w-7xl">
                         {/* Hero Section */}
                         <div className="relative overflow-hidden rounded-xl shadow-lg">
-                            {/* Background gradient overlay */}
                             <div className="absolute inset-0 bg-gradient-to-r from-[#005a2d]/95 to-[#008040]/90"></div>
-
-                            {/* Background pattern */}
-                            <div className="absolute inset-0 opacity-10">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                                    <pattern id="pattern-circles" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
-                                        <circle id="pattern-circle" cx="10" cy="10" r="1.6257413380501518" fill="#fff"></circle>
-                                    </pattern>
-                                    <rect id="rect" x="0" y="0" width="100%" height="100%" fill="url(#pattern-circles)"></rect>
-                                </svg>
-                            </div>
-
+                            {/* ... existing background pattern ... */}
                             <div className="relative flex min-h-[40vh] flex-col items-center justify-center px-6 py-12 md:px-10 lg:px-16">
                                 <div className="text-center">
                                     <div className="inline-block rounded-full bg-[#febd12]/20 px-4 py-1 text-sm font-medium text-[#febd12]">
@@ -219,14 +214,13 @@ export default function Scholarships() {
                                     Find and apply for scholarships that match your qualifications
                                 </p>
                             </div>                            
-                            
+
                             <GeneralRequirementsList />
 
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                                 {scholarships.map((scholarship) => (
                                     <ScholarshipCard
                                         key={scholarship.id}
-                            
                                         scholarship={scholarship}
                                     />
                                 ))}
@@ -236,16 +230,7 @@ export default function Scholarships() {
                         {/* CTA Section */}
                         <section className="mt-16 mb-8">
                             <div className="rounded-2xl bg-gradient-to-r from-[#005a2d] to-[#008040] p-8 shadow-xl overflow-hidden relative">
-                                {/* Background pattern */}
-                                <div className="absolute inset-0 opacity-10">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                                        <pattern id="pattern-circles-cta" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
-                                            <circle id="pattern-circle" cx="10" cy="10" r="1.6257413380501518" fill="#fff"></circle>
-                                        </pattern>
-                                        <rect id="rect" x="0" y="0" width="100%" height="100%" fill="url(#pattern-circles-cta)"></rect>
-                                    </svg>
-                                </div>
-
+                                {/* ... existing background pattern ... */}
                                 <div className="relative z-10 flex flex-col items-center justify-center text-center py-12">
                                     <h2 className="text-3xl font-bold text-white leading-tight md:text-4xl lg:text-5xl">
                                         Ready to Apply for a Scholarship?
@@ -253,11 +238,11 @@ export default function Scholarships() {
                                     <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
                                         Take the next step towards your academic and professional goals. Apply for our scholarships today!
                                     </p>
-                                    <Button className="mt-6 px-8 py-3 text-base font-semibold" variant="default" asChild>
-                                        <a href="/scholarships/apply">
-                                            Start Your Application
-                                        </a>
-                                    </Button>
+                                    <Link href={route('login')} className="mt-6">
+                                        <Button variant="default" className="px-8 py-3 text-base font-semibold">
+                                            Login to Apply
+                                        </Button>
+                                    </Link>
                                 </div>
                             </div>
                         </section>

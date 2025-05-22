@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Eye, MoreHorizontal, Trash2, Mail } from "lucide-react"
+import { Eye, MoreHorizontal, Trash2 } from "lucide-react"
 import { Link } from "@inertiajs/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -34,23 +34,25 @@ export const columns: ColumnDef<User>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
-  },
-  {
+  }, {
+    id: "fullName",
     accessorFn: (row) => `${row.first_name} ${row.last_name}`,
     header: "Name",
     cell: ({ row }) => {
       const user = row.original
       const fullName = `${user.first_name}${user.middle_name ? ` ${user.middle_name} ` : ' '}${user.last_name}`
-      
+
       return (
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user.avatar} alt={fullName} />
+            <AvatarImage src={user.avatar?.toString()} alt={fullName} />
             <AvatarFallback>{fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <span className="font-medium">{fullName}</span>
-            <span className="text-xs text-muted-foreground">{user.student_id}</span>
+            {user.student_profile?.student_id && (
+              <span className="text-xs text-muted-foreground">{user.student_profile.student_id}</span>
+            )}
           </div>
         </div>
       )
@@ -65,20 +67,21 @@ export const columns: ColumnDef<User>[] = [
     accessorKey: "course",
     header: "Course",
     cell: ({ row }) => {
-      const major = row.original.major && row.original.major !== 'None' 
-        ? ` (${row.original.major})`
-        : ''
+      const course = row.original.course as string;
+      if (!course || course === 'None') return 'N/A';
       return (
         <div className="flex flex-col">
-          <span className="truncate">{row.original.course}</span>
-          {major && <span className="text-xs text-muted-foreground">{major}</span>}
+          <span className="truncate">{course}</span>
         </div>
       )
     },
-  },
-  {
+  }, {
     accessorKey: "year_level",
     header: "Year Level",
+    cell: ({ row }) => {
+      const yearLevel = row.original.year_level as string;
+      return !yearLevel || yearLevel === 'N/A' ? 'N/A' : yearLevel;
+    },
   },
   {
     accessorKey: "role",
@@ -130,19 +133,15 @@ export const columns: ColumnDef<User>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href={route('admin.users.show', user.id)}>
+              <Link href={route('admin.students.show', user.id)}>
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </Link>
             </DropdownMenuItem>
-            {user.role === 'osas_staff' && (
-              <DropdownMenuItem>
-                <Mail className="mr-2 h-4 w-4" />
-                Send Email
-              </DropdownMenuItem>
-            )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive"
+              onClick={() => window.location.href = route('admin.students.destroy', user.id)}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete User
             </DropdownMenuItem>

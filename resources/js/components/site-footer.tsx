@@ -54,7 +54,7 @@ export default function SiteFooter() {
                         <ul className="space-y-3 text-sm">
                             <li><Link href={route('home')} className="text-white/70 transition-colors hover:text-[#febd12]">Home</Link></li>
                             <li><Link href={route('about')} className="text-white/70 transition-colors hover:text-[#febd12]">About</Link></li>
-                            <li><Link href={route('scholarships')} className="text-white/70 transition-colors hover:text-[#febd12]">Scholarships</Link></li>
+                            <li><Link href={route('scholarships.index')} className="text-white/70 transition-colors hover:text-[#febd12]">Scholarships</Link></li>
                             <li><Link href={route('announcements')} className="text-white/70 transition-colors hover:text-[#febd12]">Announcements</Link></li>
                             <li><Link href={route('contact')} className="text-white/70 transition-colors hover:text-[#febd12]">Contact</Link></li>
                         </ul>

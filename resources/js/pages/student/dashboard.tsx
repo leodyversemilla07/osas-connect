@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { GraduationCap, ChevronRight, UserPlus } from 'lucide-react';
+import { GraduationCap, ChevronRight, UserPlus, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +15,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-// Types
+// Core Types
 interface User {
   first_name: string;
   last_name: string;
@@ -27,20 +27,107 @@ interface Auth {
   user: User;
 }
 
+// Academic Types
 interface Student {
   student_id: string;
   course: string;
   year_level: string;
   scholarships: number;
+  gwa?: number;
+  units_enrolled?: number;
+  academic_status?: 'regular' | 'irregular';
+}
+
+// Scholarship Types
+interface ScholarshipCriteria {
+  gwa_range?: {
+    min?: number;
+    max: number;
+  };
+  min_units?: number;
+  requirements: string[];
+  documents: string[];
 }
 
 interface Scholarship {
   id: number;
   name: string;
+  type: 'Academic' | 'Student Assistantship' | 'Performing Arts' | 'Economic Assistance';
   deadline: string;
   eligibility: string;
   status: string;
+  stipend_amount?: number;
+  payment_schedule?: 'monthly' | 'semestral' | 'annual';
+  criteria?: ScholarshipCriteria;
 }
+
+interface ScholarshipApplication {
+  id: number;
+  scholarship_name: string;
+  type: string;
+  status: ApplicationStatus;
+  date_submitted: string;
+  incomplete_documents?: string[];
+  interview_schedule?: string;
+  stipend_status?: StipendStatus;
+  last_stipend_date?: string;
+  amount_received: number;
+  renewal_status?: RenewalStatus;
+  evaluation_score?: number;
+  verifier_comments?: string;
+}
+
+// Status Types
+type ApplicationStatus =
+  | 'draft'
+  | 'submitted'
+  | 'under_verification'
+  | 'incomplete'
+  | 'verified'
+  | 'under_evaluation'
+  | 'approved'
+  | 'rejected'
+  | 'end';
+
+type StipendStatus = 'pending' | 'processing' | 'released' | 'on_hold';
+type RenewalStatus = 'eligible' | 'ineligible' | 'pending' | 'approved' | 'rejected';
+
+// Theme Constants
+const THEME = {
+  colors: {
+    primary: {
+      DEFAULT: '#005a2d',
+      dark: '#23b14d',
+      light: '#008040'
+    },
+    secondary: '#febd12',
+    success: '#16a34a',
+    warning: '#fbbf24',
+    error: '#dc2626',
+    info: '#3b82f6',
+    gradients: {
+      primary: 'from-green-800 to-green-700',
+      dark: 'from-gray-900 to-gray-800'
+    }
+  },
+  opacity: {
+    light: '5',
+    dark: '10'
+  }
+};
+
+// Status Styles
+const STATUS_COLORS: Record<ApplicationStatus, string> = {
+  draft: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100',
+  submitted: 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100',
+  under_verification: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100',
+  incomplete: 'bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-100',
+  verified: 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100',
+  under_evaluation: 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100',
+  approved: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100',
+  rejected: 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100',
+  end: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100'
+};
 
 // Course abbreviation mapping
 const COURSE_ABBREVIATIONS: Record<string, string> = {
@@ -53,26 +140,6 @@ const COURSE_ABBREVIATIONS: Record<string, string> = {
   'Bachelor of Secondary Education': 'BSEd',
   'Bachelor of Elementary Education': 'BEEd',
   'Bachelor of Science in Fisheries': 'BSF',
-};
-
-// Theme Constants
-const THEME = {
-  colors: {
-    primary: {
-      DEFAULT: '#005a2d',
-      dark: '#23b14d',
-      light: '#008040'
-    },
-    secondary: '#febd12',
-    gradients: {
-      primary: 'from-green-800 to-green-700',
-      dark: 'from-gray-900 to-gray-800'
-    }
-  },
-  opacity: {
-    light: '5',
-    dark: '10'
-  }
 };
 
 // Utility Components
@@ -100,12 +167,12 @@ const WelcomeCard = ({ auth, student }: { auth: Auth; student: Student }) => (
           </h1>
           <p className="text-muted-foreground">Student ID: {student.student_id}</p>
         </div>
-        <Button 
-          variant="default" 
+        <Button
+          variant="default"
           className="bg-green-700 hover:bg-green-800 text-white"
           asChild
         >
-          <a href="/student/profile">
+          <a href="/settings/profile">
             <UserPlus className="w-4 h-4 mr-2" />
             Complete Profile
           </a>
@@ -136,39 +203,199 @@ const StatsOverview = ({ student }: { student: Student }) => (
 );
 
 const ScholarshipsList = ({ scholarships }: { scholarships: Scholarship[] }) => (
+  <div className="space-y-4">
+    {scholarships.map((scholarship) => (
+      <div key={scholarship.id}
+        className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50">
+        <div className="space-y-1">
+          <h4 className="font-semibold">{scholarship.name}</h4>
+          <p className="text-sm text-muted-foreground">{scholarship.eligibility}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end">
+            <Badge variant="secondary">
+              Deadline: {scholarship.deadline}
+            </Badge>
+          </div>
+          <Button size="sm" asChild>
+            <a href={`/scholarships/${scholarship.id}/apply`}>Apply</a>
+          </Button>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// Application components
+const MyApplications = ({ applications }: { applications: ScholarshipApplication[] }) => (
   <Card>
-    <CardHeader className="flex flex-row items-center justify-between">
+    <CardHeader>
       <CardTitle className="flex items-center gap-2">
         <GraduationCap className="h-5 w-5" />
-        Available Scholarships
+        My Applications
       </CardTitle>
-      <Button variant="outline" size="sm" asChild>
-        <a href="/scholarships">View All</a>
-      </Button>
     </CardHeader>
     <CardContent>
       <div className="space-y-4">
-        {scholarships.map((scholarship) => (
-          <div key={scholarship.id}
-            className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50">
-            <div className="space-y-1">
-              <h4 className="font-semibold">{scholarship.name}</h4>
-              <p className="text-sm text-muted-foreground">{scholarship.eligibility}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex flex-col items-end">
-                <Badge variant="secondary">
-                  Deadline: {scholarship.deadline}
-                </Badge>
-              </div>
-              <Button size="sm">Apply</Button>
-            </div>
+        {applications.length === 0 ? (
+          <div className="text-center py-6 text-muted-foreground">
+            <p>You haven't applied to any scholarships yet.</p>
+            <Button className="mt-4" asChild>
+              <a href="/scholarships">View Available Scholarships</a>
+            </Button>
           </div>
-        ))}
+        ) : (
+          applications.map((application) => (
+            <div
+              key={application.id}
+              className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/50"
+            >
+              <div className="space-y-1">
+                <h4 className="font-semibold">{application.scholarship_name}</h4>
+                <div className="flex gap-2 items-center">
+                  <Badge variant="secondary">
+                    {application.type}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    Submitted: {new Date(application.date_submitted).toLocaleDateString()
+                    }</span>
+                </div>
+                {application.incomplete_documents && (
+                  <p className="text-sm text-red-600 dark:text-red-400">
+                    Missing documents: {application.incomplete_documents.join(', ')}
+                  </p>
+                )}
+                {application.interview_schedule && (
+                  <p className="text-sm text-emerald-600 dark:text-emerald-400">
+                    Interview scheduled: {new Date(application.interview_schedule).toLocaleString()}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-end">
+                  <Badge className={STATUS_COLORS[application.status]}>
+                    {application.status.split('_').map(word =>
+                      word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ')}
+                  </Badge>
+                </div>
+                <Button size="sm" asChild>
+                  <a href={`/scholarships/application/${application.id}`}>View Details</a>
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </CardContent>
   </Card>
 );
+
+// Stipend components
+// Utility functions
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-PH', {
+    style: 'currency',
+    currency: 'PHP',
+    minimumFractionDigits: 0,
+  }).format(amount);
+};
+
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString('en-PH', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+const StipendTracker = ({ applications }: { applications: ScholarshipApplication[] }) => {
+  const approvedApplications = applications.filter(app => app.status === 'approved');
+  const totalReceived = approvedApplications.reduce((sum, app) => sum + app.amount_received, 0);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <GraduationCap className="h-5 w-5" />
+          Stipend Tracker
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {approvedApplications.length === 0 ? (
+            <p className="text-center py-4 text-muted-foreground">No active stipends</p>
+          ) : (
+            <>
+              <div className="flex justify-between items-center pb-4 border-b">
+                <span className="text-sm font-medium">Total Received</span>
+                <span className="text-2xl font-bold">{formatCurrency(totalReceived)}</span>
+              </div>
+              <div className="space-y-4">
+                {approvedApplications.map((application) => (
+                  <div key={application.id} className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">{application.scholarship_name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Last disbursement: {application.last_stipend_date ?
+                          formatDate(application.last_stipend_date) :
+                          'N/A'
+                        }
+                      </p>
+                    </div>
+                    <Badge
+                      variant={application.stipend_status === 'released' ? 'default' : 'secondary'}
+                      className={application.stipend_status === 'on_hold' ? 'bg-red-100 text-red-800' : ''}
+                    >
+                      {application.stipend_status || 'pending'}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Interview components
+const UpcomingInterviews = ({ applications }: { applications: ScholarshipApplication[] }) => {
+  const upcomingInterviews = applications.filter(app => app.interview_schedule && new Date(app.interview_schedule) > new Date());
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Calendar className="h-5 w-5" />
+          Upcoming Interviews
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {upcomingInterviews.length === 0 ? (
+            <p className="text-center py-4 text-muted-foreground">No upcoming interviews</p>
+          ) : (
+            upcomingInterviews.map((application) => (
+              <div key={application.id} className="flex items-center justify-between p-4 rounded-lg border">
+                <div>
+                  <h4 className="font-medium">{application.scholarship_name}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {new Date(application.interview_schedule!).toLocaleString()}
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <a href={`/scholarships/application/${application.id}`}>View Details</a>
+                </Button>
+              </div>
+            ))
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 // ID Card Components
 const IDCardHeader = () => (
@@ -304,57 +531,177 @@ const StudentIDCard = ({ auth, student }: { auth: Auth; student: Student }) => (
 );
 
 // Main Dashboard Component
-export default function StudentDashboard({ auth, student }: { auth: Auth; student: Student }) {  const scholarships = [
+export default function StudentDashboard({ auth, student }: { auth: Auth; student: Student }) {
+  const scholarships: Scholarship[] = [
     {
       id: 1,
       name: 'Academic Scholarship (Full)',
+      type: 'Academic',
       deadline: '2025-05-30',
       eligibility: 'GWA: 1.000 - 1.450 (President\'s Lister)\n• Monthly stipend: ₱500\n• No grade below 1.75\n• Must carry at least 18 units\n• No Drops/Deferred/Failed marks',
-      status: 'open'
+      status: 'open',
+      stipend_amount: 500,
+      payment_schedule: 'monthly',
+      criteria: {
+        gwa_range: {
+          min: 1.000,
+          max: 1.450
+        },
+        min_units: 18,
+        requirements: [
+          'No grade below 1.75',
+          'No Drops/Deferred/Failed marks'
+        ],
+        documents: [
+          'Certified True Copy of Grades',
+          'Certificate of Registration',
+          'Good Moral Character',
+          "Dean's Endorsement"
+        ]
+      }
     },
     {
       id: 2,
       name: 'Academic Scholarship (Partial)',
+      type: 'Academic',
       deadline: '2025-05-30',
-      eligibility: 'GWA: 1.460 - 1.750 (Dean\'s Lister)\n• Monthly stipend: ₱300\n• No grade below 1.75\n• Must carry at least 18 units\n• No Drops/Deferred/Failed marks',
-      status: 'open'
+      eligibility: 'GWA: 1.460 - 1.750 (Dean\'s Lister)\n• Monthly stipend: ₱300\n• No grade below 2.00\n• Must carry at least 18 units\n• No Drops/Deferred/Failed marks',
+      status: 'open',
+      stipend_amount: 300,
+      payment_schedule: 'monthly',
+      criteria: {
+        gwa_range: {
+          min: 1.460,
+          max: 1.750
+        },
+        min_units: 18,
+        requirements: [
+          'No grade below 2.00',
+          'No Drops/Deferred/Failed marks'
+        ],
+        documents: [
+          'Certified True Copy of Grades',
+          'Certificate of Registration',
+          'Good Moral Character'
+        ]
+      }
     },
     {
       id: 3,
       name: 'Student Assistantship Program',
+      type: 'Student Assistantship',
       deadline: '2025-05-30',
-      eligibility: '• Maximum load of 21 units\n• No failing/incomplete grades\n• Must pass pre-hiring screening\n• Parent\'s consent required',
-      status: 'open'
+      eligibility: '• Maximum load of 21 units\n• No failing grades\n• Available for office work (3-4 hrs/day)\n• Must submit parent\'s consent\n• Physical and medical fitness required',
+      status: 'open',
+      stipend_amount: 0, // Based on work hours
+      payment_schedule: 'monthly',
+      criteria: {
+        min_units: 21, // Maximum units
+        requirements: [
+          'No failing grades',
+          'Available for office work',
+          'Medical fitness'
+        ],
+        documents: [
+          'Application Form with 2x2 Picture',
+          'Class Schedule',
+          "Parent's Consent",
+          'Medical Certificate',
+          'Interview Assessment Form'
+        ]
+      }
     },
     {
       id: 4,
       name: 'MinSU Performing Arts (Full)',
+      type: 'Performing Arts',
       deadline: '2025-05-30',
-      eligibility: '• Active member for 1+ year\n• Participated in major local/regional/national events\n• Requires coach/adviser recommendation',
-      status: 'open'
+      eligibility: '• Active member for 1+ year\n• Regular participation in performances\n• Must maintain good academic standing\n• Monthly stipend: ₱500\n• Certificate from coach/adviser required',
+      status: 'open',
+      stipend_amount: 500,
+      payment_schedule: 'monthly',
+      criteria: {
+        requirements: [
+          'Active membership (1+ year)',
+          'Regular performance participation',
+          'Good academic standing'
+        ],
+        documents: [
+          'Certification from Group Adviser',
+          'Performance Portfolio',
+          'Certificate of Registration',
+          'Good Moral Character'
+        ]
+      }
     },
     {
       id: 5,
-      name: 'MinSU Performing Arts (Partial)',
+      name: 'Economic Assistance Program',
+      type: 'Economic Assistance',
       deadline: '2025-05-30',
-      eligibility: '• Member for at least 1 semester\n• Performed in 2+ major University activities\n• Requires coach/adviser recommendation',
-      status: 'open'
+      eligibility: '• GWA not lower than 2.25\n• Must be from low-income family\n• Monthly stipend: ₱400\n• MSWDO Indigency Certificate required\n• Regular load required',
+      status: 'open',
+      stipend_amount: 400,
+      payment_schedule: 'monthly',
+      criteria: {
+        gwa_range: {
+          max: 2.25
+        },
+        requirements: [
+          'From low-income family',
+          'Regular load student',
+          'No other scholarships'
+        ],
+        documents: [
+          'Application Form with 2x2 Picture',
+          'Latest Income Tax Return',
+          'MSWDO Indigency Certificate',
+          'Barangay Certificate',
+          'Good Moral Character',
+          'Grades Certification',
+          'Certificate of Registration'
+        ]
+      }
+    }
+  ];
+
+  const applications: ScholarshipApplication[] = [
+    {
+      id: 1,
+      scholarship_name: 'Academic Excellence Scholarship',
+      type: 'Academic',
+      status: 'under_verification',
+      date_submitted: '2025-05-15',
+      amount_received: 0,
+      incomplete_documents: ['Recommendation Letter'],
+      evaluation_score: 85,
+      verifier_comments: 'Pending faculty recommendation'
     },
     {
-      id: 6,
-      name: 'Economic Assistance Grant',
-      deadline: '2025-05-30',
-      eligibility: '• GWA of 2.25 or better\n• Must provide MSWDO Indigency Certificate\n• For economically disadvantaged students',
-      status: 'open'
+      id: 2,
+      scholarship_name: 'Student Assistantship Program',
+      type: 'Work-Study',
+      status: 'approved',
+      date_submitted: '2025-04-01',
+      interview_schedule: '2025-05-25T14:00:00',
+      stipend_status: 'pending',
+      amount_received: 2500,
+      evaluation_score: 92,
+      verifier_comments: 'Excellent work ethic shown in interview'
     }
-  ]; return (
+  ];
+
+  // Group dashboard sections
+  return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Student Dashboard" />
       <div className="flex h-full flex-1 gap-6 p-6">
         <div className="flex-1 flex flex-col gap-6">
+          {/* Profile Section */}
           <WelcomeCard auth={auth} student={student} />
 
-          <div className="grid gap-6 md:grid-cols-1">
+          {/* Academic & Financial Overview */}
+          <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
@@ -366,10 +713,30 @@ export default function StudentDashboard({ auth, student }: { auth: Auth; studen
                 <StatsOverview student={student} />
               </CardContent>
             </Card>
-
-            <ScholarshipsList scholarships={scholarships} />
+            <StipendTracker applications={applications} />
           </div>
+
+          {/* Applications & Interviews */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <MyApplications applications={applications} />
+            <UpcomingInterviews applications={applications} />
+          </div>
+
+          {/* Available Scholarships */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <GraduationCap className="h-5 w-5" />
+                Available Scholarships
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScholarshipsList scholarships={scholarships} />
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Student ID Card */}
         <div className="hidden lg:block">
           <StudentIDCard auth={auth} student={student} />
         </div>

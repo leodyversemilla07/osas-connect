@@ -137,47 +137,52 @@ export default function SiteHeader() {
                         className="hidden md:block"
                         aria-label="Primary navigation"
                     >
-                        <ul className="flex space-x-8">
-                            <li>
+                        <ul className="flex space-x-8" role="menubar">
+                            <li role="none">
                                 <Link
                                     href="/"
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('home') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('home') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
                                     aria-current={route().current('home') ? 'page' : undefined}
+                                    role="menuitem"
                                 >
                                     Home
                                 </Link>
                             </li>
-                            <li>
+                            <li role="none">
                                 <Link
                                     href="/about"
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('about') || route().current('about.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('about') || route().current('about.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
                                     aria-current={route().current('about') || route().current('about.*') ? 'page' : undefined}
+                                    role="menuitem"
                                 >
                                     About
                                 </Link>
                             </li>
-                            <li>
-                                <Link
-                                    href="/scholarships"
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('scholarships') || route().current('scholarships.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
-                                    aria-current={route().current('scholarships') || route().current('scholarships.*') ? 'page' : undefined}
+                            <li role="none">                                <Link
+                                    href={route('scholarships.available')}
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('scholarships.available') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    aria-current={route().current('scholarships.available') ? 'page' : undefined}
+                                    role="menuitem"
                                 >
                                     Scholarships
                                 </Link>
-                            </li>                            <li>
+                            </li>
+                            <li role="none">
                                 <Link
                                     href="/announcements"
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('announcements') || route().current('announcements.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('announcements') || route().current('announcements.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
                                     aria-current={route().current('announcements') || route().current('announcements.*') ? 'page' : undefined}
+                                    role="menuitem"
                                 >
                                     Announcements
                                 </Link>
                             </li>
-                            <li>
+                            <li role="none">
                                 <Link
                                     href="/contact"
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] ${route().current('contact') || route().current('contact.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('contact') || route().current('contact.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
                                     aria-current={route().current('contact') || route().current('contact.*') ? 'page' : undefined}
+                                    role="menuitem"
                                 >
                                     Contact
                                 </Link>
@@ -217,17 +222,20 @@ export default function SiteHeader() {
                     <div className="flex md:hidden">
                         <button
                             type="button"
-                            className="inline-flex items-center justify-center rounded-md p-2 text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
+                            className="inline-flex items-center justify-center rounded-md p-2 text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             aria-controls="mobile-menu"
                             aria-expanded={isMenuOpen}
+                            aria-label={isMenuOpen ? 'Close main menu' : 'Open main menu'}
                         >
                             <span className="sr-only">{isMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
-                            {isMenuOpen ? (
-                                <X className="h-6 w-6" />
-                            ) : (
-                                <Menu className="h-6 w-6" />
-                            )}
+                            <span className="relative w-6 h-6">
+                                {isMenuOpen ? (
+                                    <X className="h-6 w-6 transition-transform duration-200 ease-in-out" />
+                                ) : (
+                                    <Menu className="h-6 w-6 transition-transform duration-200 ease-in-out" />
+                                )}
+                            </span>
                         </button>
                     </div>
                 </header>
@@ -235,41 +243,52 @@ export default function SiteHeader() {
 
             {/* Mobile menu */}
             <div
-                className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'}`}
+                className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
                 id="mobile-menu"
                 ref={mobileMenuRef}
-            >                <nav className="space-y-1 bg-[#004020] px-4 pb-3 pt-2 sm:px-6" aria-label="Mobile navigation">
+                aria-expanded={isMenuOpen}
+            >
+                <nav
+                    className="space-y-1 bg-[#004020] px-4 pb-3 pt-2 sm:px-6"
+                    aria-label="Mobile navigation"
+                >
                     <Link
                         href="/"
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('home') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('home') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
                         aria-current={route().current('home') ? 'page' : undefined}
+                        role="menuitem"
                     >
                         Home
                     </Link>
                     <Link
                         href="/about"
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('about') || route().current('about.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('about') || route().current('about.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
                         aria-current={route().current('about') || route().current('about.*') ? 'page' : undefined}
+                        role="menuitem"
                     >
                         About
                     </Link>
                     <Link
-                        href="/scholarships"
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('scholarships') || route().current('scholarships.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
-                        aria-current={route().current('scholarships') || route().current('scholarships.*') ? 'page' : undefined}
+                        href={route('scholarships.index')}
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('scholarships.index') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        aria-current={route().current('scholarships.index') ? 'page' : undefined}
+                        role="menuitem"
                     >
                         Scholarships
-                    </Link>                    <Link
+                    </Link>
+                    <Link
                         href="/announcements"
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('announcements') || route().current('announcements.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('announcements') || route().current('announcements.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
                         aria-current={route().current('announcements') || route().current('announcements.*') ? 'page' : undefined}
+                        role="menuitem"
                     >
                         Announcements
                     </Link>
                     <Link
                         href="/contact"
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white hover:bg-[#005a2d] hover:text-[#febd12] ${route().current('contact') || route().current('contact.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('contact') || route().current('contact.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
                         aria-current={route().current('contact') || route().current('contact.*') ? 'page' : undefined}
+                        role="menuitem"
                     >
                         Contact
                     </Link>
@@ -278,7 +297,8 @@ export default function SiteHeader() {
                         {auth.user ? (
                             <Link
                                 href={route('dashboard')}
-                                className="flex items-center w-full rounded-md bg-[#febd12] px-5 py-2 text-center text-base font-medium text-[#010002] shadow-sm hover:bg-[#e5ab0e]"
+                                className="flex items-center w-full rounded-md bg-[#febd12] px-5 py-2 text-center text-base font-medium text-[#010002] shadow-sm transition-all duration-200 hover:bg-[#e5ab0e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2"
+                                role="menuitem"
                             >
                                 Dashboard
                             </Link>
@@ -286,13 +306,15 @@ export default function SiteHeader() {
                             <div className="flex flex-col space-y-2">
                                 <Link
                                     href={route('login')}
-                                    className="flex items-center justify-center w-full rounded-md px-5 py-2 text-center text-base font-medium text-white hover:text-[#febd12]"
+                                    className="flex items-center justify-center w-full rounded-md px-5 py-2 text-center text-base font-medium text-white transition-all duration-200 hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2"
+                                    role="menuitem"
                                 >
                                     Log in
                                 </Link>
                                 <Link
                                     href={route('register')}
-                                    className="flex items-center justify-center w-full rounded-md bg-[#febd12] px-5 py-2 text-center text-base font-medium text-[#010002] shadow-sm hover:bg-[#e5ab0e]"
+                                    className="flex items-center justify-center w-full rounded-md bg-[#febd12] px-5 py-2 text-center text-base font-medium text-[#010002] shadow-sm transition-all duration-200 hover:bg-[#e5ab0e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2"
+                                    role="menuitem"
                                 >
                                     Register
                                 </Link>

@@ -1,11 +1,11 @@
-import { Link, router } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import {
     TrashIcon, UserCircle, Building2, GraduationCap, Shield,
     Mail, Phone, MapPin, User2,
     BookOpen, School, Award,
-    LucideIcon
+    LucideIcon, Pencil as PencilIcon
 } from 'lucide-react';
-import { type User } from '@/types';
+import { type User, type StudentProfile } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,27 +15,51 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem } from '@/types';
 
-interface UserProfileProps {
-    user: User;
+interface UserWithProfile extends User {
+    studentProfile?: StudentProfile;
+    street?: string;
+    barangay?: string;
+    city?: string;
+    civil_status?: string;
+    sex?: string;
+    major?: string;
+    mobile_number?: string;
+    year_level?: string;
+    course?: string;
+    scholarships?: string;
+    student_id?: string;
+    is_active?: boolean;
+    avatar: string | null | undefined;
+    first_name: string;
+    last_name: string;
+    middle_name: string | null;
+    email: string;
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Users',
-        href: '/admin/users',
-    },
-    {
-        title: 'User Profile',
-        href: '/admin/users/profile',
-    },
-];
+interface UserProfileProps {
+    user: UserWithProfile;
+}
 
-function ProfileHeader({ user }: { user: User }) {
+function ProfileHeader({ user }: { user: UserWithProfile }) {
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-            router.delete(route('admin.users.destroy', user.id));
+            const deleteRoute = user.role === 'student' ? 'admin.students.destroy' : 'admin.staff.destroy';
+            router.delete(route(deleteRoute, user.id));
         }
     };
+
+    // Determine the edit route based on user role
+    const getEditRoute = () => {
+        // Admin users cannot be edited
+        if (user.role === 'admin') {
+            return null;
+        }
+
+        // Use different routes for student and staff
+        return user.role === 'student' ? 'admin.students.edit' : 'admin.staff.edit';
+    };
+
+    const editRoute = getEditRoute();
 
     return (
         <div className="space-y-6">
@@ -45,16 +69,23 @@ function ProfileHeader({ user }: { user: User }) {
                     <p className="text-lg text-muted-foreground mt-2">View and manage user information</p>
                 </div>
                 <div className="flex gap-3">
-                    {/* <Button variant="outline" asChild className="hover:bg-primary/5">
-                        <Link href={route('admin.users.edit', user.id)} className="flex items-center gap-2">
-                            <PencilIcon className="h-4 w-4" />
-                            Edit Profile
-                        </Link>
-                    </Button> */}
-                    <Button variant="destructive" onClick={handleDelete} className="flex items-center gap-2">
-                        <TrashIcon className="h-4 w-4" />
-                        Delete User
-                    </Button>
+                    {editRoute && (
+                        <Button variant="outline" asChild className="hover:bg-primary/5">
+                            <Link 
+                                href={route(editRoute, user.id)} 
+                                className="flex items-center gap-2"
+                            >
+                                <PencilIcon className="h-4 w-4" />
+                                Edit Profile
+                            </Link>
+                        </Button>
+                    )}
+                    {user.role !== 'admin' && (
+                        <Button variant="destructive" onClick={handleDelete} className="flex items-center gap-2">
+                            <TrashIcon className="h-4 w-4" />
+                            Delete User
+                        </Button>
+                    )}
                 </div>
             </div>
         </div>
@@ -92,7 +123,7 @@ function UserAvatar({ user }: { user: User }) {
         <div className="relative flex items-center gap-6 mb-6">
             <div className="relative">
                 <Avatar className="h-24 w-24 ring-2 ring-offset-2 ring-offset-background transition-all hover:ring-4">
-                    <AvatarImage src={user.avatar || ''} alt={`${user.first_name} ${user.last_name}`} />
+                    <AvatarImage src={user.avatar?.toString() || ''} alt={`${user.first_name} ${user.last_name}`} />
                     <AvatarFallback className="text-xl">
                         {user.first_name[0]}
                         {user.last_name[0]}
@@ -135,7 +166,7 @@ function InfoItem({ icon: Icon, label, value }: { icon: LucideIcon, label: strin
     );
 }
 
-function PersonalInfoCard({ user }: { user: User }) {
+function PersonalInfoCard({ user }: { user: UserWithProfile }) {
     return (
         <Card className="border-2 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="space-y-1.5">
@@ -152,36 +183,22 @@ function PersonalInfoCard({ user }: { user: User }) {
                     <InfoItem
                         icon={Phone}
                         label="Contact"
-                        value={
-                            <div className="space-y-2 font-medium">
-                                <p>Mobile: {user.mobile_number}</p>
-                                {user.telephone_number && <p>Tel: {user.telephone_number}</p>}
-                            </div>
-                        }
+                        value={user.mobile_number || 'Not provided'}
                     />
                     <Separator className="my-3" />
                     <InfoItem
                         icon={MapPin}
                         label="Address"
-                        value={
-                            <div className="space-y-1 font-medium">
-                                <p>{user.street}</p>
-                                <p>{user.barangay}, {user.city}</p>
-                                <p>{user.province}</p>
-                            </div>
-                        }
+                        value={[user.street, user.barangay, user.city].filter(Boolean).join(', ') || 'Not provided'}
                     />
                     <Separator className="my-3" />
                     <InfoItem
                         icon={User2}
                         label="Details"
                         value={
-                            <div className="space-y-2 font-medium">
-                                <p>Civil Status: {user.civil_status}</p>
-                                <p>Sex: {user.sex}</p>
-                                <p>Date of Birth: {new Date(user.date_of_birth).toLocaleDateString()}</p>
-                                <p>Place of Birth: {user.place_of_birth}</p>
-                                <p>Religion: {user.religion}</p>
+                            <div className="space-y-1">
+                                <p>Sex: {user.sex || 'Not provided'}</p>
+                                <p>Civil Status: {user.civil_status || 'Not provided'}</p>
                             </div>
                         }
                     />
@@ -191,7 +208,7 @@ function PersonalInfoCard({ user }: { user: User }) {
     );
 }
 
-function AcademicInfoCard({ user }: { user: User }) {
+function AcademicInfoCard({ user }: { user: UserWithProfile }) {
     if (!user.studentProfile) return null;
 
     return (
@@ -247,6 +264,21 @@ function AcademicInfoCard({ user }: { user: User }) {
 }
 
 export default function UserProfile({ user }: UserProfileProps) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/admin/dashboard',
+        },
+        {
+            title: user.role === 'student' ? 'Students' : 'Staff',
+            href: user.role === 'student' ? '/admin/students' : '/admin/staff',
+        },
+        {
+            title: 'User Profile',
+            href: `${user.role === 'student' ? '/admin/students' : '/admin/staff'}/${user.id}`,
+        },
+    ];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto py-12 max-w-6xl px-4">

@@ -29,9 +29,6 @@ class AdminSeeder extends Seeder
         AdminProfile::create([
             'user_id' => $admin->id,
             'admin_id' => 'ADMIN001',
-            'department' => 'OSAS',
-            'position' => 'System Administrator',
-            'access_level' => 'full',
         ]);
 
         // You can add more admin users here as needed

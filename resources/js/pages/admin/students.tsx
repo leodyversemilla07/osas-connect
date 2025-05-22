@@ -10,15 +10,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     href: '/admin/dashboard',
   },
   {
-    title: 'Users',
-    href: '/admin/users',
+    title: 'Students',
+    href: '/admin/students',
   },
 ];
 
-interface UsersPageProps {
+interface StudentsPageProps {
   users: {
     data: User[];
-    // Add other pagination properties if needed
     current_page: number;
     from: number;
     last_page: number;
@@ -28,20 +27,20 @@ interface UsersPageProps {
   };
 }
 
-export default function Users({ users }: UsersPageProps) {
+export default function Students({ users }: StudentsPageProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head>
-        <title>Users</title>
-        <meta name="description" content="Manage OSAS Connect user accounts and permissions" />
+        <title>Students</title>
+        <meta name="description" content="Manage OSAS Connect student accounts" />
       </Head>
 
       <div className="flex h-full flex-1 flex-col gap-4 p-4">
         {/* Header Section */}
         <div className="flex items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Users</h2>
-            <p className="text-muted-foreground">Manage user accounts and permissions</p>
+            <h2 className="text-3xl font-bold tracking-tight">Students</h2>
+            <p className="text-muted-foreground">Manage student accounts and information</p>
           </div>
         </div>
 
