@@ -37,7 +37,7 @@ class AdminController extends Controller
     /**
      * Display a listing of all students.
      */
-    public function users(Request $request): Response
+    public function students(Request $request): Response
     {
         $search = $request->query('search');
         $currentUserId = Auth::id();
@@ -67,6 +67,7 @@ class AdminController extends Controller
             return [
                 'id' => $user->id,
                 'first_name' => $user->first_name,
+                'middle_name' => $user->middle_name,
                 'last_name' => $user->last_name,
                 'email' => $user->email,
                 'avatar' => $user->avatar, // This will utilize the getAvatarAttribute accessor from the User model
@@ -82,7 +83,7 @@ class AdminController extends Controller
             ];
         });
 
-        return Inertia::render('admin/students', [
+        return Inertia::render('admin/manage-students', [
             'students' => $users, // Changed from 'users' to 'students'
             'filters' => [
                 'search' => $search,
@@ -93,7 +94,7 @@ class AdminController extends Controller
     /**
      * Show a specific user's profile.
      */
-    public function showUser(User $user): Response
+    public function showStudents(User $user): Response
     {
         // Load the appropriate profile based on user role
         $user->load($user->role.'Profile');

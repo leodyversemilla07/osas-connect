@@ -30,6 +30,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {
     Pagination,
     PaginationContent,
     PaginationEllipsis,
@@ -38,6 +45,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
+import { ChevronDown } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -54,6 +62,7 @@ export function DataTable<TData, TValue>({
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+    const [pageSize, setPageSize] = React.useState(10)
 
     const table = useReactTable({
         data,
@@ -72,6 +81,10 @@ export function DataTable<TData, TValue>({
             columnFilters,
             columnVisibility,
             rowSelection,
+            pagination: {
+                pageSize: pageSize,
+                pageIndex: 0,
+            },
         },
     })
 
@@ -121,27 +134,28 @@ export function DataTable<TData, TValue>({
     }, [currentPage, totalPages, maxVisiblePages])
 
     return (
-        <div>
-            <div className="flex items-center justify-between gap-4 py-4">                <Input
-                    placeholder="Filter by name..."
-                    className="max-w-sm"
-                    value={table.getColumn("fullName")?.getFilterValue() as string}
-                    onChange={(event) =>
-                        table.getColumn("fullName")?.setFilterValue(event.target.value)
-                    }
-                />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            View
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => {
-                                return (
+        <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <Input
+                        placeholder="Filter by name..."
+                        className="max-w-sm"
+                        value={table.getColumn("fullName")?.getFilterValue() as string}
+                        onChange={(event) =>
+                            table.getColumn("fullName")?.setFilterValue(event.target.value)
+                        }
+                    />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="ml-auto">
+                                Columns <ChevronDown className="ml-2 h-4 w-4"/>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {table
+                                .getAllColumns()
+                                .filter((column) => column.getCanHide())
+                                .map((column) => (
                                     <DropdownMenuCheckboxItem
                                         key={column.id}
                                         className="capitalize"
@@ -152,26 +166,43 @@ export function DataTable<TData, TValue>({
                                     >
                                         {column.id}
                                     </DropdownMenuCheckboxItem>
-                                )
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => table.toggleAllPageRowsSelected()}
+                    >
+                        {table.getIsAllPageRowsSelected() ? 'Deselect All' : 'Select All'}
+                    </Button>
+                    {table.getFilteredSelectedRowModel().rows.length > 0 && (
+                        <Button variant="default" size="sm">
+                            Bulk Actions ({table.getFilteredSelectedRowModel().rows.length})
+                        </Button>
+                    )}
+                </div>
             </div>
-            <div className="rounded-md border">
+            
+            <div className="rounded-md border shadow-sm">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="sticky top-0 bg-white dark:bg-gray-900">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                    </TableHead>
-                                ))}
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                        </TableHead>
+                                    )
+                                })}
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -184,14 +215,20 @@ export function DataTable<TData, TValue>({
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center"
+                                >
                                     No results.
                                 </TableCell>
                             </TableRow>
@@ -199,12 +236,34 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center gap-2 py-4">
-                <div className="text-sm text-muted-foreground">
+
+            <div className="flex items-center justify-between">
+                <div className="flex-1 text-sm text-muted-foreground">
                     {table.getFilteredSelectedRowModel().rows.length} of{" "}
                     {table.getFilteredRowModel().rows.length} row(s) selected.
                 </div>
-                <div className="grow flex justify-center">
+                <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium">Rows per page</p>
+                        <Select
+                            value={`${pageSize}`}
+                            onValueChange={(value) => {
+                                setPageSize(Number(value))
+                                table.setPageSize(Number(value))
+                            }}
+                        >
+                            <SelectTrigger className="h-8 w-[70px]">
+                                <SelectValue placeholder={pageSize} />
+                            </SelectTrigger>
+                            <SelectContent side="top">
+                                {[10, 20, 30, 40, 50].map((size) => (
+                                    <SelectItem key={size} value={`${size}`}>
+                                        {size}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <Pagination>
                         <PaginationContent>
                             <PaginationItem>
@@ -214,25 +273,20 @@ export function DataTable<TData, TValue>({
                                     aria-disabled={!table.getCanPreviousPage()}
                                 />
                             </PaginationItem>
-
                             {generatePagination().map((page, index) => (
-                                page === 'ellipsis' ? (
-                                    <PaginationItem key={`ellipsis-${index}`}>
+                                <PaginationItem key={index}>
+                                    {page === 'ellipsis' ? (
                                         <PaginationEllipsis />
-                                    </PaginationItem>
-                                ) : (
-                                    <PaginationItem key={page}>
+                                    ) : (
                                         <PaginationLink
                                             onClick={() => table.setPageIndex((page as number) - 1)}
                                             isActive={currentPage === page}
-                                            className="cursor-pointer"
                                         >
                                             {page}
                                         </PaginationLink>
-                                    </PaginationItem>
-                                )
+                                    )}
+                                </PaginationItem>
                             ))}
-
                             <PaginationItem>
                                 <PaginationNext
                                     onClick={() => table.nextPage()}
@@ -242,9 +296,6 @@ export function DataTable<TData, TValue>({
                             </PaginationItem>
                         </PaginationContent>
                     </Pagination>
-                </div>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    Page {currentPage} of {totalPages}
                 </div>
             </div>
         </div>

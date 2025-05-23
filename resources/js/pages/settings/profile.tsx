@@ -538,7 +538,12 @@ export default function Profile({
         data.withholding_tax,
         data.sss_gsis_pagibig_contribution,
         data.subtotal_annual_expenses,
-        isStudent
+        isStudent,
+        data.total_annual_income,
+        data.total_monthly_expenses,
+        data.annualized_monthly_expenses,
+        data.total_annual_expenses,
+        setData
     ]);
 
     const getRoleIdField = useCallback(() => {

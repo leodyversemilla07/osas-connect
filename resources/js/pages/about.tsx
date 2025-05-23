@@ -62,7 +62,7 @@ export default function About() {
 
                                     <div className="mt-8">
                                         <Link
-                                            href="/scholarships"
+                                            href="/scholarships/available"
                                             className="rounded-md bg-[#005a2d] px-8 py-3 text-center font-medium text-white shadow-md transition-all hover:bg-[#004020] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#005a2d] focus:ring-offset-2"
                                         >
                                             Explore Scholarships
@@ -203,6 +203,228 @@ export default function About() {
                             </div>
                         </section>
 
+                        {/* Organizational Chart Section */}
+                        <section className="py-16">
+                            <div className="text-center mb-12">
+                                <div className="inline-block px-4 py-1 rounded-full bg-[#005a2d]/10 text-sm font-medium text-[#005a2d] mb-3">
+                                    Our Structure
+                                </div>
+                                <h2 className="text-3xl font-bold text-[#005a2d]">Organizational Chart</h2>
+                                <p className="mt-4 max-w-2xl mx-auto text-lg text-[#010002]/70 dark:text-[#f3f2f2]/70">
+                                    How our team works together to serve the student community
+                                </p>
+                            </div>
+                            <div className="mx-auto max-w-4xl">
+                                {/* Level 1 - University President */}
+                                <div className="flex justify-center mb-12">
+                                    <div className="w-96 p-6 bg-[#004523] rounded-xl text-center text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-white/10">
+                                        <div className="h-28 w-28 mx-auto mb-6 overflow-hidden rounded-full border-4 border-white/20 shadow-inner">
+                                            <img
+                                                src="https://minsu.edu.ph/template/images/employee/key%20officials/apostol_enya.jpg"
+                                                alt="Dr. Enya Marie D. Apostol"
+                                                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "https://placehold.co/300x300/005a2d/FFFFFF?text=PRESIDENT";
+                                                }}
+                                            />
+                                        </div>
+                                        <h4 className="font-bold text-xl mb-2">Dr. Enya Marie D. Apostol</h4>
+                                        <p className="text-base font-medium text-white/90">University President</p>
+                                        <p className="text-sm text-white/75 mt-1">SUC President III</p>
+                                    </div>
+                                </div>
+
+                                {/* Vertical Line with decorative elements */}
+                                <div className="relative h-12 mb-12">
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 w-px h-full bg-gradient-to-b from-[#005a2d] to-transparent"></div>
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#005a2d] rounded-full"></div>
+                                </div>
+
+                                {/* Level 2 - VP Academic Affairs */}
+                                <div className="flex justify-center mb-12">
+                                    <div className="w-96 p-6 bg-[#005a2d] rounded-xl text-center text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-white/10">
+                                        <div className="h-28 w-28 mx-auto mb-6 overflow-hidden rounded-full border-4 border-white/20 shadow-inner">
+                                            <img
+                                                src="https://minsu.edu.ph/template/images/employee/key%20officials/salazar_ciedelle.jpg"
+                                                alt="Dr. Ciedelle P. Salazar"
+                                                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "https://placehold.co/300x300/006d36/FFFFFF?text=VP";
+                                                }}
+                                            />
+                                        </div>
+                                        <h4 className="font-bold text-xl mb-2">Dr. Ciedelle P. Salazar</h4>
+                                        <p className="text-base font-medium text-white/90">Vice President for Academic Affairs</p>
+                                        <p className="text-sm text-white/75 mt-1">Academic Affairs Leadership</p>
+                                    </div>
+                                </div>
+
+                                {/* Vertical Line with decorative elements */}
+                                <div className="relative h-12 mb-12">
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 w-px h-full bg-gradient-to-b from-[#005a2d] to-transparent"></div>
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#005a2d] rounded-full"></div>
+                                </div>
+
+                                {/* Level 3 - Campus Executive Director */}
+                                <div className="flex justify-center mb-12">
+                                    <div className="w-96 p-6 bg-[#006d36] rounded-xl text-center text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-white/10">
+                                        <div className="h-28 w-28 mx-auto mb-6 overflow-hidden rounded-full border-4 border-white/20 shadow-inner">
+                                            <img
+                                                src="https://minsu.edu.ph/template/images/employee/key%20officials/salazar_ciedelle.jpg"
+                                                alt="Dr. Ciedelle P. Salazar"
+                                                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "https://placehold.co/300x300/007f3f/FFFFFF?text=DIRECTOR";
+                                                }}
+                                            />
+                                        </div>
+                                        <h4 className="font-bold text-xl mb-2">Dr. Ciedelle P. Salazar</h4>
+                                        <p className="text-base font-medium text-white/90">Campus Executive Director</p>
+                                        <p className="text-sm text-white/75 mt-1">Bongabong Campus</p>
+                                    </div>
+                                </div>
+
+                                {/* Vertical Line with decorative elements */}
+                                <div className="relative h-12 mb-12">
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 w-px h-full bg-gradient-to-b from-[#005a2d] to-transparent"></div>
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#005a2d] rounded-full"></div>
+                                </div>
+
+                                {/* Level 4 - OSAS Director */}
+                                <div className="flex justify-center mb-12">
+                                    <div className="w-96 p-6 bg-[#007f3f] rounded-xl text-center text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-white/10">
+                                        <div className="h-28 w-28 mx-auto mb-6 overflow-hidden rounded-full border-4 border-white/20 shadow-inner">
+                                            <img
+                                                src="https://minsu.edu.ph/template/images/employee/key%20officials/caoli_jonbert1.jpg"
+                                                alt="Jonbert M. Caoli"
+                                                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "https://placehold.co/300x300/23b14d/FFFFFF?text=OSAS";
+                                                }}
+                                            />
+                                        </div>
+                                        <h4 className="font-bold text-xl mb-2">Jonbert M. Caoli</h4>
+                                        <p className="text-base font-medium text-white/90">Director, Student Affairs and Services</p>
+                                        <p className="text-sm text-white/75 mt-1">Office of Student Affairs and Services</p>
+                                    </div>
+                                </div>
+
+                                {/* Vertical Line with decorative elements */}
+                                <div className="relative h-12 mb-12">
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 w-px h-full bg-gradient-to-b from-[#005a2d] to-transparent"></div>
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#005a2d] rounded-full"></div>
+                                </div>
+
+                                {/* Level 5 - OSAS Coordinator */}
+                                <div className="flex justify-center mb-12">
+                                    <div className="w-96 p-6 bg-[#009148] rounded-xl text-center text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-white/10">
+                                        <div className="h-28 w-28 mx-auto mb-6 overflow-hidden rounded-full border-4 border-white/20 shadow-inner">
+                                            <img
+                                                src="https://scontent.fmnl17-2.fna.fbcdn.net/v/t39.30808-6/499538815_3139584229529008_529685815103046574_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeFy-p85pppEJfDtyPt3eJGqolGMGeS2jvaiUYwZ5LaO9pV4n-w43TDy92z604SLxVAW358eZX7NdGSulYx6m6Ds&_nc_ohc=rEefjkOJ5JwQ7kNvwHURCY_&_nc_oc=AdlB42KPwi1OR2SYZp-gpmOCOdd4Dr3ASsVEx5HIs1GYBfSDFWJ1wa9qxwyNOzyZZss&_nc_zt=23&_nc_ht=scontent.fmnl17-2.fna&_nc_gid=Q6rU3lSOhrGPYWd2pe6JpA&oh=00_AfLnZ_-pTb6AP4r1jB_wwQW5aj0beQW5XPpLH0-89few8g&oe=68367CA2"
+                                                alt="Dr. Dionisio E. Briñosa"
+                                                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "https://placehold.co/300x300/26b853/FFFFFF?text=COORDINATOR";
+                                                }}
+                                            />
+                                        </div>                                        <h4 className="font-bold text-xl mb-2">Dr. Dionisio E. Briñosa</h4>
+                                        <p className="text-base font-medium text-white/90">Coordinator, Office of Student Affairs and Services</p>
+                                        <p className="text-sm text-white/75 mt-1">Bongabong Campus</p>
+                                    </div>
+                                </div>
+
+                                {/* Vertical Line with decorative elements */}
+                                <div className="relative h-12 mb-12">
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 w-px h-full bg-gradient-to-b from-[#005a2d] to-transparent"></div>
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#005a2d] rounded-full"></div>
+                                </div>
+
+                                {/* Level 6 - Scholarship Coordinator */}
+                                <div className="flex justify-center mb-12">
+                                    <div className="w-96 p-6 bg-[#00a352] rounded-xl text-center text-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-white/10">
+                                        <div className="h-28 w-28 mx-auto mb-6 overflow-hidden rounded-full border-4 border-white/20 shadow-inner">
+                                            <img
+                                                src="https://scontent.fmnl17-8.fna.fbcdn.net/v/t1.6435-1/62021920_2573218819389782_451695487112708096_n.jpg?stp=c0.0.575.575a_dst-jpg_s200x200_tt6&_nc_cat=104&ccb=1-7&_nc_sid=e99d92&_nc_eui2=AeE8x3yFeZ7cVf8tutRuf7mwbbd5LXNMHIptt3ktc0wcip4SSthG6exNN1kpGMeIdApcP3RE13eoHNopaVN7bLwW&_nc_ohc=mz7_41UhK2UQ7kNvwEHPA4o&_nc_oc=AdmMn-PyETTmZesEu_MkgukobEfnaYQf0lvRwcmRiCIVHETfHo4Lgi0dl7a_d-d6neg&_nc_zt=24&_nc_ht=scontent.fmnl17-8.fna&_nc_gid=psoPlVNAn7PFEdgeorVChg&oh=00_AfKOO3E7aj7vt1i1bqCtEDxUWi-4CsgkKRbHq4ms2hNuaw&oe=68581156"
+                                                alt="Nicko A. Magnaye"
+                                                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "https://placehold.co/300x300/28c959/FFFFFF?text=COORDINATOR";
+                                                }}
+                                            />
+                                        </div>
+                                        <h4 className="font-bold text-xl mb-2">Nicko A. Magnaye</h4>
+                                        <p className="text-base font-medium text-white/90">Scholarship Coordinator</p>
+                                        <p className="text-sm text-white/75 mt-1">Scholarship Program Management</p>
+                                    </div>
+                                </div>
+
+                                {/* Vertical Line with decorative elements */}
+                                <div className="relative h-12 mb-12">
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 w-px h-full bg-gradient-to-b from-[#005a2d] to-transparent"></div>
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#005a2d] rounded-full"></div>
+                                </div>
+                                {/* Bottom Level - Multiple Boxes */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+                                    {/* Box 1 */}
+                                    <div className="p-6 bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-[#febd12]/20">
+                                        <div className="h-36 w-36 mx-auto overflow-hidden rounded-full border-4 border-[#febd12]/20 shadow-inner">
+                                            <img
+                                                src="https://placehold.co/300x300/005a2d/FFFFFF?text=STAFF1"
+                                                alt="OSAS Staff - Scholarship Processing"
+                                                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "https://placehold.co/300x300/005a2d/FFFFFF?text=STAFF1";
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="mt-6 text-center">
+                                            <h4 className="font-bold text-lg text-[#005a2d]">Ma. Cristina P. Lumauig</h4>
+                                            <p className="text-sm text-[#febd12] font-medium mt-2">OSAS Staff</p>
+                                            <p className="text-sm text-[#010002]/70 dark:text-[#f3f2f2]/70 mt-2">Scholarship Processing</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Box 2 */}
+                                    <div className="p-6 bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-[#febd12]/20">
+                                        <div className="h-36 w-36 mx-auto overflow-hidden rounded-full border-4 border-[#febd12]/20 shadow-inner">
+                                            <img
+                                                src="https://placehold.co/300x300/005a2d/FFFFFF?text=STAFF2"
+                                                alt="OSAS Staff - Documentation & Records"
+                                                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "https://placehold.co/300x300/005a2d/FFFFFF?text=STAFF2";
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="mt-6 text-center">
+                                            <h4 className="font-bold text-lg text-[#005a2d]">John Doe</h4>
+                                            <p className="text-sm text-[#febd12] font-medium mt-2">OSAS Staff</p>
+                                            <p className="text-sm text-[#010002]/70 dark:text-[#f3f2f2]/70 mt-2">Documentation & Records</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Box 3 */}
+                                    <div className="p-6 bg-white dark:bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-[#febd12]/20">
+                                        <div className="h-36 w-36 mx-auto overflow-hidden rounded-full border-4 border-[#febd12]/20 shadow-inner">
+                                            <img
+                                                src="https://placehold.co/300x300/005a2d/FFFFFF?text=STAFF3"
+                                                alt="OSAS Staff - Student Support"
+                                                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "https://placehold.co/300x300/005a2d/FFFFFF?text=STAFF3";
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="mt-6 text-center">
+                                            <h4 className="font-bold text-lg text-[#005a2d]">Jane Smith</h4>
+                                            <p className="text-sm text-[#febd12] font-medium mt-2">OSAS Staff</p>
+                                            <p className="text-sm text-[#010002]/70 dark:text-[#f3f2f2]/70 mt-2">Student Support Services</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
                         {/* Contact CTA Section */}
                         <section className="mt-16 mb-8">
                             <div className="rounded-2xl bg-gradient-to-r from-[#005a2d] to-[#008040] p-8 shadow-xl overflow-hidden relative">
@@ -210,29 +432,32 @@ export default function About() {
                                 <div className="absolute inset-0 opacity-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
                                         <pattern id="pattern-circles-cta" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
-                                            <circle id="pattern-circle-cta" cx="10" cy="10" r="1.6" fill="#fff"></circle>
+                                            <circle id="pattern-circle" cx="10" cy="10" r="1.6257413380501518" fill="#fff"></circle>
                                         </pattern>
-                                        <rect id="rect-cta" x="0" y="0" width="100%" height="100%" fill="url(#pattern-circles-cta)"></rect>
+                                        <rect id="rect" x="0" y="0" width="100%" height="100%" fill="url(#pattern-circles-cta)"></rect>
                                     </svg>
                                 </div>
 
                                 <div className="relative z-10 text-center">
-                                    <h2 className="text-3xl font-bold text-white">Have Questions About OSAS Connect?</h2>
-                                    <p className="mt-4 mx-auto max-w-2xl text-lg text-white/80">
-                                        Our team is ready to assist you with any inquiries about our platform, scholarship opportunities, or how to get started.
+                                    <h2 className="text-3xl font-bold text-white sm:text-4xl">
+                                        Ready to Unlock Your Potential?
+                                    </h2>
+                                    <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
+                                        Join OSAS Connect today and take the first step towards a brighter academic and professional future.
                                     </p>
-                                    <div className="mt-8 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
+
+                                    <div className="mt-8 flex justify-center gap-4">
                                         <Link
-                                            href="/contact"
-                                            className="rounded-md bg-[#febd12] px-8 py-3 text-center font-medium text-[#010002] shadow-md transition-all hover:bg-[#f5b400] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
+                                            href="/register"
+                                            className="rounded-md bg-white px-6 py-3 text-center font-medium text-[#005a2d] shadow-md transition-all hover:bg-[#f3f4f6] focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
                                         >
-                                            Contact Us
+                                            Get Started
                                         </Link>
                                         <Link
-                                            href="/faqs"
-                                            className="rounded-md border-2 border-white bg-transparent px-8 py-3 text-center font-medium text-white transition-all hover:bg-white hover:text-[#005a2d] focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+                                            href="/scholarships/available"
+                                            className="rounded-md bg-[#febd12] px-6 py-3 text-center font-medium text-[#010002] shadow-md transition-all hover:bg-[#f3bd07] focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
                                         >
-                                            View FAQs
+                                            Explore Scholarships
                                         </Link>
                                     </div>
                                 </div>

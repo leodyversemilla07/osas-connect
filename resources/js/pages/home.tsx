@@ -47,7 +47,7 @@ export default function Home() {
 
                                     <div className="mt-6 flex flex-col space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
                                         <Link
-                                            href="/scholarships"
+                                            href="/scholarships/available"
                                             className="rounded-md bg-[#febd12] px-8 py-3 text-center font-medium text-[#010002] shadow-md transition-all hover:bg-[#f5b400] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
                                         >
                                             Browse Scholarships
@@ -127,7 +127,7 @@ export default function Home() {
                                     </div>
                                     <h3 className="mb-3 text-xl font-medium text-[#005a2d]">Apply Online</h3>
                                     <p className="text-[#010002]/80 dark:text-[#f3f2f2]/80 mb-4">Complete and submit your applications directly through our secure online platform.</p>
-                                    <Link href="/scholarships/application" className="inline-flex items-center text-[#23b14d] hover:underline">
+                                    <Link href="/student/scholarships/view" className="inline-flex items-center text-[#23b14d] hover:underline">
                                         Application guide
                                         <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

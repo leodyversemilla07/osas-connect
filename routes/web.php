@@ -13,14 +13,11 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
-
-// Public routes
 Route::inertia('scholarships/available', 'scholarships')->name('scholarships.available');
 Route::inertia('announcements', 'announcements')->name('announcements');
 Route::inertia('contact', 'contact')->name('contact');
-
-// Additional public routes
 Route::inertia('about', 'about')->name('about');
+
 Route::inertia('privacy', 'privacy')->name('privacy');
 Route::inertia('terms', 'terms')->name('terms');
 Route::inertia('accessibility', 'accessibility')->name('accessibility');
@@ -52,8 +49,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
         // Students management
-        Route::get('/students', [AdminController::class, 'users'])->name('admin.students');
-        Route::get('/students/{user}', [AdminController::class, 'showUser'])->name('admin.students.show');
+        Route::get('/students', [AdminController::class, 'students'])->name('admin.students');
+        Route::get('/students/{user}', [AdminController::class, 'showStudents'])->name('admin.students.show');
         Route::get('/students/{user}/edit', [AdminController::class, 'editUser'])->name('admin.students.edit');
         Route::put('/students/{user}', [AdminController::class, 'updateUser'])->name('admin.students.update');
         Route::delete('/students/{user}', [AdminController::class, 'destroyUser'])->name('admin.students.destroy');

@@ -71,6 +71,7 @@ export default function StudentRecords({ students, filters, courses, yearLevels 
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 {/* Header Section */}
+
                 <div className="flex justify-between items-center">
                     <div>
                         <h2 className="text-3xl font-bold tracking-tight">Student Records</h2>
@@ -154,13 +155,13 @@ export default function StudentRecords({ students, filters, courses, yearLevels 
                             ) : (
                                 students.data.map((student) => (
                                     <TableRow key={student.id}>
-                                        <TableCell>{student.student_profile.student_id}</TableCell>
+                                        <TableCell>{student.student_profile?.student_id}</TableCell>
                                         <TableCell className="font-medium">
                                             {student.first_name} {student.middle_name && `${student.middle_name} `}
                                             {student.last_name}
                                         </TableCell>
-                                        <TableCell>{student.student_profile.course}</TableCell>
-                                        <TableCell>{student.student_profile.year_level}</TableCell>
+                                        <TableCell>{student.student_profile?.course}</TableCell>
+                                        <TableCell>{student.student_profile?.year_level}</TableCell>
                                         <TableCell className="text-right">
                                             <Button variant="ghost" size="sm" asChild>
                                                 <Link href={route('osas.students.details', { id: student.id })}>
