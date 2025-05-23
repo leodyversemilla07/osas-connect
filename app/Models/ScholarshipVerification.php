@@ -16,22 +16,29 @@ class ScholarshipVerification extends Model
         'verification_type',
         'status',
         'comments',
-        'verification_data'
+        'verification_data',
     ];
 
     protected $casts = [
-        'verification_data' => 'array'
+        'verification_data' => 'array',
     ];
 
     const TYPE_REGISTRAR = 'registrar';
+
     const TYPE_GUIDANCE = 'guidance';
+
     const TYPE_OSAS = 'osas';
+
     const TYPE_COACH = 'coach';
+
     const TYPE_ADVISER = 'adviser';
 
     const STATUS_PENDING = 'pending';
+
     const STATUS_VERIFIED = 'verified';
+
     const STATUS_INCOMPLETE = 'incomplete';
+
     const STATUS_REJECTED = 'rejected';
 
     /**

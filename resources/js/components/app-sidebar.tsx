@@ -64,6 +64,12 @@ const studentNavItems: NavItem[] = [
         href: route('student.scholarships'),
         icon: FileText, // Using DocumentText as a substitute for academic-cap
         roles: ['student']
+    },
+    {
+        title: 'Interviews',
+        href: route('interviews.index'),
+        icon: FileText, // Using FileText as a substitute for academic-cap
+        roles: ['student']
     }
 ];
 

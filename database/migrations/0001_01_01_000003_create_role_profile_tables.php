@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Student-specific information
-        Schema::create('student_profiles', function (Blueprint $table) {              
+        Schema::create('student_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('student_id')->unique();
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('year_level');
             $table->string('guardian_name')->default('Not Applicable');
             $table->string('existing_scholarships')->nullable();
-            
+
             // Personal Information
             $table->string('civil_status');
             $table->enum('sex', ['Male', 'Female']);
@@ -37,16 +37,16 @@ return new class extends Migration
             $table->string('disability_type')->nullable();
             $table->string('religion')->default('Prefer not to say');
             $table->string('residence_type');
-            
+
             // Family Background
             $table->enum('status_of_parents', [
-                'Living Together', 
-                'Separated', 
-                'Single Parent', 
-                'Mother Deceased', 
-                'Father Deceased'
+                'Living Together',
+                'Separated',
+                'Single Parent',
+                'Mother Deceased',
+                'Father Deceased',
             ])->nullable();
-            
+
             // Father's Information
             $table->string('father_name')->nullable();
             $table->integer('father_age')->nullable();
@@ -145,7 +145,7 @@ return new class extends Migration
 
             $table->timestamps();
         });
-        
+
         // OSAS staff-specific information
         Schema::create('osas_staff_profiles', function (Blueprint $table) {
             $table->id();
@@ -153,7 +153,7 @@ return new class extends Migration
             $table->string('staff_id')->unique();
             $table->timestamps();
         });
-        
+
         // Admin-specific information
         Schema::create('admin_profiles', function (Blueprint $table) {
             $table->id();

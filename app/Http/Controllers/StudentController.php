@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StudentProfile;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\Auth;
-use App\Models\ScholarshipApplication;
-use App\Models\Scholarship;
 
 class StudentController extends Controller
 {
@@ -19,25 +15,25 @@ class StudentController extends Controller
     {
         $student = Auth::user()->studentProfile;
 
-        if (!$student) {
+        if (! $student) {
             return Inertia::render('errors/404', [
-                'message' => 'Student profile not found'
+                'message' => 'Student profile not found',
             ]);
         }
 
         // Get count of active/approved scholarships and add it to student data
         $studentData = $student->toArray();
-        
+
         // Count both existing scholarships and approved applications
-        $existingScholarships = !empty($student->existing_scholarships) ? 1 : 0;
+        $existingScholarships = ! empty($student->existing_scholarships) ? 1 : 0;
         $approvedApplications = $student->scholarshipApplications()
             ->where('status', 'approved')
             ->count();
-            
+
         $studentData['scholarships'] = $existingScholarships + $approvedApplications;
 
         return Inertia::render('student/dashboard', [
-            'student' => $studentData
+            'student' => $studentData,
         ]);
     }
 
@@ -45,25 +41,25 @@ class StudentController extends Controller
     {
         $student = Auth::user()->studentProfile;
 
-        if (!$student) {
+        if (! $student) {
             return Inertia::render('errors/404', [
-                'message' => 'Student profile not found'
+                'message' => 'Student profile not found',
             ]);
         }
 
         // Get count of active/approved scholarships and add it to student data
         $studentData = $student->toArray();
-        
+
         // Count both existing scholarships and approved applications
-        $existingScholarships = !empty($student->existing_scholarships) ? 1 : 0;
+        $existingScholarships = ! empty($student->existing_scholarships) ? 1 : 0;
         $approvedApplications = $student->scholarshipApplications()
             ->where('status', 'approved')
             ->count();
-            
+
         $studentData['scholarships'] = $existingScholarships + $approvedApplications;
 
         return Inertia::render('student/view-scholarships', [
-            'student' => $studentData
+            'student' => $studentData,
         ]);
     }
 }

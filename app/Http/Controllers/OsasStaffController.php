@@ -22,28 +22,29 @@ class OsasStaffController extends Controller
     {
         return Inertia::render('osas_staff/dashboard');
     }
-    
+
     /**
      * Show the invitation acceptance form.
      */
     public function showAcceptInvitationForm(Request $request, $token)
     {
-        if (!$request->hasValidSignature()) {
+        if (! $request->hasValidSignature()) {
             abort(401, 'Invalid or expired invitation link.');
         }
-        
+
         $invitation = StaffInvitation::where('token', $token)
             ->where('accepted_at', null)
             ->where('expires_at', '>', Carbon::now())
             ->firstOrFail();
-              return Inertia::render('auth/accept-invitation', [
+
+        return Inertia::render('auth/accept-invitation', [
             'invitation' => [
                 'email' => $invitation->email,
                 'token' => $invitation->token,
             ],
         ]);
     }
-    
+
     /**
      * Process the invitation acceptance.
      */
@@ -53,7 +54,7 @@ class OsasStaffController extends Controller
             ->where('accepted_at', null)
             ->where('expires_at', '>', Carbon::now())
             ->firstOrFail();
-            
+
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -61,9 +62,9 @@ class OsasStaffController extends Controller
             'staff_id' => ['required', 'string', 'max:255', 'unique:osas_staff_profiles'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-        
+
         DB::beginTransaction();
-        
+
         try {
             // Create the user
             $user = User::create([
@@ -74,27 +75,28 @@ class OsasStaffController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => 'osas_staff',
             ]);
-            
-            // Create the staff profile            
+
+            // Create the staff profile
             OsasStaffProfile::create([
                 'user_id' => $user->id,
                 'staff_id' => $request->staff_id,
             ]);
-              // Mark invitation as accepted
+            // Mark invitation as accepted
             $invitation->update([
                 'accepted_at' => Carbon::now(),
                 'status' => 'accepted',
             ]);
-            
+
             DB::commit();
-            
+
             // Log the user in
             \Illuminate\Support\Facades\Auth::login($user);
-            
+
             return redirect()->route('osas.dashboard')->with('success', 'Welcome to OSAS Connect! Your account has been created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to process invitation: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Failed to process invitation: '.$e->getMessage()]);
         }
     }
 
@@ -109,23 +111,23 @@ class OsasStaffController extends Controller
         // Apply filters if provided
         if ($request->search) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhereHas('studentProfile', function($q) use ($search) {
+                    ->orWhereHas('studentProfile', function ($q) use ($search) {
                         $q->where('student_id', 'like', "%{$search}%");
                     });
             });
         }
 
         if ($request->course) {
-            $query->whereHas('studentProfile', function($q) use ($request) {
+            $query->whereHas('studentProfile', function ($q) use ($request) {
                 $q->where('course', $request->course);
             });
         }
 
         if ($request->year_level) {
-            $query->whereHas('studentProfile', function($q) use ($request) {
+            $query->whereHas('studentProfile', function ($q) use ($request) {
                 $q->where('year_level', $request->year_level);
             });
         }
@@ -143,14 +145,14 @@ class OsasStaffController extends Controller
             'Bachelor of Science in Criminology',
             'Bachelor of Secondary Education',
             'Bachelor of Elementary Education',
-            'Bachelor of Science in Fisheries'
+            'Bachelor of Science in Fisheries',
         ];
 
         $yearLevels = [
             '1st Year',
             '2nd Year',
             '3rd Year',
-            '4th Year'
+            '4th Year',
         ];
 
         return Inertia::render('osas_staff/student-records', [
@@ -183,7 +185,7 @@ class OsasStaffController extends Controller
         ]);
 
         return Inertia::render('osas_staff/student-details', [
-            'student' => $studentData
+            'student' => $studentData,
         ]);
     }
 
@@ -202,9 +204,9 @@ class OsasStaffController extends Controller
     {
         // You can load events data here as needed
         $events = [];
-        
+
         return Inertia::render('osas_staff/events', [
-            'events' => $events
+            'events' => $events,
         ]);
     }
 
@@ -215,9 +217,9 @@ class OsasStaffController extends Controller
     {
         // You can load reports data here as needed
         $reports = [];
-        
+
         return Inertia::render('osas_staff/reports', [
-            'reports' => $reports
+            'reports' => $reports,
         ]);
     }
 }

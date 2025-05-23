@@ -16,7 +16,7 @@ class StaffInvitation extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [        
+    protected $fillable = [
         'email',
         'token',
         'invited_by',

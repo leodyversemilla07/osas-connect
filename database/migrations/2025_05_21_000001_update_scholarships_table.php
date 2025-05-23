@@ -13,19 +13,19 @@ class UpdateScholarshipsTable extends Migration
     {
         Schema::table('scholarships', function (Blueprint $table) {
             // Add new columns only if they don't exist
-            if (!Schema::hasColumn('scholarships', 'stipend_schedule')) {
+            if (! Schema::hasColumn('scholarships', 'stipend_schedule')) {
                 $table->enum('stipend_schedule', ['monthly', 'semestral'])->default('monthly');
             }
 
-            if (!Schema::hasColumn('scholarships', 'slots_available')) {
+            if (! Schema::hasColumn('scholarships', 'slots_available')) {
                 $table->integer('slots_available')->default(0);
             }
 
-            if (!Schema::hasColumn('scholarships', 'criteria')) {
+            if (! Schema::hasColumn('scholarships', 'criteria')) {
                 $table->json('criteria')->nullable();
             }
 
-            if (!Schema::hasColumn('scholarships', 'renewal_criteria')) {
+            if (! Schema::hasColumn('scholarships', 'renewal_criteria')) {
                 $table->json('renewal_criteria')->nullable();
             }
         });
@@ -41,7 +41,7 @@ class UpdateScholarshipsTable extends Migration
                 'stipend_schedule',
                 'slots_available',
                 'criteria',
-                'renewal_criteria'
+                'renewal_criteria',
             ]);
         });
     }

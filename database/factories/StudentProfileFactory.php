@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\StudentProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +20,7 @@ class StudentProfileFactory extends Factory
             'Bachelor of Science in Criminology',
             'Bachelor of Secondary Education',
             'Bachelor of Elementary Education',
-            'Bachelor of Science in Fisheries'
+            'Bachelor of Science in Fisheries',
         ];
 
         $course = fake()->randomElement($courses);
@@ -35,11 +34,11 @@ class StudentProfileFactory extends Factory
         }
 
         $isPwd = fake()->boolean();
-        $residenceType = fake()->randomElement(["Parent's House", "Boarding House", "With Guardian"]);
+        $residenceType = fake()->randomElement(["Parent's House", 'Boarding House', 'With Guardian']);
 
         return [
             // Basic Student Information
-            'student_id' => 'MBC' . fake()->numberBetween(2020, 2025) . '-' . fake()->unique()->randomNumber(4, true),
+            'student_id' => 'MBC'.fake()->numberBetween(2020, 2025).'-'.fake()->unique()->randomNumber(4, true),
             'course' => $course,
             'major' => $major,
             'year_level' => fake()->randomElement(['1st Year', '2nd Year', '3rd Year', '4th Year']),
@@ -49,14 +48,14 @@ class StudentProfileFactory extends Factory
                 'Tulong Dunong',
                 'Municipal Scholarship',
                 'Provincial Scholarship',
-                'DOST Scholarship'
+                'DOST Scholarship',
             ]),
 
             // Personal Information
             'civil_status' => fake()->randomElement(['Single', 'Married', 'Widowed', 'Separated', 'Annulled']),
             'sex' => fake()->randomElement(['Male', 'Female']),
             'date_of_birth' => fake()->dateTimeBetween('-25 years', '-17 years'),
-            'place_of_birth' => fake()->city() . ', ' . fake()->state(),
+            'place_of_birth' => fake()->city().', '.fake()->state(),
             'religion' => fake()->randomElement([
                 'Roman Catholic',
                 'Islam',
@@ -64,7 +63,7 @@ class StudentProfileFactory extends Factory
                 'Methodist',
                 'Seventh Day Adventist',
                 'Baptist',
-                'Prefer not to say'
+                'Prefer not to say',
             ]),
 
             // Contact & Address Information
@@ -72,7 +71,7 @@ class StudentProfileFactory extends Factory
             'barangay' => fake()->word(),
             'city' => fake()->city(),
             'province' => fake()->state(),
-            'mobile_number' => '+63' . fake()->numerify('9#########'),
+            'mobile_number' => '+63'.fake()->numerify('9#########'),
             'telephone_number' => fake()->optional(0.3)->numerify('###-####'),
 
             // PWD Information
@@ -81,7 +80,7 @@ class StudentProfileFactory extends Factory
                 'Visual Impairment',
                 'Hearing Impairment',
                 'Physical Disability',
-                'Learning Disability'
+                'Learning Disability',
             ]) : null,
 
             // Residence Information
@@ -96,7 +95,7 @@ class StudentProfileFactory extends Factory
                 'Separated',
                 'Single Parent',
                 'Mother Deceased',
-                'Father Deceased'
+                'Father Deceased',
             ]),
 
             // Father's Information
@@ -104,7 +103,7 @@ class StudentProfileFactory extends Factory
             'father_age' => fake()->numberBetween(35, 70),
             'father_address' => fake()->address(),
             'father_telephone' => fake()->optional(0.3)->phoneNumber(),
-            'father_mobile' => '+63' . fake()->numerify('9#########'),
+            'father_mobile' => '+63'.fake()->numerify('9#########'),
             'father_email' => fake()->optional(0.5)->safeEmail(),
             'father_occupation' => fake()->jobTitle(),
             'father_company' => fake()->optional(0.8)->company(),
@@ -114,7 +113,7 @@ class StudentProfileFactory extends Factory
                 'High School',
                 'College',
                 'Vocational',
-                'Post Graduate'
+                'Post Graduate',
             ]),
             'father_school' => fake()->company(),
             'father_unemployment_reason' => fake()->optional(0.2)->sentence(),
@@ -124,7 +123,7 @@ class StudentProfileFactory extends Factory
             'mother_age' => fake()->numberBetween(35, 70),
             'mother_address' => fake()->address(),
             'mother_telephone' => fake()->optional(0.3)->phoneNumber(),
-            'mother_mobile' => '+63' . fake()->numerify('9#########'),
+            'mother_mobile' => '+63'.fake()->numerify('9#########'),
             'mother_email' => fake()->optional(0.5)->safeEmail(),
             'mother_occupation' => fake()->jobTitle(),
             'mother_company' => fake()->optional(0.8)->company(),
@@ -134,7 +133,7 @@ class StudentProfileFactory extends Factory
                 'High School',
                 'College',
                 'Vocational',
-                'Post Graduate'
+                'Post Graduate',
             ]),
             'mother_school' => fake()->company(),
             'mother_unemployment_reason' => fake()->optional(0.2)->sentence(),
@@ -145,7 +144,7 @@ class StudentProfileFactory extends Factory
                 array_map(function () {
                     return [
                         'name' => fake()->name(),
-                        'age_civil_status' => fake()->numberBetween(1, 40) . ' / ' . fake()->randomElement(['Single', 'Married']),
+                        'age_civil_status' => fake()->numberBetween(1, 40).' / '.fake()->randomElement(['Single', 'Married']),
                         'permanent_home_address' => fake()->address(),
                         'occupation' => fake()->jobTitle(),
                         'average_monthly_income' => fake()->randomFloat(2, 0, 50000),
@@ -153,7 +152,7 @@ class StudentProfileFactory extends Factory
                             'Elementary',
                             'High School',
                             'College',
-                            'Post Graduate'
+                            'Post Graduate',
                         ]),
                         'school_or_college' => fake()->company(),
                         'still_with_you' => fake()->boolean(),

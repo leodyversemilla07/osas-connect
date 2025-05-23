@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\Auth;
 
 class ScholarshipsController extends Controller
 {
@@ -38,7 +38,7 @@ class ScholarshipsController extends Controller
             });
 
         return Inertia::render('Scholarships/Index', [
-            'scholarships' => $scholarships
+            'scholarships' => $scholarships,
         ]);
     }
 
@@ -52,13 +52,13 @@ class ScholarshipsController extends Controller
             ->where('scholarship_id', $scholarship->id)
             ->whereNotIn('status', [
                 ScholarshipApplication::STATUS_REJECTED,
-                ScholarshipApplication::STATUS_END
+                ScholarshipApplication::STATUS_END,
             ])
             ->first();
 
         if ($existingApplication) {
             return Inertia::render('Scholarships/AlreadyApplied', [
-                'application' => $existingApplication
+                'application' => $existingApplication,
             ]);
         }
 
@@ -68,7 +68,7 @@ class ScholarshipsController extends Controller
         return Inertia::render('Scholarships/Apply', [
             'scholarship' => $scholarship,
             'student' => $student,
-            'requiredDocuments' => $scholarship->required_documents
+            'requiredDocuments' => $scholarship->required_documents,
         ]);
     }
 
@@ -79,7 +79,7 @@ class ScholarshipsController extends Controller
     {
         $request->validate([
             'uploaded_documents' => ['required', 'array'],
-            'uploaded_documents.*' => ['required', 'file', 'max:2048']
+            'uploaded_documents.*' => ['required', 'file', 'max:2048'],
         ]);
 
         // Store uploaded documents
@@ -89,7 +89,7 @@ class ScholarshipsController extends Controller
             $documents[$type] = [
                 'path' => $path,
                 'original_name' => $file->getClientOriginalName(),
-                'uploaded_at' => now()
+                'uploaded_at' => now(),
             ];
         }
 
@@ -101,7 +101,7 @@ class ScholarshipsController extends Controller
             'uploaded_documents' => $documents,
             'semester' => $scholarship->semester,
             'academic_year' => $scholarship->academic_year,
-            'applied_at' => now()
+            'applied_at' => now(),
         ]);
 
         // Transition to under verification status
@@ -122,7 +122,7 @@ class ScholarshipsController extends Controller
         $application->load(['scholarship', 'student']);
 
         return Inertia::render('Scholarships/Track', [
-            'application' => $application
+            'application' => $application,
         ]);
     }
 }

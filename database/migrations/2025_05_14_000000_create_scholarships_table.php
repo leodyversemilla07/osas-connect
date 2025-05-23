@@ -21,7 +21,7 @@ return new class extends Migration
                 'Research',
                 'Athletic',
                 'Cultural',
-                'Student Assistantship'
+                'Student Assistantship',
             ]);
             $table->decimal('amount', 10, 2);
             $table->date('deadline');

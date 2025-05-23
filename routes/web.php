@@ -1,14 +1,14 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\OsasStaffController;
+use App\Http\Controllers\PdfController;
+use App\Http\Controllers\ScholarshipsController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\PdfController;
-use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\ScholarshipsController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('home');
@@ -126,6 +126,6 @@ Route::get('/generate-scholarship-pdf/{user}', [PdfController::class, 'generateP
     ->name('generate.scholarship.pdf') // Added a route name for convenience
     ->middleware('auth'); // Assuming only authenticated users can generate this
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
-require __DIR__ . '/scholarships.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';
+require __DIR__.'/scholarships.php';

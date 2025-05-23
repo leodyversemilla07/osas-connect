@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\User;
 use App\Models\StudentProfile;
-use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 // Define minimal PDF template as a constant
 const MINIMAL_PDF_TEMPLATE = '%PDF-1.4
@@ -25,12 +25,12 @@ startxref
 beforeEach(function () {
     // Clear any existing state
     Cache::flush();
-    
+
     Storage::fake('local'); // For other parts of the app if they use Storage::disk('local')
 
     // Setup public template for PdfController as it uses public_path()
     $publicTemplatesDir = public_path('templates');
-    if (!is_dir($publicTemplatesDir)) {
+    if (! is_dir($publicTemplatesDir)) {
         mkdir($publicTemplatesDir, 0777, true);
     }
     file_put_contents(public_path('templates/scholarship_form_fillable.pdf'), MINIMAL_PDF_TEMPLATE);
@@ -129,25 +129,26 @@ test('student can generate pdf', function () {
         'withholding_tax' => 0,
         'sss_gsis_pagibig_contribution' => 0,
         'subtotal_annual_expenses' => 0,
-        'total_annual_expenses' => 0
+        'total_annual_expenses' => 0,
     ]);
 
     $response = $this
         ->actingAs($user)
         ->get(route('generate.scholarship.pdf', $user->id));
-    
+
     $response->assertSuccessful()
         ->assertHeader('Content-Type', 'application/pdf');
 
     // Check filename format in Content-Disposition header
-    $disposition = $response->headers->get('Content-Disposition');    expect($disposition)->toBeString();
+    $disposition = $response->headers->get('Content-Disposition');
+    expect($disposition)->toBeString();
     expect($disposition)->toMatch('/^attachment; filename="scholarship_application_Doe_John_\\d{4}-\\d{2}-\\d{2}_\\d{6}\\.pdf"$/');
 
     // Verify the temporary template PDF was created in the generated_pdfs directory.
     // The actual output PDF is deleted by deleteFileAfterSend(true) in the controller.
     $generatedFiles = glob(storage_path('app/generated_pdfs/template_*.pdf'));
-    expect($generatedFiles)->toHaveCount(1); 
-    
+    expect($generatedFiles)->toHaveCount(1);
+
     // Files are automatically cleaned up by deleteFileAfterSend in the response
 });
 
@@ -157,7 +158,7 @@ test('non-student cannot generate pdf', function () {
         'role' => 'osas_staff',
         'email' => 'staff@minsu.edu.ph',
         'first_name' => 'Staff',
-        'last_name' => 'Member'
+        'last_name' => 'Member',
     ]);
 
     $response = $this
@@ -173,7 +174,7 @@ test('student without profile cannot generate pdf', function () {
         'role' => 'student',
         'email' => 'student@minsu.edu.ph',
         'first_name' => 'Student',
-        'last_name' => 'Test'
+        'last_name' => 'Test',
     ]);
 
     $response = $this

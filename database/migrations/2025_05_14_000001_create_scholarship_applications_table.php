@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('student_profiles')->onDelete('cascade');
             $table->foreignId('scholarship_id')->constrained('scholarships')->onDelete('cascade');
-            
+
             // Application Status
             $table->enum('status', [
                 'draft',
@@ -26,7 +26,7 @@ return new class extends Migration
                 'under_evaluation',
                 'approved',
                 'rejected',
-                'end'
+                'end',
             ])->default('draft');
 
             // Tracking Data

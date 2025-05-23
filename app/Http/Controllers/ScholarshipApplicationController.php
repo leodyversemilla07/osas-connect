@@ -25,9 +25,9 @@ class ScholarshipApplicationController extends Controller
      */
     public function create(Scholarship $scholarship): Response
     {
-        if (!$scholarship->isAcceptingApplications()) {
+        if (! $scholarship->isAcceptingApplications()) {
             return Inertia::render('errors/403', [
-                'message' => 'This scholarship is not accepting applications at this time.'
+                'message' => 'This scholarship is not accepting applications at this time.',
             ]);
         }
 
@@ -40,8 +40,8 @@ class ScholarshipApplicationController extends Controller
                 'amount' => $scholarship->amount,
                 'deadline' => $scholarship->deadline->format('Y-m-d'),
                 'eligibility' => $scholarship->eligibility_criteria,
-                'requirements' => $scholarship->required_documents
-            ]
+                'requirements' => $scholarship->required_documents,
+            ],
         ]);
     }
 
@@ -62,7 +62,7 @@ class ScholarshipApplicationController extends Controller
 
         try {
             $student = Auth::user()->studentProfile;
-            
+
             $application = $this->applicationService->submit(
                 $student,
                 $scholarship,
@@ -118,14 +118,14 @@ class ScholarshipApplicationController extends Controller
             'can' => [
                 'update_documents' => in_array($application->status, [
                     ScholarshipApplication::STATUS_INCOMPLETE,
-                    ScholarshipApplication::STATUS_UNDER_VERIFICATION
+                    ScholarshipApplication::STATUS_UNDER_VERIFICATION,
                 ]),
                 'schedule_interview' => Auth::user()->isOsasStaff() && in_array($application->status, [
                     ScholarshipApplication::STATUS_VERIFIED,
-                    ScholarshipApplication::STATUS_UNDER_EVALUATION
+                    ScholarshipApplication::STATUS_UNDER_EVALUATION,
                 ]),
-                'record_stipend' => Auth::user()->isOsasStaff() && $application->status === ScholarshipApplication::STATUS_APPROVED
-            ]
+                'record_stipend' => Auth::user()->isOsasStaff() && $application->status === ScholarshipApplication::STATUS_APPROVED,
+            ],
         ]);
     }
 
@@ -142,7 +142,7 @@ class ScholarshipApplicationController extends Controller
         }
 
         $request->validate([
-            'document' => ['required', 'file', 'max:5120'] // 5MB max
+            'document' => ['required', 'file', 'max:5120'], // 5MB max
         ]);
 
         try {
@@ -164,12 +164,12 @@ class ScholarshipApplicationController extends Controller
      */
     public function scheduleInterview(Request $request, ScholarshipApplication $application)
     {
-        if (!Auth::user()->isOsasStaff()) {
+        if (! Auth::user()->isOsasStaff()) {
             abort(403);
         }
 
         $request->validate([
-            'schedule_date' => ['required', 'date', 'after:today']
+            'schedule_date' => ['required', 'date', 'after:today'],
         ]);
 
         try {
@@ -190,12 +190,12 @@ class ScholarshipApplicationController extends Controller
      */
     public function recordStipend(Request $request, ScholarshipApplication $application)
     {
-        if (!Auth::user()->isOsasStaff()) {
+        if (! Auth::user()->isOsasStaff()) {
             abort(403);
         }
 
         $request->validate([
-            'amount' => ['required', 'numeric', 'min:0']
+            'amount' => ['required', 'numeric', 'min:0'],
         ]);
 
         try {

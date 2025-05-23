@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\StaffInvitation;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class AdminDashboardController extends Controller
 {
@@ -29,7 +27,7 @@ class AdminDashboardController extends Controller
             ->map(function ($user) {
                 return [
                     'id' => $user->id,
-                    'name' => $user->first_name . ' ' . $user->last_name,
+                    'name' => $user->first_name.' '.$user->last_name,
                     'email' => $user->email,
                     'role' => $this->getUserRole($user),
                     'timestamp' => $user->last_login_at,
@@ -67,7 +65,7 @@ class AdminDashboardController extends Controller
             ->map(function ($user) {
                 return [
                     'id' => $user->id,
-                    'name' => $user->first_name . ' ' . $user->last_name,
+                    'name' => $user->first_name.' '.$user->last_name,
                     'email' => $user->email,
                     'role' => $this->getUserRole($user),
                     'timestamp' => $user->last_login_at,
@@ -75,7 +73,9 @@ class AdminDashboardController extends Controller
             });
 
         return response()->json($recentLogins);
-    }    public function pendingInvitations()
+    }
+
+    public function pendingInvitations()
     {
         $pendingInvitations = StaffInvitation::where('status', 'pending')
             ->whereNull('accepted_at')
@@ -121,6 +121,7 @@ class AdminDashboardController extends Controller
         } elseif ($user->studentProfile) {
             return 'Student';
         }
+
         return 'Unknown';
     }
 }

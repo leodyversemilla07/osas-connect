@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         // Call the admin seeder to create initial admin users
         $this->call(AdminSeeder::class);
-        
+
         // Add other seeders here as needed
     }
 }

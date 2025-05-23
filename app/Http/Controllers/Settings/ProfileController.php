@@ -8,10 +8,10 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -21,15 +21,15 @@ class ProfileController extends Controller
     public function edit(Request $request): Response
     {
         $user = $request->user();
-        
+
         // Load the appropriate profile based on user role
         $profile = null;
         $photoUrl = null;
-        
+
         // Get photo URL from user record since photo_id is stored in users table
-        $photoUrl = $user->photo_id ? asset('storage/' . $user->photo_id) : null;
-        
-        switch($user->role) {
+        $photoUrl = $user->photo_id ? asset('storage/'.$user->photo_id) : null;
+
+        switch ($user->role) {
             case 'student':
                 $profile = $user->studentProfile;
                 break;
@@ -48,9 +48,23 @@ class ProfileController extends Controller
             ['photo_url' => $photoUrl]
         );
 
-        // Convert boolean is_pwd back to Yes/No for student profiles
+        // ✅ FIXED: Don't convert boolean to Yes/No - keep as boolean
         if (isset($profileData['is_pwd'])) {
-            $profileData['is_pwd'] = $profileData['is_pwd'] ? 'Yes' : 'No';
+            $profileData['is_pwd'] = (bool) $profileData['is_pwd'];
+        }
+
+        // ✅ Ensure other boolean fields are properly typed
+        $booleanFields = [
+            'has_tv', 'has_radio_speakers_karaoke', 'has_musical_instruments',
+            'has_computer', 'has_stove', 'has_laptop', 'has_refrigerator',
+            'has_microwave', 'has_air_conditioner', 'has_electric_fan',
+            'has_washing_machine', 'has_cellphone', 'has_gaming_box', 'has_dslr_camera',
+        ];
+
+        foreach ($booleanFields as $field) {
+            if (isset($profileData[$field])) {
+                $profileData[$field] = (bool) $profileData[$field];
+            }
         }
 
         return Inertia::render('settings/profile', [
@@ -66,58 +80,95 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $user = Auth::user();
+        $user = $request->user();
+
+        // ✅ Enhanced debug logging
+        Log::info('=== PROFILE UPDATE DEBUG ===');
+        Log::info('User role: '.$user->role);
+        Log::info('Request method: '.$request->method());
+        Log::info('Content-Type: '.$request->header('Content-Type'));
+        Log::info('All request data: ', $request->all());
+        Log::info('Individual fields:', [
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'email' => $request->input('email'),
+            'admin_id' => $request->input('admin_id'),
+        ]);
+        Log::info('Has file: '.($request->hasFile('photo_id') ? 'yes' : 'no'));
+        Log::info('=== END DEBUG ===');
+
         $validatedData = $request->validated();
 
-        try {
-            // The data is already validated by ProfileUpdateRequest
-            $userData = [
-                'first_name' => $validatedData['first_name'],
-                'middle_name' => $validatedData['middle_name'] ?? null,
-                'last_name' => $validatedData['last_name'],
-                'email' => $validatedData['email'],
+        // ✅ Handle photo upload first if present
+        if ($request->hasFile('photo_id')) {
+            Log::info('Processing photo upload...');
+            // Delete old photo if exists
+            if ($user->photo_id) {
+                Storage::disk('public')->delete($user->photo_id);
+            }
+
+            // Store new photo
+            $photoPath = $request->file('photo_id')->store('profile-photos', 'public');
+            $validatedData['photo_id'] = $photoPath;
+            Log::info('Photo uploaded to: '.$photoPath);
+        }
+
+        // ✅ Update user basic information
+        $userFields = ['first_name', 'middle_name', 'last_name', 'email'];
+        if (isset($validatedData['photo_id'])) {
+            $userFields[] = 'photo_id';
+        }
+
+        $userUpdateData = array_intersect_key($validatedData, array_flip($userFields));
+
+        Log::info('Updating user with data: ', $userUpdateData);
+        $user->update($userUpdateData);
+
+        // ✅ Update role-specific profile data
+        if ($user->role === 'admin') {
+            $adminProfile = $user->adminProfile()->firstOrCreate(['user_id' => $user->id]);
+            if (isset($validatedData['admin_id'])) {
+                $adminProfile->update(['admin_id' => $validatedData['admin_id']]);
+                Log::info('Updated admin profile with admin_id: '.$validatedData['admin_id']);
+            }
+
+        } elseif ($user->role === 'osas_staff') {
+            $staffProfile = $user->osasStaffProfile()->firstOrCreate(['user_id' => $user->id]);
+            if (isset($validatedData['staff_id'])) {
+                $staffProfile->update(['staff_id' => $validatedData['staff_id']]);
+                Log::info('Updated staff profile with staff_id: '.$validatedData['staff_id']);
+            }
+
+        } elseif ($user->role === 'student') {
+            $studentProfile = $user->studentProfile()->firstOrCreate(['user_id' => $user->id]);
+
+            // ✅ Filter out user fields and photo from student profile data
+            $profileFields = array_diff_key(
+                $validatedData,
+                array_flip(['first_name', 'middle_name', 'last_name', 'email', 'photo_id'])
+            );
+
+            // ✅ Ensure boolean fields are properly handled
+            $booleanFields = [
+                'is_pwd', 'has_tv', 'has_radio_speakers_karaoke', 'has_musical_instruments',
+                'has_computer', 'has_stove', 'has_laptop', 'has_refrigerator',
+                'has_microwave', 'has_air_conditioner', 'has_electric_fan',
+                'has_washing_machine', 'has_cellphone', 'has_gaming_box', 'has_dslr_camera',
             ];
 
-            // Handle photo upload if provided
-            if ($request->hasFile('photo_id')) {
-                if ($user->photo_id) {
-                    Storage::disk('public')->delete($user->photo_id);
+            foreach ($booleanFields as $field) {
+                if (array_key_exists($field, $profileFields)) {
+                    $profileFields[$field] = (bool) $profileFields[$field];
                 }
-                
-                $path = $request->file('photo_id')->store('profile-photos', 'public');
-                $userData['photo_id'] = $path;
-            }
-            
-            // Update the user record with all changes at once
-            $user->update($userData);
-
-            // Handle profile updates based on role
-            switch($user->role) {
-                case 'student':
-                    $this->updateStudentProfile($user, $validatedData);
-                    break;
-                case 'osas_staff':
-                    $this->updateStaffProfile($user, $validatedData);
-                    break;
-                case 'admin':
-                    $this->updateAdminProfile($user, $validatedData);
-                    break;
-                default:
-                    // Optional: Log or handle unexpected role
             }
 
-            return to_route('profile.edit')->with('message', 'Profile updated successfully.');
-            
-        } catch (\Exception $e) {
-            Log::error('Profile update failed: ' . $e->getMessage(), [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data' => $validatedData
-            ]);
-            
-            return back()->withInput()->withErrors(['error' => $e->getMessage()]);
+            $studentProfile->update($profileFields);
+            Log::info('Updated student profile with fields: ', array_keys($profileFields));
         }
+
+        Log::info('Profile update completed successfully for user: '.$user->id);
+
+        return redirect()->back()->with('success', 'Profile updated successfully!');
     }
 
     /**
@@ -131,6 +182,11 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // Delete profile photo if exists
+        if ($user->photo_id) {
+            Storage::disk('public')->delete($user->photo_id);
+        }
+
         Auth::logout();
 
         $user->delete();
@@ -139,88 +195,5 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
-    }
-
-    /**
-     * Update the user's student profile.
-     */
-    private function updateStudentProfile($user, array $validatedData)
-    {
-        // Explicitly select student-specific fields based on StudentProfile model's fillable attributes
-        // This list should be comprehensive and match the StudentProfile model's $fillable array
-        $studentProfileFields = [
-            'student_id', 'course', 'major', 'year_level', 'existing_scholarships',
-            'civil_status', 'sex', 'date_of_birth', 'place_of_birth', 'street',
-            'barangay', 'city', 'province', 'mobile_number', 'telephone_number',
-            'is_pwd', 'disability_type', 'religion', 'residence_type', 'guardian_name',
-            'status_of_parents',
-            'father_name', 'father_age', 'father_address', 'father_telephone', 'father_mobile',
-            'father_email', 'father_occupation', 'father_company', 'father_monthly_income',
-            'father_years_service', 'father_education', 'father_school', 'father_unemployment_reason',
-            'mother_name', 'mother_age', 'mother_address', 'mother_telephone', 'mother_mobile',
-            'mother_email', 'mother_occupation', 'mother_company', 'mother_monthly_income',
-            'mother_years_service', 'mother_education', 'mother_school', 'mother_unemployment_reason',
-            'total_siblings', 'siblings', // 'siblings' might need special handling if it's JSON/array
-            'combined_annual_pay_parents', 'combined_annual_pay_siblings', 'income_from_business',
-            'income_from_land_rentals', 'income_from_building_rentals', 'retirement_benefits_pension',
-            'commissions', 'support_from_relatives', 'bank_deposits', 'other_income_description',
-            'other_income_amount', 'total_annual_income',
-            'has_tv', 'has_radio_speakers_karaoke', 'has_musical_instruments', 'has_computer',
-            'has_stove', 'has_laptop', 'has_refrigerator', 'has_microwave', 'has_air_conditioner',
-            'has_electric_fan', 'has_washing_machine', 'has_cellphone', 'has_gaming_box', 'has_dslr_camera',
-            'house_rental', 'food_grocery', 'car_loan_details', 'other_loan_details',
-            'school_bus_payment', 'transportation_expense', 'education_plan_premiums',
-            'insurance_policy_premiums', 'health_insurance_premium', 'sss_gsis_pagibig_loans',
-            'clothing_expense', 'utilities_expense', 'communication_expense', 'helper_details',
-            'driver_details', 'medicine_expense', 'doctor_expense', 'hospital_expense',
-            'recreation_expense', 'other_monthly_expense_details', 'total_monthly_expenses',
-            'annualized_monthly_expenses', 'school_tuition_fee', 'withholding_tax',
-            'sss_gsis_pagibig_contribution', 'other_annual_expense_details',
-            'subtotal_annual_expenses', 'total_annual_expenses',
-            // Ensure all relevant fields from ProfileUpdateRequest and StudentProfile model are listed
-            // For example, if 'water_expense', 'electricity_expense' etc. are separate, list them.
-        ];
-        
-        $studentData = collect($validatedData)->only($studentProfileFields)->all();
-
-        // Add special handling for boolean fields
-        if (isset($studentData['is_pwd'])) {
-            $studentData['is_pwd'] = $studentData['is_pwd'] === 'Yes';
-        }
-        
-        // Handle 'siblings' if it's expected to be JSON
-        if (isset($studentData['siblings']) && is_array($studentData['siblings'])) {
-            $studentData['siblings'] = json_encode($studentData['siblings']);
-        }
-
-        // Update or create student profile
-        $user->studentProfile()->updateOrCreate(['user_id' => $user->id], $studentData);
-    }
-
-    /**
-     * Update the user's OSAS staff profile.
-     */
-    private function updateStaffProfile($user, array $validatedData)
-    {
-        $staffData = collect($validatedData)->only(['staff_id'])->all();
-        
-        // Update or create OSAS staff profile
-        $user->osasStaffProfile()->updateOrCreate(['user_id' => $user->id], $staffData);
-    }
-
-    /**
-     * Update the user's admin profile.
-     */
-    private function updateAdminProfile($user, array $validatedData)
-    {
-        $adminData = collect($validatedData)->only(['admin_id'])->all();
-
-        if (!isset($adminData['admin_id'])) {
-            // This check might be redundant if 'admin_id' is required by ProfileUpdateRequest for admins
-            throw new \Exception('The admin ID field is required.');
-        }
-
-        // Update or create admin profile
-        $user->adminProfile()->updateOrCreate(['user_id' => $user->id], $adminData);
     }
 }

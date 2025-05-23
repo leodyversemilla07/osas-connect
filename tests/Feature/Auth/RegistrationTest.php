@@ -68,14 +68,14 @@ test('registration validation errors are shown', function () {
         'religion',
         'residence_type',
         'guardian_name',
-        'terms_agreement'
+        'terms_agreement',
     ]);
 });
 
 test('email must be unique', function () {
     // First create a user
     $user = \App\Models\User::factory()->create([
-        'email' => 'duplicate@minsu.edu.ph'
+        'email' => 'duplicate@minsu.edu.ph',
     ]);
 
     // Try to register with the same email

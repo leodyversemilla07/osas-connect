@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 import { type BreadcrumbItem, type User } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/user-management/data-table';
-import { columns } from '@/components/user-management/columns';
+import { columns } from '@/components/student-management/columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -16,7 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface StudentsPageProps {
-  users: {
+  students: {
     data: User[];
     current_page: number;
     from: number;
@@ -27,7 +27,7 @@ interface StudentsPageProps {
   };
 }
 
-export default function Students({ users }: StudentsPageProps) {
+export default function Students({ students }: StudentsPageProps) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head>
@@ -40,11 +40,11 @@ export default function Students({ users }: StudentsPageProps) {
         <div className="flex items-center">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Students</h2>
-            <p className="text-muted-foreground">Manage student accounts and information</p>
+            <p className="text-muted-foreground">Manage student accounts</p>
           </div>
         </div>
 
-        <DataTable columns={columns} data={users.data} />
+        <DataTable columns={columns} data={students.data} />
       </div>
     </AppLayout>
   );

@@ -15,18 +15,22 @@ class ScholarshipNotification extends Model
         'data',
         'read_at',
         'notifiable_type',
-        'notifiable_id'
+        'notifiable_id',
     ];
 
     protected $casts = [
         'data' => 'array',
-        'read_at' => 'datetime'
+        'read_at' => 'datetime',
     ];
 
     const TYPE_APPLICATION_STATUS = 'application_status';
+
     const TYPE_DOCUMENT_REQUEST = 'document_request';
+
     const TYPE_INTERVIEW_SCHEDULE = 'interview_schedule';
+
     const TYPE_STIPEND_RELEASE = 'stipend_release';
+
     const TYPE_RENEWAL_REMINDER = 'renewal_reminder';
 
     /**
@@ -50,7 +54,7 @@ class ScholarshipNotification extends Model
      */
     public function markAsRead()
     {
-        if (!$this->read_at) {
+        if (! $this->read_at) {
             $this->update(['read_at' => now()]);
         }
     }

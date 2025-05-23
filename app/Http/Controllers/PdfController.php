@@ -33,23 +33,25 @@ class PdfController extends Controller
                         'total_siblings', 'total_annual_income', 'total_monthly_expenses',
                         'total_annual_expenses'
                     );
-                }
+                },
             ]);
 
-            if (!$user->studentProfile) {
+            if (! $user->studentProfile) {
                 return response('Student profile not found.', 404);
             }
 
             // Get template with detailed error logging
             $templatePath = public_path(self::TEMPLATE_PATH);
-            if (!file_exists($templatePath)) {
-                logger()->error("PDF template not found at: " . $templatePath);
-                return response('PDF template not found at: ' . $templatePath, 404);
+            if (! file_exists($templatePath)) {
+                logger()->error('PDF template not found at: '.$templatePath);
+
+                return response('PDF template not found at: '.$templatePath, 404);
             }
 
             $pdfTemplate = file_get_contents($templatePath);
             if ($pdfTemplate === false) {
-                logger()->error("Failed to read PDF template from: " . $templatePath);
+                logger()->error('Failed to read PDF template from: '.$templatePath);
+
                 return response('Failed to read PDF template', 500);
             }
 
@@ -61,8 +63,9 @@ class PdfController extends Controller
 
             return $response;
         } catch (Exception $e) {
-            logger()->error("PDF generation failed: " . $e->getMessage());
-            return response('Error generating PDF: ' . $e->getMessage(), 500);
+            logger()->error('PDF generation failed: '.$e->getMessage());
+
+            return response('Error generating PDF: '.$e->getMessage(), 500);
         }
     }
 
@@ -70,14 +73,15 @@ class PdfController extends Controller
     {
         // Create generated_pdfs directory if it doesn't exist
         $pdfDir = storage_path('app/generated_pdfs');
-        if (!file_exists($pdfDir)) {
+        if (! file_exists($pdfDir)) {
             mkdir($pdfDir, 0777, true);
         }
 
-        $tempId = time() . '_' . Str::random(8);
+        $tempId = time().'_'.Str::random(8);
+
         return [
-            'tempTemplate' => $pdfDir . DIRECTORY_SEPARATOR . 'template_' . $tempId . '.pdf',
-            'tempOutput' => $pdfDir . DIRECTORY_SEPARATOR . 'output_' . $tempId . '.pdf'
+            'tempTemplate' => $pdfDir.DIRECTORY_SEPARATOR.'template_'.$tempId.'.pdf',
+            'tempOutput' => $pdfDir.DIRECTORY_SEPARATOR.'output_'.$tempId.'.pdf',
         ];
     }
 
@@ -89,7 +93,7 @@ class PdfController extends Controller
                 throw new Exception('Failed to write template to temporary file');
             }
 
-            if (!file_exists($tempTemplate) || !is_readable($tempTemplate)) {
+            if (! file_exists($tempTemplate) || ! is_readable($tempTemplate)) {
                 throw new Exception('Cannot read template file after writing');
             }
 
@@ -100,24 +104,24 @@ class PdfController extends Controller
                 ->compress()
                 ->saveAs($tempOutput);
 
-            if (!$result) {
+            if (! $result) {
                 throw new Exception($pdf->getError() ?: 'Unknown error while generating PDF');
             }
 
-            if (!file_exists($tempOutput) || !is_readable($tempOutput)) {
+            if (! file_exists($tempOutput) || ! is_readable($tempOutput)) {
                 throw new Exception('Failed to generate or read PDF output file');
             }
 
             // Generate filename
-            $safeName = preg_replace("/[^a-zA-Z0-9_\-\.]/", '_', $user->last_name . '_' . $user->first_name);
-            $fileName = 'scholarship_application_' . $safeName . '_' . date('Y-m-d_His') . '.pdf';
+            $safeName = preg_replace("/[^a-zA-Z0-9_\-\.]/", '_', $user->last_name.'_'.$user->first_name);
+            $fileName = 'scholarship_application_'.$safeName.'_'.date('Y-m-d_His').'.pdf';
 
             // Return the PDF as a download response with automatic cleanup
             return response()->file(
                 $tempOutput,
                 [
                     'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
+                    'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
                 ]
             )->deleteFileAfterSend(true);
 
@@ -126,7 +130,9 @@ class PdfController extends Controller
             $this->cleanup($tempOutput);
             throw $e;
         }
-    }    private function prepareFormData(User $user): array
+    }
+
+    private function prepareFormData(User $user): array
     {
         $profile = $user->studentProfile;
 
@@ -135,22 +141,22 @@ class PdfController extends Controller
             $profile->street,
             $profile->barangay,
             $profile->city,
-            $profile->province
-        ], fn($part) => !empty($part));
+            $profile->province,
+        ], fn ($part) => ! empty($part));
 
         // Prepare course year string with major if available
         $courseYearStr = $profile->course ?? '';
-        if (!empty($profile->major)) {
-            $courseYearStr .= ' Major in ' . $profile->major;
+        if (! empty($profile->major)) {
+            $courseYearStr .= ' Major in '.$profile->major;
         }
-        if (!empty($profile->year_level)) {
-            $courseYearStr .= ' - ' . $profile->year_level;
+        if (! empty($profile->year_level)) {
+            $courseYearStr .= ' - '.$profile->year_level;
         }
 
         return [
             // Basic Information
             'student_id' => $profile->student_id ?? 'N/A',
-            'course_year' => !empty($courseYearStr) ? $courseYearStr : 'N/A',
+            'course_year' => ! empty($courseYearStr) ? $courseYearStr : 'N/A',
             'existing_scholarships' => $profile->existing_scholarships ?? 'N/A',
 
             // Personal Information
@@ -162,7 +168,7 @@ class PdfController extends Controller
             'sex' => $profile->sex ?? 'N/A',
             'date_of_birth' => $profile->date_of_birth ? $profile->date_of_birth->format('m/d/Y') : 'N/A',
             'place_of_birth' => $profile->place_of_birth ?? 'N/A',
-            'address' => !empty($addressParts) ? implode(', ', $addressParts) : 'N/A',
+            'address' => ! empty($addressParts) ? implode(', ', $addressParts) : 'N/A',
             'mobile_number' => $profile->mobile_number ?? 'N/A',
             'telephone_number' => $profile->telephone_number ?? 'N/A',
             'is_pwd' => $profile->is_pwd ? 'yes' : 'no',
@@ -184,7 +190,7 @@ class PdfController extends Controller
             // Financial Information
             'total_annual_income' => number_format($profile->total_annual_income ?? 0, 2) ?? 'N/A',
             'total_monthly_expenses' => number_format($profile->total_monthly_expenses ?? 0, 2) ?? 'N/A',
-            'total_annual_expenses' => number_format($profile->total_annual_expenses ?? 0, 2) ?? 'N/A'
+            'total_annual_expenses' => number_format($profile->total_annual_expenses ?? 0, 2) ?? 'N/A',
         ];
     }
 
@@ -196,7 +202,7 @@ class PdfController extends Controller
             }
         } catch (Exception $e) {
             // Log but don't throw - cleanup shouldn't break the response
-            logger()->warning("Failed to cleanup file {$path}: " . $e->getMessage());
+            logger()->warning("Failed to cleanup file {$path}: ".$e->getMessage());
         }
     }
 }

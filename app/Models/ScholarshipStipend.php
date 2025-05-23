@@ -19,18 +19,22 @@ class ScholarshipStipend extends Model
         'semester',
         'status',
         'remarks',
-        'processed_at'
+        'processed_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
-        'processed_at' => 'datetime'
+        'processed_at' => 'datetime',
     ];
 
     const STATUS_PENDING = 'pending';
+
     const STATUS_PROCESSING = 'processing';
+
     const STATUS_RELEASED = 'released';
+
     const STATUS_FAILED = 'failed';
+
     const STATUS_CANCELLED = 'cancelled';
 
     /**

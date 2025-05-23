@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if(!is_dir(public_path('storage'))) {
+        if (! is_dir(public_path('storage'))) {
             app('files')->link(storage_path('app/public'), public_path('storage'));
         }
 

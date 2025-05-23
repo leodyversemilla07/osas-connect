@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\ScholarshipApplication;
 use App\Models\Scholarship;
-use App\Models\StudentProfile;
+use App\Models\ScholarshipApplication;
 use App\Models\ScholarshipNotification;
+use App\Models\StudentProfile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
-use Illuminate\Support\Facades\DB;
 
 class ScholarshipApplicationService
 {
@@ -22,7 +22,7 @@ class ScholarshipApplicationService
         array $documents
     ): ScholarshipApplication {
         // Validate that scholarship is accepting applications
-        if (!$scholarship->isAcceptingApplications()) {
+        if (! $scholarship->isAcceptingApplications()) {
             throw new InvalidArgumentException('This scholarship is not accepting applications at this time.');
         }
 
@@ -34,7 +34,7 @@ class ScholarshipApplicationService
                 ScholarshipApplication::STATUS_UNDER_VERIFICATION,
                 ScholarshipApplication::STATUS_VERIFIED,
                 ScholarshipApplication::STATUS_UNDER_EVALUATION,
-                ScholarshipApplication::STATUS_APPROVED
+                ScholarshipApplication::STATUS_APPROVED,
             ])
             ->first();
 
@@ -59,11 +59,11 @@ class ScholarshipApplicationService
             // Handle document uploads
             $uploadedDocuments = [];
             foreach ($documents as $type => $file) {
-                $path = $file->store('scholarship-documents/' . $student->id, 'public');
+                $path = $file->store('scholarship-documents/'.$student->id, 'public');
                 $uploadedDocuments[$type] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toDateTimeString()
+                    'uploaded_at' => now()->toDateTimeString(),
                 ];
             }
             $application->uploaded_documents = $uploadedDocuments;
@@ -78,13 +78,14 @@ class ScholarshipApplicationService
                 'data' => [
                     'application_id' => $application->id,
                     'scholarship_name' => $scholarship->name,
-                    'student_name' => $student->user->full_name
+                    'student_name' => $student->user->full_name,
                 ],
                 'notifiable_type' => ScholarshipApplication::class,
-                'notifiable_id' => $application->id
+                'notifiable_id' => $application->id,
             ]);
 
             DB::commit();
+
             return $application;
 
         } catch (\Exception $e) {
@@ -108,10 +109,10 @@ class ScholarshipApplicationService
         }
 
         $documents = $application->uploaded_documents ?? [];
-        
+
         // Store new document
-        $path = $file->store('scholarship-documents/' . $application->student_id, 'public');
-        
+        $path = $file->store('scholarship-documents/'.$application->student_id, 'public');
+
         // Delete old file if it exists
         if (isset($documents[$documentType]['path'])) {
             Storage::disk('public')->delete($documents[$documentType]['path']);
@@ -121,12 +122,12 @@ class ScholarshipApplicationService
         $documents[$documentType] = [
             'path' => $path,
             'original_name' => $file->getClientOriginalName(),
-            'uploaded_at' => now()->toDateTimeString()
+            'uploaded_at' => now()->toDateTimeString(),
         ];
 
         return $application->update([
             'uploaded_documents' => $documents,
-            'status' => ScholarshipApplication::STATUS_UNDER_VERIFICATION
+            'status' => ScholarshipApplication::STATUS_UNDER_VERIFICATION,
         ]);
     }
 
@@ -137,9 +138,9 @@ class ScholarshipApplicationService
         ScholarshipApplication $application,
         \DateTime $scheduleDate
     ): bool {
-        if (!in_array($application->status, [
+        if (! in_array($application->status, [
             ScholarshipApplication::STATUS_VERIFIED,
-            ScholarshipApplication::STATUS_UNDER_EVALUATION
+            ScholarshipApplication::STATUS_UNDER_EVALUATION,
         ])) {
             throw new InvalidArgumentException('Application is not ready for interview scheduling.');
         }
@@ -155,10 +156,10 @@ class ScholarshipApplicationService
             'type' => ScholarshipNotification::TYPE_INTERVIEW_SCHEDULE,
             'data' => [
                 'application_id' => $application->id,
-                'interview_date' => $scheduleDate->format('Y-m-d H:i:s')
+                'interview_date' => $scheduleDate->format('Y-m-d H:i:s'),
             ],
             'notifiable_type' => ScholarshipApplication::class,
-            'notifiable_id' => $application->id
+            'notifiable_id' => $application->id,
         ]);
 
         return true;
@@ -184,15 +185,15 @@ class ScholarshipApplicationService
         ScholarshipNotification::create([
             'user_id' => $application->student->user_id,
             'title' => 'Stipend Released',
-            'message' => "A stipend of PHP " . number_format($amount, 2) . " has been released for your scholarship.",
+            'message' => 'A stipend of PHP '.number_format($amount, 2).' has been released for your scholarship.',
             'type' => ScholarshipNotification::TYPE_STIPEND_RELEASE,
             'data' => [
                 'application_id' => $application->id,
                 'amount' => $amount,
-                'date' => now()->toDateTimeString()
+                'date' => now()->toDateTimeString(),
             ],
             'notifiable_type' => ScholarshipApplication::class,
-            'notifiable_id' => $application->id
+            'notifiable_id' => $application->id,
         ]);
 
         return true;
@@ -200,11 +201,6 @@ class ScholarshipApplicationService
 
     /**
      * Create a new scholarship application.
-     *
-     * @param StudentProfile $student
-     * @param Scholarship $scholarship
-     * @param array $data
-     * @return ScholarshipApplication
      */
     public function createApplication(StudentProfile $student, Scholarship $scholarship, array $data): ScholarshipApplication
     {
@@ -231,8 +227,6 @@ class ScholarshipApplicationService
     /**
      * Validate student's eligibility for a scholarship.
      *
-     * @param StudentProfile $student
-     * @param Scholarship $scholarship
      * @throws InvalidArgumentException
      */
     protected function validateEligibility(StudentProfile $student, Scholarship $scholarship): void
@@ -243,7 +237,7 @@ class ScholarshipApplicationService
         }
 
         // Check if student has a regular load
-        if (!$this->hasRegularLoad($student)) {
+        if (! $this->hasRegularLoad($student)) {
             throw new InvalidArgumentException('Student must have a regular load');
         }
 
@@ -256,9 +250,6 @@ class ScholarshipApplicationService
 
     /**
      * Check if student has regular load.
-     *
-     * @param StudentProfile $student
-     * @return bool
      */
     protected function hasRegularLoad(StudentProfile $student): bool
     {
@@ -267,9 +258,6 @@ class ScholarshipApplicationService
 
     /**
      * Check if student has an active scholarship.
-     *
-     * @param StudentProfile $student
-     * @return bool
      */
     protected function hasActiveScholarship(StudentProfile $student): bool
     {
@@ -277,7 +265,7 @@ class ScholarshipApplicationService
             ->whereIn('status', [
                 ScholarshipApplication::STATUS_APPROVED,
                 ScholarshipApplication::STATUS_UNDER_EVALUATION,
-                ScholarshipApplication::STATUS_VERIFIED
+                ScholarshipApplication::STATUS_VERIFIED,
             ])
             ->exists();
     }
@@ -285,14 +273,12 @@ class ScholarshipApplicationService
     /**
      * Validate GWA requirements for scholarship.
      *
-     * @param StudentProfile $student
-     * @param Scholarship $scholarship
      * @throws InvalidArgumentException
      */
     protected function validateGWARequirement(StudentProfile $student, Scholarship $scholarship): void
     {
         $gwaRequirement = $scholarship->getGwaRequirement();
-        if (!$gwaRequirement) {
+        if (! $gwaRequirement) {
             return;
         }
 
@@ -310,8 +296,6 @@ class ScholarshipApplicationService
     /**
      * Validate scholarship type specific requirements.
      *
-     * @param StudentProfile $student
-     * @param Scholarship $scholarship
      * @throws InvalidArgumentException
      */
     protected function validateTypeSpecificRequirements(StudentProfile $student, Scholarship $scholarship): void
@@ -326,16 +310,16 @@ class ScholarshipApplicationService
             case Scholarship::TYPE_PERFORMING_ARTS:
                 $membershipDuration = $this->verifyPerformingArtsMembership($student);
                 $isFullScholarship = str_contains(strtolower($scholarship->name), 'full');
-                
+
                 if ($isFullScholarship && $membershipDuration < 12) {
                     throw new InvalidArgumentException('Requires at least 1 year of active membership');
-                } elseif (!$isFullScholarship && $membershipDuration < 4) {
+                } elseif (! $isFullScholarship && $membershipDuration < 4) {
                     throw new InvalidArgumentException('Requires at least 1 semester of active membership');
                 }
                 break;
 
             case Scholarship::TYPE_ECONOMIC_ASSISTANCE:
-                if (!$this->hasValidIndigencyCertificate($student)) {
+                if (! $this->hasValidIndigencyCertificate($student)) {
                     throw new InvalidArgumentException('Valid MSWDO Indigency Certificate required');
                 }
                 break;
@@ -345,7 +329,6 @@ class ScholarshipApplicationService
     /**
      * Verify performing arts group membership duration.
      *
-     * @param StudentProfile $student
      * @return int Duration in months
      */
     protected function verifyPerformingArtsMembership(StudentProfile $student): int
@@ -357,9 +340,6 @@ class ScholarshipApplicationService
 
     /**
      * Check for valid indigency certificate.
-     *
-     * @param StudentProfile $student
-     * @return bool
      */
     protected function hasValidIndigencyCertificate(StudentProfile $student): bool
     {

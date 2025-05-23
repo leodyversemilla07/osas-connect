@@ -51,7 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'last_login_at' => 'datetime',
         ];
     }
-    
+
     /**
      * Get the student profile associated with the user.
      */
@@ -59,7 +59,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(StudentProfile::class);
     }
-    
+
     /**
      * Get the OSAS staff profile associated with the user.
      */
@@ -67,7 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(OsasStaffProfile::class);
     }
-    
+
     /**
      * Get the admin profile associated with the user.
      */
@@ -75,20 +75,20 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(AdminProfile::class);
     }
-    
+
     /**
      * Get the appropriate profile based on user role.
      */
     public function profile()
     {
-        return match($this->role) {
+        return match ($this->role) {
             'student' => $this->studentProfile,
             'osas_staff' => $this->osasStaffProfile,
             'admin' => $this->adminProfile,
             default => null,
         };
     }
-    
+
     /**
      * Check if user is an admin.
      */
@@ -96,7 +96,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->role === 'admin';
     }
-    
+
     /**
      * Check if user is an OSAS staff.
      */
@@ -104,7 +104,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->role === 'osas_staff';
     }
-    
+
     /**
      * Check if user is a student.
      */
@@ -112,12 +112,25 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->role === 'student';
     }
-    
+
     /**
      * Get the full name of the user.
      */
     public function getFullNameAttribute(): string
     {
-        return "{$this->first_name} " . ($this->middle_name ? $this->middle_name . ' ' : '') . "{$this->last_name}";
+        return "{$this->first_name} ".($this->middle_name ? $this->middle_name.' ' : '')."{$this->last_name}";
+    }
+
+    /**
+     * Get the URL to the user's avatar.
+     */
+    public function getAvatarAttribute(): ?string
+    {
+        if ($this->photo_id) {
+            // $this->photo_id is expected to store the path like 'profile-photos/image.jpg'
+            return asset('storage/'.$this->photo_id);
+        }
+
+        return null;
     }
 }

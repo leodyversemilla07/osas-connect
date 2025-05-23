@@ -13,10 +13,15 @@ class ScholarshipApplication extends Model
 
     // Define scholarship types
     const TYPE_ACADEMIC_FULL = 'academic_full';
+
     const TYPE_ACADEMIC_PARTIAL = 'academic_partial';
+
     const TYPE_STUDENT_ASSISTANTSHIP = 'student_assistantship';
+
     const TYPE_PERFORMING_ARTS_FULL = 'performing_arts_full';
+
     const TYPE_PERFORMING_ARTS_PARTIAL = 'performing_arts_partial';
+
     const TYPE_ECONOMIC_ASSISTANCE = 'economic_assistance';
 
     protected $fillable = [
@@ -55,13 +60,21 @@ class ScholarshipApplication extends Model
 
     // Application Status Constants
     const STATUS_DRAFT = 'draft';
+
     const STATUS_SUBMITTED = 'submitted';
+
     const STATUS_UNDER_VERIFICATION = 'under_verification';
+
     const STATUS_INCOMPLETE = 'incomplete';
+
     const STATUS_VERIFIED = 'verified';
+
     const STATUS_UNDER_EVALUATION = 'under_evaluation';
+
     const STATUS_APPROVED = 'approved';
+
     const STATUS_REJECTED = 'rejected';
+
     const STATUS_END = 'end';
 
     // Status Workflow Definition
@@ -74,27 +87,24 @@ class ScholarshipApplication extends Model
         self::STATUS_UNDER_EVALUATION => [self::STATUS_APPROVED, self::STATUS_REJECTED],
         self::STATUS_APPROVED => [self::STATUS_END],
         self::STATUS_REJECTED => [self::STATUS_END],
-        self::STATUS_END => []
+        self::STATUS_END => [],
     ];
 
     /**
      * Update the application status if the transition is allowed.
      *
-     * @param string $newStatus
-     * @param string|null $comment
-     * @return bool
      * @throws InvalidArgumentException
      */
     public function updateStatus(string $newStatus, ?string $comment = null): bool
     {
-        if (!$this->canTransitionTo($newStatus)) {
+        if (! $this->canTransitionTo($newStatus)) {
             throw new InvalidArgumentException(
                 "Cannot transition from {$this->status} to {$newStatus}"
             );
         }
 
         $this->status = $newStatus;
-        
+
         // Set timestamps based on status
         switch ($newStatus) {
             case self::STATUS_SUBMITTED:
@@ -117,9 +127,6 @@ class ScholarshipApplication extends Model
 
     /**
      * Check if the application can transition to the given status.
-     *
-     * @param string $newStatus
-     * @return bool
      */
     public function canTransitionTo(string $newStatus): bool
     {
@@ -128,8 +135,6 @@ class ScholarshipApplication extends Model
 
     /**
      * Get the next possible statuses for this application.
-     *
-     * @return array
      */
     public function getNextPossibleStatuses(): array
     {
@@ -138,21 +143,17 @@ class ScholarshipApplication extends Model
 
     /**
      * Check if all required documents are complete.
-     *
-     * @return bool
      */
     public function areDocumentsComplete(): bool
     {
         $requiredDocs = $this->scholarship->required_documents ?? [];
         $uploadedDocs = $this->uploaded_documents ?? [];
-        
+
         return empty(array_diff($requiredDocs, array_keys($uploadedDocs)));
     }
 
     /**
      * Check if application meets basic eligibility criteria.
-     *
-     * @return bool
      */
     public function meetsEligibilityCriteria(): bool
     {
@@ -161,7 +162,7 @@ class ScholarshipApplication extends Model
         $scholarship = $this->scholarship;
 
         // Check if student has no failing grades
-        if (!$student->hasNoFailingGrades()) {
+        if (! $student->hasNoFailingGrades()) {
             return false;
         }
 
@@ -173,28 +174,30 @@ class ScholarshipApplication extends Model
         // Check specific scholarship type requirements
         switch ($scholarship->type) {
             case self::TYPE_ACADEMIC_FULL:
-                return $student->gwa >= 1.000 && $student->gwa <= 1.450 && !$student->hasGradeBelow(1.75);
-            
+                return $student->gwa >= 1.000 && $student->gwa <= 1.450 && ! $student->hasGradeBelow(1.75);
+
             case self::TYPE_ACADEMIC_PARTIAL:
-                return $student->gwa >= 1.460 && $student->gwa <= 1.750 && !$student->hasGradeBelow(2.00);
-            
+                return $student->gwa >= 1.460 && $student->gwa <= 1.750 && ! $student->hasGradeBelow(2.00);
+
             case self::TYPE_STUDENT_ASSISTANTSHIP:
                 // Check if units don't exceed 21
                 return $student->units <= 21;
-            
+
             case self::TYPE_PERFORMING_ARTS_FULL:
                 // Verify 1+ year membership through records
                 $membershipDuration = $this->verifyPerformingArtsMembership();
+
                 return $membershipDuration >= 12; // 12 months
-            
+
             case self::TYPE_PERFORMING_ARTS_PARTIAL:
                 // Verify 1+ semester membership through records
                 $membershipDuration = $this->verifyPerformingArtsMembership();
+
                 return $membershipDuration >= 4; // 4 months (1 semester)
-            
+
             case self::TYPE_ECONOMIC_ASSISTANCE:
                 return $student->gwa <= 2.25 && $this->hasValidIndigencyCertificate();
-                
+
             default:
                 return true;
         }
@@ -214,20 +217,18 @@ class ScholarshipApplication extends Model
 
     /**
      * Check if applicant has submitted a valid indigency certificate
-     *
-     * @return bool
      */
     protected function hasValidIndigencyCertificate(): bool
     {
-        if (!isset($this->uploaded_documents['indigency_certificate'])) {
+        if (! isset($this->uploaded_documents['indigency_certificate'])) {
             return false;
         }
 
         $certificate = $this->uploaded_documents['indigency_certificate'];
-        
+
         // Check if certificate is not expired (valid for 6 months)
         $issueDate = new \DateTime($certificate['issue_date']);
-        $validity = new \DateTime();
+        $validity = new \DateTime;
         $validity->modify('-6 months');
 
         return $issueDate > $validity;

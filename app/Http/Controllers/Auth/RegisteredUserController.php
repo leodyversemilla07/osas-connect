@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\StudentProfile;
+use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
     {
         $validationRules = $this->getStudentValidationRules();
         $validationMessages = $this->getValidationMessages();
-        
+
         $request->validate($validationRules, $validationMessages);
 
         DB::beginTransaction();
@@ -49,7 +49,7 @@ class RegisteredUserController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => 'student', // Ensure role is always student
             ]);
-            
+
             // Create student profile with all personal information
             StudentProfile::create([
                 'user_id' => $user->id,
@@ -65,7 +65,7 @@ class RegisteredUserController extends Controller
                 'barangay' => $request->barangay,
                 'city' => $request->city,
                 'province' => $request->province,
-                'mobile_number' => '+63' . $request->mobile_number,
+                'mobile_number' => '+63'.$request->mobile_number,
                 'telephone_number' => $request->telephone_number,
                 'is_pwd' => $request->is_pwd === 'Yes',
                 'disability_type' => $request->disability_type,
@@ -76,16 +76,17 @@ class RegisteredUserController extends Controller
                     : 'Not Applicable',
                 'existing_scholarships' => $request->scholarships,
             ]);
-            
+
             DB::commit();
-            
+
             event(new Registered($user));
             Auth::login($user);
 
             return to_route('dashboard');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Registration failed: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Registration failed: '.$e->getMessage()]);
         }
     }
 
@@ -104,15 +105,15 @@ class RegisteredUserController extends Controller
                 'lowercase',
                 'email',
                 'max:255',
-                'unique:' . User::class,
+                'unique:'.User::class,
                 'ends_with:@minsu.edu.ph',
             ],
             'student_id' => [
-                'required', 
-                'string', 
-                'max:255', 
-                'unique:' . StudentProfile::class,
-                'regex:/^MBC\d{4}-\d{4}$/'
+                'required',
+                'string',
+                'max:255',
+                'unique:'.StudentProfile::class,
+                'regex:/^MBC\d{4}-\d{4}$/',
             ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
 
@@ -139,8 +140,8 @@ class RegisteredUserController extends Controller
 
             // Contact information
             'mobile_number' => [
-                'required', 
-                'string', 
+                'required',
+                'string',
                 'regex:/^[0-9]{10}$/',
                 function ($attribute, $value, $fail) {
                     // Remove any non-digit characters
@@ -149,7 +150,7 @@ class RegisteredUserController extends Controller
                     if (str_starts_with($digits, '0')) {
                         $fail('The mobile number should not start with 0 when using +63 country code.');
                     }
-                }
+                },
             ],
             'telephone_number' => ['nullable', 'string', 'max:255'],
 

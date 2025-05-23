@@ -27,8 +27,8 @@ class ScholarshipApplicationPolicy
     public function verifyDocuments(User $user, ScholarshipApplication $application): bool
     {
         // Only admin, OSAS staff, or specific verifiers (Registrar, Guidance) can verify
-        return $user->isAdmin() || 
-               $user->isOsasStaff() || 
+        return $user->isAdmin() ||
+               $user->isOsasStaff() ||
                $user->hasRole(['registrar', 'guidance_counselor']);
     }
 
@@ -48,10 +48,10 @@ class ScholarshipApplicationPolicy
     {
         // Students can only update their own applications if they're in draft or incomplete status
         if ($user->isStudent()) {
-            return $application->student_id === $user->id && 
+            return $application->student_id === $user->id &&
                    in_array($application->status, [
                        ScholarshipApplication::STATUS_DRAFT,
-                       ScholarshipApplication::STATUS_INCOMPLETE
+                       ScholarshipApplication::STATUS_INCOMPLETE,
                    ]);
         }
 

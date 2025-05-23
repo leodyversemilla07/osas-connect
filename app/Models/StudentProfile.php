@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class StudentProfile extends Model
 {
-    use HasFactory;    
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
-     */    
+     */
     protected $fillable = [
         // Basic Information
         'user_id',
@@ -21,7 +22,7 @@ class StudentProfile extends Model
         'major',
         'year_level',
         'existing_scholarships',
-        
+
         // Personal Information
         'civil_status',
         'sex',
@@ -37,10 +38,10 @@ class StudentProfile extends Model
         'disability_type',
         'religion',
         'residence_type',
-        
+
         // Family Background
         'status_of_parents',
-        
+
         // Father's Information
         'father_name',
         'father_age',
@@ -55,7 +56,7 @@ class StudentProfile extends Model
         'father_education',
         'father_school',
         'father_unemployment_reason',
-        
+
         // Mother's Information
         'mother_name',
         'mother_age',
@@ -70,11 +71,11 @@ class StudentProfile extends Model
         'mother_education',
         'mother_school',
         'mother_unemployment_reason',
-        
+
         // Siblings Information
         'total_siblings',
         'siblings',
-        
+
         // Income Information
         'combined_annual_pay_parents',
         'combined_annual_pay_siblings',
@@ -88,7 +89,7 @@ class StudentProfile extends Model
         'other_income_description',
         'other_income_amount',
         'total_annual_income',
-        
+
         // Appliances
         'has_tv',
         'has_radio_speakers_karaoke',
@@ -104,7 +105,7 @@ class StudentProfile extends Model
         'has_cellphone',
         'has_gaming_box',
         'has_dslr_camera',
-        
+
         // Monthly Expenses
         'house_rental',
         'food_grocery',
@@ -128,7 +129,7 @@ class StudentProfile extends Model
         'other_monthly_expense_details',
         'total_monthly_expenses',
         'annualized_monthly_expenses',
-        
+
         // Annual Expenses
         'school_tuition_fee',
         'withholding_tax',
@@ -142,15 +143,15 @@ class StudentProfile extends Model
      * The attributes that should be cast.
      *
      * @var array<string, string>
-     */    
+     */
     protected $casts = [
         'date_of_birth' => 'datetime',
         'is_pwd' => 'boolean',
-        
+
         // Siblings Information
         'siblings' => 'array',
         'total_siblings' => 'integer',
-        
+
         // Income Information
         'combined_annual_pay_parents' => 'decimal:2',
         'combined_annual_pay_siblings' => 'decimal:2',
@@ -163,7 +164,7 @@ class StudentProfile extends Model
         'bank_deposits' => 'decimal:2',
         'other_income_amount' => 'decimal:2',
         'total_annual_income' => 'decimal:2',
-        
+
         // Appliances
         'has_tv' => 'boolean',
         'has_radio_speakers_karaoke' => 'boolean',
@@ -179,7 +180,7 @@ class StudentProfile extends Model
         'has_cellphone' => 'boolean',
         'has_gaming_box' => 'boolean',
         'has_dslr_camera' => 'boolean',
-        
+
         // Monthly & Annual Expenses
         'house_rental' => 'decimal:2',
         'food_grocery' => 'decimal:2',
@@ -208,7 +209,7 @@ class StudentProfile extends Model
         'bank_deposits' => 'decimal:2',
         'other_income_amount' => 'decimal:2',
         'total_annual_income' => 'decimal:2',
-        
+
         // Appliances
         'has_tv' => 'boolean',
         'has_radio_speakers_karaoke' => 'boolean',
@@ -224,7 +225,7 @@ class StudentProfile extends Model
         'has_cellphone' => 'boolean',
         'has_gaming_box' => 'boolean',
         'has_dslr_camera' => 'boolean',
-        
+
         // Monthly Expenses
         'house_rental' => 'decimal:2',
         'food_grocery' => 'decimal:2',
@@ -243,18 +244,18 @@ class StudentProfile extends Model
         'recreation_expense' => 'decimal:2',
         'total_monthly_expenses' => 'decimal:2',
         'annualized_monthly_expenses' => 'decimal:2',
-        
+
         // Annual Expenses
         'school_tuition_fee' => 'decimal:2',
         'withholding_tax' => 'decimal:2',
         'sss_gsis_pagibig_contribution' => 'decimal:2',
         'subtotal_annual_expenses' => 'decimal:2',
         'total_annual_expenses' => 'decimal:2',
-        
+
         // Parent Monthly Income
         'father_monthly_income' => 'decimal:2',
         'mother_monthly_income' => 'decimal:2',
-        
+
         // Parent Years Service
         'father_years_service' => 'integer',
         'mother_years_service' => 'integer',
@@ -275,7 +276,15 @@ class StudentProfile extends Model
     {
         return $this->hasMany(ScholarshipApplication::class, 'student_id');
     }
-    
+
+    /**
+     * Get all scholarship applications for this student.
+     */
+    public function applications()
+    {
+        return $this->hasMany(ScholarshipApplication::class, 'student_id', 'id');
+    }
+
     /**
      * Get the number of active scholarships for the student.
      */
@@ -288,8 +297,6 @@ class StudentProfile extends Model
 
     /**
      * Check if student has no failing grades in the previous semester.
-     *
-     * @return bool
      */
     public function hasNoFailingGrades(): bool
     {
@@ -299,9 +306,6 @@ class StudentProfile extends Model
 
     /**
      * Check if student has a grade below the specified value.
-     *
-     * @param float $threshold
-     * @return bool
      */
     public function hasGradeBelow(float $threshold): bool
     {
@@ -320,33 +324,30 @@ class StudentProfile extends Model
             ->whereIn('status', [
                 ScholarshipApplication::STATUS_APPROVED,
                 ScholarshipApplication::STATUS_UNDER_EVALUATION,
-                ScholarshipApplication::STATUS_VERIFIED
+                ScholarshipApplication::STATUS_VERIFIED,
             ]);
     }
 
     /**
      * Check if student is eligible for academic scholarship.
      *
-     * @param string $type full|partial
-     * @return bool
+     * @param  string  $type  full|partial
      */
     public function isEligibleForAcademicScholarship(string $type = 'full'): bool
     {
-        if (!$this->hasNoFailingGrades() || $this->units < 18) {
+        if (! $this->hasNoFailingGrades() || $this->units < 18) {
             return false;
         }
 
         if ($type === 'full') {
-            return $this->gwa >= 1.000 && $this->gwa <= 1.450 && !$this->hasGradeBelow(1.75);
+            return $this->gwa >= 1.000 && $this->gwa <= 1.450 && ! $this->hasGradeBelow(1.75);
         }
 
-        return $this->gwa >= 1.460 && $this->gwa <= 1.750 && !$this->hasGradeBelow(2.00);
+        return $this->gwa >= 1.460 && $this->gwa <= 1.750 && ! $this->hasGradeBelow(2.00);
     }
 
     /**
      * Check if student is eligible for student assistantship.
-     *
-     * @return bool
      */
     public function isEligibleForStudentAssistantship(): bool
     {
@@ -355,8 +356,6 @@ class StudentProfile extends Model
 
     /**
      * Check if student is eligible for economic assistance.
-     *
-     * @return bool
      */
     public function isEligibleForEconomicAssistance(): bool
     {
@@ -378,6 +377,7 @@ class StudentProfile extends Model
                     case Scholarship::TYPE_ACADEMIC_FULL:
                     case Scholarship::TYPE_ACADEMIC_PARTIAL:
                         $isFullScholarship = str_contains(strtolower($scholarship->name), 'full');
+
                         return $this->isEligibleForAcademicScholarship($isFullScholarship ? 'full' : 'partial');
 
                     case Scholarship::TYPE_STUDENT_ASSISTANTSHIP:
