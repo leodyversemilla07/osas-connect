@@ -1520,24 +1520,45 @@ class PdfController extends Controller
             return $envCmd;
         }
 
-        // Try different pdftk variants with more comprehensive paths for Heroku
-        $commands = [
-            'pdftk', 
-            'pdftk-java', 
-            '/usr/bin/pdftk', 
-            '/usr/bin/pdftk-java',
-            '/app/.apt/usr/bin/pdftk',
-            '/app/.apt/usr/bin/pdftk-java',
-            '/app/.apt/usr/bin/pdftk.pdftk-java',  // Heroku apt buildpack installs it with this name
-            // Direct Java command with comprehensive security bypass (most reliable option)
-            'java -Djava.awt.headless=true -Djava.security.manager= -Djava.security.properties= -Djava.security.policy= -Djava.security.auth.login.config= -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8 -Djava.net.useSystemProxies=false -Djava.util.prefs.systemRoot=/tmp -Djava.util.prefs.userRoot=/tmp -jar /app/.apt/usr/share/pdftk/pdftk.jar',
-            // Alternative with minimal security bypass
-            'java -Djava.awt.headless=true -Djava.security.manager= -Djava.security.properties= -Dfile.encoding=UTF-8 -jar /app/.apt/usr/share/pdftk/pdftk.jar',
-            // Fallback with just headless mode
-            'java -Djava.awt.headless=true -Dfile.encoding=UTF-8 -jar /app/.apt/usr/share/pdftk/pdftk.jar',
-            // Last resort: completely simplified command
-            'java -jar /app/.apt/usr/share/pdftk/pdftk.jar'
-        ];
+        // Determine environment and prioritize commands accordingly
+        $isLocal = app()->environment('local', 'development', 'testing');
+        $isProduction = app()->environment('production', 'staging');
+
+        $commands = [];
+
+        if ($isLocal) {
+            // For local/dev environment: prioritize native pdftk first
+            $commands = [
+                'pdftk',                                          // pdftk in PATH
+                'pdftk.exe',                                     // Windows pdftk binary in PATH
+                'C:\\Program Files (x86)\\PDFtk Server\\bin\\pdftk.exe',  // Windows pdftk installation path (unquoted)
+                '/usr/bin/pdftk',                                // Common Linux installation path
+                'pdftk-java',                                    // Java version as fallback
+                '/usr/bin/pdftk-java',
+            ];
+        } else {
+            // For production/staging environment: prioritize pdftk-java for Heroku
+            $commands = [
+                'pdftk-java',                                      // Java version for Heroku
+                '/app/.apt/usr/bin/pdftk-java',                   // Heroku apt buildpack path
+                '/app/.apt/usr/bin/pdftk.pdftk-java',             // Heroku apt buildpack installs it with this name
+                // Direct Java command with comprehensive security bypass (most reliable option for Heroku)
+                'java -Djava.awt.headless=true -Djava.security.manager= -Djava.security.properties= -Djava.security.policy= -Djava.security.auth.login.config= -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8 -Djava.net.useSystemProxies=false -Djava.util.prefs.systemRoot=/tmp -Djava.util.prefs.userRoot=/tmp -jar /app/.apt/usr/share/pdftk/pdftk.jar',
+                // Alternative with minimal security bypass
+                'java -Djava.awt.headless=true -Djava.security.manager= -Djava.security.properties= -Dfile.encoding=UTF-8 -jar /app/.apt/usr/share/pdftk/pdftk.jar',
+                // Fallback with just headless mode
+                'java -Djava.awt.headless=true -Dfile.encoding=UTF-8 -jar /app/.apt/usr/share/pdftk/pdftk.jar',
+                // Last resort: completely simplified command
+                'java -jar /app/.apt/usr/share/pdftk/pdftk.jar',
+                // Native pdftk as final fallback
+                'pdftk',
+                '/usr/bin/pdftk',
+                '/app/.apt/usr/bin/pdftk',
+            ];
+        }
+        
+        logger()->info("Environment: " . app()->environment() . " (isLocal: " . ($isLocal ? 'true' : 'false') . ", isProduction: " . ($isProduction ? 'true' : 'false') . ")");
+        logger()->info("Trying PDFTK commands in order: " . implode(', ', array_slice($commands, 0, 5)) . "...");
         
         foreach ($commands as $cmd) {
             if ($this->testPdftkCommand($cmd)) {
@@ -1570,6 +1591,12 @@ class PdfController extends Controller
         $output = [];
         $returnCode = 0;
         
+        // Windows: quote paths containing spaces
+        $cmdToTest = $cmd;
+        if (PHP_OS_FAMILY === 'Windows' && preg_match('/\s/', $cmdToTest)) {
+            $cmdToTest = '"' . $cmdToTest . '"';
+        }
+    
         // Set up environment with Java path for Heroku
         $env = $_ENV;
         if (is_dir('/app/.apt/usr/lib/jvm/java-21-openjdk-amd64')) {
@@ -1597,8 +1624,8 @@ class PdfController extends Controller
             2 => ["pipe", "w"]
         ];
         
-        $process = proc_open("$cmd --version", $descriptorspec, $pipes, null, $env);
-        
+        $process = proc_open($cmdToTest . ' --version', $descriptorspec, $pipes, null, $env);
+
         if (is_resource($process)) {
             fclose($pipes[0]);
             $output = stream_get_contents($pipes[1]);

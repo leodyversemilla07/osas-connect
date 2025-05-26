@@ -1,4 +1,4 @@
-import { router, Link } from '@inertiajs/react';
+import { router, Link, Head } from '@inertiajs/react';
 import {
     TrashIcon, UserCircle, Building2, GraduationCap, Shield,
     Mail, Phone, MapPin, User2,
@@ -218,6 +218,7 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
 
     return (
         <>
+        <Head title={`${user.first_name} ${user.last_name} | ${user.role.charAt(0).toUpperCase() + user.role.slice(1)} Profile`} />
             <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
                 <div className="flex items-center justify-between">
                     <div>
