@@ -60,6 +60,19 @@ return [
             'report' => false,
         ],
 
+        'cloudcube' => [
+            'driver' => 's3',
+            'key' => env('CLOUDCUBE_ACCESS_KEY_ID'),
+            'secret' => env('CLOUDCUBE_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'bucket' => env('CLOUDCUBE_BUCKET'),
+            'url' => env('CLOUDCUBE_URL'),
+            'endpoint' => env('CLOUDCUBE_URL'),
+            'use_path_style_endpoint' => true,
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

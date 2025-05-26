@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,8 +20,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (! is_dir(public_path('storage'))) {
-            app('files')->link(storage_path('app/public'), public_path('storage'));
+        // Force HTTPS in production
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
+
+        // Only create storage link in local environment
+        if (config('app.env') === 'local') {
+            if (! is_dir(public_path('storage'))) {
+                try {
+                    app('files')->link(storage_path('app/public'), public_path('storage'));
+                } catch (\Exception $e) {
+                    // Silently fail if symlink creation fails
+                }
+            }
         }
 
         //
