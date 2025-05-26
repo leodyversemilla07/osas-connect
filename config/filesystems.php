@@ -69,6 +69,7 @@ return [
             'url' => env('CLOUDCUBE_URL'),
             'endpoint' => env('CLOUDCUBE_URL'),
             'use_path_style_endpoint' => true,
+            'visibility' => 'public',
             'throw' => false,
             'report' => false,
         ],

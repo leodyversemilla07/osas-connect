@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Services\StorageService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class ProfileController extends Controller
         $photoUrl = null;
 
         // Get photo URL from user record since photo_id is stored in users table
-        $photoUrl = $user->photo_id ? asset('storage/'.$user->photo_id) : null;
+        $photoUrl = $user->photo_id ? StorageService::url($user->photo_id) : null;
 
         switch ($user->role) {
             case 'student':
@@ -104,11 +105,11 @@ class ProfileController extends Controller
             Log::info('Processing photo upload...');
             // Delete old photo if exists
             if ($user->photo_id) {
-                Storage::disk('public')->delete($user->photo_id);
+                StorageService::delete($user->photo_id);
             }
 
-            // Store new photo
-            $photoPath = $request->file('photo_id')->store('profile-photos', 'public');
+            // Store new photo using the appropriate storage service
+            $photoPath = StorageService::store($request->file('photo_id'), 'profile-photos');
             $validatedData['photo_id'] = $photoPath;
             Log::info('Photo uploaded to: '.$photoPath);
         }
@@ -190,7 +191,7 @@ class ProfileController extends Controller
 
         // Delete profile photo if exists
         if ($user->photo_id) {
-            Storage::disk('public')->delete($user->photo_id);
+            StorageService::delete($user->photo_id);
         }
 
         Auth::logout();

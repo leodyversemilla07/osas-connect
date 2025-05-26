@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Document;
 use App\Models\ScholarshipApplication;
+use App\Services\StorageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,7 +17,7 @@ class DocumentController extends Controller
             'type' => ['required', 'string', 'in:grades,indigency,good_moral,parent_consent,recommendation'],
         ]);
 
-        $path = $request->file('document')->store('documents', 'public');
+        $path = StorageService::store($request->file('document'), 'documents');
 
         $document = Document::create([
             'application_id' => $application->id,
@@ -35,10 +36,10 @@ class DocumentController extends Controller
         ]);
 
         // Delete old file
-        Storage::disk('public')->delete($document->file_path);
+        StorageService::delete($document->file_path);
 
         // Store new file
-        $path = $request->file('document')->store('documents', 'public');
+        $path = StorageService::store($request->file('document'), 'documents');
 
         $document->update([
             'file_path' => $path,
@@ -50,7 +51,7 @@ class DocumentController extends Controller
 
     public function destroy(Document $document)
     {
-        Storage::disk('public')->delete($document->file_path);
+        StorageService::delete($document->file_path);
         $document->delete();
 
         return back()->with('success', 'Document deleted successfully');

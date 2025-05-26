@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\StorageService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use mikehaertl\pdftk\Pdf as PdftkPdf;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -347,6 +349,55 @@ class PdfController extends Controller
         'Bachelor of Elementary Education' => 'BEEd',
         'Bachelor of Science in Fisheries' => 'BSF',
     ];
+
+    /**
+     * Get the local file path for an image stored in storage
+     * Downloads CloudCube images temporarily for PDF processing
+     */
+    private function getImagePathForPdf(string $photoId): string
+    {
+        if (empty($photoId)) {
+            return '';
+        }
+
+        $disk = StorageService::getDisk();
+        
+        if ($disk === 'cloudcube') {
+            // For CloudCube, download the image temporarily
+            try {
+                $imageContents = Storage::disk('cloudcube')->get($photoId);
+                if ($imageContents) {
+                    $tempPath = storage_path('app/temp/' . basename($photoId));
+                    
+                    // Ensure temp directory exists
+                    if (!file_exists(dirname($tempPath))) {
+                        mkdir(dirname($tempPath), 0755, true);
+                    }
+                    
+                    file_put_contents($tempPath, $imageContents);
+                    return $tempPath;
+                }
+            } catch (Exception $e) {
+                logger()->error('Failed to download CloudCube image: ' . $e->getMessage());
+                return '';
+            }
+        } else {
+            // For local storage, get the full path
+            $photoPath = storage_path('app/public/' . $photoId);
+            
+            if (file_exists($photoPath) && is_readable($photoPath)) {
+                return $photoPath;
+            }
+            
+            // Try alternate path format
+            $alternativePath = public_path('storage/' . $photoId);
+            if (file_exists($alternativePath) && is_readable($alternativePath)) {
+                return $alternativePath;
+            }
+        }
+        
+        return '';
+    }
 
     public function generatePdf(Request $request, User $user)
     {
@@ -737,37 +788,7 @@ class PdfController extends Controller
         $formData[self::FORM_FIELDS['SCHOLARSHIPS']] = $ensureValue($profile->existing_scholarships);
         
         // Student Photo - Handle photo from user record
-        $photoPath = '';
-        if (!empty($user->photo_id)) {
-            // Convert relative path to full path for PDF processing
-            $photoPath = storage_path('app/public/' . $user->photo_id);
-            
-            // Check if file exists, otherwise use default
-            if (!file_exists($photoPath)) {
-                // Try alternate path format
-                $alternativePath = public_path('storage/' . $user->photo_id);
-                if (file_exists($alternativePath)) {
-                    $photoPath = $alternativePath;
-                } else {
-                    logger()->warning('Student photo not found at either: ' . $photoPath . ' or ' . $alternativePath);
-                    $photoPath = '';
-                }
-            }
-            
-            // Verify the image is readable and valid
-            if (!empty($photoPath)) {
-                try {
-                    // Check if image is readable
-                    if (!is_readable($photoPath)) {
-                        logger()->warning('Student photo is not readable: ' . $photoPath);
-                        $photoPath = '';
-                    }
-                } catch (Exception $e) {
-                    logger()->error('Error processing student photo: ' . $e->getMessage());
-                    $photoPath = '';
-                }
-            }
-        }
+        $photoPath = $this->getImagePathForPdf($user->photo_id ?? '');
         
         // ID Picture - Same photo as student photo for PDF form field
         $formData[self::FORM_FIELDS['ID_PICTURE']] = $photoPath;
@@ -952,18 +973,7 @@ class PdfController extends Controller
         $formData[self::CHED_FORM_FIELDS['ZIP_CODE']] = $ensureValue(null, '0000'); // Default zip code
 
         // Student Photo - Handle photo from user record
-        $photoPath = '';
-        if (!empty($user->photo_id)) {
-            $photoPath = storage_path('app/public/' . $user->photo_id);
-            if (!file_exists($photoPath)) {
-                $alternativePath = public_path('storage/' . $user->photo_id);
-                if (file_exists($alternativePath)) {
-                    $photoPath = $alternativePath;
-                } else {
-                    $photoPath = '';
-                }
-            }
-        }
+        $photoPath = $this->getImagePathForPdf($user->photo_id ?? '');
         $formData[self::CHED_FORM_FIELDS['ID_PICTURE']] = $photoPath;
         $formData[self::CHED_FORM_FIELDS['ID_PICTURE_AF_IMAGE']] = $photoPath;
 
@@ -1114,18 +1124,7 @@ class PdfController extends Controller
         $formData[self::ANNEX1_FORM_FIELDS['DATE_ACCOMPLISHED']] = date('m/d/Y'); // Current date
 
         // Student Photo - Handle photo from user record
-        $photoPath = '';
-        if (!empty($user->photo_id)) {
-            $photoPath = storage_path('app/public/' . $user->photo_id);
-            if (!file_exists($photoPath)) {
-                $alternativePath = public_path('storage/' . $user->photo_id);
-                if (file_exists($alternativePath)) {
-                    $photoPath = $alternativePath;
-                } else {
-                    $photoPath = '';
-                }
-            }
-        }
+        $photoPath = $this->getImagePathForPdf($user->photo_id ?? '');
         $formData[self::ANNEX1_FORM_FIELDS['ID_PICTURE_AF_IMAGE']] = $photoPath;
 
         // Signature
