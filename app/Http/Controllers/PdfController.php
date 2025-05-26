@@ -1529,9 +1529,11 @@ class PdfController extends Controller
             '/app/.apt/usr/bin/pdftk',
             '/app/.apt/usr/bin/pdftk-java',
             '/app/.apt/usr/bin/pdftk.pdftk-java',  // Heroku apt buildpack installs it with this name
-            // Direct Java command with disabled security manager (most reliable option)
-            'java -Djava.awt.headless=true -Djava.security.manager= -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8 -Djava.net.useSystemProxies=false -jar /app/.apt/usr/share/pdftk/pdftk.jar',
-            // Alternative Java command with simplified security options
+            // Direct Java command with comprehensive security bypass (most reliable option)
+            'java -Djava.awt.headless=true -Djava.security.manager= -Djava.security.properties= -Djava.security.policy= -Djava.security.auth.login.config= -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8 -Djava.net.useSystemProxies=false -Djava.util.prefs.systemRoot=/tmp -Djava.util.prefs.userRoot=/tmp -jar /app/.apt/usr/share/pdftk/pdftk.jar',
+            // Alternative with minimal security bypass
+            'java -Djava.awt.headless=true -Djava.security.manager= -Djava.security.properties= -Dfile.encoding=UTF-8 -jar /app/.apt/usr/share/pdftk/pdftk.jar',
+            // Fallback with just headless mode
             'java -Djava.awt.headless=true -Dfile.encoding=UTF-8 -jar /app/.apt/usr/share/pdftk/pdftk.jar',
             // Last resort: completely simplified command
             'java -jar /app/.apt/usr/share/pdftk/pdftk.jar'
@@ -1573,8 +1575,8 @@ class PdfController extends Controller
         if (is_dir('/app/.apt/usr/lib/jvm/java-21-openjdk-amd64')) {
             $env['JAVA_HOME'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64';
             $env['PATH'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64/bin:/app/.apt/usr/bin:' . ($_ENV['PATH'] ?? '');
-            // Add Java headless mode and security options to prevent GUI and security errors
-            $env['JAVA_OPTS'] = '-Djava.awt.headless=true -Djava.security.manager= -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8';
+            // Add comprehensive Java security bypass options to prevent security configuration issues
+            $env['JAVA_OPTS'] = '-Djava.awt.headless=true -Djava.security.manager= -Djava.security.properties= -Djava.security.policy= -Djava.security.auth.login.config= -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8';
         }
         
         // Test the command with proper environment
