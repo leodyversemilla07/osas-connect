@@ -1509,8 +1509,15 @@ class PdfController extends Controller
      */
     private function getPdftkCommand(): ?string
     {
-        // Try different pdftk variants
-        $commands = ['pdftk', 'pdftk-java', '/usr/bin/pdftk', '/usr/bin/pdftk-java'];
+        // Try different pdftk variants with more comprehensive paths for Heroku
+        $commands = [
+            'pdftk', 
+            'pdftk-java', 
+            '/usr/bin/pdftk', 
+            '/usr/bin/pdftk-java',
+            '/app/.apt/usr/bin/pdftk',
+            '/app/.apt/usr/bin/pdftk-java'
+        ];
         
         foreach ($commands as $cmd) {
             $output = [];
@@ -1529,6 +1536,15 @@ class PdfController extends Controller
         // Try to see what's actually installed
         exec('which pdftk* 2>&1', $output, $returnCode);
         logger()->info('Available pdftk variants: ' . implode("\n", $output));
+        
+        // Also check what's in the apt directory on Heroku
+        if (is_dir('/app/.apt/usr/bin/')) {
+            $aptBinFiles = scandir('/app/.apt/usr/bin/');
+            $pdftkFiles = array_filter($aptBinFiles, function($file) {
+                return strpos($file, 'pdftk') !== false;
+            });
+            logger()->info('PDFTK files in /app/.apt/usr/bin/: ' . implode(', ', $pdftkFiles));
+        }
         
         return null;
     }
