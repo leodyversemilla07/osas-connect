@@ -1529,10 +1529,12 @@ class PdfController extends Controller
             '/app/.apt/usr/bin/pdftk',
             '/app/.apt/usr/bin/pdftk-java',
             '/app/.apt/usr/bin/pdftk.pdftk-java',  // Heroku apt buildpack installs it with this name
-            // Direct Java command with comprehensive headless and security settings for Heroku
-            'java -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -Djava.security.manager=allow -Dfile.encoding=UTF-8 -Djava.net.useSystemProxies=false -jar /app/.apt/usr/share/pdftk/pdftk.jar',
-            // Fallback Java command with minimal security constraints
-            'java -Djava.awt.headless=true -Djava.security.manager=allow -Dfile.encoding=UTF-8 -jar /app/.apt/usr/share/pdftk/pdftk.jar'
+            // Direct Java command with disabled security manager (most reliable option)
+            'java -Djava.awt.headless=true -Djava.security.manager= -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8 -Djava.net.useSystemProxies=false -jar /app/.apt/usr/share/pdftk/pdftk.jar',
+            // Alternative Java command with simplified security options
+            'java -Djava.awt.headless=true -Dfile.encoding=UTF-8 -jar /app/.apt/usr/share/pdftk/pdftk.jar',
+            // Last resort: completely simplified command
+            'java -jar /app/.apt/usr/share/pdftk/pdftk.jar'
         ];
         
         foreach ($commands as $cmd) {
@@ -1571,8 +1573,8 @@ class PdfController extends Controller
         if (is_dir('/app/.apt/usr/lib/jvm/java-21-openjdk-amd64')) {
             $env['JAVA_HOME'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64';
             $env['PATH'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64/bin:/app/.apt/usr/bin:' . ($_ENV['PATH'] ?? '');
-            // Add comprehensive Java headless mode and security options to prevent GUI and security manager issues
-            $env['JAVA_OPTS'] = '-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -Djava.security.manager=allow -Dfile.encoding=UTF-8';
+            // Add Java headless mode and security options to prevent GUI and security errors
+            $env['JAVA_OPTS'] = '-Djava.awt.headless=true -Djava.security.manager= -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8';
         }
         
         // Test the command with proper environment
@@ -1599,7 +1601,7 @@ class PdfController extends Controller
             }
         }
         
-        return false;
+        // Check what's in the apt directory on Heroku for additional debugging
         if (is_dir('/app/.apt/usr/bin/')) {
             $aptBinFiles = scandir('/app/.apt/usr/bin/');
             $pdftkFiles = array_filter($aptBinFiles, function($file) {
@@ -1608,6 +1610,6 @@ class PdfController extends Controller
             logger()->info('PDFTK files in /app/.apt/usr/bin/: ' . implode(', ', $pdftkFiles));
         }
         
-        return null;
+        return false;
     }
 }
