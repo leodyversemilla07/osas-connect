@@ -4,8 +4,8 @@
 export JAVA_HOME="/app/.apt/usr/lib/jvm/java-21-openjdk-amd64"
 export PATH="$JAVA_HOME/bin:/app/.apt/usr/bin:$PATH"
 
-# Set Java headless mode to prevent GUI-related errors
-export JAVA_OPTS="-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom"
+# Set Java headless mode and security options to prevent GUI-related errors and security manager issues
+export JAVA_OPTS="-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -Djava.security.manager=allow -Dfile.encoding=UTF-8"
 
 # Set PDFTK command for easier access
 export PDFTK_CMD="/app/.apt/usr/bin/pdftk.pdftk-java"

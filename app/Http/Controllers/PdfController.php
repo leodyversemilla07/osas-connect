@@ -1529,7 +1529,10 @@ class PdfController extends Controller
             '/app/.apt/usr/bin/pdftk',
             '/app/.apt/usr/bin/pdftk-java',
             '/app/.apt/usr/bin/pdftk.pdftk-java',  // Heroku apt buildpack installs it with this name
-            'java -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -jar /app/.apt/usr/share/pdftk/pdftk.jar'  // Direct Java command with headless mode
+            // Direct Java command with comprehensive headless and security settings for Heroku
+            'java -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -Djava.security.manager=allow -Dfile.encoding=UTF-8 -Djava.net.useSystemProxies=false -jar /app/.apt/usr/share/pdftk/pdftk.jar',
+            // Fallback Java command with minimal security constraints
+            'java -Djava.awt.headless=true -Djava.security.manager=allow -Dfile.encoding=UTF-8 -jar /app/.apt/usr/share/pdftk/pdftk.jar'
         ];
         
         foreach ($commands as $cmd) {
@@ -1568,8 +1571,8 @@ class PdfController extends Controller
         if (is_dir('/app/.apt/usr/lib/jvm/java-21-openjdk-amd64')) {
             $env['JAVA_HOME'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64';
             $env['PATH'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64/bin:/app/.apt/usr/bin:' . ($_ENV['PATH'] ?? '');
-            // Add Java headless mode to prevent GUI initialization issues
-            $env['JAVA_OPTS'] = '-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom';
+            // Add comprehensive Java headless mode and security options to prevent GUI and security manager issues
+            $env['JAVA_OPTS'] = '-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -Djava.security.manager=allow -Dfile.encoding=UTF-8';
         }
         
         // Test the command with proper environment
