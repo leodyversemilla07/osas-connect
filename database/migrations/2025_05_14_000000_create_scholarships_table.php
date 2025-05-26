@@ -30,6 +30,10 @@ return new class extends Migration
             $table->string('funding_source');
             $table->json('eligibility_criteria');
             $table->json('required_documents');
+            $table->enum('stipend_schedule', ['monthly', 'semestral'])->default('monthly');
+            $table->integer('slots_available')->default(0);
+            $table->json('criteria')->nullable();
+            $table->json('renewal_criteria')->nullable();
             $table->enum('status', ['draft', 'active', 'inactive', 'upcoming'])->default('draft');
             $table->text('admin_remarks')->nullable();
             $table->timestamps();

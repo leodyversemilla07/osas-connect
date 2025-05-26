@@ -14,6 +14,8 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
+        // php artisan db:seed -> this should be run to seed the database with the default admin user
+
         // Create the default system admin with basic information
         $admin = User::create([
             'last_name' => 'Jane',
