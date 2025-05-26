@@ -600,6 +600,11 @@ class PdfController extends Controller
     private function generatePdfFile(string $templatePath, string $tempOutput, User $user): BinaryFileResponse
     {
         try {
+            // Check if pdftk is available
+            if (!$this->isPdftkAvailable()) {
+                throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
+            }
+
             // Fill the form directly from the original template
             $pdf = new PdftkPdf($templatePath);
             $result = $pdf->fillForm($this->prepareFormData($user))
@@ -637,6 +642,11 @@ class PdfController extends Controller
     private function generateChedPdfFile(string $templatePath, string $tempOutput, User $user): BinaryFileResponse
     {
         try {
+            // Check if pdftk is available
+            if (!$this->isPdftkAvailable()) {
+                throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
+            }
+
             // Fill the CHED form directly from the original template
             $pdf = new PdftkPdf($templatePath);
             $result = $pdf->fillForm($this->prepareChedFormData($user))
@@ -674,6 +684,11 @@ class PdfController extends Controller
     private function generateAnnex1PdfFile(string $templatePath, string $tempOutput, User $user): BinaryFileResponse
     {
         try {
+            // Check if pdftk is available
+            if (!$this->isPdftkAvailable()) {
+                throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
+            }
+
             // Fill the Annex 1 form directly from the original template
             $pdf = new PdftkPdf($templatePath);
             $result = $pdf->fillForm($this->prepareAnnex1FormData($user))
@@ -1469,5 +1484,37 @@ class PdfController extends Controller
         }
 
         return $report;
+    }
+
+    /**
+     * Check if pdftk is available on the system
+     */
+    private function isPdftkAvailable(): bool
+    {
+        // Try to execute pdftk --version to check if it's available
+        $output = [];
+        $returnCode = 0;
+        exec('pdftk --version 2>&1', $output, $returnCode);
+        
+        if ($returnCode === 0) {
+            return true;
+        }
+        
+        // If pdftk is not available, log the issue
+        logger()->warning('PDFTK not available. Output: ' . implode("\n", $output) . ' Return code: ' . $returnCode);
+        
+        // Also try checking if it's in different paths
+        exec('which pdftk 2>&1', $output, $returnCode);
+        if ($returnCode === 0) {
+            return true;
+        }
+        
+        // Try absolute path that might be installed by apt buildpack
+        exec('/usr/bin/pdftk --version 2>&1', $output, $returnCode);
+        if ($returnCode === 0) {
+            return true;
+        }
+        
+        return false;
     }
 }

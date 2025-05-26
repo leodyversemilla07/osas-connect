@@ -404,7 +404,7 @@ class AdminController extends Controller
         $photoUrl = null;
 
         // Get photo URL from user record since photo_id is stored in users table
-        $photoUrl = $user->photo_id ? asset('storage/'.$user->photo_id) : null;
+        $photoUrl = $user->photo_id ? \App\Services\StorageService::url($user->photo_id) : null;
 
         switch ($user->role) {
             case 'student':

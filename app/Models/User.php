@@ -127,8 +127,8 @@ class User extends Authenticatable
     public function getAvatarAttribute(): ?string
     {
         if ($this->photo_id) {
-            // $this->photo_id is expected to store the path like 'profile-photos/image.jpg'
-            return asset('storage/'.$this->photo_id);
+            // Use StorageService to handle CloudCube URLs in production
+            return \App\Services\StorageService::url($this->photo_id);
         }
 
         return null;
