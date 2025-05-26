@@ -605,8 +605,14 @@ class PdfController extends Controller
                 throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
             }
 
+            $pdftkCommand = $this->getPdftkCommand();
+            if (!$pdftkCommand) {
+                throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
+            }
+
             // Fill the form directly from the original template
             $pdf = new PdftkPdf($templatePath);
+            $pdf->setBinary($pdftkCommand); // Set the correct pdftk binary
             $result = $pdf->fillForm($this->prepareFormData($user))
                 ->needAppearances()
                 ->compress()
@@ -643,12 +649,14 @@ class PdfController extends Controller
     {
         try {
             // Check if pdftk is available
-            if (!$this->isPdftkAvailable()) {
+            $pdftkCommand = $this->getPdftkCommand();
+            if (!$pdftkCommand) {
                 throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
             }
 
             // Fill the CHED form directly from the original template
             $pdf = new PdftkPdf($templatePath);
+            $pdf->setBinary($pdftkCommand); // Set the correct pdftk binary
             $result = $pdf->fillForm($this->prepareChedFormData($user))
                 ->needAppearances()
                 ->compress()
@@ -685,12 +693,14 @@ class PdfController extends Controller
     {
         try {
             // Check if pdftk is available
-            if (!$this->isPdftkAvailable()) {
+            $pdftkCommand = $this->getPdftkCommand();
+            if (!$pdftkCommand) {
                 throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
             }
 
             // Fill the Annex 1 form directly from the original template
             $pdf = new PdftkPdf($templatePath);
+            $pdf->setBinary($pdftkCommand); // Set the correct pdftk binary
             $result = $pdf->fillForm($this->prepareAnnex1FormData($user))
                 ->needAppearances()
                 ->compress()
@@ -1491,30 +1501,35 @@ class PdfController extends Controller
      */
     private function isPdftkAvailable(): bool
     {
-        // Try to execute pdftk --version to check if it's available
-        $output = [];
-        $returnCode = 0;
-        exec('pdftk --version 2>&1', $output, $returnCode);
+        return $this->getPdftkCommand() !== null;
+    }
+
+    /**
+     * Get the available pdftk command
+     */
+    private function getPdftkCommand(): ?string
+    {
+        // Try different pdftk variants
+        $commands = ['pdftk', 'pdftk-java', '/usr/bin/pdftk', '/usr/bin/pdftk-java'];
         
-        if ($returnCode === 0) {
-            return true;
+        foreach ($commands as $cmd) {
+            $output = [];
+            $returnCode = 0;
+            exec("$cmd --version 2>&1", $output, $returnCode);
+            
+            if ($returnCode === 0) {
+                logger()->info("Found working pdftk command: $cmd");
+                return $cmd;
+            }
         }
         
-        // If pdftk is not available, log the issue
-        logger()->warning('PDFTK not available. Output: ' . implode("\n", $output) . ' Return code: ' . $returnCode);
+        // Log which commands we tried
+        logger()->warning('PDFTK not available. Tried commands: ' . implode(', ', $commands));
         
-        // Also try checking if it's in different paths
-        exec('which pdftk 2>&1', $output, $returnCode);
-        if ($returnCode === 0) {
-            return true;
-        }
+        // Try to see what's actually installed
+        exec('which pdftk* 2>&1', $output, $returnCode);
+        logger()->info('Available pdftk variants: ' . implode("\n", $output));
         
-        // Try absolute path that might be installed by apt buildpack
-        exec('/usr/bin/pdftk --version 2>&1', $output, $returnCode);
-        if ($returnCode === 0) {
-            return true;
-        }
-        
-        return false;
+        return null;
     }
 }
