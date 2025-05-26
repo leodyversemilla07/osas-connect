@@ -1,5 +1,0 @@
-:repo:deb http://archive.ubuntu.com/ubuntu bionic main universe
-:repo:deb http://archive.ubuntu.com/ubuntu bionic-updates main universe
-pdftk
-poppler-utils
-qpdf
