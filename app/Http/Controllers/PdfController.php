@@ -1509,6 +1509,13 @@ class PdfController extends Controller
      */
     private function getPdftkCommand(): ?string
     {
+        // First check if PDFTK_CMD environment variable is set
+        $envCmd = env('PDFTK_CMD');
+        if ($envCmd && $this->testPdftkCommand($envCmd)) {
+            logger()->info("Found working pdftk from environment: $envCmd");
+            return $envCmd;
+        }
+
         // Try different pdftk variants with more comprehensive paths for Heroku
         $commands = [
             'pdftk', 
@@ -1521,11 +1528,7 @@ class PdfController extends Controller
         ];
         
         foreach ($commands as $cmd) {
-            $output = [];
-            $returnCode = 0;
-            exec("$cmd --version 2>&1", $output, $returnCode);
-            
-            if ($returnCode === 0) {
+            if ($this->testPdftkCommand($cmd)) {
                 logger()->info("Found working pdftk command: $cmd");
                 return $cmd;
             }
@@ -1539,6 +1542,54 @@ class PdfController extends Controller
         logger()->info('Available pdftk variants: ' . implode("\n", $output));
         
         // Also check what's in the apt directory on Heroku
+        if (is_dir('/app/.apt/usr/bin/')) {
+            $files = glob('/app/.apt/usr/bin/*pdftk*');
+            logger()->info('Found pdftk files in /app/.apt/usr/bin/: ' . implode(', ', $files));
+        }
+        
+        return null;
+    }
+
+    /**
+     * Test if a pdftk command works
+     */
+    private function testPdftkCommand(string $cmd): bool
+    {
+        $output = [];
+        $returnCode = 0;
+        
+        // Set up environment with Java path for Heroku
+        $env = $_ENV;
+        if (is_dir('/app/.apt/usr/lib/jvm/java-21-openjdk-amd64')) {
+            $env['JAVA_HOME'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64';
+            $env['PATH'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64/bin:/app/.apt/usr/bin:' . ($_ENV['PATH'] ?? '');
+        }
+        
+        // Test the command with proper environment
+        $descriptorspec = [
+            0 => ["pipe", "r"],
+            1 => ["pipe", "w"],
+            2 => ["pipe", "w"]
+        ];
+        
+        $process = proc_open("$cmd --version", $descriptorspec, $pipes, null, $env);
+        
+        if (is_resource($process)) {
+            fclose($pipes[0]);
+            $output = stream_get_contents($pipes[1]);
+            $error = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $returnCode = proc_close($process);
+            
+            if ($returnCode === 0) {
+                return true;
+            } else {
+                logger()->debug("Command '$cmd' failed with code $returnCode. Error: $error");
+            }
+        }
+        
+        return false;
         if (is_dir('/app/.apt/usr/bin/')) {
             $aptBinFiles = scandir('/app/.apt/usr/bin/');
             $pdftkFiles = array_filter($aptBinFiles, function($file) {
