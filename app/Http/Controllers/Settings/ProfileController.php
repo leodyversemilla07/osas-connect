@@ -175,6 +175,16 @@ class ProfileController extends Controller
 
         Log::info('Profile update completed successfully for user: '.$user->id);
 
+        // Refresh the user model to ensure we get the latest data
+        $user->refresh();
+        
+        // Log the updated photo info for debugging
+        Log::info('Updated user photo info:', [
+            'user_id' => $user->id,
+            'photo_id' => $user->photo_id,
+            'avatar_url' => $user->avatar
+        ]);
+
         return redirect()->back()->with('success', 'Profile updated successfully!');
     }
 
