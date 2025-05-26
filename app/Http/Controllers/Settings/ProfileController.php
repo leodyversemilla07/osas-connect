@@ -142,11 +142,9 @@ class ProfileController extends Controller
         } elseif ($user->role === 'student') {
             $studentProfile = $user->studentProfile()->firstOrCreate(['user_id' => $user->id]);
 
-            // ✅ Filter out user fields and photo from student profile data
-            $profileFields = array_diff_key(
-                $validatedData,
-                array_flip(['first_name', 'middle_name', 'last_name', 'email', 'photo_id'])
-            );
+            // ✅ Filter out ONLY user table fields, keep all student profile fields including date_of_birth
+            $userTableFields = ['first_name', 'middle_name', 'last_name', 'email', 'photo_id'];
+            $profileFields = array_diff_key($validatedData, array_flip($userTableFields));
 
             // ✅ Ensure boolean fields are properly handled
             $booleanFields = [
@@ -161,6 +159,14 @@ class ProfileController extends Controller
                     $profileFields[$field] = (bool) $profileFields[$field];
                 }
             }
+
+            // ✅ Log the date_of_birth specifically for debugging
+            Log::info('Date of birth in profile fields: ', [
+                'date_of_birth' => $profileFields['date_of_birth'] ?? 'NOT SET',
+                'all_date_fields' => array_filter($profileFields, function($key) {
+                    return strpos($key, 'date') !== false || strpos($key, 'birth') !== false;
+                }, ARRAY_FILTER_USE_KEY)
+            ]);
 
             $studentProfile->update($profileFields);
             Log::info('Updated student profile with fields: ', array_keys($profileFields));

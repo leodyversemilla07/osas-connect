@@ -123,6 +123,16 @@ Route::get('/generate-scholarship-pdf/{user}', [PdfController::class, 'generateP
     ->name('generate.scholarship.pdf') // Added a route name for convenience
     ->middleware('auth'); // Assuming only authenticated users can generate this
 
+// CHED PDF generation route - expects a user ID
+Route::get('/generate-ched-scholarship-pdf/{user}', [PdfController::class, 'generateChedPdf'])
+    ->name('generate.ched.scholarship.pdf')
+    ->middleware('auth');
+
+// Annex 1 TPDF PDF generation route - expects a user ID
+Route::get('/generate-annex1-tpdf-pdf/{user}', [PdfController::class, 'generateAnnex1Pdf'])
+    ->name('generate.annex1.tpdf.pdf')
+    ->middleware('auth');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 require __DIR__.'/scholarships.php';

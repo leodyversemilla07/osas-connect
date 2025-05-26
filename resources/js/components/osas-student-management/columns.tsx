@@ -8,11 +8,10 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { router } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
 
 export const columns: ColumnDef<User>[] = [
     {
@@ -81,7 +80,8 @@ export const columns: ColumnDef<User>[] = [
     },
     {
         accessorKey: "student_profile.year_level",
-        header: "Year",        cell: ({ row }) => {
+        header: "Year",
+        cell: ({ row }) => {
             const yearLevel = row.original.student_profile?.year_level;
             const course = row.original.student_profile?.course;
 
@@ -108,25 +108,12 @@ export const columns: ColumnDef<User>[] = [
                 </div>
             )
         },
-    },    {
+    },
+    {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {
             const user = row.original;
-            
-            const handleView = () => {
-                router.visit(route('admin.students.show', user.id));
-            };
-            
-            const handleEdit = () => {
-                router.visit(route('admin.students.edit', user.id));
-            };
-            
-            const handleArchive = () => {
-                if (confirm('Are you sure you want to archive this student? This action cannot be undone.')) {
-                    router.delete(route('admin.students.destroy', user.id));
-                }
-            };
 
             return (
                 <div className="text-left">
@@ -137,15 +124,10 @@ export const columns: ColumnDef<User>[] = [
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem onClick={handleView} className="text-base cursor-pointer">
-                                View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleEdit} className="text-base cursor-pointer">
-                                Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleArchive} className="text-base text-red-600 dark:text-red-400 cursor-pointer">
-                                Archive
+                            <DropdownMenuItem asChild className="text-base cursor-pointer">
+                                <Link href={route('osas.students.details', { id: user.id })}>
+                                    View Details
+                                </Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

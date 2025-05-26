@@ -308,6 +308,23 @@ export default function Profile({
             return str === '' ? fallback : str;
         };
 
+        const safeDate = (value: unknown, fallback: string = ''): string => {
+            if (value === null || value === undefined) return fallback;
+            const dateStr = String(value).trim();
+            // Handle different date formats
+            if (dateStr && dateStr !== '') {
+                try {
+                    const date = new Date(dateStr);
+                    if (!isNaN(date.getTime())) {
+                        return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                    }
+                } catch {
+                    // Invalid date, return fallback
+                }
+            }
+            return fallback;
+        };
+
         return {
             // Basic Information with better fallbacks
             photo_id: null,
@@ -337,7 +354,7 @@ export default function Profile({
                 // Personal Information
                 civil_status: safeString(profile.civil_status),
                 sex: safeString(profile.sex),
-                date_of_birth: safeString(profile.date_of_birth),
+                date_of_birth: safeDate(profile.date_of_birth),
                 place_of_birth: safeString(profile.place_of_birth),
                 street: safeString(profile.street),
                 barangay: safeString(profile.barangay),

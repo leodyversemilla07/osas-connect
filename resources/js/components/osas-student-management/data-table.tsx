@@ -84,7 +84,8 @@ export function DataTable<TData, TValue>({
                     onChange={(event) =>
                         table.getColumn("fullName")?.setFilterValue(event.target.value)
                     }
-                />                {table.getFilteredSelectedRowModel().rows.length > 0 && (
+                />
+                {table.getFilteredSelectedRowModel().rows.length > 0 && (
                     <div className="text-base text-gray-500 dark:text-gray-400">
                         {table.getFilteredSelectedRowModel().rows.length} selected
                     </div>

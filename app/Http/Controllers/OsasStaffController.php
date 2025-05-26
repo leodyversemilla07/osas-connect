@@ -136,6 +136,27 @@ class OsasStaffController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Transform each user to include avatar and student_profile details (similar to AdminController)
+        $students->getCollection()->transform(function ($user) {
+            return [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'middle_name' => $user->middle_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'avatar' => $user->avatar, // This will utilize the getAvatarAttribute accessor from the User model
+                'role' => 'Student',
+                'student_profile' => $user->studentProfile ? [
+                    'student_id' => $user->studentProfile->student_id,
+                    'course' => $user->studentProfile->course,
+                    'major' => $user->studentProfile->major,
+                    'year_level' => $user->studentProfile->year_level,
+                    'mobile_number' => $user->studentProfile->mobile_number,
+                ] : null,
+                'created_at' => $user->created_at,
+            ];
+        });
+
         $courses = [
             'Bachelor of Arts in Political Science',
             'Bachelor of Science in Tourism Management',
