@@ -1516,7 +1516,8 @@ class PdfController extends Controller
             '/usr/bin/pdftk', 
             '/usr/bin/pdftk-java',
             '/app/.apt/usr/bin/pdftk',
-            '/app/.apt/usr/bin/pdftk-java'
+            '/app/.apt/usr/bin/pdftk-java',
+            '/app/.apt/usr/bin/pdftk.pdftk-java'  // Heroku apt buildpack installs it with this name
         ];
         
         foreach ($commands as $cmd) {
