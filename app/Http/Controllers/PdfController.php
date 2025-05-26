@@ -1509,10 +1509,17 @@ class PdfController extends Controller
      */
     private function getPdftkCommand(): ?string
     {
-        // First check if PDFTK_CMD environment variable is set
+        // First check if PDFTK_COMMAND environment variable is set (for Heroku)
+        $envCmd = env('PDFTK_COMMAND');
+        if ($envCmd && $this->testPdftkCommand($envCmd)) {
+            logger()->info("Found working pdftk from PDFTK_COMMAND environment: $envCmd");
+            return $envCmd;
+        }
+
+        // Fallback: check if PDFTK_CMD environment variable is set
         $envCmd = env('PDFTK_CMD');
         if ($envCmd && $this->testPdftkCommand($envCmd)) {
-            logger()->info("Found working pdftk from environment: $envCmd");
+            logger()->info("Found working pdftk from PDFTK_CMD environment: $envCmd");
             return $envCmd;
         }
 
@@ -1524,7 +1531,8 @@ class PdfController extends Controller
             '/usr/bin/pdftk-java',
             '/app/.apt/usr/bin/pdftk',
             '/app/.apt/usr/bin/pdftk-java',
-            '/app/.apt/usr/bin/pdftk.pdftk-java'  // Heroku apt buildpack installs it with this name
+            '/app/.apt/usr/bin/pdftk.pdftk-java',  // Heroku apt buildpack installs it with this name
+            'java -Djava.security.egd=file:/dev/./urandom -jar /app/.apt/usr/share/pdftk/pdftk.jar'  // Direct Java command
         ];
         
         foreach ($commands as $cmd) {
