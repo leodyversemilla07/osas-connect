@@ -12,7 +12,7 @@ import ErrorBoundary from '@/components/error-boundary';
 // Extended type to handle both staff and invitations
 type StaffTableEntry = User & {
   type: 'staff' | 'invitation'
-  status: 'active' | 'pending' | 'expired'
+  status: 'active' | 'pending' | 'expired' | 'accepted'
   expires_at?: string
   invitation_id?: number
   inviter?: {

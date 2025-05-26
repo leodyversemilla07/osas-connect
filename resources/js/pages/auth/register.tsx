@@ -387,7 +387,17 @@ export default function Register() {
                                         <Calendar
                                             mode="single"
                                             selected={data.date_of_birth ? new Date(data.date_of_birth) : undefined}
-                                            onSelect={(date) => setData('date_of_birth', date ? date.toISOString().split('T')[0] : '')}
+                                            onSelect={(date) => {
+                                                if (date) {
+                                                    // Format date as YYYY-MM-DD using local time to avoid timezone issues
+                                                    const year = date.getFullYear();
+                                                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                                                    const day = String(date.getDate()).padStart(2, '0');
+                                                    setData('date_of_birth', `${year}-${month}-${day}`);
+                                                } else {
+                                                    setData('date_of_birth', '');
+                                                }
+                                            }}
                                             disabled={(date) =>
                                                 date > new Date() || date < new Date("1900-01-01")
                                             }

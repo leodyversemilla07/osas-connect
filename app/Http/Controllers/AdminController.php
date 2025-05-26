@@ -647,15 +647,13 @@ class AdminController extends Controller
 
         $staffMembers = $staffQuery->orderBy('last_name')->get();
 
-        // Query for pending invitations
+        // Query for all staff invitations (regardless of status)
         $invitationsQuery = StaffInvitation::with('inviter')
-            ->where('status', 'pending')
-            ->whereNull('accepted_at')
             ->when($search, function ($query) use ($search) {
                 $query->where('email', 'like', "%{$search}%");
             });
 
-        $pendingInvitations = $invitationsQuery->orderBy('created_at', 'desc')->get();
+        $allInvitations = $invitationsQuery->orderBy('created_at', 'desc')->get();
 
         // Combine staff and invitations into unified collection
         $combinedData = collect();
@@ -677,8 +675,8 @@ class AdminController extends Controller
             ]);
         }
 
-        // Add pending invitations
-        foreach ($pendingInvitations as $invitation) {
+        // Add all invitations (regardless of status)
+        foreach ($allInvitations as $invitation) {
             $combinedData->push([
                 'id' => 'invitation_' . $invitation->id,
                 'type' => 'invitation',
@@ -766,9 +764,9 @@ class AdminController extends Controller
      */
     public function revokeInvitation(StaffInvitation $invitation)
     {
-        $invitation->update(['status' => 'revoked']);
+        $invitation->delete();
 
-        return back()->with('success', 'Invitation revoked successfully.');
+        return back()->with('success', 'Invitation revoked and removed successfully.');
     }
 
     /**

@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 // Extended type to handle both staff and invitations
 type StaffTableEntry = User & {
     type: 'staff' | 'invitation'
-    status: 'active' | 'pending' | 'expired'
+    status: 'active' | 'pending' | 'expired' | 'accepted'
     expires_at?: string
     invitation_id?: number
     inviter?: {
@@ -125,16 +125,46 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
         enableHiding: false,
     },    {
         accessorKey: "email",
-        header: "Contact",
-        cell: ({ row }) => {
+        header: "Contact",        cell: ({ row }) => {
             if (row.original.type === 'invitation') {
+                const getBadgeVariantAndText = (status: string) => {
+                    switch (status) {
+                        case 'pending':
+                            return {
+                                className: "bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-300",
+                                text: "Pending Invitation",
+                                icon: Clock
+                            };
+                        case 'accepted':
+                            return {
+                                className: "bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-300",
+                                text: "Accepted",
+                                icon: UserCheck
+                            };
+                        case 'expired':
+                            return {
+                                className: "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-300",
+                                text: "Expired",
+                                icon: Clock
+                            };
+                        default:
+                            return {
+                                className: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+                                text: status,
+                                icon: Clock
+                            };
+                    }
+                };
+
+                const { className, text, icon: Icon } = getBadgeVariantAndText(row.original.status);
+
                 return (
                     <div className="space-y-1">
                         <div className="text-base text-gray-900 dark:text-gray-100">{row.original.email}</div>
                         <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-300">
-                                <Clock className="h-3 w-3 mr-1" />
-                                Pending Invitation
+                            <Badge variant="secondary" className={className}>
+                                <Icon className="h-3 w-3 mr-1" />
+                                {text}
                             </Badge>
                         </div>
                     </div>
