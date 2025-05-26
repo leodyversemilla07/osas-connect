@@ -735,8 +735,7 @@ class ScholarshipApplication extends Model
         'root' => storage_path('app/documents'),
         'visibility' => 'private',
     ],
-    
-    // Cloud storage for production
+      // Cloud storage for production
     's3' => [
         'driver' => 's3',
         'key' => env('AWS_ACCESS_KEY_ID'),
@@ -744,10 +743,26 @@ class ScholarshipApplication extends Model
         'region' => env('AWS_DEFAULT_REGION'),
         'bucket' => env('AWS_BUCKET'),
     ],
+    
+    // CloudCube S3 storage for Heroku deployment
+    'cloudcube' => [
+        'driver' => 's3',
+        'key' => env('CLOUDCUBE_ACCESS_KEY_ID'),
+        'secret' => env('CLOUDCUBE_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+        'bucket' => env('CLOUDCUBE_BUCKET', 'cloud-cube'),
+        'root' => env('CLOUDCUBE_CUBE_NAME', 'm2on55doosrx'),
+        'url' => env('CLOUDCUBE_BASE_URL', 'https://cloud-cube.s3.amazonaws.com/m2on55doosrx'),
+        'visibility' => 'public',
+        'throw' => false,
+        'report' => false,
+    ],
 ];
 ```
 
 ### File Organization Structure
+
+#### Local Development Structure
 
 ```
 storage/app/
@@ -770,6 +785,81 @@ storage/app/
 └── uploads/
     ├── profile_photos/
     └── temp/
+```
+
+#### CloudCube Production Structure
+
+```
+m2on55doosrx/                    (cube prefix)
+├── public/                      (publicly accessible files)
+│   ├── profiles/
+│   │   ├── profile_1.jpg
+│   │   └── profile_2.png
+│   ├── uploads/
+│   │   ├── documents/
+│   │   └── images/
+│   ├── assets/
+│   │   ├── templates/
+│   │   └── logos/
+│   └── exports/
+│       ├── reports/
+│       └── data/
+└── private/                     (secure files with signed URLs)
+    ├── applications/
+    │   ├── user_123/
+    │   │   ├── academic_records/
+    │   │   ├── recommendation_letters/
+    │   │   ├── financial_documents/
+    │   │   └── identity_documents/
+    │   └── verified/
+    ├── reports/
+    │   ├── admin/
+    │   └── financial/
+    └── backups/
+        ├── database/
+        └── files/
+```
+
+### CloudCube S3 Configuration
+
+CloudCube is a Heroku add-on that provides S3-compatible storage. Each CloudCube instance gets a dedicated "cube" (prefix) within a shared S3 bucket.
+
+#### URL Pattern
+```
+https://BUCKETNAME.s3.amazonaws.com/CUBENAME/...
+```
+
+For our application:
+- **Bucket**: `cloud-cube`
+- **Cube Name**: `m2on55doosrx`
+- **Base URL**: `https://cloud-cube.s3.amazonaws.com/m2on55doosrx`
+
+#### Environment Variables
+
+```bash
+# CloudCube Configuration (Heroku Config Vars)
+CLOUDCUBE_ACCESS_KEY_ID=your_access_key
+CLOUDCUBE_SECRET_ACCESS_KEY=your_secret_key
+CLOUDCUBE_BUCKET=cloud-cube
+CLOUDCUBE_CUBE_NAME=m2on55doosrx
+CLOUDCUBE_BASE_URL=https://cloud-cube.s3.amazonaws.com/m2on55doosrx
+```
+
+#### Usage Examples
+
+```php
+use App\Services\CloudCubeService;
+
+// Upload public file (accessible via direct URL)
+$path = CloudCubeService::uploadPublic($file, 'document.pdf', 'applications');
+$publicUrl = CloudCubeService::getPublicUrl($path);
+
+// Upload private file (requires signed URL for access)
+$path = CloudCubeService::uploadPrivate($file, 'sensitive.pdf', 'documents');
+$signedUrl = CloudCubeService::getSignedUrl($path, 60); // 60 minutes
+
+// Delete file
+CloudCubeService::delete($path);
 ```
 
 ## Deployment Architecture

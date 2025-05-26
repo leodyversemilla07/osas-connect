@@ -185,7 +185,7 @@ class ProfileController extends Controller
             'avatar_url' => $user->avatar
         ]);
 
-        return redirect()->back()->with('success', 'Profile updated successfully!');
+        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');
     }
 
     /**

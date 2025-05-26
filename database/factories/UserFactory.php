@@ -23,7 +23,30 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'student', // Default role for factory
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function ($user) {
+            // Create appropriate profile based on role
+            if ($user->role === 'student') {
+                \App\Models\StudentProfile::factory()->create(['user_id' => $user->id]);
+            } elseif ($user->role === 'osas_staff') {
+                // Create OSAS staff profile manually if factory doesn't exist
+                \App\Models\OsasStaffProfile::create([
+                    'user_id' => $user->id,
+                    'staff_id' => 'STAFF' . str_pad(fake()->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT),
+                ]);
+            } elseif ($user->role === 'admin') {
+                // Create admin profile manually if factory doesn't exist
+                \App\Models\AdminProfile::create([
+                    'user_id' => $user->id,
+                    'admin_id' => 'ADMIN' . str_pad(fake()->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT),
+                ]);
+            }
+        });
     }
 
     public function unverified(): static

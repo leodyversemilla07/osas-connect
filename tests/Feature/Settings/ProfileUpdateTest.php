@@ -38,7 +38,7 @@ test('profile information can be updated', function () {
             'city' => 'Mindoro City',
             'province' => 'Occidental Mindoro',
             'mobile_number' => '9123456789',
-            'is_pwd' => 'No',
+            'is_pwd' => false, // Changed from 'No' to boolean
             'disability_type' => null,
             'religion' => 'Roman Catholic',
             'residence_type' => "Parent's House",
@@ -63,6 +63,9 @@ test('email verification status is unchanged when the email address is unchanged
         'email' => 'test@minsu.edu.ph',
     ]);
 
+    // Load the student profile relationship
+    $user->load('studentProfile');
+
     $response = $this
         ->actingAs($user)
         ->patch('/settings/profile', [
@@ -70,24 +73,25 @@ test('email verification status is unchanged when the email address is unchanged
             'middle_name' => $user->middle_name,
             'last_name' => $user->last_name,
             'email' => $user->email,
-            'student_id' => $user->student_id,
-            'course' => $user->course,
-            'major' => $user->major,
-            'year_level' => $user->year_level,
-            'civil_status' => $user->civil_status,
-            'sex' => $user->sex,
-            'date_of_birth' => $user->date_of_birth,
-            'place_of_birth' => $user->place_of_birth,
-            'street' => $user->street,
-            'barangay' => $user->barangay,
-            'city' => $user->city,
-            'province' => $user->province,
-            'mobile_number' => $user->mobile_number ? str_replace('+63', '', $user->mobile_number) : '',
-            'is_pwd' => $user->is_pwd,
-            'disability_type' => $user->disability_type,
-            'religion' => $user->religion,
-            'residence_type' => $user->residence_type,
-            'guardian_name' => $user->guardian_name,
+            'student_id' => $user->studentProfile->student_id,
+            'course' => $user->studentProfile->course,
+            'major' => $user->studentProfile->major,
+            'year_level' => $user->studentProfile->year_level,
+            'civil_status' => $user->studentProfile->civil_status,
+            'sex' => $user->studentProfile->sex,
+            'date_of_birth' => $user->studentProfile->date_of_birth,
+            'place_of_birth' => $user->studentProfile->place_of_birth,
+            'address' => $user->studentProfile->address,
+            'street' => $user->studentProfile->street,
+            'barangay' => $user->studentProfile->barangay,
+            'city' => $user->studentProfile->city,
+            'province' => $user->studentProfile->province,
+            'mobile_number' => $user->studentProfile->mobile_number ? str_replace('+63', '', $user->studentProfile->mobile_number) : '',
+            'is_pwd' => $user->studentProfile->is_pwd,
+            'disability_type' => $user->studentProfile->disability_type,
+            'religion' => $user->studentProfile->religion,
+            'residence_type' => $user->studentProfile->residence_type,
+            'guardian_name' => $user->studentProfile->guardian_name,
         ]);
 
     $response
