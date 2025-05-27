@@ -613,6 +613,7 @@ class PdfController extends Controller
             // Fill the form directly from the original template
             $pdf = new PdftkPdf($templatePath, ['command' => $pdftkCommand]);
             $result = $pdf->fillForm($this->prepareFormData($user))
+                ->flatten()
                 ->compress()
                 ->saveAs($tempOutput);
 
@@ -655,6 +656,7 @@ class PdfController extends Controller
             // Fill the CHED form directly from the original template
             $pdf = new PdftkPdf($templatePath, ['command' => $pdftkCommand]);
             $result = $pdf->fillForm($this->prepareChedFormData($user))
+                ->flatten()
                 ->compress()
                 ->saveAs($tempOutput);
 
@@ -697,6 +699,7 @@ class PdfController extends Controller
             // Fill the Annex 1 form directly from the original template
             $pdf = new PdftkPdf($templatePath, ['command' => $pdftkCommand]);
             $result = $pdf->fillForm($this->prepareAnnex1FormData($user))
+                ->flatten()
                 ->compress()
                 ->saveAs($tempOutput);
 
