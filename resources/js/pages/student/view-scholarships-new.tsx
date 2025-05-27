@@ -1,14 +1,13 @@
+// filepath: c:\xampp\htdocs\osas-connect\resources\js\pages\student\view-scholarships.tsx
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
 import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/scholarship-management/data-table';
-import { createColumns } from '@/components/scholarship-management/columns';
-import { ScholarshipDetailsModal } from '@/components/scholarship-management/scholarship-details-modal';
+import { columns } from '@/components/scholarship-management/columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
-    title: 'Dashboard',
+    title: 'Student Dashboard',
     href: '/dashboard',
   },
   {
@@ -100,20 +99,6 @@ const scholarships: Scholarship[] = [
 
 export default function ViewScholarships({ scholarships: propScholarships }: ScholarshipsPageProps) {
   const scholarshipData = propScholarships || scholarships;
-  const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleViewDetails = (scholarship: Scholarship) => {
-    setSelectedScholarship(scholarship);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedScholarship(null);
-  };
-
-  const columns = createColumns(handleViewDetails);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -129,12 +114,6 @@ export default function ViewScholarships({ scholarships: propScholarships }: Sch
         </div>
 
         <DataTable columns={columns} data={scholarshipData} />
-        
-        <ScholarshipDetailsModal
-          scholarship={selectedScholarship}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-        />
       </div>
     </AppLayout>
   );
