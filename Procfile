@@ -1,1 +1,1 @@
-web: JAVA_TOOL_OPTIONS="-Djava.awt.headless=true" vendor/bin/heroku-php-apache2 public/
+web: JAVA_TOOL_OPTIONS="-Djava.awt.headless=true -Djava.security.properties=$JAVA_HOME/lib/security/java.security" vendor/bin/heroku-php-apache2 public/
