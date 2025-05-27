@@ -1,1 +1,1 @@
-web: vendor/bin/heroku-php-apache2 public/
+web: JAVA_TOOL_OPTIONS="-Djava.awt.headless=true" vendor/bin/heroku-php-apache2 public/
