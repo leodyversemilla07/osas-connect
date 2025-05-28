@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { ChevronRight, BookOpen, Clock, CheckCircle, AlertCircle, Award, DollarSign, Users, Calendar } from 'lucide-react';
+import { ChevronRight, BookOpen, Clock, AlertCircle, Award, DollarSign, Users, Calendar } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -94,15 +94,16 @@ const IDCardHeader = () => (
       ></div>
     </div>
 
-    <div className="flex items-start relative z-10">            <div className="w-20 h-20 rounded-full bg-white shadow-lg p-1 mr-4 flex-shrink-0">
-      <div className="w-full h-full rounded-full flex items-center justify-center bg-white overflow-hidden">
-        <img
-          src="https://www.minsu.edu.ph/template/images/logo.png"
-          alt="Mindoro State University Logo"
-          className="w-16 h-16 object-contain"
-        />
+    <div className="flex items-start relative z-10">
+      <div className="w-20 h-20 rounded-full bg-white shadow-lg p-1 mr-4 flex-shrink-0">
+        <div className="w-full h-full rounded-full flex items-center justify-center bg-white overflow-hidden">
+          <img
+            src="https://www.minsu.edu.ph/template/images/logo.png"
+            alt="Mindoro State University Logo"
+            className="w-16 h-16 object-contain"
+          />
+        </div>
       </div>
-    </div>
 
       <div className="flex-1">
         <h1 className="text-2xl font-bold tracking-wider">MINDORO</h1>
@@ -126,7 +127,8 @@ const IDCardStudentInfo = ({ auth, student }: { auth: Auth; student: Student }) 
     <div className="bg-white">
       <div className="flex">
         <div className="w-1/3 p-4 relative">
-          <div className="border-2 border-yellow-400 rounded-md shadow-md overflow-hidden">            <div className="aspect-square relative bg-gradient-to-b from-gray-100 to-gray-200">
+          <div className="border-2 border-yellow-400 rounded-md shadow-md overflow-hidden">
+            <div className="aspect-square relative bg-gradient-to-b from-gray-100 to-gray-200">
               <Avatar className="w-full h-full rounded-none">
                 {auth.user.avatar ? (
                   <AvatarImage
@@ -213,13 +215,13 @@ const StudentIDCard = ({ auth, student }: { auth: Auth; student: Student }) => (
 );
 
 // Main Dashboard Component
-export default function StudentDashboard({ 
-  auth, 
-  student, 
-  availableScholarships = [], 
-  recentApplications = [], 
-  totalApplications = 0, 
-  approvedScholarships = 0 
+export default function StudentDashboard({
+  auth,
+  student,
+  availableScholarships = [],
+  recentApplications = [],
+  totalApplications = 0,
+  approvedScholarships = 0
 }: DashboardProps) {
   // Sample data with enhanced student profile for testing personalization
   const enhancedStudent: Student = {
@@ -308,7 +310,7 @@ export default function StudentDashboard({
               <p className="text-xs text-muted-foreground">Scholarship applications submitted</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Approved Scholarships</CardTitle>
@@ -319,7 +321,7 @@ export default function StudentDashboard({
               <p className="text-xs text-muted-foreground">Currently receiving</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Available Scholarships</CardTitle>
@@ -330,7 +332,7 @@ export default function StudentDashboard({
               <p className="text-xs text-muted-foreground">Open for applications</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Current GWA</CardTitle>
@@ -387,7 +389,7 @@ export default function StudentDashboard({
                       </Button>
                     </div>
                   ))}
-                  
+
                   {sampleScholarships.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
                       <Award className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -437,7 +439,7 @@ export default function StudentDashboard({
                       </div>
                     </div>
                   ))}
-                  
+
                   {sampleApplications.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
                       <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -456,7 +458,7 @@ export default function StudentDashboard({
           {/* Sidebar */}
           <div className="space-y-6">
             <StudentIDCard auth={auth} student={enhancedStudent} />
-            
+
             {/* Quick Actions */}
             <Card>
               <CardHeader>

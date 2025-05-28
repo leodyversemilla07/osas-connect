@@ -921,7 +921,7 @@ function AcademicInfoCard({ user }: { user: UserWithProfile }) {
 const StudentIDCard = ({ student }: { student: UserWithProfile }) => {
     // Get course from various sources with fallbacks
     const course = student.academicInfo?.course || student.course || student.studentProfile?.course || '';
-    
+
     // Try to get abbreviation from full course name, or use the course as is
     const courseAbbr = COURSE_ABBREVIATIONS[course] || course;
 
@@ -945,9 +945,8 @@ const StudentIDCard = ({ student }: { student: UserWithProfile }) => {
                 </div>
 
                 <div className="flex items-start relative z-10">
-                    {/* Enhanced logo */}
-                    <div className="w-20 h-20 rounded-full bg-white shadow-lg p-1 mr-4 flex-shrink-0">
-                        <div className="w-full h-full rounded-full flex items-center justify-center bg-white overflow-hidden">
+                    <div className="w-20 h-20 mr-4 flex-shrink-0">
+                        <div className="w-full h-full flex items-center justify-center overflow-hidden">
                             <img
                                 src="https://www.minsu.edu.ph/template/images/logo.png"
                                 alt="Mindoro State University Logo"
@@ -1071,7 +1070,7 @@ export default function UserProfile({ user }: UserProfileProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="w-full py-12 px-4">
                 <div className="max-w-none mx-auto space-y-8">
-                    <ProfileHeader user={user} />                    
+                    <ProfileHeader user={user} />
                     {/* Main content */}
                     <div className="grid gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
                         <div className="space-y-8 xl:col-span-1">
