@@ -231,7 +231,7 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
 
     return (
         <>
-        <Head title={`${user.first_name} ${user.last_name} | ${user.role.charAt(0).toUpperCase() + user.role.slice(1)} Profile`} />
+            <Head title={`${user.first_name} ${user.last_name} | ${user.role.charAt(0).toUpperCase() + user.role.slice(1)} Profile`} />
             <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
                 <div className="flex items-center justify-between">
                     <div>
@@ -242,37 +242,38 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
                             View and manage user information
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">                        {user.role === 'student' && (
-                        <>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleGeneratePDF}
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
-                            >
-                                <FileText className="h-4 w-4 mr-2" />
-                                Generate Scholarship PDF
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleGenerateChedPDF}
-                                className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/20"
-                            >
-                                <FileText className="h-4 w-4 mr-2" />
-                                Generate CHED PDF
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleGenerateAnnex1PDF}
-                                className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:text-purple-300 dark:hover:bg-purple-900/20"
-                            >
-                                <FileText className="h-4 w-4 mr-2" />
-                                Generate Annex 1 PDF
-                            </Button>
-                        </>
-                    )}
+                    <div className="flex items-center gap-3">
+                        {user.role === 'student' && (
+                            <>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleGeneratePDF}
+                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+                                >
+                                    <FileText className="h-4 w-4 mr-2" />
+                                    Generate Scholarship PDF
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleGenerateChedPDF}
+                                    className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/20"
+                                >
+                                    <FileText className="h-4 w-4 mr-2" />
+                                    Generate CHED PDF
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleGenerateAnnex1PDF}
+                                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:text-purple-300 dark:hover:bg-purple-900/20"
+                                >
+                                    <FileText className="h-4 w-4 mr-2" />
+                                    Generate Annex 1 PDF
+                                </Button>
+                            </>
+                        )}
                         {editRoute && (
                             <Button
                                 variant="ghost"
@@ -367,7 +368,7 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
     );
 }
 
-function UserAvatar({ user }: { user: User }) {
+function UserAvatar({ user }: { user: UserWithProfile }) {
     const getRoleIcon = () => {
         switch (user.role) {
             case 'student':
@@ -394,6 +395,15 @@ function UserAvatar({ user }: { user: User }) {
         }
     };
 
+    // Get staff ID from various possible sources
+    const getStaffId = () => {
+        return user.staffInfo?.staff_id ||
+            user.osasStaffProfile?.staff_id ||
+            user.studentProfile?.student_id;
+    };
+
+    const staffId = getStaffId();
+
     return (
         <div className="flex items-center gap-6 pb-6 border-b border-gray-100 dark:border-gray-800">
             <div className="relative">
@@ -414,6 +424,11 @@ function UserAvatar({ user }: { user: User }) {
                         {getRoleIcon()}
                         {user.role === 'osas_staff' ? 'OSAS Staff' : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     </Badge>
+                    {staffId && (
+                        <Badge variant="outline" className="text-xs">
+                            ID: {staffId}
+                        </Badge>
+                    )}
                 </div>
             </div>
         </div>
@@ -471,16 +486,20 @@ function PersonalInfoCard({ user }: { user: UserWithProfile }) {
                 <InfoItem icon={Mail} label="Email" value={user.email} />
 
                 {/* Personal Details */}
-                <InfoItem
-                    icon={User2}
-                    label="Civil Status"
-                    value={personalInfo.civil_status || user.civil_status || studentProfile?.civil_status || 'Not provided'}
-                />
-                <InfoItem
-                    icon={User2}
-                    label="Sex"
-                    value={personalInfo.sex || user.sex || studentProfile?.sex || 'Not provided'}
-                />
+                {user.role === 'student' && (
+                    <>
+                        <InfoItem
+                            icon={User2}
+                            label="Civil Status"
+                            value={personalInfo.civil_status || user.civil_status || studentProfile?.civil_status || 'Not provided'}
+                        />
+                        <InfoItem
+                            icon={User2}
+                            label="Sex"
+                            value={personalInfo.sex || user.sex || studentProfile?.sex || 'Not provided'}
+                        />
+                    </>
+                )}
 
                 {/* Birth Information */}
                 {(personalInfo.date_of_birth || studentProfile?.date_of_birth) && (
@@ -535,11 +554,15 @@ function ContactInfoCard({ user }: { user: UserWithProfile }) {
             <SectionHeader icon={Phone} title="Contact Information" />
 
             <div className="space-y-4">
-                <InfoItem
-                    icon={Phone}
-                    label="Mobile Number"
-                    value={user.contactInfo?.mobile_number || user.mobile_number || user.studentProfile?.mobile_number || user.osasStaffProfile?.mobile_number || 'Not provided'}
-                />
+
+                {user.role === 'student' && (
+                    <InfoItem
+                        icon={Phone}
+                        label="Mobile Number"
+                        value={user.contactInfo?.mobile_number || user.mobile_number || user.studentProfile?.mobile_number || 'Not provided'}
+                    />
+                )}
+
                 {(user.contactInfo?.telephone_number || user.studentProfile?.telephone_number) && (
                     <InfoItem
                         icon={Phone}
@@ -547,11 +570,13 @@ function ContactInfoCard({ user }: { user: UserWithProfile }) {
                         value={user.contactInfo?.telephone_number || user.studentProfile?.telephone_number}
                     />
                 )}
+
                 <InfoItem
                     icon={Mail}
                     label="Email"
                     value={user.email}
                 />
+
                 {(user.contactInfo?.residence_type || user.studentProfile?.residence_type) && (
                     <InfoItem
                         icon={MapPin}
@@ -559,6 +584,7 @@ function ContactInfoCard({ user }: { user: UserWithProfile }) {
                         value={user.contactInfo?.residence_type || user.studentProfile?.residence_type}
                     />
                 )}
+
             </div>
         </InfoCard>
     );
@@ -847,7 +873,6 @@ function AcademicInfoCard({ user }: { user: UserWithProfile }) {
     if (!studentProfile && !academicInfo) return null;
 
     // Get values with fallbacks
-    const studentId = academicInfo.student_id || user.student_id || studentProfile?.student_id;
     const course = academicInfo.course || user.course || studentProfile?.course;
     const major = academicInfo.major || user.major || studentProfile?.major;
     const yearLevel = academicInfo.year_level || user.year_level || studentProfile?.year_level;
@@ -858,13 +883,6 @@ function AcademicInfoCard({ user }: { user: UserWithProfile }) {
             <SectionHeader icon={BookOpen} title="Academic Information" />
 
             <div className="space-y-4">
-                {studentId && (
-                    <InfoItem
-                        icon={School}
-                        label="Student ID"
-                        value={<span className="font-medium">{studentId}</span>}
-                    />
-                )}
                 {course && (
                     <InfoItem
                         icon={BookOpen}

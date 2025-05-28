@@ -11,8 +11,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Staff Dashboard',
-        href: '/osas_staff/dashboard',
+        title: 'Dashboard',
+        href: route('osas.dashboard'),
     },
 ];
 
@@ -23,47 +23,30 @@ const statusColors = {
 } as const;
 
 export default function StaffDashboard() {
-    const { auth: pageAuth } = usePage<SharedData>().props;
-    const user = pageAuth.user;    // Sample announcements
-    const announcements = [
-        { id: 1, title: 'Staff Meeting', date: '2025-04-10', content: 'Monthly staff meeting at 2:00 PM in the Conference Room.' },
-        { id: 2, title: 'Upcoming Training', date: '2025-04-18', content: 'Mandatory training session on the new student support system.' }
-    ];
-
-    // Sample pending applications
-    const pendingApplications = [
-        {
-            id: 1,
-            studentName: 'Maria Santos',
-            scholarshipName: 'Academic Merit Scholarship',
-            dateSubmitted: '2025-04-05',
-            status: 'pending',
-            studentId: 'ST-2025-1001'
-        },
-        {
-            id: 2,
-            studentName: 'Juan Cruz',
-            scholarshipName: 'Need-Based Financial Aid',
-            dateSubmitted: '2025-04-03',
-            status: 'pending',
-            studentId: 'ST-2025-1042'
-        },
-        {
-            id: 3,
-            studentName: 'Ana Reyes',
-            scholarshipName: 'Student Assistantship Program',
-            dateSubmitted: '2025-04-01',
-            status: 'pending',
-            studentId: 'ST-2025-1089'
-        }
-    ];
-
-    // Sample document submissions
-    const recentDocuments = [
-        { id: 1, studentName: 'Pedro Garcia', documentType: 'Transcript of Records', submissionDate: '2025-04-07', status: 'pending' },
-        { id: 2, studentName: 'Sofia Lopez', documentType: 'Certificate of Registration', submissionDate: '2025-04-06', status: 'approved' },
-        { id: 3, studentName: 'Carlo Tan', documentType: 'Income Tax Return', submissionDate: '2025-04-05', status: 'rejected' },
-    ];
+    const { auth: pageAuth, announcements = [], pendingApplications = [], recentDocuments = [] } = usePage<SharedData & {
+        announcements: Array<{
+            id: number;
+            title: string;
+            date: string;
+            content: string;
+        }>;
+        pendingApplications: Array<{
+            id: number;
+            studentName: string;
+            scholarshipName: string;
+            dateSubmitted: string;
+            status: string;
+            studentId: string;
+        }>;
+        recentDocuments: Array<{
+            id: number;
+            studentName: string;
+            documentType: string;
+            submissionDate: string;
+            status: string;
+        }>;
+    }>().props;
+    const user = pageAuth.user;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -85,7 +68,7 @@ export default function StaffDashboard() {
                             <div className="flex items-center gap-4">
                                 <ClipboardList className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
                                 <div>
-                                    <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-400">{pendingApplications.length}</p>
+                                    <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-400">{pendingApplications?.length || 0}</p>
                                     <p className="text-sm text-muted-foreground">Pending Applications</p>
                                     <p className="text-xs text-muted-foreground mt-1">As of {new Date().toLocaleDateString()}</p>
                                 </div>
@@ -109,7 +92,7 @@ export default function StaffDashboard() {
                             <div className="flex items-center gap-4">
                                 <FileText className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                                 <div>
-                                    <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{recentDocuments.length}</p>
+                                    <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{recentDocuments?.length || 0}</p>
                                     <p className="text-sm text-muted-foreground">Recent Documents</p>
                                     <p className="text-xs text-muted-foreground mt-1">Last 7 days</p>
                                 </div>
@@ -131,9 +114,8 @@ export default function StaffDashboard() {
                                 </CardTitle>
                                 <Button variant="outline" size="sm">New Announcement</Button>
                             </CardHeader>
-                            <CardContent className="pt-4">
-                                <div className="space-y-4">
-                                    {announcements.map(announcement => (
+                            <CardContent className="pt-4">                                <div className="space-y-4">
+                                    {announcements?.map(announcement => (
                                         <div key={announcement.id} className="rounded-lg border p-4 shadow-sm">
                                             <div className="flex justify-between items-start mb-2">
                                                 <h4 className="font-semibold text-lg">{announcement.title}</h4>
@@ -147,7 +129,7 @@ export default function StaffDashboard() {
                                         </div>
                                     ))}
                                 </div>
-                            </CardContent>                        
+                            </CardContent>
                         </Card>
 
                         {/* Recent Documents */}
@@ -161,9 +143,8 @@ export default function StaffDashboard() {
                                     <a href="/documents">View All</a>
                                 </Button>
                             </CardHeader>
-                            <CardContent className="pt-4">
-                                <div className="space-y-4">
-                                    {recentDocuments.map((doc) => (
+                            <CardContent className="pt-4">                                <div className="space-y-4">
+                                    {recentDocuments?.map((doc) => (
                                         <div key={doc.id} className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
                                             <div>
                                                 <p className="font-medium">{doc.studentName}</p>
@@ -181,7 +162,7 @@ export default function StaffDashboard() {
                                 </div>
                             </CardContent>
                         </Card>
-                    </div>                    
+                    </div>
 
                     {/* Right Column - Pending Applications */}
                     <div className="flex flex-col gap-4">
@@ -196,7 +177,7 @@ export default function StaffDashboard() {
                                 </Button>
                             </CardHeader>
                             <CardContent className="pt-4">
-                                {pendingApplications.length > 0 ? (
+                                {pendingApplications?.length > 0 ? (
                                     <div className="rounded-md border">
                                         <Table>
                                             <TableHeader>
@@ -206,9 +187,8 @@ export default function StaffDashboard() {
                                                     <TableHead>Submitted</TableHead>
                                                     <TableHead className="text-right">Action</TableHead>
                                                 </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {pendingApplications.map((app) => (
+                                            </TableHeader>                                            <TableBody>
+                                                {pendingApplications?.map((app) => (
                                                     <TableRow key={app.id} className="hover:bg-muted/50">
                                                         <TableCell className="font-medium">
                                                             <div>
@@ -250,7 +230,7 @@ export default function StaffDashboard() {
                                         <p className="mt-2">No pending applications</p>
                                     </div>
                                 )}
-                            </CardContent>                        
+                            </CardContent>
                         </Card>
                     </div>
                 </div>

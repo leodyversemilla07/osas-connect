@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\OsasStaffController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ScholarshipsController;
@@ -13,7 +12,11 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
-Route::inertia('scholarships/available', 'scholarships')->name('scholarships.available');
+Route::inertia('scholarships/available', 'scholarships', [
+    'auth' => fn () => [
+        'user' => Auth::user()
+    ]
+])->name('scholarships.available');
 Route::inertia('announcements', 'announcements')->name('announcements');
 Route::inertia('contact', 'contact')->name('contact');
 Route::inertia('about', 'about')->name('about');
@@ -23,14 +26,6 @@ Route::inertia('terms', 'terms')->name('terms');
 Route::inertia('accessibility', 'accessibility')->name('accessibility');
 Route::inertia('sitemap', 'sitemap')->name('sitemap');
 Route::inertia('cookies', 'cookies')->name('cookies');
-
-// Scholarship related routes
-Route::prefix('scholarships')->group(function () {
-    Route::inertia('application', 'scholarships/application')->name('scholarships.application');
-    Route::inertia('requirements', 'scholarships/requirements')->name('scholarships.requirements');
-    Route::inertia('deadlines', 'scholarships/deadlines')->name('scholarships.deadlines');
-    Route::inertia('tips', 'scholarships/tips')->name('scholarships.tips');
-});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Common dashboard route that redirects to role-specific dashboard
@@ -50,7 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Students management
         Route::get('/students', [AdminController::class, 'students'])->name('admin.students');
-        Route::get('/students/{user}', [AdminController::class, 'showStudents'])->name('admin.students.show');
+        Route::get('/students/{user}', [AdminController::class, 'showUser'])->name('admin.students.show');
         Route::get('/students/{user}/edit', [AdminController::class, 'editUser'])->name('admin.students.edit');
         Route::put('/students/{user}', [AdminController::class, 'updateUser'])->name('admin.students.update');
         Route::delete('/students/{user}', [AdminController::class, 'destroyUser'])->name('admin.students.destroy');
@@ -63,57 +58,58 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/staff/{user}', [AdminController::class, 'destroyUser'])->name('admin.staff.destroy');
 
         // Staff invitation routes
-        Route::get('/invitations/create', [AdminController::class, 'showInvitationForm'])->name('admin.invitations.create');
         Route::post('/invitations', [AdminController::class, 'sendInvitation'])->name('admin.invitations.store');
         Route::delete('/invitations/{invitation}', [AdminController::class, 'revokeInvitation'])->name('admin.invitations.revoke');
         Route::delete('/invitations/{invitation}/delete', [AdminController::class, 'destroyInvitation'])->name('admin.invitations.destroy');
         Route::post('/invitations/{invitation}/resend', [AdminController::class, 'resendInvitation'])->name('admin.invitations.resend');
+        
+        // Additional admin routes
+        Route::get('/recent-logins', [AdminController::class, 'recentLogins'])->name('admin.recent-logins');
+        Route::get('/invitations/pending', [AdminController::class, 'pendingInvitations'])->name('admin.invitations.pending');
     });
 
     // OSAS Staff routes
     Route::middleware(['role:osas_staff'])->prefix('osas-staff')->group(function () {
         Route::get('/dashboard', [OsasStaffController::class, 'index'])->name('osas.dashboard');
         Route::get('/students', [OsasStaffController::class, 'studentRecords'])->name('osas.students');
-
-
-        Route::get('/students/{user}', [OsasStaffController::class, 'getStudentDetails'])->name('osas.students.details');
-        Route::get('/students/{user}/edit', [OsasStaffController::class, 'editStudent'])->name('osas.students.edit');
-        Route::put('/students/{user}', [OsasStaffController::class, 'updateStudent'])->name('osas.students.update');
-        Route::delete('/students/{user}', [OsasStaffController::class, 'destroyStudent'])->name('osas.students.destroy');
-
+        Route::get('/students/{id}', [OsasStaffController::class, 'getStudentDetails'])->name('osas.students.details');
 
         Route::get('/manage-scholarships', [OsasStaffController::class, 'scholarshipRecords'])->name('osas.manage.scholarships');
+        Route::post('/scholarships', [OsasStaffController::class, 'storeScholarship'])->name('osas.scholarships.store');
+        Route::put('/scholarships/{scholarship}', [OsasStaffController::class, 'updateScholarship'])->name('osas.scholarships.update');
+        
+        // Application management routes
+        Route::get('/applications', [OsasStaffController::class, 'scholarshipApplications'])->name('osas.applications');
+        Route::get('/applications/export', [OsasStaffController::class, 'exportApplications'])->name('osas.applications.export');
+        Route::get('/applications/{application}/review', [OsasStaffController::class, 'reviewApplication'])->name('osas.applications.review');
+        Route::patch('/applications/{application}/status', [OsasStaffController::class, 'updateApplicationStatus'])->name('osas.applications.status');
+        Route::post('/applications/{application}/comment', [OsasStaffController::class, 'addApplicationComment'])->name('osas.applications.comment');
+        Route::patch('/documents/{document}/verify', [OsasStaffController::class, 'verifyDocument'])->name('osas.documents.verify');
     });
 
     // Student routes
-    Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
+    Route::middleware(['role:student'])->prefix('student')->name('student.')->group(function () {
         Route::get('/dashboard', [StudentController::class, 'index'])->name('dashboard');
         Route::get('/scholarships/view', [StudentController::class, 'showScholarships'])->name('scholarships');
-        Route::get('/scholarships/{id}', [StudentController::class, 'showScholarshipDetails'])->name('scholarships.details');
+        Route::get('/scholarships/{scholarship}', [StudentController::class, 'showScholarshipDetails'])->name('scholarships.details');
+        Route::get('/applications', [StudentController::class, 'applications'])->name('applications');
+        Route::get('/applications/{application}/status', [StudentController::class, 'applicationStatus'])->name('applications.status');
     });
 
-    // Scholarship Routes
-    Route::get('/scholarships', [ScholarshipsController::class, 'index'])->name('scholarships.index');
-    Route::get('/scholarships/{scholarship}/apply', [ScholarshipsController::class, 'showApplicationForm'])
-        ->name('scholarships.apply');
-    Route::post('/scholarships/{scholarship}/submit', [ScholarshipsController::class, 'apply'])
-        ->name('scholarships.submit');
-    Route::get('/scholarships/track/{application}', [ScholarshipsController::class, 'track'])
-        ->name('scholarships.track');
+    // Scholarship Routes - Restricted to students only
+    Route::middleware(['role:student'])->group(function () {
+        Route::get('/scholarships', [ScholarshipsController::class, 'index'])->name('scholarships.index');
+        Route::get('/scholarships/{scholarship}/apply', [ScholarshipsController::class, 'showApplicationForm'])
+            ->name('scholarships.apply');
+        Route::post('/scholarships/{scholarship}/submit', [ScholarshipsController::class, 'apply'])
+            ->name('scholarships.submit');
+        Route::get('/scholarships/track/{application}', [ScholarshipsController::class, 'track'])
+            ->name('scholarships.track');
+    });
 
     Route::get('index', function () {
         return Inertia::render('index');
     })->name('index');
-});
-
-Route::middleware(['auth'])->group(function () {
-    // Admin routes
-    Route::prefix('admin')->middleware(['role:admin'])->group(function () {
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-        Route::get('/recent-logins', [AdminDashboardController::class, 'recentLogins'])->name('admin.recent-logins');
-        Route::get('/invitations/pending', [AdminDashboardController::class, 'pendingInvitations'])->name('admin.invitations.pending');
-        Route::post('/invitations/{invitation}/resend', [AdminDashboardController::class, 'resendInvitation'])->name('admin.invitations.resend');
-    });
 });
 
 // Staff invitation acceptance (public route with signature verification)
@@ -124,20 +120,20 @@ Route::get('/accept-invitation/{token}', [OsasStaffController::class, 'showAccep
 Route::post('/accept-invitation', [OsasStaffController::class, 'acceptInvitation'])
     ->name('staff.accept-invitation.store');
 
-// PDF generation routes - with proper authorization
-Route::middleware(['auth'])->group(function () {
-    // Only allow users to generate their own PDFs, or staff/admin to generate any user's PDF
-    Route::get('/generate-scholarship-pdf/{user}', [PdfController::class, 'generatePdf'])
-        ->name('generate.scholarship.pdf');
+// PDF generation route - expects a user ID
+Route::get('/generate-scholarship-pdf/{user}', [PdfController::class, 'generatePdf'])
+    ->name('generate.scholarship.pdf') // Added a route name for convenience
+    ->middleware('auth'); // Assuming only authenticated users can generate this
 
-    // CHED PDF generation route - expects a user ID
-    Route::get('/generate-ched-scholarship-pdf/{user}', [PdfController::class, 'generateChedPdf'])
-        ->name('generate.ched.scholarship.pdf');
+// CHED PDF generation route - expects a user ID
+Route::get('/generate-ched-scholarship-pdf/{user}', [PdfController::class, 'generateChedPdf'])
+    ->name('generate.ched.scholarship.pdf')
+    ->middleware('auth');
 
-    // Annex 1 TPDF PDF generation route - expects a user ID
-    Route::get('/generate-annex1-tpdf-pdf/{user}', [PdfController::class, 'generateAnnex1Pdf'])
-        ->name('generate.annex1.tpdf.pdf');
-});
+// Annex 1 TPDF PDF generation route - expects a user ID
+Route::get('/generate-annex1-tpdf-pdf/{user}', [PdfController::class, 'generateAnnex1Pdf'])
+    ->name('generate.annex1.tpdf.pdf')
+    ->middleware('auth');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

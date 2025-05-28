@@ -14,12 +14,26 @@ class Document extends Model
         'application_id',
         'type',
         'file_path',
+        'original_name',
+        'file_size',
+        'mime_type',
         'status',
         'verification_remarks',
+        'verified_at',
+        'verified_by',
+    ];
+
+    protected $casts = [
+        'verified_at' => 'datetime',
     ];
 
     public function application(): BelongsTo
     {
         return $this->belongsTo(ScholarshipApplication::class);
+    }
+
+    public function verifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 }

@@ -1,11 +1,14 @@
 import { Head } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
+import { useState } from 'react';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, GraduationCap, Calendar } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowRight, GraduationCap, Calendar, Search, Filter } from 'lucide-react';
 import { GeneralRequirementsList, RequirementsList } from '@/components/scholarships/requirements-list';
 
 interface Scholarship {
@@ -17,6 +20,17 @@ interface Scholarship {
     type: 'Academic Scholarship' | 'Student Assistantship Program' | 'Performing Arts Scholarship' | 'Economic Assistance';
     description: string;
     requirements: string[];
+}
+
+interface ScholarshipsProps {
+    auth?: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            role: string;
+        } | null;
+    };
 }
 
 const scholarshipColors: Record<Scholarship['type'], {
@@ -133,7 +147,7 @@ const scholarships: Scholarship[] = [
     }
 ];
 
-function ScholarshipCard({ scholarship }: { scholarship: Scholarship }) {
+function ScholarshipCard({ scholarship, isAuthenticated }: { scholarship: Scholarship; isAuthenticated: boolean }) {
     const colors = scholarshipColors[scholarship.type];
 
     return (
@@ -160,18 +174,39 @@ function ScholarshipCard({ scholarship }: { scholarship: Scholarship }) {
                     title="Program Requirements"
                     requirements={scholarship.requirements}
                 />
-                <Link href={route('login')} className="block">
-                    <Button className="mt-4 w-full" variant="default">
-                        Login to Apply
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                </Link>
+                {isAuthenticated ? (
+                    <Link href={`/scholarships/${scholarship.id}/apply`} className="block">
+                        <Button className="mt-4 w-full" variant="default">
+                            Apply Now
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </Link>
+                ) : (
+                    <Link href={route('login')} className="block">
+                        <Button className="mt-4 w-full" variant="default">
+                            Login to Apply
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </Link>
+                )}
             </CardContent>
         </Card>
     );
 }
 
-export default function Scholarships() {
+export default function Scholarships({ auth }: ScholarshipsProps) {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedType, setSelectedType] = useState<string>('all');
+    const isAuthenticated = !!auth?.user;
+
+    // Filter scholarships based on search and type
+    const filteredScholarships = scholarships.filter(scholarship => {
+        const matchesSearch = scholarship.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            scholarship.description.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesType = selectedType === 'all' || scholarship.type === selectedType;
+        return matchesSearch && matchesType;
+    });
+
     return (
         <>
             <Head title="Scholarships - OSAS Connect">
@@ -187,7 +222,6 @@ export default function Scholarships() {
                         {/* Hero Section */}
                         <div className="relative overflow-hidden rounded-xl shadow-lg">
                             <div className="absolute inset-0 bg-gradient-to-r from-[#005a2d]/95 to-[#008040]/90"></div>
-                            {/* ... existing background pattern ... */}
                             <div className="relative flex min-h-[40vh] flex-col items-center justify-center px-6 py-12 md:px-10 lg:px-16">
                                 <div className="text-center">
                                     <div className="inline-block rounded-full bg-[#febd12]/20 px-4 py-1 text-sm font-medium text-[#febd12]">
@@ -203,6 +237,38 @@ export default function Scholarships() {
                             </div>
                         </div>
 
+                        {/* Search and Filter Section - Only show for authenticated users */}
+                        {isAuthenticated && (
+                            <section className="mt-8 py-4">
+                                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                                    <div className="relative flex-1">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                        <Input
+                                            placeholder="Search scholarships..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="pl-10"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Filter className="h-4 w-4 text-muted-foreground" />
+                                        <Select value={selectedType} onValueChange={setSelectedType}>
+                                            <SelectTrigger className="w-[200px]">
+                                                <SelectValue placeholder="Filter by type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All Types</SelectItem>
+                                                <SelectItem value="Academic Scholarship">Academic Scholarship</SelectItem>
+                                                <SelectItem value="Student Assistantship Program">Student Assistantship</SelectItem>
+                                                <SelectItem value="Performing Arts Scholarship">Performing Arts</SelectItem>
+                                                <SelectItem value="Economic Assistance">Economic Assistance</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
                         {/* Scholarships Grid */}
                         <section className="mt-8 py-4">
                             <div className="text-center mb-12">
@@ -211,41 +277,52 @@ export default function Scholarships() {
                                 </span>
                                 <h2 className="text-3xl font-bold text-[#005a2d]">Available Scholarships</h2>
                                 <p className="mt-4 max-w-2xl mx-auto text-lg text-[#010002]/70 dark:text-[#f3f2f2]/70">
-                                    Find and apply for scholarships that match your qualifications
+                                    {isAuthenticated 
+                                        ? 'Find and apply for scholarships that match your qualifications'
+                                        : 'Discover scholarship opportunities - login to apply'
+                                    }
                                 </p>
                             </div>                            
 
                             <GeneralRequirementsList />
 
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                {scholarships.map((scholarship) => (
+                                {filteredScholarships.map((scholarship) => (
                                     <ScholarshipCard
                                         key={scholarship.id}
                                         scholarship={scholarship}
+                                        isAuthenticated={isAuthenticated}
                                     />
                                 ))}
                             </div>
+
+                            {filteredScholarships.length === 0 && isAuthenticated && (searchTerm || selectedType !== 'all') && (
+                                <div className="text-center py-12">
+                                    <p className="text-muted-foreground">No scholarships match your search criteria.</p>
+                                </div>
+                            )}
                         </section>
 
-                        {/* CTA Section */}
-                        <section className="mt-16 mb-8">
-                            <div className="rounded-2xl bg-gradient-to-r from-[#005a2d] to-[#008040] p-8 shadow-xl overflow-hidden relative">
-                                {/* ... existing background pattern ... */}
-                                <div className="relative z-10 flex flex-col items-center justify-center text-center py-12">
-                                    <h2 className="text-3xl font-bold text-white leading-tight md:text-4xl lg:text-5xl">
-                                        Ready to Apply for a Scholarship?
-                                    </h2>
-                                    <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
-                                        Take the next step towards your academic and professional goals. Apply for our scholarships today!
-                                    </p>
-                                    <Link href={route('login')} className="mt-6">
-                                        <Button variant="default" className="px-8 py-3 text-base font-semibold">
-                                            Login to Apply
-                                        </Button>
-                                    </Link>
+                        {/* CTA Section - Only show for unauthenticated users */}
+                        {!isAuthenticated && (
+                            <section className="mt-16 mb-8">
+                                <div className="rounded-2xl bg-gradient-to-r from-[#005a2d] to-[#008040] p-8 shadow-xl overflow-hidden relative">
+                                    <div className="relative z-10 flex flex-col items-center justify-center text-center py-12">
+                                        <h2 className="text-3xl font-bold text-white leading-tight md:text-4xl lg:text-5xl">
+                                            Ready to Apply for a Scholarship?
+                                        </h2>
+                                        <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
+                                            Take the next step towards your academic and professional goals. Apply for our scholarships today!
+                                        </p>
+                                        <Link href={route('login')} className="mt-6">
+                                            <Button variant="default" className="px-8 py-3 text-base font-semibold">
+                                                Login to Apply
+                                            </Button>
+                                        </Link>
+                                    </div>
                                 </div>
-                            </div>
-                        </section>
+                            </section>
+                        )}
                     </div>
                 </main>
 

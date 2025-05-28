@@ -96,7 +96,7 @@ class AdminController extends Controller
     /**
      * Show a specific user's profile.
      */
-    public function showStudents(User $user): Response
+    public function showUser(User $user): Response
     {
         // Load the appropriate profile based on user role
         if ($user->role === 'student') {
@@ -171,7 +171,17 @@ class AdminController extends Controller
             }
         } else {
             // For staff members, load the appropriate profile
-            $user->load($user->role.'Profile');
+            if ($user->role === 'osas_staff') {
+                $user->load('osasStaffProfile');
+            } elseif ($user->role === 'admin') {
+                $user->load('adminProfile');
+            } else {
+                // Fallback for any other role types - construct the relationship name carefully
+                $relationshipName = $user->role . 'Profile';
+                if (method_exists($user, $relationshipName)) {
+                    $user->load($relationshipName);
+                }
+            }
         }
         
         // Prepare base user data with all required fields
@@ -372,10 +382,9 @@ class AdminController extends Controller
                 'studentProfile' => $safeStudentProfile,
             ]);
         } elseif ($user->role === 'osas_staff' && $user->osasStaffProfile) {
-            // For staff members, organize data by sections
+            // For OSAS staff members, organize data by sections
             $staffInfo = [
                 'staff_id' => $user->osasStaffProfile->staff_id,
-                'mobile_number' => $user->osasStaffProfile->mobile_number,
             ];
             
             // Merge organized sections into user data
@@ -384,8 +393,21 @@ class AdminController extends Controller
                 
                 // Also add top-level fields for backward compatibility
                 'staff_id' => $user->osasStaffProfile->staff_id,
-                'mobile_number' => $user->osasStaffProfile->mobile_number,
                 'osasStaffProfile' => $user->osasStaffProfile,
+            ]);
+        } elseif ($user->role === 'admin' && $user->adminProfile) {
+            // For admin users, organize data by sections
+            $adminInfo = [
+                'admin_id' => $user->adminProfile->admin_id,
+            ];
+            
+            // Merge organized sections into user data
+            $userData = array_merge($userData, [
+                'adminInfo' => $adminInfo,
+                
+                // Also add top-level fields for backward compatibility
+                'admin_id' => $user->adminProfile->admin_id,
+                'adminProfile' => $user->adminProfile,
             ]);
         }
 
@@ -397,42 +419,30 @@ class AdminController extends Controller
     /**
      * Show the form for editing a user.
      */
-    public function editUser(User $user): Response
+    public function editUser(User $user): Response|RedirectResponse
     {
+        // Redirect admin users back as they cannot be edited
+        if ($user->isAdmin()) {
+            return redirect()->back()->withErrors(['error' => 'Admin profiles cannot be edited.']);
+        }
+
         // Load the appropriate profile based on user role
-        $profile = null;
-        $photoUrl = null;
+        switch ($user->role) {
+            case 'student':
+                $user->load('studentProfile');
+                break;
+            case 'osas_staff':
+                $user->load('osasStaffProfile');
+                break;
+            case 'admin':
+                $user->load('adminProfile');
+                break;
+        }
 
         // Get photo URL from user record since photo_id is stored in users table
         $photoUrl = $user->photo_id ? \App\Services\StorageService::url($user->photo_id) : null;
 
-        switch ($user->role) {
-            case 'student':
-                $profile = $user->studentProfile;
-                break;
-            case 'osas_staff':
-                $profile = $user->osasStaffProfile;
-                break;
-            case 'admin':
-                $profile = $user->adminProfile;
-                break;
-        }
-
-        // Make sure the profile exists
-        if (! $profile) {
-            return Inertia::render('admin/manage-students', [
-                'error' => 'User profile not found.',
-            ]);
-        }
-
-        // Redirect admin users back as they cannot be edited
-        if ($user->isAdmin()) {
-            return Inertia::render('admin/manage-students', [
-                'error' => 'Admin profiles cannot be edited.',
-            ]);
-        }
-
-        // Prepare the profile data based on role
+        // Prepare the base user data
         $userData = [
             'id' => $user->id,
             'first_name' => $user->first_name,
@@ -440,12 +450,14 @@ class AdminController extends Controller
             'last_name' => $user->last_name,
             'email' => $user->email,
             'role' => $user->role,
-            'photo_url' => $photoUrl
+            'photo_url' => $photoUrl,
+            'avatar' => $user->avatar,
+            'full_name' => $user->full_name,
         ];
 
-        if ($user->role === 'student') {
-            // Ensure boolean fields are properly typed
-            $studentProfileData = $profile->toArray();
+        if ($user->role === 'student' && $user->studentProfile) {
+            // Ensure boolean fields are properly typed for student profiles
+            $studentProfileData = $user->studentProfile->toArray();
             
             $booleanFields = [
                 'is_pwd', 'has_tv', 'has_radio_speakers_karaoke', 'has_musical_instruments',
@@ -460,9 +472,30 @@ class AdminController extends Controller
                 }
             }
             
+            // Handle date fields
+            if (isset($studentProfileData['date_of_birth']) && $studentProfileData['date_of_birth']) {
+                try {
+                    $studentProfileData['date_of_birth'] = \Carbon\Carbon::parse($studentProfileData['date_of_birth'])->format('Y-m-d');
+                } catch (\Exception $e) {
+                    $studentProfileData['date_of_birth'] = null;
+                }
+            }
+            
+            // Handle siblings array data if exists
+            if (isset($studentProfileData['siblings']) && is_string($studentProfileData['siblings'])) {
+                $studentProfileData['siblings'] = json_decode($studentProfileData['siblings'], true) ?? [];
+            } elseif (!isset($studentProfileData['siblings'])) {
+                $studentProfileData['siblings'] = [];
+            }
+            
             $userData['studentProfile'] = $studentProfileData;
-        } elseif ($user->role === 'osas_staff') {
-            $userData['osasStaffProfile'] = $profile->toArray();
+        } elseif ($user->role === 'osas_staff' && $user->osasStaffProfile) {
+            $userData['osasStaffProfile'] = $user->osasStaffProfile->toArray();
+        } elseif ($user->role === 'admin' && $user->adminProfile) {
+            $userData['adminProfile'] = $user->adminProfile->toArray();
+        } else {
+            // Profile not found for the user role
+            return redirect()->back()->withErrors(['error' => 'User profile not found.']);
         }
 
         return Inertia::render('admin/edit-user-profile', [
@@ -486,7 +519,6 @@ class AdminController extends Controller
             'last_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
-            'mobile_number' => ['nullable', 'string', 'max:255'],
         ];
 
         // Add role-specific validation rules
@@ -504,6 +536,7 @@ class AdminController extends Controller
                 'sex' => ['required', 'string', 'in:Male,Female'],
                 'date_of_birth' => ['nullable', 'date'],
                 'place_of_birth' => ['nullable', 'string', 'max:255'],
+                'mobile_number' => ['nullable', 'string', 'max:255'],
                 'telephone_number' => ['nullable', 'string', 'max:255'],
                 'is_pwd' => ['nullable', 'boolean'],
                 'disability_type' => ['nullable', 'string', 'max:255'],
@@ -590,7 +623,6 @@ class AdminController extends Controller
             } elseif ($user->role === 'osas_staff' && $user->osasStaffProfile) {
                 $user->osasStaffProfile->update([
                     'staff_id' => $validatedData['staff_id'],
-                    'mobile_number' => $validatedData['mobile_number'],
                 ]);
             }
 

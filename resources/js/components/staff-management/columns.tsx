@@ -10,7 +10,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Clock, UserCheck } from "lucide-react"
+import { MoreHorizontal, Clock, UserCheck, Eye } from "lucide-react"
 import { Link, router } from "@inertiajs/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -48,16 +48,16 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
         ),
         enableSorting: false,
         enableHiding: false,
-    },    {
+    }, {
         accessorKey: "avatar",
-        header: "Avatar",        cell: ({ row }) => {
+        header: "Avatar", cell: ({ row }) => {
             if (row.original.type === 'invitation') {
                 // Generate initials from email address
                 const email = row.original.email || ''
                 const emailPrefix = email.split('@')[0]
-                
+
                 let initials = 'U'
-                
+
                 // Try to extract meaningful initials from email
                 if (emailPrefix.includes('.')) {
                     // Handle emails like john.doe@example.com
@@ -74,7 +74,7 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
                     // Single character email prefix
                     initials = emailPrefix[0].toUpperCase()
                 }
-                
+
                 return (
                     <Avatar className="h-10 w-10">
                         <AvatarFallback className="bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 text-sm">
@@ -94,7 +94,7 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
         },
         enableSorting: false,
         enableHiding: false,
-    },    {
+    }, {
         id: "fullName",
         accessorFn: (row) => row.type === 'invitation' ? row.email : `${row.first_name} ${row.last_name}`,
         header: "Name",
@@ -123,9 +123,9 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
             )
         },
         enableHiding: false,
-    },    {
+    }, {
         accessorKey: "email",
-        header: "Contact",        cell: ({ row }) => {
+        header: "Contact", cell: ({ row }) => {
             if (row.original.type === 'invitation') {
                 const getBadgeVariantAndText = (status: string) => {
                     switch (status) {
@@ -182,7 +182,7 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
                 </div>
             )
         },
-    },    {
+    }, {
         accessorKey: "created_at",
         header: "Date",
         cell: ({ row }) => {
@@ -210,7 +210,7 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
                 </div>
             )
         },
-    },    {
+    }, {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {
@@ -224,7 +224,7 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-40">
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
                                     onClick={() => {
                                         router.post(route('admin.invitations.resend', { invitation: row.original.invitation_id }))
                                     }}
@@ -233,7 +233,7 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
                                     Resend Invitation
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
                                     onClick={() => {
                                         router.delete(route('admin.invitations.revoke', { invitation: row.original.invitation_id }))
                                     }}
@@ -246,39 +246,16 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
                     </div>
                 )
             }
-            
+
             return (
                 <div className="text-left">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
-                                <MoreHorizontal className="h-5 w-5" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem asChild>
-                                <Link href={route('admin.staff.show', { user: row.original.id })} className="text-base">
-                                    View
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={route('admin.staff.edit', { user: row.original.id })} className="text-base">
-                                    Edit
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link
-                                    href={route('admin.staff.destroy', { user: row.original.id })}
-                                    method="delete"
-                                    as="button"
-                                    className="text-base text-red-600 dark:text-red-400"
-                                >
-                                    Remove
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Link
+                        href={route('admin.staff.show', { user: row.original.id })}
+                        className="text-sm text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition-colors flex items-center gap-2 pb-1"
+                    >
+                        <Eye className="h-4 w-4" />
+                        View
+                    </Link>
                 </div>
             )
         },

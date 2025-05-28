@@ -17,7 +17,7 @@ class ScholarshipsController extends Controller
     public function index(): Response
     {
         $scholarships = Scholarship::where('status', 'active')
-            ->where('application_deadline', '>=', now())
+            ->where('deadline', '>=', now())
             ->with(['applications' => function ($query) {
                 $query->where('student_id', Auth::id());
             }])
@@ -31,13 +31,13 @@ class ScholarshipsController extends Controller
                     'stipend_amount' => $scholarship->stipend_amount,
                     'requirements' => $scholarship->requirements,
                     'eligibility_criteria' => $scholarship->eligibility_criteria,
-                    'deadline' => $scholarship->application_deadline,
+                    'deadline' => $scholarship->deadline,
                     'has_applied' => $scholarship->applications->count() > 0,
                     'required_documents' => $scholarship->required_documents,
                 ];
             });
 
-        return Inertia::render('Scholarships/Index', [
+        return Inertia::render('scholarships/index', [
             'scholarships' => $scholarships,
         ]);
     }

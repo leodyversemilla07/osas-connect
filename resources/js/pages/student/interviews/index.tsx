@@ -1,4 +1,3 @@
-import { PageProps } from '@/types';
 import { Interview } from '@/types/models';
 import { Head } from '@inertiajs/react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,7 +10,7 @@ import { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
-    title: 'Student Dashboard',
+    title: 'Dashboard',
     href: '/student/dashboard',
   },
   {
@@ -20,7 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-interface Props extends PageProps {
+interface Props {
   interviews: Interview[];
 }
 

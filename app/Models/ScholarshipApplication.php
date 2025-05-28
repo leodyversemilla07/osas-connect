@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use InvalidArgumentException;
 
@@ -28,6 +29,8 @@ class ScholarshipApplication extends Model
         'student_id',
         'scholarship_id',
         'status',
+        'priority',
+        'reviewer_id',
         'applied_at',
         'approved_at',
         'rejected_at',
@@ -248,5 +251,29 @@ class ScholarshipApplication extends Model
     public function scholarship(): BelongsTo
     {
         return $this->belongsTo(Scholarship::class);
+    }
+
+    /**
+     * Get the documents for this application.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class, 'application_id');
+    }
+
+    /**
+     * Get the comments for this application.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(ApplicationComment::class, 'application_id');
+    }
+
+    /**
+     * Get the reviewer for this application.
+     */
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewer_id');
     }
 }

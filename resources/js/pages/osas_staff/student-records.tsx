@@ -9,7 +9,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Dashboard', href: route('osas.dashboard')
     },
     {
-        title: 'Students Records', href: route('osas.students')
+        title: 'Student Records', href: route('osas.students')
     },
 ];
 
