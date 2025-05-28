@@ -5,7 +5,7 @@ import {
     BookOpen, School, Award,
     Pencil as PencilIcon,
     type LucideIcon,
-    Users, FileText, Loader2
+    Users, FileText, Loader2, ChevronRight
 } from 'lucide-react';
 import { type User, type StudentProfile } from '@/types';
 import AppLayout from '@/layouts/app-layout';
@@ -23,6 +23,19 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+
+// Course abbreviation mapping
+const COURSE_ABBREVIATIONS: Record<string, string> = {
+    'Bachelor of Science in Information Technology': 'BSIT',
+    'Bachelor of Science in Computer Engineering': 'BSCpE',
+    'Bachelor of Science in Tourism Management': 'BSTM',
+    'Bachelor of Science in Hospitality Management': 'BSHM',
+    'Bachelor of Science in Criminology': 'BSCrim',
+    'Bachelor of Arts in Political Science': 'AB PolSci',
+    'Bachelor of Secondary Education': 'BSEd',
+    'Bachelor of Elementary Education': 'BEEd',
+    'Bachelor of Science in Fisheries': 'BSF',
+};
 
 interface UserWithProfile extends User {
     studentProfile?: StudentProfile;
@@ -887,6 +900,139 @@ function AcademicInfoCard({ user }: { user: UserWithProfile }) {
     );
 }
 
+const StudentIDCard = ({ student }: { student: UserWithProfile }) => {
+    // Get course from various sources with fallbacks
+    const course = student.academicInfo?.course || student.course || student.studentProfile?.course || '';
+    
+    // Try to get abbreviation from full course name, or use the course as is
+    const courseAbbr = COURSE_ABBREVIATIONS[course] || course;
+
+    // Get student ID from various sources
+    const studentId = student.academicInfo?.student_id || student.student_id || student.studentProfile?.student_id || '';
+
+    return (
+        <div className="w-full max-w-[350px] rounded-xl overflow-hidden shadow-2xl bg-white">
+            {/* Top section - Enhanced header with gradient */}
+            <div className="bg-gradient-to-r from-green-800 to-green-700 text-white p-5 relative">
+                <div className="absolute top-0 left-0 w-full h-full opacity-10">
+                    {/* Subtle pattern overlay */}
+                    <div
+                        className="w-full h-full"
+                        style={{
+                            backgroundImage:
+                                "url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fillOpacity='1' fillRule='evenodd'/%3E%3C/svg%3E\")",
+                            backgroundSize: "100px 100px",
+                        }}
+                    ></div>
+                </div>
+
+                <div className="flex items-start relative z-10">
+                    {/* Enhanced logo */}
+                    <div className="w-20 h-20 rounded-full bg-white shadow-lg p-1 mr-4 flex-shrink-0">
+                        <div className="w-full h-full rounded-full flex items-center justify-center bg-white overflow-hidden">
+                            <img
+                                src="https://www.minsu.edu.ph/template/images/logo.png"
+                                alt="Mindoro State University Logo"
+                                className="w-full h-full object-contain"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex-1">
+                        <h1 className="text-2xl font-bold tracking-wider">MINDORO</h1>
+                        <h1 className="text-2xl font-bold tracking-wider">STATE UNIVERSITY</h1>
+                        <p className="text-sm mt-1 opacity-90 font-light">ORIENTAL MINDORO, PHILIPPINES 5211</p>
+                    </div>
+                </div>
+
+                {/* Centered STUDENT IDENTIFICATION CARD text */}
+                <div className="mt-4 text-center">
+                    <div className="bg-green-900 bg-opacity-30 py-1 px-4 rounded-md inline-block mx-auto">
+                        <p className="text-sm font-medium tracking-wide">STUDENT IDENTIFICATION CARD</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Middle section - Student info with improved layout */}
+            <div className="bg-white">
+                <div className="flex">
+                    {/* Enhanced photo section */}
+                    <div className="w-1/3 p-4 relative">
+                        <div className="border-2 border-yellow-400 rounded-md shadow-md overflow-hidden">
+                            <div className="aspect-square relative bg-gradient-to-b from-gray-100 to-gray-200">
+                                <Avatar className="w-full h-full rounded-none">
+                                    {student.avatar ? (
+                                        <AvatarImage src={student.avatar} alt={`${student.first_name}'s photo`} />
+                                    ) : (
+                                        <AvatarFallback className="text-lg">
+                                            {student.first_name[0]}{student.last_name[0]}
+                                        </AvatarFallback>
+                                    )}
+                                </Avatar>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Enhanced student details */}
+                    <div className="w-2/3 bg-gradient-to-br from-green-800 to-green-700 text-white p-4">
+                        <div className="border-l-2 border-yellow-400 pl-3">
+                            <h2 className="text-3xl font-bold">{student.last_name}</h2>
+                            <p className="text-lg font-medium">{student.first_name} {student.middle_name?.[0] || ''}</p>
+                        </div>
+
+                        <div className="mt-6 mb-2">
+                            <div className="flex items-center">
+                                <ChevronRight className="h-4 w-4 text-yellow-400" />
+                                <h3 className="text-3xl font-bold ml-1">{courseAbbr}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* ID Number and Issue Date - Enhanced dark section */}
+            <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-3 px-4">
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                    <div className="flex items-center">
+                        <div className="w-1 h-3 bg-yellow-400 mr-2"></div>
+                        <p className="text-xs font-medium uppercase tracking-wide">Student ID Number</p>
+                    </div>
+                    <div>
+                        <p className="text-xs font-bold tracking-wider">{studentId}</p>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-1 h-3 bg-yellow-400 mr-2"></div>
+                        <p className="text-xs font-medium uppercase tracking-wide">Issued</p>
+                    </div>
+                    <div>
+                        <p className="text-xs font-bold tracking-wider">AY {new Date().getFullYear()}-{new Date().getFullYear() + 1}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Enhanced signature section */}
+            <div className="bg-white p-5 text-center">
+                <div className="h-8 mb-2 flex items-center justify-center">
+                    <div className="w-40 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+                </div>
+                <p className="font-bold text-sm text-gray-800">DR. ENYA MARIE D. APOSTOL</p>
+                <p className="text-xs text-gray-600">University President</p>
+            </div>
+
+            {/* Enhanced footer */}
+            <div className="bg-gradient-to-r from-green-800 to-green-700 border-t-2 border-yellow-400 p-3">
+                <p className="text-[10px] text-center text-white leading-tight font-light">
+                    <span className="font-medium">MAIN CAMPUS</span>, Alcate, Victoria
+                    <span className="mx-2">•</span>
+                    <span className="font-medium">BONGABONG CAMPUS</span>, Labasan, Bongabong
+                    <span className="mx-2">•</span>
+                    <span className="font-medium">CALAPAN CAMPUS</span>, Masipit, Calapan City
+                </p>
+            </div>
+        </div>
+    );
+};
+
 export default function UserProfile({ user }: UserProfileProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -907,10 +1053,9 @@ export default function UserProfile({ user }: UserProfileProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="w-full py-12 px-4">
                 <div className="max-w-none mx-auto space-y-8">
-                    <ProfileHeader user={user} />
-
+                    <ProfileHeader user={user} />                    
                     {/* Main content */}
-                    <div className="grid gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
                         <div className="space-y-8 xl:col-span-1">
                             <PersonalInfoCard user={user} />
                             {user.role === 'student' && <FamilyBackgroundCard user={user} />}
@@ -926,6 +1071,17 @@ export default function UserProfile({ user }: UserProfileProps) {
                             <div className="space-y-8 xl:col-span-1">
                                 {user.studentProfile?.father_name && <FatherInfoCard user={user} />}
                                 {user.studentProfile?.mother_name && <MotherInfoCard user={user} />}
+                            </div>
+                        )}
+
+                        {user.role === 'student' && (
+                            <div className="space-y-8 xl:col-span-1">
+                                <InfoCard>
+                                    <SectionHeader icon={GraduationCap} title="Student ID Card" />
+                                    <div className="flex justify-center">
+                                        <StudentIDCard student={user} />
+                                    </div>
+                                </InfoCard>
                             </div>
                         )}
                     </div>

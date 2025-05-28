@@ -28,6 +28,8 @@ return new class extends Migration
                 'rejected',
                 'end',
             ])->default('draft');
+            $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
+            $table->foreignId('reviewer_id')->nullable()->constrained('users')->onDelete('set null');
 
             // Tracking Data
             $table->timestamp('applied_at')->nullable();

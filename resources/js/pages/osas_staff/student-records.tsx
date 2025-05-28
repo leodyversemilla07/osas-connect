@@ -5,8 +5,12 @@ import { DataTable } from '@/components/osas-student-management/data-table';
 import { columns } from '@/components/osas-student-management/columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: route('osas.dashboard') },
-    { title: 'Student Records', href: route('osas.students') },
+    {
+        title: 'Dashboard', href: route('osas.dashboard')
+    },
+    {
+        title: 'Students Records', href: route('osas.students')
+    },
 ];
 
 interface Props {
