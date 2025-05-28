@@ -1,6 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { ChevronRight, BookOpen, Clock, AlertCircle, Award, DollarSign, Users, Calendar } from 'lucide-react';
+import {
+  ChevronRight, BookOpen, Clock, AlertCircle, Award, DollarSign, Users, Calendar,
+  Bell, BellDot, FileText, Upload, CheckCircle, XCircle, TrendingUp, Target,
+  MessageSquare, CalendarCheck, Wallet, GraduationCap, Star, ArrowRight
+} from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -56,6 +60,29 @@ interface ScholarshipApplication {
   status: string;
   submitted_at: string;
   progress: number;
+  next_step?: string;
+  interview_date?: string;
+  documents_status?: string;
+}
+
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  type: 'application_status' | 'document_request' | 'interview_schedule' | 'stipend_release' | 'renewal_reminder';
+  read_at?: string;
+  created_at: string;
+}
+
+interface FinancialSummary {
+  total_received: number;
+  monthly_amount: number;
+  next_stipend_date: string;
+  payment_history: Array<{
+    month: string;
+    amount: number;
+    status: string;
+  }>;
 }
 
 interface DashboardProps {
@@ -65,6 +92,13 @@ interface DashboardProps {
   recentApplications: ScholarshipApplication[];
   totalApplications: number;
   approvedScholarships: number;
+  notifications?: Notification[];
+  financialSummary?: FinancialSummary;
+  upcomingDeadlines?: Array<{
+    scholarship: string;
+    deadline: string;
+    type: string;
+  }>;
 }
 
 // Course abbreviation mapping
@@ -94,16 +128,15 @@ const IDCardHeader = () => (
       ></div>
     </div>
 
-    <div className="flex items-start relative z-10">
-      <div className="w-20 h-20 rounded-full bg-white shadow-lg p-1 mr-4 flex-shrink-0">
-        <div className="w-full h-full rounded-full flex items-center justify-center bg-white overflow-hidden">
-          <img
-            src="https://www.minsu.edu.ph/template/images/logo.png"
-            alt="Mindoro State University Logo"
-            className="w-16 h-16 object-contain"
-          />
-        </div>
+    <div className="flex items-start relative z-10">            <div className="w-20 h-20 rounded-full bg-white shadow-lg p-1 mr-4 flex-shrink-0">
+      <div className="w-full h-full rounded-full flex items-center justify-center bg-white overflow-hidden">
+        <img
+          src="https://www.minsu.edu.ph/template/images/logo.png"
+          alt="Mindoro State University Logo"
+          className="w-16 h-16 object-contain"
+        />
       </div>
+    </div>
 
       <div className="flex-1">
         <h1 className="text-2xl font-bold tracking-wider">MINDORO</h1>
@@ -127,21 +160,20 @@ const IDCardStudentInfo = ({ auth, student }: { auth: Auth; student: Student }) 
     <div className="bg-white">
       <div className="flex">
         <div className="w-1/3 p-4 relative">
-          <div className="border-2 border-yellow-400 rounded-md shadow-md overflow-hidden">
-            <div className="aspect-square relative bg-gradient-to-b from-gray-100 to-gray-200">
-              <Avatar className="w-full h-full rounded-none">
-                {auth.user.avatar ? (
-                  <AvatarImage
-                    src={auth.user.avatar}
-                    alt={`${auth.user.first_name}'s photo`}
-                  />
-                ) : (
-                  <AvatarFallback className="text-lg">
-                    {auth.user.first_name[0]}{auth.user.last_name[0]}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-            </div>
+          <div className="border-2 border-yellow-400 rounded-md shadow-md overflow-hidden">            <div className="aspect-square relative bg-gradient-to-b from-gray-100 to-gray-200">
+            <Avatar className="w-full h-full rounded-none">
+              {auth.user.avatar ? (
+                <AvatarImage
+                  src={auth.user.avatar}
+                  alt={`${auth.user.first_name}'s photo`}
+                />
+              ) : (
+                <AvatarFallback className="text-lg">
+                  {auth.user.first_name[0]}{auth.user.last_name[0]}
+                </AvatarFallback>
+              )}
+            </Avatar>
+          </div>
           </div>
         </div>
 
@@ -221,7 +253,10 @@ export default function StudentDashboard({
   availableScholarships = [],
   recentApplications = [],
   totalApplications = 0,
-  approvedScholarships = 0
+  approvedScholarships = 0,
+  notifications = [],
+  financialSummary,
+  upcomingDeadlines = []
 }: DashboardProps) {
   // Sample data with enhanced student profile for testing personalization
   const enhancedStudent: Student = {
@@ -259,8 +294,54 @@ export default function StudentDashboard({
       scholarship_name: 'Academic Scholarship (Partial)',
       status: 'under_evaluation',
       submitted_at: '2025-05-15',
-      progress: 80
+      progress: 80,
+      next_step: 'Interview scheduling',
+      documents_status: 'verified'
     }
+  ];
+
+  // Sample notifications data
+  const sampleNotifications: Notification[] = notifications.length > 0 ? notifications : [
+    {
+      id: 1,
+      title: 'Application Status Update',
+      message: 'Your Academic Scholarship application is now under evaluation.',
+      type: 'application_status',
+      created_at: '2025-05-28',
+    },
+    {
+      id: 2,
+      title: 'Interview Scheduled',
+      message: 'Your scholarship interview is scheduled for June 5, 2025 at 2:00 PM.',
+      type: 'interview_schedule',
+      created_at: '2025-05-27',
+    },
+    {
+      id: 3,
+      title: 'Document Verification Required',
+      message: 'Please upload your updated Certificate of Registration.',
+      type: 'document_request',
+      created_at: '2025-05-26',
+    }
+  ];
+
+  // Sample financial data
+  const sampleFinancialSummary: FinancialSummary = financialSummary || {
+    total_received: 2500,
+    monthly_amount: 500,
+    next_stipend_date: '2025-06-15',
+    payment_history: [
+      { month: 'May 2025', amount: 500, status: 'received' },
+      { month: 'April 2025', amount: 500, status: 'received' },
+      { month: 'March 2025', amount: 500, status: 'received' },
+    ]
+  };
+
+  // Sample deadlines
+  const sampleDeadlines = upcomingDeadlines.length > 0 ? upcomingDeadlines : [
+    { scholarship: 'Economic Assistance Program', deadline: '2025-05-30', type: 'Application' },
+    { scholarship: 'Performing Arts Scholarship', deadline: '2025-06-15', type: 'Application' },
+    { scholarship: 'Student Assistantship', deadline: '2025-06-30', type: 'Renewal' },
   ];
 
   const getStatusColor = (status: string): string => {
@@ -294,12 +375,59 @@ export default function StudentDashboard({
       <div className="flex h-full flex-1 flex-col space-y-6 p-6">
         {/* Header Section */}
         <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-          <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">Dashboard</h1>
-          <p className="text-base text-gray-500 dark:text-gray-400">Welcome to your student dashboard</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">
+                Welcome back, {auth.user.first_name}!
+              </h1>
+              <p className="text-base text-gray-500 dark:text-gray-400">
+                Here's your scholarship journey overview
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/student/notifications" className="flex items-center gap-2">
+                  {sampleNotifications.filter(n => !n.read_at).length > 0 ? (
+                    <BellDot className="h-4 w-4" />
+                  ) : (
+                    <Bell className="h-4 w-4" />
+                  )}
+                  Notifications
+                  {sampleNotifications.filter(n => !n.read_at).length > 0 && (
+                    <Badge variant="destructive" className="ml-1">
+                      {sampleNotifications.filter(n => !n.read_at).length}
+                    </Badge>
+                  )}
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
 
+        {/* Urgent Notifications Banner */}
+        {sampleNotifications.filter(n => !n.read_at && n.type === 'document_request').length > 0 && (
+          <Card className="border-orange-200 bg-orange-50 dark:bg-orange-900/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-orange-600" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-orange-800 dark:text-orange-200">
+                    Action Required
+                  </h3>
+                  <p className="text-sm text-orange-700 dark:text-orange-300">
+                    You have pending document requests that need immediate attention.
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/student/documents">View Details</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
@@ -313,7 +441,7 @@ export default function StudentDashboard({
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Approved Scholarships</CardTitle>
+              <CardTitle className="text-sm font-medium">Active Scholarships</CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -336,11 +464,28 @@ export default function StudentDashboard({
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Current GWA</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{enhancedStudent.gwa}</div>
-              <p className="text-xs text-muted-foreground">Academic performance</p>
+              <p className="text-xs text-muted-foreground">
+                <Badge variant={(enhancedStudent.gwa && enhancedStudent.gwa <= 1.75) ? "default" : "secondary"} className="text-xs">
+                  {(enhancedStudent.gwa && enhancedStudent.gwa <= 1.75) ? "Eligible" : "Maintain"}
+                </Badge>
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Monthly Stipend</CardTitle>
+              <Wallet className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">₱{sampleFinancialSummary.monthly_amount}</div>
+              <p className="text-xs text-muted-foreground">
+                Next: {new Date(sampleFinancialSummary.next_stipend_date).toLocaleDateString()}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -348,6 +493,64 @@ export default function StudentDashboard({
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Personalized Scholarship Recommendations */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    Recommended for You
+                  </CardTitle>
+                  <CardDescription>Based on your academic profile and preferences</CardDescription>
+                </div>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/student/scholarships?recommended=true">View All</Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {sampleScholarships.slice(0, 2).map((scholarship) => (
+                    <div key={scholarship.id} className="p-4 border border-blue-200 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-semibold text-blue-900 dark:text-blue-100">{scholarship.name}</h4>
+                            <Badge className="bg-blue-100 text-blue-800 text-xs">
+                              High Match
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
+                            {scholarship.description}
+                          </p>
+                          <div className="flex items-center gap-4 text-sm text-blue-700 dark:text-blue-300">
+                            <span className="flex items-center gap-1">
+                              <DollarSign className="h-3 w-3" />
+                              {scholarship.amount}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              Due: {new Date(scholarship.deadline).toLocaleDateString()}
+                            </span>
+                          </div>
+                          {(enhancedStudent.gwa && enhancedStudent.gwa <= 1.75 && scholarship.type === 'Academic') && (
+                            <div className="mt-2 flex items-center gap-1 text-xs text-green-600">
+                              <CheckCircle className="h-3 w-3" />
+                              Your GWA qualifies for this scholarship
+                            </div>
+                          )}
+                        </div>
+                        <Button size="sm" asChild>
+                          <Link href={`/scholarships/${scholarship.id}/apply`} className="flex items-center gap-1">
+                            Apply <ArrowRight className="h-3 w-3" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Available Scholarships */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
@@ -423,9 +626,22 @@ export default function StudentDashboard({
                           <span>{application.progress}%</span>
                         </div>
                         <Progress value={application.progress} className="h-2" />
-                        <p className="text-sm text-gray-500">
-                          Submitted: {new Date(application.submitted_at).toLocaleDateString()}
-                        </p>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-500">
+                            Submitted: {new Date(application.submitted_at).toLocaleDateString()}
+                          </span>
+                          {application.next_step && (
+                            <span className="text-blue-600 font-medium">
+                              Next: {application.next_step}
+                            </span>
+                          )}
+                        </div>
+                        {application.interview_date && (
+                          <div className="flex items-center gap-1 text-sm text-purple-600">
+                            <CalendarCheck className="h-3 w-3" />
+                            Interview: {new Date(application.interview_date).toLocaleDateString()}
+                          </div>
+                        )}
                       </div>
                       <div className="mt-3 flex gap-2">
                         <Button variant="outline" size="sm" asChild>
@@ -457,6 +673,111 @@ export default function StudentDashboard({
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Recent Notifications */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-4 w-4" />
+                  Recent Notifications
+                </CardTitle>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/student/notifications">View All</Link>
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {sampleNotifications.slice(0, 3).map((notification) => (
+                  <div key={notification.id} className="p-3 border rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <div className={`w-2 h-2 rounded-full mt-2 ${notification.read_at ? 'bg-gray-300' : 'bg-blue-500'
+                        }`} />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-sm">{notification.title}</h4>
+                        <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {new Date(notification.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {sampleNotifications.length === 0 && (
+                  <div className="text-center py-4 text-gray-500">
+                    <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No notifications yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Upcoming Deadlines */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Upcoming Deadlines
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {sampleDeadlines.slice(0, 3).map((deadline, index) => {
+                  const daysLeft = Math.ceil((new Date(deadline.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                  return (
+                    <div key={index} className="flex items-center justify-between p-2 border rounded">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{deadline.scholarship}</p>
+                        <p className="text-xs text-gray-600">{deadline.type}</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant={daysLeft <= 7 ? "destructive" : "secondary"} className="text-xs">
+                          {daysLeft}d left
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+
+            {/* Financial Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wallet className="h-4 w-4" />
+                  Financial Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <p className="text-sm text-green-800 dark:text-green-200">Total Received</p>
+                    <p className="text-lg font-bold text-green-900 dark:text-green-100">
+                      ₱{sampleFinancialSummary.total_received.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">Monthly</p>
+                    <p className="text-lg font-bold text-blue-900 dark:text-blue-100">
+                      ₱{sampleFinancialSummary.monthly_amount}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Recent Payments</h4>
+                  {sampleFinancialSummary.payment_history.slice(0, 3).map((payment, index) => (
+                    <div key={index} className="flex justify-between items-center text-sm">
+                      <span>{payment.month}</span>
+                      <div className="flex items-center gap-2">
+                        <span>₱{payment.amount}</span>
+                        <CheckCircle className="h-3 w-3 text-green-500" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Button variant="outline" size="sm" className="w-full" asChild>
+                  <Link href="/student/financial">View All Payments</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
             <StudentIDCard auth={auth} student={enhancedStudent} />
 
             {/* Quick Actions */}
@@ -465,29 +786,91 @@ export default function StudentDashboard({
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button className="w-full" asChild>
-                  <Link href="/student/scholarships">Browse Scholarships</Link>
+                <Button className="w-full justify-start" asChild>
+                  <Link href="/student/scholarships" className="flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    Browse Scholarships
+                  </Link>
                 </Button>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link href="/student/applications">My Applications</Link>
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <Link href="/student/applications" className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    My Applications
+                  </Link>
                 </Button>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link href="/student/profile">Update Profile</Link>
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <Link href="/student/documents" className="flex items-center gap-2">
+                    <Upload className="h-4 w-4" />
+                    Upload Documents
+                  </Link>
+                </Button>
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <Link href="/student/profile" className="flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4" />
+                    Update Profile
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Eligibility Tips */}
+            {/* Academic Performance */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-4 w-4" />
+                  Academic Standing
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Current GWA</span>
+                    <span className="font-bold">{enhancedStudent.gwa}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Units Enrolled</span>
+                    <span className="font-bold">{enhancedStudent.units_enrolled}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm">Status</span>
+                    <Badge variant={enhancedStudent.academic_status === 'regular' ? 'default' : 'secondary'}>
+                      {enhancedStudent.academic_status}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t">
+                  <h4 className="text-sm font-medium mb-2">Scholarship Eligibility</h4>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span>Academic Scholarship</span>
+                      {(enhancedStudent.gwa && enhancedStudent.gwa <= 1.75) ? (
+                        <CheckCircle className="h-3 w-3 text-green-500" />
+                      ) : (
+                        <XCircle className="h-3 w-3 text-red-500" />
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span>General Scholarship</span>
+                      <CheckCircle className="h-3 w-3 text-green-500" />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Enhanced Scholarship Tips */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4" />
-                  Scholarship Tips
+                  Success Tips & Guidelines
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <p className="font-medium text-blue-800 dark:text-blue-200 mb-1">
+                  <p className="font-medium text-blue-800 dark:text-blue-200 mb-1 flex items-center gap-1">
+                    <GraduationCap className="h-3 w-3" />
                     Academic Excellence
                   </p>
                   <p className="text-blue-700 dark:text-blue-300">
@@ -495,7 +878,8 @@ export default function StudentDashboard({
                   </p>
                 </div>
                 <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <p className="font-medium text-green-800 dark:text-green-200 mb-1">
+                  <p className="font-medium text-green-800 dark:text-green-200 mb-1 flex items-center gap-1">
+                    <FileText className="h-3 w-3" />
                     Complete Documentation
                   </p>
                   <p className="text-green-700 dark:text-green-300">
@@ -503,13 +887,26 @@ export default function StudentDashboard({
                   </p>
                 </div>
                 <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                  <p className="font-medium text-yellow-800 dark:text-yellow-200 mb-1">
+                  <p className="font-medium text-yellow-800 dark:text-yellow-200 mb-1 flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
                     Apply Early
                   </p>
                   <p className="text-yellow-700 dark:text-yellow-300">
                     Applications are processed on a first-come, first-served basis.
                   </p>
                 </div>
+                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <p className="font-medium text-purple-800 dark:text-purple-200 mb-1 flex items-center gap-1">
+                    <MessageSquare className="h-3 w-3" />
+                    Interview Preparation
+                  </p>
+                  <p className="text-purple-700 dark:text-purple-300">
+                    Prepare for interviews by reviewing your application and scholarship goals.
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" className="w-full mt-3" asChild>
+                  <Link href="/student/guidelines">View Full Guidelines</Link>
+                </Button>
               </CardContent>
             </Card>
           </div>
