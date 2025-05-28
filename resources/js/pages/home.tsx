@@ -67,9 +67,9 @@ export default function Home() {
                                         <div className="absolute right-0 top-5 h-5/6 w-5/6 rounded-3xl bg-[#febd12]/30"></div>
                                         <div className="absolute left-0 top-0 h-5/6 w-5/6 rounded-3xl bg-white/10 backdrop-blur-sm"></div>
                                         <img
-                                            src="https://img.freepik.com/free-photo/education-students-happy-asian-woman-holding-notebooks-laughing-smiling-camera-enjoys-goi_1258-167792.jpg?ga=GA1.1.356696801.1743149314&semt=ais_hybrid"
+                                            src="https://scontent.fmnl4-2.fna.fbcdn.net/v/t39.30808-6/483629014_669192902285751_1736933274720208377_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFZXtOa81sijqh7rIU05kOdbdrB0hz9HOZt2sHSHP0c5uLPDxz5CXHKkkJNEHv4AjdQ3dWq5fWFtzdcsyFrHQOB&_nc_ohc=IoFJR-94wGMQ7kNvwE7eOD6&_nc_oc=AdniH08iGsIrFvrStXBha-xZPebUzd07XZBtCv1gIDvrktm2_xohu0x0MvBp3drlNrE&_nc_zt=23&_nc_ht=scontent.fmnl4-2.fna&_nc_gid=83R5tKFapxz4fG9LshaNXw&oh=00_AfKQc42oEroAJPf8O45JLO4403BRhj64QEa7gaf60g91Qg&oe=683B2663"
                                             alt="Students with scholarships"
-                                            className="absolute left-10 top-10 h-5/6 w-5/6 object-contain"
+                                            className="absolute left-10 top-10 h-5/6 w-5/6 object-contain rounded-3xl"
                                             onError={(e) => {
                                                 e.currentTarget.src = "https://placehold.co/400x400/005a2d/FFFFFF?text=OSAS+CONNECT";
                                             }}
@@ -127,7 +127,7 @@ export default function Home() {
                                     </div>
                                     <h3 className="mb-3 text-xl font-medium text-[#005a2d]">Apply Online</h3>
                                     <p className="text-[#010002]/80 dark:text-[#f3f2f2]/80 mb-4">Complete and submit your applications directly through our secure online platform.</p>
-                                    <Link href="/student/scholarships/view" className="inline-flex items-center text-[#23b14d] hover:underline">
+                                    <Link href="/scholarships/available" className="inline-flex items-center text-[#23b14d] hover:underline">
                                         Application guide
                                         <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

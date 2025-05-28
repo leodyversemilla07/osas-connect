@@ -16,18 +16,24 @@ class Scholarship extends Model
         'description',
         'status',
         'amount',
-        'stipend_schedule',
         'deadline',
+        'slots',
+        'beneficiaries',
+        'funding_source',
+        'eligibility_criteria',
+        'required_documents',
+        'stipend_schedule',
         'slots_available',
         'criteria',
-        'required_documents',
         'renewal_criteria',
+        'admin_remarks',
     ];
 
     protected $casts = [
         'deadline' => 'date',
-        'criteria' => 'array',
+        'eligibility_criteria' => 'array',
         'required_documents' => 'array',
+        'criteria' => 'array',
         'renewal_criteria' => 'array',
         'amount' => 'decimal:2',
     ];

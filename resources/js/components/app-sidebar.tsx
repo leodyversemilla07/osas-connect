@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, FileText, Folder, Home, Users, GraduationCap, UserCog } from 'lucide-react';
+import { BookOpen, Folder, Home, Users, GraduationCap, UserCog, ClipboardList, Award, Search, MessageCircle } from 'lucide-react';
 import AppLogo from './app-logo';
 
 
@@ -44,9 +44,15 @@ const osasNavItems: NavItem[] = [
         roles: ['osas_staff']
     },
     {
+        title: 'Applications',
+        href: route('osas.applications'),
+        icon: ClipboardList,
+        roles: ['osas_staff']
+    },
+    {
         title: 'Scholarships',
         href: route('osas.manage.scholarships'),
-        icon: FileText, // Using FileText as a substitute for academic-cap
+        icon: Award, // Using Award icon for scholarships
         roles: ['osas_staff']
     }
 ];
@@ -60,15 +66,21 @@ const studentNavItems: NavItem[] = [
         roles: ['student']
     },
     {
-        title: 'Scholarships',
-        href: route('student.scholarships'),
-        icon: FileText, // Using DocumentText as a substitute for academic-cap
+        title: 'Browse Scholarships',
+        href: route('scholarships.index'),
+        icon: Search, // Using Search icon for browsing scholarships
+        roles: ['student']
+    },
+    {
+        title: 'My Applications',
+        href: route('student.applications'),
+        icon: Folder, // Using Folder icon to distinguish from Scholarships
         roles: ['student']
     },
     {
         title: 'Interviews',
         href: route('interviews.index'),
-        icon: FileText, // Using FileText as a substitute for academic-cap
+        icon: MessageCircle, // Using MessageCircle icon for interviews
         roles: ['student']
     }
 ];

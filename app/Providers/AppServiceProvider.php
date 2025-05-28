@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\ScholarshipApplication;
+use App\Observers\ScholarshipApplicationObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 
@@ -36,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
-        //
+        // Register model observers
+        ScholarshipApplication::observe(ScholarshipApplicationObserver::class);
     }
 }
