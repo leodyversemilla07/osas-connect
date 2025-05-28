@@ -198,7 +198,9 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         {user.first_name} {user.last_name}
                     </p>
-                </div>                {/* Success Message */}
+                </div>
+
+                {/* Success Message */}
                 {wasSuccessful && (
                     <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
                         <AlertDescription className="text-green-800 dark:text-green-200 text-sm">
@@ -254,20 +256,10 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                     className="border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-gray-400 dark:focus-visible:border-gray-500"
                                 />
                             </FormField>
-
-                            {user.role === 'osas_staff' && (
-                                <FormField label="Mobile Number" error={errors.mobile_number}>
-                                    <Input
-                                        id="mobile_number"
-                                        value={data.mobile_number}
-                                        onChange={(e) => setData('mobile_number', e.target.value)}
-                                        className="border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-gray-400 dark:focus-visible:border-gray-500"
-                                        placeholder="+639123456789"
-                                    />
-                                </FormField>
-                            )}
                         </div>
-                    </div>                    {/* Student-specific sections */}
+                    </div>
+
+                    {/* Student-specific sections */}
                     {user.role === 'student' && (
                         <>
                             {/* Academic Information */}
@@ -781,7 +773,9 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                 </FormField>
                             </div>
                         </div>
-                    )}                    {/* Form Actions */}
+                    )}
+
+                    {/* Form Actions */}
                     <div className="flex items-center justify-end gap-6 pt-6 border-t border-gray-100 dark:border-gray-800">
                         <Link
                             href={route(backRoute, user.id)}

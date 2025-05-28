@@ -30,6 +30,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -67,12 +68,11 @@ export function DataTable<TData, TValue>({
                 pageSize: pageSize,
                 pageIndex: 0,
             },
-        },
-    })
+        },    })
 
-    // Calculate pagination details
-    const totalPages = table.getPageCount()
-    const currentPage = table.getState().pagination.pageIndex + 1
+    React.useEffect(() => {
+        table.setPageSize(pageSize)
+    }, [pageSize, table])
 
     return (
         <div className="space-y-4">
@@ -140,53 +140,61 @@ export function DataTable<TData, TValue>({
                         )}
                     </TableBody>
                 </Table>
-            </div>
-            <div className="flex items-center justify-between text-base text-gray-500 dark:text-gray-400">
-                <div>
-                    Showing {table.getRowModel().rows.length} of {table.getFilteredRowModel().rows.length} students
-                </div>
-                <div className="flex items-center gap-4">
+            </div>            {/* Pagination */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center space-x-2">
+                    <p className="text-sm font-medium">Rows per page</p>
                     <Select
                         value={`${pageSize}`}
-                        onValueChange={(value) => {
-                            setPageSize(Number(value))
-                            table.setPageSize(Number(value))
-                        }}
+                        onValueChange={(value) => setPageSize(Number(value))}
                     >
-                        <SelectTrigger className="h-8 w-20 border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent">
-                            <SelectValue />
+                        <SelectTrigger className="h-8 w-[70px]">
+                            <SelectValue placeholder={pageSize} />
                         </SelectTrigger>
-                        <SelectContent className="w-20">
-                            {[10, 20, 30, 50].map((size) => (
+                        <SelectContent side="top">
+                            {[10, 20, 30, 40, 50].map((size) => (
                                 <SelectItem key={size} value={`${size}`}>
                                     {size}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
-                    <div className="flex items-center gap-1">
+                </div>
+
+                <div className="flex items-center justify-between space-x-6 lg:space-x-8">
+                    <div className="flex items-center space-x-2">
+                        <p className="text-sm font-medium">
+                            Page {table.getState().pagination.pageIndex + 1} of{" "}
+                            {table.getPageCount()}
+                        </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
                         <Button
-                            variant="ghost"
-                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0"
                             onClick={() => table.previousPage()}
                             disabled={!table.getCanPreviousPage()}
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                         >
-                            ←
+                            <span className="sr-only">Go to previous page</span>
+                            <ChevronLeftIcon className="h-4 w-4" />
                         </Button>
-                        <span className="mx-3 text-sm">
-                            {currentPage} of {totalPages}
-                        </span>
                         <Button
-                            variant="ghost"
-                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0"
                             onClick={() => table.nextPage()}
                             disabled={!table.getCanNextPage()}
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                         >
-                            →
+                            <span className="sr-only">Go to next page</span>
+                            <ChevronRightIcon className="h-4 w-4" />
                         </Button>
                     </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                    <p className="text-sm font-medium">
+                        Showing {table.getRowModel().rows.length} of{" "}
+                        {table.getFilteredRowModel().rows.length} students
+                    </p>
                 </div>
             </div>
         </div>

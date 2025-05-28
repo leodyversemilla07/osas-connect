@@ -1,18 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { router } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
 
 export const columns: ColumnDef<User>[] = [
     {
@@ -81,7 +73,7 @@ export const columns: ColumnDef<User>[] = [
     },
     {
         accessorKey: "student_profile.year_level",
-        header: "Year",        cell: ({ row }) => {
+        header: "Year", cell: ({ row }) => {
             const yearLevel = row.original.student_profile?.year_level;
             const course = row.original.student_profile?.course;
 
@@ -108,47 +100,19 @@ export const columns: ColumnDef<User>[] = [
                 </div>
             )
         },
-    },    {
+    }, {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {
-            const user = row.original;
-            
-            const handleView = () => {
-                router.visit(route('admin.students.show', user.id));
-            };
-            
-            const handleEdit = () => {
-                router.visit(route('admin.students.edit', user.id));
-            };
-            
-            const handleArchive = () => {
-                if (confirm('Are you sure you want to archive this student? This action cannot be undone.')) {
-                    router.delete(route('admin.students.destroy', user.id));
-                }
-            };
-
             return (
                 <div className="text-left">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
-                                <MoreHorizontal className="h-5 w-5" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem onClick={handleView} className="text-base cursor-pointer">
-                                View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleEdit} className="text-base cursor-pointer">
-                                Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleArchive} className="text-base text-red-600 dark:text-red-400 cursor-pointer">
-                                Archive
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Link
+                        href={route('admin.students.show', { user: row.original.id })}
+                        className="text-sm text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition-colors flex items-center gap-2 pb-1"
+                    >
+                        <Eye className="h-4 w-4" />
+                        View
+                    </Link>
                 </div>
             );
         },

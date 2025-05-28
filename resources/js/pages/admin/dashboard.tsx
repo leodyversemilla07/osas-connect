@@ -43,7 +43,7 @@ interface PageProps extends SharedData {
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
-    title: 'Admin Dashboard',
+    title: 'Dashboard',
     href: '/admin/dashboard',
   },
 ];
@@ -51,6 +51,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function AdminDashboard() {
   const { auth: pageAuth, stats, recentLogins, pendingInvitations } = usePage<PageProps>().props;
   const user = pageAuth.user;
+
+  // Provide default values to prevent undefined errors
+  const safeStats = stats || {
+    totalStudents: 0,
+    totalStaff: 0,
+    totalAdmins: 0,
+    pendingInvitations: 0
+  };
+  const safeRecentLogins = recentLogins || [];
+  const safePendingInvitations = pendingInvitations || [];
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -67,30 +77,29 @@ export default function AdminDashboard() {
             <p className="text-muted-foreground">Administrator dashboard for system management</p>
           </CardContent>
         </Card>
-
         {/* Main Stats */}
         <div className="grid gap-4 md:grid-cols-4">
           <Card className="bg-[#005a2d]/5 dark:bg-[#005a2d]/20 border-none hover:bg-[#005a2d]/10 dark:hover:bg-[#005a2d]/30 transition-colors">
             <CardContent className="p-6">
-              <p className="text-3xl font-bold text-[#005a2d] dark:text-[#23b14d]">{stats.totalStudents}</p>
+              <p className="text-3xl font-bold text-[#005a2d] dark:text-[#23b14d]">{safeStats.totalStudents}</p>
               <p className="text-sm text-muted-foreground">Total Students</p>
             </CardContent>
           </Card>
           <Card className="bg-[#febd12]/5 dark:bg-[#febd12]/20 border-none hover:bg-[#febd12]/10 dark:hover:bg-[#febd12]/30 transition-colors">
             <CardContent className="p-6">
-              <p className="text-3xl font-bold text-[#febd12] dark:text-[#febd12]">{stats.totalStaff}</p>
+              <p className="text-3xl font-bold text-[#febd12] dark:text-[#febd12]">{safeStats.totalStaff}</p>
               <p className="text-sm text-muted-foreground">OSAS Staff Members</p>
             </CardContent>
           </Card>
           <Card className="bg-[#0070f3]/5 dark:bg-[#0070f3]/20 border-none hover:bg-[#0070f3]/10 dark:hover:bg-[#0070f3]/30 transition-colors">
             <CardContent className="p-6">
-              <p className="text-3xl font-bold text-[#0070f3] dark:text-[#0070f3]">{stats.totalAdmins}</p>
+              <p className="text-3xl font-bold text-[#0070f3] dark:text-[#0070f3]">{safeStats.totalAdmins}</p>
               <p className="text-sm text-muted-foreground">Admin Users</p>
             </CardContent>
           </Card>
           <Card className="bg-[#ff4081]/5 dark:bg-[#ff4081]/20 border-none hover:bg-[#ff4081]/10 dark:hover:bg-[#ff4081]/30 transition-colors">
             <CardContent className="p-6">
-              <p className="text-3xl font-bold text-[#ff4081] dark:text-[#ff4081]">{stats.pendingInvitations}</p>
+              <p className="text-3xl font-bold text-[#ff4081] dark:text-[#ff4081]">{safeStats.pendingInvitations}</p>
               <p className="text-sm text-muted-foreground">Pending Invitations</p>
             </CardContent>
           </Card>
@@ -112,13 +121,21 @@ export default function AdminDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {recentLogins.map((login) => (
-                      <TableRow key={login.id}>
-                        <TableCell className="font-medium">{login.name}</TableCell>
-                        <TableCell>{login.role}</TableCell>
-                        <TableCell>{format(new Date(login.timestamp), 'MMM dd, yyyy HH:mm')}</TableCell>
+                    {safeRecentLogins && safeRecentLogins.length > 0 ? (
+                      safeRecentLogins.map((login) => (
+                        <TableRow key={login.id}>
+                          <TableCell className="font-medium">{login.name}</TableCell>
+                          <TableCell>{login.role}</TableCell>
+                          <TableCell>{format(new Date(login.timestamp), 'MMM dd, yyyy HH:mm')}</TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={3} className="text-center text-muted-foreground">
+                          No recent logins found
+                        </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </div>
@@ -139,13 +156,21 @@ export default function AdminDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {pendingInvitations.map((invitation) => (
-                      <TableRow key={invitation.id}>
-                        <TableCell className="font-medium">{invitation.email}</TableCell>
-                        <TableCell>{invitation.role}</TableCell>
-                        <TableCell>{format(new Date(invitation.sentDate), 'MMM dd, yyyy')}</TableCell>
+                    {safePendingInvitations && safePendingInvitations.length > 0 ? (
+                      safePendingInvitations.map((invitation) => (
+                        <TableRow key={invitation.id}>
+                          <TableCell className="font-medium">{invitation.email}</TableCell>
+                          <TableCell>{invitation.role}</TableCell>
+                          <TableCell>{format(new Date(invitation.sentDate), 'MMM dd, yyyy')}</TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={3} className="text-center text-muted-foreground">
+                          No pending invitations found
+                        </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </div>

@@ -30,6 +30,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -66,8 +67,7 @@ export function DataTable<TData, TValue>({
         },        meta: {
             updateData: () => {
                 // Skip for now
-            },
-        },
+            },        },
     })
 
     React.useEffect(() => {
@@ -75,25 +75,28 @@ export function DataTable<TData, TValue>({
     }, [pageSize, table])
 
     return (
-        <div className="w-full">
-            <div className="flex items-center py-4">
+        <div className="space-y-4">            <div className="flex items-center justify-between">
                 <Input
-                    placeholder="Filter scholarships..."
+                    placeholder="Search scholarships..."
                     value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
                         table.getColumn("name")?.setFilterValue(event.target.value)
                     }
-                    className="max-w-sm"
+                    className="max-w-xs text-base border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-gray-400 dark:focus-visible:border-gray-500 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                 />
-            </div>
-            <div className="rounded-md border">
+                {table.getFilteredSelectedRowModel().rows.length > 0 && (
+                    <div className="text-base text-gray-500 dark:text-gray-400">
+                        {table.getFilteredSelectedRowModel().rows.length} selected
+                    </div>
+                )}
+            </div>            <div className="border-b border-gray-100 dark:border-gray-800">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
+                            <TableRow key={headerGroup.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-transparent">
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead key={header.id} className="h-12 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -112,9 +115,10 @@ export function DataTable<TData, TValue>({
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
+                                    className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="py-4">
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
@@ -122,54 +126,42 @@ export function DataTable<TData, TValue>({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                <TableCell colSpan={columns.length} className="h-24 text-center text-base text-gray-500 dark:text-gray-400">
+                                    No scholarships found
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
-            </div>
-            <div className="flex items-center justify-between space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                    {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>{/* Pagination */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center space-x-2">
+                    <p className="text-sm font-medium">Rows per page</p>
+                    <Select
+                        value={`${pageSize}`}
+                        onValueChange={(value) => setPageSize(Number(value))}
+                    >
+                        <SelectTrigger className="h-8 w-[70px]">
+                            <SelectValue placeholder={pageSize} />
+                        </SelectTrigger>
+                        <SelectContent side="top">
+                            {[10, 20, 30, 40, 50].map((size) => (
+                                <SelectItem key={size} value={`${size}`}>
+                                    {size}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
-                <div className="flex items-center space-x-6 lg:space-x-8">
+
+                <div className="flex items-center justify-between space-x-6 lg:space-x-8">
                     <div className="flex items-center space-x-2">
-                        <p className="text-sm font-medium">Rows per page</p>
-                        <Select
-                            value={`${pageSize}`}
-                            onValueChange={(value) => {
-                                setPageSize(Number(value))
-                            }}
-                        >
-                            <SelectTrigger className="h-8 w-[70px]">
-                                <SelectValue placeholder={pageSize} />
-                            </SelectTrigger>
-                            <SelectContent side="top">
-                                {[5, 10, 20, 30, 40, 50].map((size) => (
-                                    <SelectItem key={size} value={`${size}`}>
-                                        {size}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                        Page {table.getState().pagination.pageIndex + 1} of{" "}
-                        {table.getPageCount()}
+                        <p className="text-sm font-medium">
+                            Page {table.getState().pagination.pageIndex + 1} of{" "}
+                            {table.getPageCount()}
+                        </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Button
-                            variant="outline"
-                            className="hidden h-8 w-8 p-0 lg:flex"
-                            onClick={() => table.setPageIndex(0)}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            <span className="sr-only">Go to first page</span>
-                            {'<<'}
-                        </Button>
                         <Button
                             variant="outline"
                             className="h-8 w-8 p-0"
@@ -177,7 +169,7 @@ export function DataTable<TData, TValue>({
                             disabled={!table.getCanPreviousPage()}
                         >
                             <span className="sr-only">Go to previous page</span>
-                            {'<'}
+                            <ChevronLeftIcon className="h-4 w-4" />
                         </Button>
                         <Button
                             variant="outline"
@@ -186,18 +178,16 @@ export function DataTable<TData, TValue>({
                             disabled={!table.getCanNextPage()}
                         >
                             <span className="sr-only">Go to next page</span>
-                            {'>'}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="hidden h-8 w-8 p-0 lg:flex"
-                            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            <span className="sr-only">Go to last page</span>
-                            {'>>'}
+                            <ChevronRightIcon className="h-4 w-4" />
                         </Button>
                     </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                    <p className="text-sm font-medium">
+                        Showing {table.getRowModel().rows.length} of{" "}
+                        {table.getFilteredRowModel().rows.length} scholarships
+                    </p>
                 </div>
             </div>
         </div>

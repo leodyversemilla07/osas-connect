@@ -19,6 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{scholarship}/apply', [ScholarshipApplicationController::class, 'create'])->name('apply');
         Route::post('{scholarship}/apply', [ScholarshipApplicationController::class, 'store'])->name('store');
 
+        // Application status tracking
+        Route::get('applications/{application}/status', [ScholarshipApplicationController::class, 'showStatus'])->name('applications.status');
+
         // Document management
         Route::post('applications/{application}/documents', [DocumentController::class, 'store'])->name('documents.store');
         Route::patch('applications/{application}/documents/{document}', [DocumentController::class, 'update'])->name('documents.update');

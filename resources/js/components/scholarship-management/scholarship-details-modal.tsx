@@ -7,7 +7,9 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, DollarSign, FileText, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar, DollarSign, FileText, Info, ExternalLink } from "lucide-react";
+import { router } from '@inertiajs/react';
 
 type ScholarshipType = 'Academic' | 'Student Assistantship' | 'Performing Arts' | 'Economic Assistance';
 
@@ -26,6 +28,7 @@ interface ScholarshipDetailsModalProps {
     scholarship: Scholarship | null;
     isOpen: boolean;
     onClose: () => void;
+    showApplyButton?: boolean;
 }
 
 const getTypeColor = (type: ScholarshipType): string => {
@@ -44,12 +47,17 @@ const getStatusColor = (status: 'open' | 'closed'): string => {
         : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
 };
 
-export function ScholarshipDetailsModal({ scholarship, isOpen, onClose }: ScholarshipDetailsModalProps) {
+export function ScholarshipDetailsModal({ scholarship, isOpen, onClose, showApplyButton = true }: ScholarshipDetailsModalProps) {
     if (!scholarship) return null;
 
     const deadline = new Date(scholarship.deadline);
     const now = new Date();
     const daysLeft = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    const isApplicationOpen = scholarship.status === 'open' && daysLeft > 0;
+
+    const handleApplyNow = () => {
+        router.visit(`/scholarships/${scholarship.id}/apply`);
+    };
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -185,12 +193,34 @@ export function ScholarshipDetailsModal({ scholarship, isOpen, onClose }: Schola
                             </p>
                             <p>
                                 • Recipients are required to maintain the scholarship requirements throughout the award period.
-                            </p>
-                            <p>
+                            </p>                            <p>
                                 • For questions about this scholarship, please contact the OSAS office.
                             </p>
                         </div>
                     </div>
+
+                    {/* Apply Button */}
+                    {showApplyButton && isApplicationOpen && (
+                        <div className="flex justify-center pt-4">
+                            <Button 
+                                onClick={handleApplyNow}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold flex items-center gap-2"
+                                size="lg"
+                            >
+                                Apply Now
+                                <ExternalLink className="h-5 w-5" />
+                            </Button>
+                        </div>
+                    )}
+
+                    {/* Application Closed Message */}
+                    {showApplyButton && !isApplicationOpen && (
+                        <div className="flex justify-center pt-4">
+                            <div className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-8 py-3 rounded-lg text-center">
+                                {scholarship.status === 'closed' ? 'Application period has ended' : 'Applications are currently closed'}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </DialogContent>
         </Dialog>
