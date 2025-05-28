@@ -72,7 +72,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:osas_staff'])->prefix('osas-staff')->group(function () {
         Route::get('/dashboard', [OsasStaffController::class, 'index'])->name('osas.dashboard');
         Route::get('/students', [OsasStaffController::class, 'studentRecords'])->name('osas.students');
-        Route::get('/students/{id}', [OsasStaffController::class, 'getStudentDetails'])->name('osas.students.details');
+
+        Route::get('/students/{user}', [OsasStaffController::class, 'getStudentDetails'])->name('osas.students.details');
+        Route::get('/students/{user}/edit', [OsasStaffController::class, 'editStudent'])->name('osas.students.edit');
+        Route::put('/students/{user}', [OsasStaffController::class, 'updateStudent'])->name('osas.students.update');
+        Route::delete('/students/{user}', [OsasStaffController::class, 'destroyStudent'])->name('osas.students.destroy');
+
 
         Route::get('/manage-scholarships', [OsasStaffController::class, 'scholarshipRecords'])->name('osas.manage.scholarships');
         Route::post('/scholarships', [OsasStaffController::class, 'storeScholarship'])->name('osas.scholarships.store');
@@ -120,20 +125,20 @@ Route::get('/accept-invitation/{token}', [OsasStaffController::class, 'showAccep
 Route::post('/accept-invitation', [OsasStaffController::class, 'acceptInvitation'])
     ->name('staff.accept-invitation.store');
 
-// PDF generation route - expects a user ID
-Route::get('/generate-scholarship-pdf/{user}', [PdfController::class, 'generatePdf'])
-    ->name('generate.scholarship.pdf') // Added a route name for convenience
-    ->middleware('auth'); // Assuming only authenticated users can generate this
+// PDF generation routes - with proper authorization
+Route::middleware(['auth'])->group(function () {
+    // Only allow users to generate their own PDFs, or staff/admin to generate any user's PDF
+    Route::get('/generate-scholarship-pdf/{user}', [PdfController::class, 'generatePdf'])
+        ->name('generate.scholarship.pdf');
 
-// CHED PDF generation route - expects a user ID
-Route::get('/generate-ched-scholarship-pdf/{user}', [PdfController::class, 'generateChedPdf'])
-    ->name('generate.ched.scholarship.pdf')
-    ->middleware('auth');
+    // CHED PDF generation route - expects a user ID
+    Route::get('/generate-ched-scholarship-pdf/{user}', [PdfController::class, 'generateChedPdf'])
+        ->name('generate.ched.scholarship.pdf');
 
-// Annex 1 TPDF PDF generation route - expects a user ID
-Route::get('/generate-annex1-tpdf-pdf/{user}', [PdfController::class, 'generateAnnex1Pdf'])
-    ->name('generate.annex1.tpdf.pdf')
-    ->middleware('auth');
+    // Annex 1 TPDF PDF generation route - expects a user ID
+    Route::get('/generate-annex1-tpdf-pdf/{user}', [PdfController::class, 'generateAnnex1Pdf'])
+        ->name('generate.annex1.tpdf.pdf');
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
