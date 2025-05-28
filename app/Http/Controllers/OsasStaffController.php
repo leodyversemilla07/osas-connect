@@ -104,14 +104,19 @@ class OsasStaffController extends Controller
      */
     public function showAcceptInvitationForm(Request $request, $token)
     {
-        if (! $request->hasValidSignature()) {
-            abort(401, 'Invalid or expired invitation link.');
-        }
-
+        // The 'signed' middleware already validates the signature, so we don't need to check again
+        
         $invitation = StaffInvitation::where('token', $token)
             ->where('accepted_at', null)
             ->where('expires_at', '>', Carbon::now())
-            ->firstOrFail();
+            ->first();
+
+        // If invitation not found or invalid, show appropriate error
+        if (!$invitation) {
+            return Inertia::render('auth/invitation-error', [
+                'message' => 'This invitation is either invalid, expired, or has already been used.'
+            ]);
+        }
 
         return Inertia::render('auth/accept-invitation', [
             'invitation' => [
