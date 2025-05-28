@@ -80,6 +80,15 @@ class StaffInvitation extends Model
      */
     public function getAcceptanceUrl()
     {
-        return URL::signedRoute('staff.accept-invitation', ['token' => $this->token]);
+        // Force production URL for invitations
+        $originalUrl = config('app.url');
+        config(['app.url' => 'https://osas-connect-265283e577fe.herokuapp.com']);
+        
+        $url = URL::signedRoute('staff.accept-invitation', ['token' => $this->token], $this->expires_at);
+        
+        // Restore original URL
+        config(['app.url' => $originalUrl]);
+        
+        return $url;
     }
 }

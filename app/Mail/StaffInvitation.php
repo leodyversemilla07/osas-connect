@@ -36,8 +36,9 @@ class StaffInvitation extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.staff.invitation',
-            with: ['url' => $this->invitation->getAcceptanceUrl(),
+            view: 'emails.staff.invitation',
+            with: [
+                'url' => $this->invitation->getAcceptanceUrl(),
                 'expiresAt' => $this->invitation->expires_at->format('F j, Y, g:i A'),
                 'inviter' => $this->invitation->inviter->full_name,
             ],
