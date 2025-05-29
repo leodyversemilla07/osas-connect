@@ -80,7 +80,7 @@ class StaffInvitation extends Model
      */
     public function getAcceptanceUrl()
     {
-        // Use the configured APP_URL for consistency
-        return URL::signedRoute('staff.accept-invitation', ['token' => $this->token], $this->expires_at);
+        // Simple URL without signed middleware - token and expiration provide security
+        return route('staff.accept-invitation', ['token' => $this->token]);
     }
 }

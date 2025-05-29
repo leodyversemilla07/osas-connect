@@ -117,10 +117,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('index');
 });
 
-// Staff invitation acceptance (public route with signature verification)
+// Staff invitation acceptance (public route)
 Route::get('/accept-invitation/{token}', [OsasStaffController::class, 'showAcceptInvitationForm'])
-    ->name('staff.accept-invitation')
-    ->middleware('signed');
+    ->name('staff.accept-invitation');
 
 Route::post('/accept-invitation', [OsasStaffController::class, 'acceptInvitation'])
     ->name('staff.accept-invitation.store');
