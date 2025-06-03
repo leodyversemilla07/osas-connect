@@ -260,17 +260,17 @@ class ScholarshipApplicationSeeder extends Seeder
 
         $baseDocuments = [
             'transcript_of_records' => [
-                'path' => 'scholarship-documents/transcript_' . uniqid() . '.pdf',
+                'path' => 'scholarship-documents/transcript_'.uniqid().'.pdf',
                 'original_name' => 'transcript.pdf',
                 'uploaded_at' => now()->toDateTimeString(),
             ],
             'birth_certificate' => [
-                'path' => 'scholarship-documents/birth_cert_' . uniqid() . '.pdf',
+                'path' => 'scholarship-documents/birth_cert_'.uniqid().'.pdf',
                 'original_name' => 'birth_certificate.pdf',
                 'uploaded_at' => now()->toDateTimeString(),
             ],
             'id_photo' => [
-                'path' => 'scholarship-documents/id_photo_' . uniqid() . '.jpg',
+                'path' => 'scholarship-documents/id_photo_'.uniqid().'.jpg',
                 'original_name' => '2x2_photo.jpg',
                 'uploaded_at' => now()->toDateTimeString(),
             ],
@@ -280,12 +280,12 @@ class ScholarshipApplicationSeeder extends Seeder
         switch ($scholarshipType) {
             case 'student_assistantship':
                 $baseDocuments['parent_consent'] = [
-                    'path' => 'scholarship-documents/consent_' . uniqid() . '.pdf',
+                    'path' => 'scholarship-documents/consent_'.uniqid().'.pdf',
                     'original_name' => 'parent_consent.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
                 $baseDocuments['medical_certificate'] = [
-                    'path' => 'scholarship-documents/medical_' . uniqid() . '.pdf',
+                    'path' => 'scholarship-documents/medical_'.uniqid().'.pdf',
                     'original_name' => 'medical_certificate.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
@@ -294,12 +294,12 @@ class ScholarshipApplicationSeeder extends Seeder
             case 'performing_arts_full':
             case 'performing_arts_partial':
                 $baseDocuments['coach_recommendation'] = [
-                    'path' => 'scholarship-documents/coach_rec_' . uniqid() . '.pdf',
+                    'path' => 'scholarship-documents/coach_rec_'.uniqid().'.pdf',
                     'original_name' => 'coach_recommendation.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
                 $baseDocuments['performance_portfolio'] = [
-                    'path' => 'scholarship-documents/performance_portfolio_' . uniqid() . '.pdf',
+                    'path' => 'scholarship-documents/performance_portfolio_'.uniqid().'.pdf',
                     'original_name' => 'performance_portfolio.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
@@ -307,7 +307,7 @@ class ScholarshipApplicationSeeder extends Seeder
 
             case 'economic_assistance':
                 $baseDocuments['indigency_certificate'] = [
-                    'path' => 'scholarship-documents/indigency_' . uniqid() . '.pdf',
+                    'path' => 'scholarship-documents/indigency_'.uniqid().'.pdf',
                     'original_name' => 'indigency_certificate.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
@@ -524,16 +524,33 @@ class ScholarshipApplicationSeeder extends Seeder
                 'user_id' => $user->id,
                 'student_id' => $studentData['student_id'],
                 'course' => $studentData['course'],
+                'major' => 'None',
                 'year_level' => $studentData['year_level'],
                 'current_gwa' => $studentData['current_gwa'],
                 'enrollment_status' => 'enrolled',
-                'contact_number' => '+63912345' . str_pad($user->id, 4, '0', STR_PAD_LEFT),
-                'address' => 'Mindanao State University, Butig Campus',
-                'date_of_birth' => now()->subYears(rand(18, 24))->format('Y-m-d'),
-                'gender' => collect(['Male', 'Female'])->random(),
+                'units' => 18,
+                'existing_scholarships' => null,
+
+                // Personal Information
                 'civil_status' => 'Single',
-                'emergency_contact_name' => 'Parent/Guardian',
-                'emergency_contact_number' => '+63912345' . str_pad($user->id + 1000, 4, '0', STR_PAD_LEFT),
+                'sex' => collect(['Male', 'Female'])->random(),
+                'date_of_birth' => now()->subYears(rand(18, 24))->format('Y-m-d'),
+                'place_of_birth' => 'Butig, Lanao del Sur',
+                'street' => 'MinSU Campus',
+                'barangay' => 'Butig',
+                'city' => 'Butig',
+                'province' => 'Lanao del Sur',
+                'zip_code' => '9307',
+                'mobile_number' => '+63912345'.str_pad($user->id, 4, '0', STR_PAD_LEFT),
+                'telephone_number' => null,
+                'is_pwd' => false,
+                'disability_type' => null,
+                'religion' => 'Islam',
+                'residence_type' => 'Boarding House',
+
+                // Family Background
+                'status_of_parents' => 'Living Together',
+                'guardian_name' => 'Not Applicable',
             ]);
 
             $createdStudents->push($user->load('studentProfile'));

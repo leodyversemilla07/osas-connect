@@ -6,7 +6,6 @@ use App\Models\Scholarship;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -179,13 +178,13 @@ class StudentController extends Controller
 
         // Get required documents status - format for React component
         $requiredDocuments = [];
-        
+
         $documentTypes = [
             'transcripts' => 'Official Transcripts',
-            'recommendation_letter' => 'Letter of Recommendation', 
+            'recommendation_letter' => 'Letter of Recommendation',
             'financial_statement' => 'Financial Statement',
         ];
-        
+
         foreach ($documentTypes as $type => $displayName) {
             $document = $application->documents->where('type', $type)->first();
             if ($document || $type !== 'financial_statement' || in_array($application->scholarship->type, ['need_based', 'both'])) {

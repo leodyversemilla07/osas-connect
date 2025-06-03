@@ -28,25 +28,36 @@ class ScholarshipApplication extends Model
 
     // Priority levels
     const PRIORITY_LOW = 'low';
+
     const PRIORITY_MEDIUM = 'medium';
+
     const PRIORITY_HIGH = 'high';
+
     const PRIORITY_URGENT = 'urgent';
 
     // Stipend status
     const STIPEND_PENDING = 'pending';
+
     const STIPEND_PROCESSING = 'processing';
+
     const STIPEND_RELEASED = 'released';
 
     // Renewal status
     const RENEWAL_ELIGIBLE = 'eligible';
+
     const RENEWAL_INELIGIBLE = 'ineligible';
+
     const RENEWAL_PENDING = 'pending';
+
     const RENEWAL_APPROVED = 'approved';
+
     const RENEWAL_REJECTED = 'rejected';
 
     // Semester options
     const SEMESTER_FIRST = '1st';
+
     const SEMESTER_SECOND = '2nd';
+
     const SEMESTER_SUMMER = 'Summer';
 
     protected $fillable = [
@@ -93,13 +104,21 @@ class ScholarshipApplication extends Model
 
     // Status constants for easier reference
     const STATUS_DRAFT = 'draft';
+
     const STATUS_SUBMITTED = 'submitted';
+
     const STATUS_UNDER_VERIFICATION = 'under_verification';
+
     const STATUS_INCOMPLETE = 'incomplete';
+
     const STATUS_VERIFIED = 'verified';
+
     const STATUS_UNDER_EVALUATION = 'under_evaluation';
+
     const STATUS_APPROVED = 'approved';
+
     const STATUS_REJECTED = 'rejected';
+
     const STATUS_END = 'end';
 
     // Standardized status flow - aligned with database enum

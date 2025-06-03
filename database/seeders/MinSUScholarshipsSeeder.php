@@ -161,7 +161,7 @@ class MinSUScholarshipsSeeder extends Seeder
                 'renewal_criteria',
                 'status',
                 'admin_remarks',
-                'updated_at'
+                'updated_at',
             ]
         );
     }

@@ -355,13 +355,13 @@ class ScholarshipService
     public function formatApplicationData(ScholarshipApplication $application): array
     {
         // Ensure we have the necessary relationships loaded
-        if (!$application->relationLoaded('scholarship')) {
+        if (! $application->relationLoaded('scholarship')) {
             $application->load('scholarship');
         }
-        if (!$application->relationLoaded('interview')) {
+        if (! $application->relationLoaded('interview')) {
             $application->load('interview');
         }
-        if (!$application->relationLoaded('comments')) {
+        if (! $application->relationLoaded('comments')) {
             $application->load('comments.user');
         }
 
@@ -373,11 +373,11 @@ class ScholarshipService
         return [
             'id' => $application->id ?? 0,
             'status' => $application->status ?? 'unknown',
-            'submitted_at' => ($application->submitted_at ?: $application->applied_at) ? 
+            'submitted_at' => ($application->submitted_at ?: $application->applied_at) ?
                 (is_string($application->submitted_at ?: $application->applied_at) ?
                     \Carbon\Carbon::parse($application->submitted_at ?: $application->applied_at)->format('Y-m-d H:i:s') :
                     ($application->submitted_at ?: $application->applied_at)->format('Y-m-d H:i:s')) : null,
-            'created_at' => $application->created_at ? 
+            'created_at' => $application->created_at ?
                 (is_string($application->created_at) ?
                     \Carbon\Carbon::parse($application->created_at)->format('Y-m-d H:i:s') :
                     $application->created_at->format('Y-m-d H:i:s')) : null,
@@ -385,7 +385,7 @@ class ScholarshipService
             'purpose_letter' => $applicationData['purpose_letter'] ?? $application->purpose_letter ?? '',
             'documents' => $this->formatRequiredDocuments($application),
             'verifier_comments' => $application->reviewer_notes ?? null,
-            'interview_schedule' => $application->interview && $application->interview->schedule ? 
+            'interview_schedule' => $application->interview && $application->interview->schedule ?
                 (is_string($application->interview->schedule) ?
                     \Carbon\Carbon::parse($application->interview->schedule)->format('Y-m-d H:i:s') :
                     $application->interview->schedule->format('Y-m-d H:i:s')) : null,
@@ -403,7 +403,7 @@ class ScholarshipService
                 'amount' => $application->scholarship->amount ?? 'Not specified',
             ],
             'timeline' => [
-                'submitted' => ($application->submitted_at ?: $application->applied_at) ? 
+                'submitted' => ($application->submitted_at ?: $application->applied_at) ?
                     (is_string($application->submitted_at ?: $application->applied_at) ?
                         \Carbon\Carbon::parse($application->submitted_at ?: $application->applied_at)->format('Y-m-d H:i:s') :
                         ($application->submitted_at ?: $application->applied_at)->format('Y-m-d H:i:s')) : null,
@@ -412,7 +412,7 @@ class ScholarshipService
                 'decision' => null,
             ],
             'interview' => $application->interview ? [
-                'schedule' => $application->interview->schedule ? 
+                'schedule' => $application->interview->schedule ?
                     (is_string($application->interview->schedule) ?
                         \Carbon\Carbon::parse($application->interview->schedule)->format('Y-m-d H:i:s') :
                         $application->interview->schedule->format('Y-m-d H:i:s')) : null,
@@ -425,7 +425,7 @@ class ScholarshipService
                     'id' => $comment->id ?? 0,
                     'content' => $comment->comment ?? '',
                     'type' => $comment->type ?? 'general',
-                    'created_at' => $comment->created_at ? 
+                    'created_at' => $comment->created_at ?
                         (is_string($comment->created_at) ?
                             \Carbon\Carbon::parse($comment->created_at)->format('Y-m-d H:i:s') :
                             $comment->created_at->format('Y-m-d H:i:s')) : null,
@@ -436,7 +436,7 @@ class ScholarshipService
                     ],
                 ];
             }) : collect([]),
-            'updated_at' => $application->updated_at ? 
+            'updated_at' => $application->updated_at ?
                 (is_string($application->updated_at) ?
                     \Carbon\Carbon::parse($application->updated_at)->format('Y-m-d H:i:s') :
                     $application->updated_at->format('Y-m-d H:i:s')) : null,
@@ -752,15 +752,15 @@ class ScholarshipService
 
         foreach ($requiredDocuments as $docType) {
             // Check if document is uploaded in uploaded_documents array
-            $uploadedDoc = collect($uploadedDocuments)->firstWhere('type', $docType) 
+            $uploadedDoc = collect($uploadedDocuments)->firstWhere('type', $docType)
                 ?? (isset($uploadedDocuments[$docType]) ? $uploadedDocuments[$docType] : null);
-            
+
             // Check if document exists in related documents
             $relatedDoc = $relatedDocuments->firstWhere('type', $docType);
-            
+
             $isUploaded = $uploadedDoc || $relatedDoc;
             $status = 'pending';
-            
+
             if ($relatedDoc) {
                 $status = $relatedDoc->status ?? 'pending';
             } elseif ($uploadedDoc) {
