@@ -193,7 +193,8 @@ class ScholarshipApplicationSeeder extends Seeder
             'applied_at' => $appliedAt,
             'verified_at' => $verifiedAt,
             'approved_at' => $approvedAt,
-            'rejected_at' => $rejectedAt,            'current_step' => $this->getCurrentStep($status),
+            'rejected_at' => $rejectedAt,
+            'current_step' => $this->getCurrentStep($status),
             'purpose_letter' => $this->generatePurposeLetter($scholarship->name),
             'application_data' => $applicationData,
             'uploaded_documents' => $uploadedDocuments,
@@ -264,17 +265,17 @@ class ScholarshipApplicationSeeder extends Seeder
 
         $baseDocuments = [
             'transcript_of_records' => [
-                'path' => 'scholarship-documents/transcript_'.uniqid().'.pdf',
+                'path' => 'scholarship-documents/transcript_' . uniqid() . '.pdf',
                 'original_name' => 'transcript.pdf',
                 'uploaded_at' => now()->toDateTimeString(),
             ],
             'birth_certificate' => [
-                'path' => 'scholarship-documents/birth_cert_'.uniqid().'.pdf',
+                'path' => 'scholarship-documents/birth_cert_' . uniqid() . '.pdf',
                 'original_name' => 'birth_certificate.pdf',
                 'uploaded_at' => now()->toDateTimeString(),
             ],
             'id_photo' => [
-                'path' => 'scholarship-documents/id_photo_'.uniqid().'.jpg',
+                'path' => 'scholarship-documents/id_photo_' . uniqid() . '.jpg',
                 'original_name' => '2x2_photo.jpg',
                 'uploaded_at' => now()->toDateTimeString(),
             ],
@@ -284,12 +285,12 @@ class ScholarshipApplicationSeeder extends Seeder
         switch ($scholarshipType) {
             case 'student_assistantship':
                 $baseDocuments['parent_consent'] = [
-                    'path' => 'scholarship-documents/consent_'.uniqid().'.pdf',
+                    'path' => 'scholarship-documents/consent_' . uniqid() . '.pdf',
                     'original_name' => 'parent_consent.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
                 $baseDocuments['medical_certificate'] = [
-                    'path' => 'scholarship-documents/medical_'.uniqid().'.pdf',
+                    'path' => 'scholarship-documents/medical_' . uniqid() . '.pdf',
                     'original_name' => 'medical_certificate.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
@@ -298,12 +299,12 @@ class ScholarshipApplicationSeeder extends Seeder
             case 'performing_arts_full':
             case 'performing_arts_partial':
                 $baseDocuments['coach_recommendation'] = [
-                    'path' => 'scholarship-documents/coach_rec_'.uniqid().'.pdf',
+                    'path' => 'scholarship-documents/coach_rec_' . uniqid() . '.pdf',
                     'original_name' => 'coach_recommendation.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
                 $baseDocuments['performance_portfolio'] = [
-                    'path' => 'scholarship-documents/portfolio_'.uniqid().'.pdf',
+                    'path' => 'scholarship-documents/performance_portfolio_' . uniqid() . '.pdf',
                     'original_name' => 'performance_portfolio.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
@@ -311,13 +312,8 @@ class ScholarshipApplicationSeeder extends Seeder
 
             case 'economic_assistance':
                 $baseDocuments['indigency_certificate'] = [
-                    'path' => 'scholarship-documents/indigency_'.uniqid().'.pdf',
+                    'path' => 'scholarship-documents/indigency_' . uniqid() . '.pdf',
                     'original_name' => 'indigency_certificate.pdf',
-                    'uploaded_at' => now()->toDateTimeString(),
-                ];
-                $baseDocuments['income_certificate'] = [
-                    'path' => 'scholarship-documents/income_'.uniqid().'.pdf',
-                    'original_name' => 'family_income.pdf',
                     'uploaded_at' => now()->toDateTimeString(),
                 ];
                 break;
@@ -327,64 +323,34 @@ class ScholarshipApplicationSeeder extends Seeder
     }
 
     /**
-     * Get current step based on status
-     */
-    private function getCurrentStep($status)
-    {
-        $steps = [
-            'draft' => 'application_form',
-            'submitted' => 'document_verification',
-            'under_verification' => 'document_verification',
-            'incomplete' => 'document_revision',
-            'verified' => 'evaluation',
-            'under_evaluation' => 'evaluation',
-            'approved' => 'completed',
-            'rejected' => 'completed',
-        ];
-
-        return $steps[$status] ?? 'unknown';
-    }
-
-    /**
-     * Generate purpose letter
+     * Generate a sample purpose letter
      */
     private function generatePurposeLetter($scholarshipName)
     {
         $templates = [
-            "I am writing to express my sincere interest in applying for the {$scholarshipName}. As a dedicated student committed to academic excellence, I believe this scholarship will greatly support my educational journey. My academic achievements, combined with my active participation in university activities, demonstrate my commitment to personal and academic growth. I am confident that with this scholarship, I can continue to excel in my studies while contributing positively to the university community.",
-
-            "I am honored to submit my application for the {$scholarshipName}. Throughout my academic career, I have maintained high standards of excellence while actively participating in extracurricular activities. This scholarship would provide crucial financial support that would allow me to focus entirely on my studies and contribute more meaningfully to campus life. I am committed to upholding the values and standards expected of scholarship recipients.",
-
-            "With great enthusiasm, I am applying for the {$scholarshipName}. Coming from a family with limited financial resources, this scholarship represents not just financial assistance, but an opportunity to pursue my dreams of academic achievement. I have consistently demonstrated dedication to my studies and community service, and I am eager to continue this commitment with the support of this scholarship program.",
+            "I am applying for the {$scholarshipName} to support my educational expenses and contribute to my personal and professional development.",
+            "The {$scholarshipName} will greatly assist me in pursuing my academic goals and alleviating my financial burdens.",
+            "With the {$scholarshipName}, I aim to enhance my skills and knowledge, and to actively participate in academic and extracurricular activities.",
+            "Receiving the {$scholarshipName} will enable me to focus more on my studies and less on my financial constraints.",
         ];
 
         return collect($templates)->random();
     }
 
     /**
-     * Generate verifier comments
+     * Generate sample verifier comments
      */
     private function generateVerifierComments($status)
     {
-        $positiveComments = [
-            'All required documents have been submitted and verified. Student meets all eligibility criteria.',
-            'Documents are complete and authentic. Strong academic record demonstrated.',
-            'All documentation provided is satisfactory. Application ready for committee review.',
-            'Complete submission with excellent supporting documents. Highly recommended for evaluation.',
+        $comments = [
+            'under_verification' => 'Application is under verification. Please check back later.',
+            'verified' => 'Application has been verified. Proceeding to evaluation.',
+            'incomplete' => 'Application is incomplete. Please provide the missing documents.',
+            'rejected' => 'Application has been rejected due to عدم استيفاء المتطلبات.',
+            'approved' => 'Application approved. Congratulations!',
         ];
 
-        $incompleteComments = [
-            'Missing updated transcript of records. Please submit current grades.',
-            'Birth certificate needs to be PSA-authenticated. Please resubmit.',
-            'Recommendation letter format does not meet requirements. Please request new letter.',
-            'ID photo does not meet specifications. Please provide 2x2 recent photo with white background.',
-        ];
-
-        if ($status === 'incomplete') {
-            return collect($incompleteComments)->random();
-        }
-
-        return collect($positiveComments)->random();
+        return $comments[$status] ?? 'No comments available.';
     }
 
     /**
@@ -392,25 +358,12 @@ class ScholarshipApplicationSeeder extends Seeder
      */
     private function generateCommitteeRecommendation($status)
     {
-        $approvedRecommendations = [
-            'Committee unanimously recommends approval based on excellent academic performance and demonstrated financial need.',
-            'Strong candidate with outstanding credentials. Recommended for scholarship award.',
-            'Exemplary academic record and community involvement. Highly recommended for approval.',
-            'Committee finds applicant meets all criteria with distinction. Recommended for immediate approval.',
+        $recommendations = [
+            'approved' => 'The committee recommends approval of this application.',
+            'rejected' => 'The committee recommends rejection of this application.',
         ];
 
-        $rejectedRecommendations = [
-            'While applicant shows promise, limited slots require selection of candidates with higher academic standing.',
-            'Committee recommends encouraging applicant to reapply next term after addressing academic performance.',
-            'Application does not meet minimum requirements for this scholarship category.',
-            'Committee suggests applicant consider alternative scholarship programs better suited to their profile.',
-        ];
-
-        if ($status === 'approved') {
-            return collect($approvedRecommendations)->random();
-        }
-
-        return collect($rejectedRecommendations)->random();
+        return $recommendations[$status] ?? 'No recommendation available.';
     }
 
     /**
@@ -418,39 +371,45 @@ class ScholarshipApplicationSeeder extends Seeder
      */
     private function generateAdminRemarks($status)
     {
-        $approvedRemarks = [
-            'Approved for full scholarship benefits effective immediately.',
-            'Award confirmed. Student to be notified of orientation schedule.',
-            'Scholarship granted with stipend disbursement to begin next month.',
-            'Approved with commendation for academic excellence.',
+        $remarks = [
+            'approved' => 'Application approved by admin.',
+            'rejected' => 'Application rejected by admin.',
         ];
 
-        $rejectedRemarks = [
-            'Application declined due to limited available slots.',
-            'Advised to maintain current GPA and reapply next semester.',
-            'Not selected in this round. Eligible for future applications.',
-            'Encourage participation in academic improvement programs.',
-        ];
-
-        if ($status === 'approved') {
-            return collect($approvedRemarks)->random();
-        }
-
-        return collect($rejectedRemarks)->random();
+        return $remarks[$status] ?? 'No remarks available.';
     }
 
     /**
-     * Generate interview notes
+     * Generate sample interview notes
      */
     private function generateInterviewNotes()
     {
         $notes = [
-            'Candidate demonstrated clear understanding of scholarship responsibilities. Excellent communication skills and genuine commitment to academic success.',
-            'Impressive interview performance. Student articulated goals clearly and showed strong motivation for academic achievement.',
-            'Well-prepared candidate with realistic academic and career goals. Shows good understanding of scholarship requirements.',
-            'Confident and articulate responses. Demonstrated strong commitment to university values and community service.',
+            'Candidate demonstrated excellent communication skills and a strong understanding of the scholarship program.',
+            'Applicant has a clear academic and career plan, and shows great potential for success.',
+            'Interview revealed a need for improvement in time management and organizational skills.',
+            'Candidate is highly motivated and has overcome significant challenges to pursue their education.',
         ];
 
         return collect($notes)->random();
+    }
+
+    /**
+     * Get the current step based on status
+     */
+    private function getCurrentStep($status)
+    {
+        $steps = [
+            'draft' => 1,
+            'submitted' => 2,
+            'under_verification' => 3,
+            'verified' => 4,
+            'under_evaluation' => 5,
+            'approved' => 6,
+            'rejected' => 7,
+            'incomplete' => 8,
+        ];
+
+        return $steps[$status] ?? 1;
     }
 }

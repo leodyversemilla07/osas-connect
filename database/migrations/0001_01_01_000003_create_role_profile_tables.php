@@ -20,6 +20,9 @@ return new class extends Migration
             $table->string('major')->default('None');
             $table->string('year_level');
             $table->decimal('current_gwa', 4, 3)->nullable();
+            $table->enum('enrollment_status', ['enrolled', 'not_enrolled', 'graduated', 'dropped_out'])
+                ->default('enrolled');
+            $table->integer('units')->default(18);
             $table->string('guardian_name')->default('Not Applicable');
             $table->string('existing_scholarships')->nullable();
 
@@ -32,6 +35,7 @@ return new class extends Migration
             $table->string('barangay');
             $table->string('city');
             $table->string('province');
+            $table->string('zip_code')->nullable();
             $table->string('mobile_number');
             $table->string('telephone_number')->nullable();
             $table->boolean('is_pwd')->default(false);

@@ -17,21 +17,25 @@ class AdminSeeder extends Seeder
         // php artisan db:seed -> this should be run to seed the database with the default admin user
 
         // Create the default system admin with basic information
-        $admin = User::create([
-            'last_name' => 'Jane',
-            'first_name' => 'Doe',
-            'middle_name' => 'Smith',
-            'email' => 'admin@minsu.edu.ph',
-            'password' => Hash::make('Admin@123'),
-            'role' => 'admin',
-            'email_verified_at' => now(),
-        ]);
+        // Create or get the default system admin
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@minsu.edu.ph'],
+            [
+                'last_name' => 'Jane',
+                'first_name' => 'Doe',
+                'middle_name' => 'Smith',
+                'password' => Hash::make('Admin@123'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
 
         // Create the admin profile with personal and professional information
-        AdminProfile::create([
-            'user_id' => $admin->id,
-            'admin_id' => 'ADMIN001',
-        ]);
+        // Create profile if not exists
+        AdminProfile::firstOrCreate(
+            ['user_id' => $admin->id],
+            ['admin_id' => 'ADMIN001']
+        );
 
         // You can add more admin users here as needed
     }

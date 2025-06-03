@@ -17,8 +17,11 @@ class DatabaseSeeder extends Seeder
         // Seed MinSU scholarships
         $this->call(MinSUScholarshipsSeeder::class);
 
-        // Seed CMS pages
-        $this->call(CMSPagesSeeder::class);
+        // Seed CMS pages using consolidated page seeder
+        $this->call(PageSeeder::class);
+
+        // Seed site components (header/footer configurations)
+        $this->call(SiteComponentSeeder::class);
 
         // Seed scholarship applications with sample data
         $this->call(ScholarshipApplicationSeeder::class);

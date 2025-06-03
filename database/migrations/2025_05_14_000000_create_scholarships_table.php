@@ -22,18 +22,17 @@ return new class extends Migration
                 'performing_arts_full',
                 'performing_arts_partial',
                 'economic_assistance',
+                'others',
             ]);
+            $table->string('type_specification')->nullable();
             $table->decimal('amount', 10, 2);
-            $table->decimal('stipend_amount', 10, 2)->nullable();
             $table->date('deadline');
-            $table->integer('slots')->default(0);
             $table->integer('beneficiaries')->default(0);
             $table->string('funding_source');
             $table->json('eligibility_criteria');
             $table->json('required_documents');
             $table->enum('stipend_schedule', ['monthly', 'semestral'])->default('monthly');
             $table->integer('slots_available')->default(0);
-            $table->json('criteria')->nullable();
             $table->json('renewal_criteria')->nullable();
             $table->enum('status', ['draft', 'active', 'inactive', 'upcoming'])->default('draft');
             $table->text('admin_remarks')->nullable();
