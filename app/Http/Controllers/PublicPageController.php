@@ -207,14 +207,57 @@ return Inertia::render('public-page', [
                 'subtitle' => 'Learn about our mission to make quality education accessible to all students.',
             ],
             'mission' => [
+                'badge' => 'Our Mission',
                 'title' => 'Our Mission',
                 'description' => 'To provide a streamlined, efficient, and transparent scholarship management system that connects deserving students with educational opportunities.',
+                'features' => [
+                    'Streamlined application process',
+                    'Transparent selection criteria',
+                    'Real-time status tracking',
+                    'Comprehensive document management',
+                    'Equal opportunity access'
+                ],
                 'image' => 'https://img.freepik.com/free-photo/portrait-female-teacher-holding-notepad-green-wall_651396-1833.jpg',
             ],
             'vision' => [
+                'badge' => 'Our Vision',
                 'title' => 'Our Vision',
-                'description' => 'A future where every student can thrive',
                 'subtitle' => 'We envision a world where financial barriers no longer prevent talented students from achieving their educational dreams',
+                'values' => [
+                    [
+                        'icon' => 'Users',
+                        'title' => 'Inclusivity',
+                        'description' => 'Ensuring equal opportunities for all students regardless of their background.'
+                    ],
+                    [
+                        'icon' => 'Shield',
+                        'title' => 'Integrity',
+                        'description' => 'Maintaining transparency and fairness in all our processes.'
+                    ],
+                    [
+                        'icon' => 'Heart',
+                        'title' => 'Compassion',
+                        'description' => 'Understanding and supporting students in their educational journey.'
+                    ]
+                ]
+            ],
+            'team' => [
+                'badge' => 'Our Team',
+                'title' => 'Meet Our Team',
+                'subtitle' => 'Dedicated professionals committed to supporting your educational journey',
+                'members' => [
+                    [
+                        'name' => 'OSAS Connect Team',
+                        'position' => 'Student Support Services',
+                        'image' => 'https://via.placeholder.com/150x150/005a2d/ffffff?text=Team'
+                    ]
+                ]
+            ],
+            'cta' => [
+                'title' => 'Ready to Start Your Journey?',
+                'description' => 'Join thousands of students who have successfully received scholarships through OSAS Connect.',
+                'button_text' => 'Apply Now',
+                'button_link' => '/login'
             ],
         ];
     }
