@@ -15,6 +15,7 @@ class ScholarshipApplicationStatusChanged extends Mailable implements ShouldQueu
     use Queueable, SerializesModels;
 
     public ScholarshipApplication $application;
+
     public string $previousStatus;
 
     /**
@@ -106,37 +107,37 @@ class ScholarshipApplicationStatusChanged extends Mailable implements ShouldQueu
             'submitted' => [
                 'Check your application status regularly',
                 'Respond promptly to any requests for additional information',
-                'Wait for OSAS staff to review your application'
+                'Wait for OSAS staff to review your application',
             ],
             'under_verification' => [
                 'No action required at this time',
                 'You may be contacted if any documents need clarification',
-                'Continue to check your application status'
+                'Continue to check your application status',
             ],
             'verified' => [
                 'Your application is moving to the evaluation stage',
                 'No action required at this time',
-                'You may be contacted for an interview if required'
+                'You may be contacted for an interview if required',
             ],
             'under_evaluation' => [
                 'The scholarship committee is reviewing your application',
                 'You may be contacted for an interview',
-                'Check back regularly for updates'
+                'Check back regularly for updates',
             ],
             'approved' => [
                 'You will be contacted with next steps',
                 'Complete any required scholarship agreements',
-                'Attend orientation sessions if applicable'
+                'Attend orientation sessions if applicable',
             ],
             'rejected' => [
                 'Review feedback if provided',
                 'Consider applying for other available scholarships',
-                'Contact OSAS if you have questions'
+                'Contact OSAS if you have questions',
             ],
             'incomplete' => [
                 'Review the feedback provided',
                 'Upload any missing or corrected documents',
-                'Resubmit your application'
+                'Resubmit your application',
             ],
         ];
 

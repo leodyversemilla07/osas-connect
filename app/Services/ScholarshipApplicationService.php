@@ -46,7 +46,7 @@ class ScholarshipApplicationService
         try {
             // Create the application
             $application = ScholarshipApplication::create([
-                'student_id' => $student->id,
+                'user_id' => $student->user_id, // Fixed: use user_id from student profile
                 'scholarship_id' => $scholarship->id,
                 'status' => ScholarshipApplication::STATUS_SUBMITTED,
                 'purpose_letter' => $data['purpose_letter'],
@@ -59,7 +59,7 @@ class ScholarshipApplicationService
             // Handle document uploads
             $uploadedDocuments = [];
             foreach ($documents as $type => $file) {
-                $path = $file->store('scholarship-documents/'.$student->id, 'public');
+                $path = $file->store('scholarship-documents/'.$student->user_id, 'public');
                 $uploadedDocuments[$type] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -111,7 +111,7 @@ class ScholarshipApplicationService
         $documents = $application->uploaded_documents ?? [];
 
         // Store new document
-        $path = $file->store('scholarship-documents/'.$application->student_id, 'public');
+        $path = $file->store('scholarship-documents/'.$application->user_id, 'public');
 
         // Delete old file if it exists
         if (isset($documents[$documentType]['path'])) {
@@ -150,7 +150,7 @@ class ScholarshipApplicationService
 
         // Notify student
         ScholarshipNotification::create([
-            'user_id' => $application->student->user_id,
+            'user_id' => $application->user_id, // Fixed: use user_id directly
             'title' => 'Interview Scheduled',
             'message' => "Your scholarship interview has been scheduled for {$scheduleDate->format('F j, Y g:i A')}",
             'type' => ScholarshipNotification::TYPE_INTERVIEW_SCHEDULE,
@@ -183,7 +183,7 @@ class ScholarshipApplicationService
 
         // Notify student
         ScholarshipNotification::create([
-            'user_id' => $application->student->user_id,
+            'user_id' => $application->user_id, // Fixed: use user_id directly
             'title' => 'Stipend Released',
             'message' => 'A stipend of PHP '.number_format($amount, 2).' has been released for your scholarship.',
             'type' => ScholarshipNotification::TYPE_STIPEND_RELEASE,
@@ -209,7 +209,7 @@ class ScholarshipApplicationService
 
         return DB::transaction(function () use ($student, $scholarship, $data) {
             $application = new ScholarshipApplication([
-                'student_id' => $student->id,
+                'user_id' => $student->user_id, // Fixed: use user_id from student profile
                 'scholarship_id' => $scholarship->id,
                 'status' => ScholarshipApplication::STATUS_SUBMITTED,
                 'applied_at' => now(),
@@ -301,15 +301,16 @@ class ScholarshipApplicationService
     protected function validateTypeSpecificRequirements(StudentProfile $student, Scholarship $scholarship): void
     {
         switch ($scholarship->type) {
-            case Scholarship::TYPE_STUDENT_ASSISTANTSHIP:
+            case 'student_assistantship':
                 if ($student->units > 21) {
                     throw new InvalidArgumentException('Units exceed maximum allowed for Student Assistantship');
                 }
                 break;
 
-            case Scholarship::TYPE_PERFORMING_ARTS:
+            case 'performing_arts_full':
+            case 'performing_arts_partial':
                 $membershipDuration = $this->verifyPerformingArtsMembership($student);
-                $isFullScholarship = str_contains(strtolower($scholarship->name), 'full');
+                $isFullScholarship = $scholarship->type === 'performing_arts_full';
 
                 if ($isFullScholarship && $membershipDuration < 12) {
                     throw new InvalidArgumentException('Requires at least 1 year of active membership');
@@ -318,7 +319,7 @@ class ScholarshipApplicationService
                 }
                 break;
 
-            case Scholarship::TYPE_ECONOMIC_ASSISTANCE:
+            case 'economic_assistance':
                 if (! $this->hasValidIndigencyCertificate($student)) {
                     throw new InvalidArgumentException('Valid MSWDO Indigency Certificate required');
                 }

@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Interview;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class InterviewController extends Controller
 {
     public function index()
     {
-        $student = auth()->user()->studentProfile;
+        $user = Auth::user();
 
-        $interviews = Interview::whereHas('application', function ($query) use ($student) {
-            $query->where('student_id', $student->id);
+        $interviews = Interview::whereHas('application', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
         })
             ->with('application.scholarship')
             ->get();

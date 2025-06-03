@@ -23,7 +23,7 @@ interface Scholarship {
     description: string;
     type: string;
     amount: number;
-    status: 'open' | 'closed' | 'upcoming';
+    status: 'active' | 'inactive' | 'upcoming' | 'draft';
     deadline: string | null;
     slots_available: number;
     total_applications: number;
@@ -31,6 +31,7 @@ interface Scholarship {
     remaining_slots: number;
     criteria: string[] | null;
     required_documents: string[] | null;
+    funding_source: string;
     created_at: string;
     updated_at: string;
 }
@@ -41,23 +42,45 @@ interface ColumnActions {
     onDelete: (scholarship: Scholarship) => void;
 }
 
-const getStatusColor = (status: 'open' | 'closed' | 'upcoming'): string => {
+const getStatusColor = (status: 'active' | 'inactive' | 'upcoming' | 'draft'): string => {
     const colors = {
-        open: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-        closed: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+        active: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+        inactive: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
         upcoming: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        draft: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
     };
     return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
 };
 
+// Shorter mappings for badges and table display
+const SCHOLARSHIP_TYPES = {
+    'academic_full': 'Academic (Full)',
+    'academic_partial': 'Academic (Partial)',
+    'student_assistantship': 'Student Assistantship',
+    'performing_arts_full': 'Performing Arts (Full)',
+    'performing_arts_partial': 'Performing Arts (Partial)',
+    'economic_assistance': 'Economic Assistance',
+    'others': 'Custom Type',
+} as const;
+
+const getScholarshipTypeDisplay = (type: string): string => {
+    return SCHOLARSHIP_TYPES[type as keyof typeof SCHOLARSHIP_TYPES] || type;
+};
+
 const getTypeColor = (type: string): string => {
+    const typeCategory = type.includes('academic') ? 'academic' :
+        type.includes('student_assistantship') ? 'assistantship' :
+            type.includes('performing_arts') ? 'arts' :
+                type.includes('economic') ? 'economic' : 'other';
+
     const colors: Record<string, string> = {
-        'Academic': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-        'Student Assistantship': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-        'Performing Arts': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
-        'Economic Assistance': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300'
+        'academic': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        'assistantship': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+        'arts': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+        'economic': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300',
+        'other': 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300'
     };
-    return colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
+    return colors[typeCategory];
 };
 
 const formatCurrency = (amount: number): string => {
@@ -67,6 +90,9 @@ const formatCurrency = (amount: number): string => {
         minimumFractionDigits: 0,
     }).format(amount);
 };
+
+// Export the function for use in other components
+export { getScholarshipTypeDisplay };
 
 export const createColumns = (actions: ColumnActions): ColumnDef<Scholarship>[] => [
     {
@@ -86,11 +112,15 @@ export const createColumns = (actions: ColumnActions): ColumnDef<Scholarship>[] 
     {
         accessorKey: "type",
         header: "TYPE",
-        cell: ({ row }) => (
-            <Badge className={getTypeColor(row.getValue("type"))}>
-                {row.getValue("type")}
-            </Badge>
-        ),
+        cell: ({ row }) => {
+            const type = row.getValue("type") as string;
+            const displayType = getScholarshipTypeDisplay(type);
+            return (
+                <Badge className={getTypeColor(type)}>
+                    {displayType}
+                </Badge>
+            );
+        },
     },
     {
         accessorKey: "amount",

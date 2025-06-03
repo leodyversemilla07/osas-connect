@@ -1,0 +1,106 @@
+<?php
+
+use App\Models\Scholarship;
+use App\Models\ScholarshipApplication;
+use App\Models\StudentProfile;
+use App\Models\User;
+
+describe('Scholarship Model', function () {
+    test('it has factory', function () {
+        $scholarship = Scholarship::factory()->create();
+
+        expect($scholarship)->toBeInstanceOf(Scholarship::class);
+        expect($scholarship->id)->not()->toBeNull();
+    });
+    test('fillable attributes work correctly', function () {
+        $data = [
+            'name' => 'Test Scholarship',
+            'type' => 'academic_full',
+            'description' => 'Description of the scholarship',
+            'amount' => 500.00,
+            'deadline' => now()->addDays(30)->toDateString(),
+            'funding_source' => 'MinSU Institutional Fund',
+            'status' => 'active',
+            'required_documents' => ['transcript', 'id'],
+            'eligibility_criteria' => ['criteria1' => 'value1'],
+        ];
+
+        $scholarship = Scholarship::create($data);
+        expect($scholarship->name)->toBe('Test Scholarship');
+        expect($scholarship->type)->toBe('academic_full');
+        expect($scholarship->amount)->toBe('500.00'); // Database returns decimal as string
+        expect($scholarship->required_documents)->toBe(['transcript', 'id']);
+        expect($scholarship->eligibility_criteria)->toBe(['criteria1' => 'value1']);
+    });
+    test('applications relationship works', function () {
+        $scholarship = Scholarship::factory()->create();
+        $student = User::factory()->create(['role' => 'student']);
+        $studentProfile = StudentProfile::factory()->create(['user_id' => $student->id]);
+
+        ScholarshipApplication::factory()->count(3)->create([
+            'scholarship_id' => $scholarship->id,
+            'user_id' => $student->id,
+        ]);
+
+        expect($scholarship->applications()->count())->toBe(3);
+        expect($scholarship->applications->first())->toBeInstanceOf(ScholarshipApplication::class);
+    });
+    test('scholarship status constants work', function () {
+        expect(Scholarship::STATUSES)->toBeArray();
+        expect(Scholarship::STATUSES)->toHaveKey('active');
+        expect(Scholarship::STATUSES)->toHaveKey('draft');
+        expect(Scholarship::STATUSES)->toHaveKey('inactive');
+        expect(Scholarship::STATUSES)->toHaveKey('upcoming');
+    });
+
+    test('scholarship types constants work', function () {
+        expect(Scholarship::TYPES)->toBeArray();
+        expect(Scholarship::TYPES)->toHaveKey('academic_full');
+        expect(Scholarship::TYPES)->toHaveKey('academic_partial');
+        expect(Scholarship::TYPES)->toHaveKey('student_assistantship');
+    });
+    test('scholarship can determine gwa requirements', function () {
+        $academicFull = Scholarship::factory()->create(['type' => 'academic_full']);
+        $academicPartial = Scholarship::factory()->create(['type' => 'academic_partial']);
+
+        // Academic full: 1.000 - 1.450 range
+        expect($academicFull->getMinimumGwa())->toBe(1.000);
+        expect($academicFull->getMaximumGwa())->toBe(1.450);
+
+        // Academic partial: 1.460 - 1.750 range
+        expect($academicPartial->getMinimumGwa())->toBe(1.460);
+        expect($academicPartial->getMaximumGwa())->toBe(1.750);
+    });
+
+    test('scholarship can get stipend amount', function () {
+        $academicFull = Scholarship::factory()->create(['type' => 'academic_full']);
+        $academicPartial = Scholarship::factory()->create(['type' => 'academic_partial']);
+
+        expect($academicFull->getStipendAmount())->toBeNumeric();
+        expect($academicPartial->getStipendAmount())->toBeNumeric();
+        expect($academicFull->getStipendAmount())->toBeGreaterThan($academicPartial->getStipendAmount());
+    });
+
+    test('scholarship soft deletes work', function () {
+        $scholarship = Scholarship::factory()->create();
+        $id = $scholarship->id;
+
+        $scholarship->delete();
+
+        expect(Scholarship::find($id))->toBeNull();
+        expect(Scholarship::withTrashed()->find($id))->not()->toBeNull();
+    });
+    test('active scholarships scope returns only active scholarships', function () {
+        // Clear any existing scholarships first
+        Scholarship::query()->delete();
+
+        Scholarship::factory()->create(['status' => 'active']);
+        Scholarship::factory()->create(['status' => 'draft']);
+        Scholarship::factory()->create(['status' => 'inactive']); // Changed from 'closed' to 'inactive'
+
+        $activeScholarships = Scholarship::where('status', 'active')->get();
+
+        expect($activeScholarships)->toHaveCount(1);
+        expect($activeScholarships->first()->status)->toBe('active');
+    });
+});

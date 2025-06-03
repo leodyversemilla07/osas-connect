@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\OsasStaffProfile;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,7 +25,7 @@ class OsasStaffProfileFactory extends Factory
     public function definition(): array
     {
         return [
-            'staff_id' => 'STAFF' . str_pad($this->faker->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT),
+            'staff_id' => 'STAFF'.str_pad($this->faker->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT),
         ];
     }
 }

@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
@@ -25,11 +25,10 @@ import {
     DialogTrigger,
     DialogFooter,
 } from "@/components/ui/dialog";
-import { 
-    ArrowLeft,
-    FileText, 
-    Download, 
-    Eye, 
+import {
+    FileText,
+    Download,
+    Eye,
     Calendar,
     Clock,
     CheckCircle,
@@ -41,7 +40,7 @@ import {
     Phone,
     MapPin,
     FileCheck,
-    MessageSquare,    History,
+    MessageSquare, History,
     Send
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -174,7 +173,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Staff Dashboard',
+            title: 'Dashboard',
             href: '/osas-staff/dashboard',
         },
         {
@@ -209,7 +208,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                 toast.error('Failed to update application status');
             },
         });
-    };    const handleDocumentVerification = (documentId: number, status: 'verified' | 'rejected') => {
+    }; const handleDocumentVerification = (documentId: number, status: 'verified' | 'rejected') => {
         verifyDocument(route('osas.documents.verify', documentId), {
             onSuccess: () => {
                 setShowDocumentDialog(null);
@@ -242,23 +241,17 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
         return progress;
     };
 
-    const StatusIcon = statusConfig[application.status].icon;
+    const StatusIcon = statusConfig[application.status]?.icon || Clock;
     const isOverdue = new Date(application.deadline) < new Date() && application.status === 'pending';
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Review Application #${application.id}`} />
 
-            <div className="space-y-6">
+            <div className="flex h-full flex-1 flex-col space-y-6 p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <Button variant="outline" size="sm" asChild>
-                            <Link href={route('osas.applications')}>
-                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                Back to Applications
-                            </Link>
-                        </Button>
                         <div>
                             <h1 className="text-2xl font-bold">Application #{application.id}</h1>
                             <p className="text-muted-foreground">
@@ -268,9 +261,9 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <Badge className={cn(statusConfig[application.status].color)}>
+                        <Badge className={cn(statusConfig[application.status]?.color || 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300')}>
                             <StatusIcon className="h-3 w-3 mr-1" />
-                            {statusConfig[application.status].label}
+                            {statusConfig[application.status]?.label || 'Unknown'}
                         </Badge>
                         <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
                             <DialogTrigger asChild>
@@ -286,9 +279,9 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                 <div className="space-y-4">
                                     <div>
                                         <Label htmlFor="status">Status</Label>
-                                        <Select value={statusData.status} onValueChange={(value) => setStatusData('status', value as typeof statusData.status)}>
+                                        <Select value={statusData.status} onValueChange={(value) => setStatusData('status', value as 'pending' | 'under_review' | 'approved' | 'rejected' | 'on_hold')}>
                                             <SelectTrigger>
-                                                <SelectValue />
+                                                <SelectValue placeholder="Select status" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="pending">Pending</SelectItem>
@@ -301,9 +294,9 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                     </div>
                                     <div>
                                         <Label htmlFor="priority">Priority</Label>
-                                        <Select value={statusData.priority} onValueChange={(value) => setStatusData('priority', value as typeof statusData.priority)}>
+                                        <Select value={statusData.priority} onValueChange={(value) => setStatusData('priority', value as 'high' | 'medium' | 'low')}>
                                             <SelectTrigger>
-                                                <SelectValue />
+                                                <SelectValue placeholder="Select priority" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="high">High</SelectItem>
@@ -393,7 +386,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                         <p className="text-muted-foreground">{application.student.student_id}</p>
                                     </div>
                                 </div>
-                                
+
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <div className="flex items-center gap-2 text-sm">
@@ -448,7 +441,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                     <h3 className="text-lg font-semibold">{application.scholarship.name}</h3>
                                     <p className="text-muted-foreground">{application.scholarship.type}</p>
                                 </div>
-                                
+
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <span className="text-sm font-medium text-muted-foreground">Amount</span>
@@ -475,7 +468,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                     <span className="text-sm font-medium text-muted-foreground">Eligibility Criteria</span>
                                     <ul className="text-sm mt-1 space-y-1">
                                         {application.scholarship.eligibility.map((criterion, index) => (
-                                            <li key={index} className="flex items-center gap-2">
+                                            <li key={`eligibility-${index}`} className="flex items-center gap-2">
                                                 <CheckCircle className="h-3 w-3 text-green-600" />
                                                 {criterion}
                                             </li>
@@ -511,7 +504,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                             <CardContent>
                                 <div className="space-y-3">
                                     {application.documents.map((document) => (
-                                        <div key={document.id} className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div key={`document-${document.id}`} className="flex items-center justify-between p-3 border rounded-lg">
                                             <div className="flex items-center space-x-3">
                                                 <FileText className="h-8 w-8 text-muted-foreground" />
                                                 <div>
@@ -527,7 +520,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                             <div className="flex items-center space-x-2">
                                                 <Badge variant={
                                                     document.status === 'verified' ? 'default' :
-                                                    document.status === 'rejected' ? 'destructive' : 'secondary'
+                                                        document.status === 'rejected' ? 'destructive' : 'secondary'
                                                 }>
                                                     {document.status}
                                                 </Badge>
@@ -566,14 +559,14 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                                                 <Button variant="outline" onClick={() => setShowDocumentDialog(null)}>
                                                                     Cancel
                                                                 </Button>
-                                                                <Button 
-                                                                    variant="destructive" 
+                                                                <Button
+                                                                    variant="destructive"
                                                                     onClick={() => handleDocumentVerification(document.id, 'rejected')}
                                                                     disabled={verifyProcessing}
                                                                 >
                                                                     Reject
                                                                 </Button>
-                                                                <Button 
+                                                                <Button
                                                                     onClick={() => handleDocumentVerification(document.id, 'verified')}
                                                                     disabled={verifyProcessing}
                                                                 >
@@ -625,8 +618,8 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                     value={commentData.comment}
                                     onChange={(e) => setCommentData('comment', e.target.value)}
                                 />
-                                <Button 
-                                    onClick={handleAddComment} 
+                                <Button
+                                    onClick={handleAddComment}
                                     disabled={commentProcessing || !commentData.comment.trim()}
                                     className="w-full"
                                 >
@@ -647,7 +640,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                             <CardContent>
                                 <div className="space-y-4">
                                     {application.timeline.map((event, index) => (
-                                        <div key={event.id} className="flex gap-3">
+                                        <div key={`timeline-${event.id || index}`} className="flex gap-3">
                                             <div className="flex flex-col items-center">
                                                 <div className="w-2 h-2 bg-blue-500 rounded-full" />
                                                 {index < application.timeline.length - 1 && (
@@ -658,7 +651,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                                 <p className="text-sm font-medium">{event.title}</p>
                                                 <p className="text-xs text-muted-foreground">{event.description}</p>
                                                 <p className="text-xs text-muted-foreground mt-1">
-                                                    {new Date(event.timestamp).toLocaleString()} • {event.user.name}
+                                                    {new Date(event.timestamp).toLocaleString()} • {event.user?.name || 'Unknown User'}
                                                 </p>
                                             </div>
                                         </div>

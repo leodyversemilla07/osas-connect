@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\AdminProfile;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,7 +25,7 @@ class AdminProfileFactory extends Factory
     public function definition(): array
     {
         return [
-            'admin_id' => 'ADMIN' . str_pad($this->faker->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT),
+            'admin_id' => 'ADMIN'.str_pad($this->faker->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT),
         ];
     }
 }

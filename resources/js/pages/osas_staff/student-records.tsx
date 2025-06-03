@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import { type BreadcrumbItem, type User } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/osas-student-management/data-table';

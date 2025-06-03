@@ -14,7 +14,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class PdfController extends Controller
 {
     private const TEMPLATE_PATH = 'templates/scholarship_form_fillable.pdf';
+
     private const CHED_TEMPLATE_PATH = 'templates/fillable_ched_scholarship_program_application_form.pdf';
+
     private const ANNEX1_TEMPLATE_PATH = 'templates/fillable_annex_1_tdp_application_form.pdf';
 
     // PDF Form Field Names - Updated to match scholarship_form_variable_names.json
@@ -334,7 +336,7 @@ class PdfController extends Controller
         'DEFAULT_DATE' => 'Not provided',
         'DEFAULT_CIVIL_STATUS' => 'Single',
         'DEFAULT_SEX' => 'Not specified',
-        'DEFAULT_RELIGION' => 'Not specified'
+        'DEFAULT_RELIGION' => 'Not specified',
     ];
 
     // Course abbreviation mapping for PDF forms
@@ -361,41 +363,43 @@ class PdfController extends Controller
         }
 
         $disk = StorageService::getDisk();
-        
+
         if ($disk === 'cloudcube') {
             // For CloudCube, download the image temporarily
             try {
                 $imageContents = Storage::disk('cloudcube')->get($photoId);
                 if ($imageContents) {
-                    $tempPath = storage_path('app/temp/' . basename($photoId));
-                    
+                    $tempPath = storage_path('app/temp/'.basename($photoId));
+
                     // Ensure temp directory exists
-                    if (!file_exists(dirname($tempPath))) {
+                    if (! file_exists(dirname($tempPath))) {
                         mkdir(dirname($tempPath), 0755, true);
                     }
-                    
+
                     file_put_contents($tempPath, $imageContents);
+
                     return $tempPath;
                 }
             } catch (Exception $e) {
-                logger()->error('Failed to download CloudCube image: ' . $e->getMessage());
+                logger()->error('Failed to download CloudCube image: '.$e->getMessage());
+
                 return '';
             }
         } else {
             // For local storage, get the full path
-            $photoPath = storage_path('app/public/' . $photoId);
-            
+            $photoPath = storage_path('app/public/'.$photoId);
+
             if (file_exists($photoPath) && is_readable($photoPath)) {
                 return $photoPath;
             }
-            
+
             // Try alternate path format
-            $alternativePath = public_path('storage/' . $photoId);
+            $alternativePath = public_path('storage/'.$photoId);
             if (file_exists($alternativePath) && is_readable($alternativePath)) {
                 return $alternativePath;
             }
         }
-        
+
         return '';
     }
 
@@ -423,7 +427,7 @@ class PdfController extends Controller
                         'total_siblings', 'siblings', 'combined_annual_pay_parents', 'combined_annual_pay_siblings',
                         'income_from_business', 'income_from_land_rentals', 'income_from_building_rentals',
                         'retirement_benefits_pension', 'commissions', 'support_from_relatives', 'bank_deposits',
-                        'other_income_description', 'other_income_amount', 'total_annual_income', 
+                        'other_income_description', 'other_income_amount', 'total_annual_income',
                         'total_monthly_expenses', 'total_annual_expenses'
                     );
                 },
@@ -486,7 +490,7 @@ class PdfController extends Controller
                         'total_siblings', 'siblings', 'combined_annual_pay_parents', 'combined_annual_pay_siblings',
                         'income_from_business', 'income_from_land_rentals', 'income_from_building_rentals',
                         'retirement_benefits_pension', 'commissions', 'support_from_relatives', 'bank_deposits',
-                        'other_income_description', 'other_income_amount', 'total_annual_income', 
+                        'other_income_description', 'other_income_amount', 'total_annual_income',
                         'total_monthly_expenses', 'total_annual_expenses'
                     );
                 },
@@ -500,12 +504,14 @@ class PdfController extends Controller
             $templatePath = public_path(self::CHED_TEMPLATE_PATH);
             if (! file_exists($templatePath)) {
                 logger()->error('CHED PDF template not found at: '.$templatePath);
+
                 return response('CHED PDF template not found at: '.$templatePath, 404);
             }
 
             $pdfTemplate = file_get_contents($templatePath);
             if ($pdfTemplate === false) {
                 logger()->error('Failed to read CHED PDF template from: '.$templatePath);
+
                 return response('Failed to read CHED PDF template', 500);
             }
 
@@ -518,6 +524,7 @@ class PdfController extends Controller
             return $response;
         } catch (Exception $e) {
             logger()->error('CHED PDF generation failed: '.$e->getMessage());
+
             return response('Error generating CHED PDF: '.$e->getMessage(), 500);
         }
     }
@@ -546,7 +553,7 @@ class PdfController extends Controller
                         'total_siblings', 'siblings', 'combined_annual_pay_parents', 'combined_annual_pay_siblings',
                         'income_from_business', 'income_from_land_rentals', 'income_from_building_rentals',
                         'retirement_benefits_pension', 'commissions', 'support_from_relatives', 'bank_deposits',
-                        'other_income_description', 'other_income_amount', 'total_annual_income', 
+                        'other_income_description', 'other_income_amount', 'total_annual_income',
                         'total_monthly_expenses', 'total_annual_expenses'
                     );
                 },
@@ -560,12 +567,14 @@ class PdfController extends Controller
             $templatePath = public_path(self::ANNEX1_TEMPLATE_PATH);
             if (! file_exists($templatePath)) {
                 logger()->error('Annex 1 PDF template not found at: '.$templatePath);
+
                 return response('Annex 1 PDF template not found at: '.$templatePath, 404);
             }
 
             $pdfTemplate = file_get_contents($templatePath);
             if ($pdfTemplate === false) {
                 logger()->error('Failed to read Annex 1 PDF template from: '.$templatePath);
+
                 return response('Failed to read Annex 1 PDF template', 500);
             }
 
@@ -578,6 +587,7 @@ class PdfController extends Controller
             return $response;
         } catch (Exception $e) {
             logger()->error('Annex 1 PDF generation failed: '.$e->getMessage());
+
             return response('Error generating Annex 1 PDF: '.$e->getMessage(), 500);
         }
     }
@@ -601,12 +611,12 @@ class PdfController extends Controller
     {
         try {
             // Check if pdftk is available
-            if (!$this->isPdftkAvailable()) {
+            if (! $this->isPdftkAvailable()) {
                 throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
             }
 
             $pdftkCommand = $this->getPdftkCommand();
-            if (!$pdftkCommand) {
+            if (! $pdftkCommand) {
                 throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
             }
 
@@ -649,7 +659,7 @@ class PdfController extends Controller
         try {
             // Check if pdftk is available
             $pdftkCommand = $this->getPdftkCommand();
-            if (!$pdftkCommand) {
+            if (! $pdftkCommand) {
                 throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
             }
 
@@ -692,7 +702,7 @@ class PdfController extends Controller
         try {
             // Check if pdftk is available
             $pdftkCommand = $this->getPdftkCommand();
-            if (!$pdftkCommand) {
+            if (! $pdftkCommand) {
                 throw new Exception('PDFTK is not available on this system. Please install PDFTK or configure the appropriate buildpack on Heroku.');
             }
 
@@ -738,23 +748,26 @@ class PdfController extends Controller
         $formData = [];
 
         // Helper function to ensure non-empty string values
-        $ensureValue = function($value, $default = null) {
+        $ensureValue = function ($value, $default = null) {
             $default = $default ?? self::DEFAULT_VALUES['DEFAULT_TEXT'];
-            return !empty(trim($value ?? '')) ? trim($value) : $default;
+
+            return ! empty(trim($value ?? '')) ? trim($value) : $default;
         };
 
         // Helper function to format monetary values safely
-        $formatMoney = function($value) {
-            $numericValue = is_numeric($value) ? (float)$value : 0;
+        $formatMoney = function ($value) {
+            $numericValue = is_numeric($value) ? (float) $value : 0;
+
             return number_format($numericValue, 2);
         };
 
         // Helper function to format date safely
-        $formatDate = function($date) {
+        $formatDate = function ($date) {
             try {
                 if ($date && method_exists($date, 'format')) {
                     return $date->format('m/d/Y');
                 }
+
                 return self::DEFAULT_VALUES['DEFAULT_DATE'];
             } catch (Exception $e) {
                 return self::DEFAULT_VALUES['DEFAULT_DATE'];
@@ -766,18 +779,18 @@ class PdfController extends Controller
             $profile->street ?? '',
             $profile->barangay ?? '',
             $profile->city ?? '',
-            $profile->province ?? ''
-        ], fn($part) => !empty(trim($part)));
+            $profile->province ?? '',
+        ], fn ($part) => ! empty(trim($part)));
 
         // Prepare course year string with validation
         $courseYearStr = '';
-        if (!empty($profile->course)) {
+        if (! empty($profile->course)) {
             $courseYearStr = trim($profile->course);
-            if (!empty($profile->major)) {
-                $courseYearStr .= ' Major in ' . trim($profile->major);
+            if (! empty($profile->major)) {
+                $courseYearStr .= ' Major in '.trim($profile->major);
             }
-            if (!empty($profile->year_level)) {
-                $courseYearStr .= ' - ' . trim($profile->year_level);
+            if (! empty($profile->year_level)) {
+                $courseYearStr .= ' - '.trim($profile->year_level);
             }
         }
 
@@ -791,15 +804,15 @@ class PdfController extends Controller
         $formData[self::FORM_FIELDS['DATE_OF_BIRTH']] = $formatDate($profile->date_of_birth);
         $formData[self::FORM_FIELDS['PLACE_OF_BIRTH']] = $ensureValue($profile->place_of_birth);
         $formData[self::FORM_FIELDS['STUDENT_ID']] = $ensureValue($profile->student_id);
-        $formData[self::FORM_FIELDS['ADDRESS']] = !empty($addressParts) ? implode(', ', $addressParts) : self::DEFAULT_VALUES['DEFAULT_ADDRESS'];
-        
+        $formData[self::FORM_FIELDS['ADDRESS']] = ! empty($addressParts) ? implode(', ', $addressParts) : self::DEFAULT_VALUES['DEFAULT_ADDRESS'];
+
         // Handle residence type with proper formatting
         $residenceType = self::DEFAULT_VALUES['DEFAULT_RESIDENCE_TYPE'];
-        if (!empty($profile->residence_type)) {
+        if (! empty($profile->residence_type)) {
             $residenceType = strtolower(str_replace(' ', '_', trim($profile->residence_type)));
         }
         $formData[self::FORM_FIELDS['RESIDENCE_TYPE']] = $residenceType;
-        
+
         $formData[self::FORM_FIELDS['TELEPHONE_NUMBER']] = $ensureValue($profile->telephone_number, self::DEFAULT_VALUES['DEFAULT_PHONE']);
         $formData[self::FORM_FIELDS['MOBILE_NUMBER']] = $ensureValue($profile->mobile_number, self::DEFAULT_VALUES['DEFAULT_PHONE']);
         $formData[self::FORM_FIELDS['EMAIL']] = $ensureValue($user->email, self::DEFAULT_VALUES['DEFAULT_EMAIL']);
@@ -808,10 +821,10 @@ class PdfController extends Controller
         $formData[self::FORM_FIELDS['TYPE_OF_DISABILITY']] = $ensureValue($profile->disability_type);
         $formData[self::FORM_FIELDS['GUARDIAN_NAME']] = $ensureValue($profile->guardian_name);
         $formData[self::FORM_FIELDS['SCHOLARSHIPS']] = $ensureValue($profile->existing_scholarships);
-        
+
         // Student Photo - Handle photo from user record
         $photoPath = $this->getImagePathForPdf($user->photo_id ?? '');
-        
+
         // ID Picture - Same photo as student photo for PDF form field
         $formData[self::FORM_FIELDS['ID_PICTURE']] = $photoPath;
 
@@ -899,7 +912,7 @@ class PdfController extends Controller
             'HEALTH_INSURANCE_PREMIUM', 'SSS_GSIS_PAGIBIG_LOANS', 'SCHOOL_OFFICE_UNIF_CLOTHING',
             'ELECTRICITY_WATER_CABLE_COOKING_GAS', 'TELEPHONE_CELLPHONE', 'HELPER_YAYA',
             'DRIVER', 'MEDICINES', 'DOCTORS_FEE_CONSULTATION', 'HOSPITALIZATION', 'RECREATION',
-            'TOTAL', 'SUB_TOTAL', 'SUB_TOTAL_X_12_MOTHS'
+            'TOTAL', 'SUB_TOTAL', 'SUB_TOTAL_X_12_MOTHS',
         ];
 
         foreach ($monthlyExpenseFields as $field) {
@@ -908,7 +921,7 @@ class PdfController extends Controller
 
         // Family Expenses - Annual (use defaults for now)
         $annualExpenseFields = [
-            'WITHHOLDING_TAX', 'SSS_GSIS_PAGIBIG_CONTRIBUTION', 'OTHERS', 'TOTAL_ANNUAL_EXPENSE'
+            'WITHHOLDING_TAX', 'SSS_GSIS_PAGIBIG_CONTRIBUTION', 'OTHERS', 'TOTAL_ANNUAL_EXPENSE',
         ];
 
         foreach ($annualExpenseFields as $field) {
@@ -948,23 +961,26 @@ class PdfController extends Controller
         $formData = [];
 
         // Helper function to ensure non-empty string values
-        $ensureValue = function($value, $default = null) {
+        $ensureValue = function ($value, $default = null) {
             $default = $default ?? self::DEFAULT_VALUES['DEFAULT_TEXT'];
-            return !empty(trim($value ?? '')) ? trim($value) : $default;
+
+            return ! empty(trim($value ?? '')) ? trim($value) : $default;
         };
 
         // Helper function to format monetary values safely
-        $formatMoney = function($value) {
-            $numericValue = is_numeric($value) ? (float)$value : 0;
+        $formatMoney = function ($value) {
+            $numericValue = is_numeric($value) ? (float) $value : 0;
+
             return number_format($numericValue, 2);
         };
 
         // Helper function to format date safely
-        $formatDate = function($date) {
+        $formatDate = function ($date) {
             try {
                 if ($date && method_exists($date, 'format')) {
                     return $date->format('m/d/Y');
                 }
+
                 return self::DEFAULT_VALUES['DEFAULT_DATE'];
             } catch (Exception $e) {
                 return self::DEFAULT_VALUES['DEFAULT_DATE'];
@@ -976,8 +992,8 @@ class PdfController extends Controller
             $profile->street ?? '',
             $profile->barangay ?? '',
             $profile->city ?? '',
-            $profile->province ?? ''
-        ], fn($part) => !empty(trim($part)));
+            $profile->province ?? '',
+        ], fn ($part) => ! empty(trim($part)));
 
         // Personal Information
         $formData[self::CHED_FORM_FIELDS['FIRST_NAME']] = $ensureValue($user->first_name);
@@ -991,7 +1007,7 @@ class PdfController extends Controller
         $formData[self::CHED_FORM_FIELDS['CITIZENSHIP']] = $ensureValue(null, 'Filipino'); // Default to Filipino
         $formData[self::CHED_FORM_FIELDS['MOBILE_NUMBER']] = $ensureValue($profile->mobile_number, self::DEFAULT_VALUES['DEFAULT_PHONE']);
         $formData[self::CHED_FORM_FIELDS['EMAIL_ADDRESS']] = $ensureValue($user->email, self::DEFAULT_VALUES['DEFAULT_EMAIL']);
-        $formData[self::CHED_FORM_FIELDS['PRESENT_ADDRESS']] = !empty($addressParts) ? implode(', ', $addressParts) : self::DEFAULT_VALUES['DEFAULT_ADDRESS'];
+        $formData[self::CHED_FORM_FIELDS['PRESENT_ADDRESS']] = ! empty($addressParts) ? implode(', ', $addressParts) : self::DEFAULT_VALUES['DEFAULT_ADDRESS'];
         $formData[self::CHED_FORM_FIELDS['ZIP_CODE']] = $ensureValue(null, '0000'); // Default zip code
 
         // Student Photo - Handle photo from user record
@@ -1043,18 +1059,18 @@ class PdfController extends Controller
         // Additional Information
         $formData[self::CHED_FORM_FIELDS['NO_OF_SIBLINGS']] = $ensureValue($profile->total_siblings, self::DEFAULT_VALUES['DEFAULT_NUMBER']);
         $formData[self::CHED_FORM_FIELDS['IP_AFFILIATION']] = $ensureValue(null, 'No'); // Default to No
-        
+
         // Handle 4PS field - use array notation to access property that starts with number
         $profileArray = $profile->toArray();
         $formData[self::CHED_FORM_FIELDS['4PS']] = isset($profileArray['4ps']) ? $ensureValue($profileArray['4ps'], 'No') : 'No';
-        
+
         $formData[self::CHED_FORM_FIELDS['OTHER_ASSISTANCE']] = $ensureValue($profile->existing_scholarships);
         $formData[self::CHED_FORM_FIELDS['TYPE_1']] = $ensureValue(null);
         $formData[self::CHED_FORM_FIELDS['TYPE_2']] = $ensureValue(null);
         $formData[self::CHED_FORM_FIELDS['GRANTEE_INSTITUTION_AGENCY_1']] = $ensureValue(null);
         $formData[self::CHED_FORM_FIELDS['DATE_ACCOMPLISHED']] = date('m/d/Y'); // Current date
         $formData[self::CHED_FORM_FIELDS['TYPE_OF_DISABILITY']] = $ensureValue($profile->disability_type);
-        $formData[self::CHED_FORM_FIELDS['SIGNATURE_OVER_PRINTED_NAME_OF_APPLICANT']] = $ensureValue($user->first_name . ' ' . $user->last_name);
+        $formData[self::CHED_FORM_FIELDS['SIGNATURE_OVER_PRINTED_NAME_OF_APPLICANT']] = $ensureValue($user->first_name.' '.$user->last_name);
 
         // Validate that all expected fields are present and non-empty
         $this->validateChedFieldsFilled($formData);
@@ -1070,17 +1086,19 @@ class PdfController extends Controller
         $formData = [];
 
         // Helper function to ensure non-empty string values
-        $ensureValue = function($value, $default = null) {
+        $ensureValue = function ($value, $default = null) {
             $default = $default ?? self::DEFAULT_VALUES['DEFAULT_TEXT'];
-            return !empty(trim($value ?? '')) ? trim($value) : $default;
+
+            return ! empty(trim($value ?? '')) ? trim($value) : $default;
         };
 
         // Helper function to format date safely
-        $formatDate = function($date) {
+        $formatDate = function ($date) {
             try {
                 if ($date && method_exists($date, 'format')) {
                     return $date->format('m/d/Y');
                 }
+
                 return self::DEFAULT_VALUES['DEFAULT_DATE'];
             } catch (Exception $e) {
                 return self::DEFAULT_VALUES['DEFAULT_DATE'];
@@ -1099,7 +1117,7 @@ class PdfController extends Controller
         $formData[self::ANNEX1_FORM_FIELDS['EMAIL_ADDRESS']] = $ensureValue($user->email, self::DEFAULT_VALUES['DEFAULT_EMAIL']);
 
         // Address Information
-        $formData[self::ANNEX1_FORM_FIELDS['STREET_BARANGAY']] = $ensureValue($profile->street ? $profile->street . ', ' . $profile->barangay : $profile->barangay);
+        $formData[self::ANNEX1_FORM_FIELDS['STREET_BARANGAY']] = $ensureValue($profile->street ? $profile->street.', '.$profile->barangay : $profile->barangay);
         $formData[self::ANNEX1_FORM_FIELDS['TOWN_CITY_MUNICIPALITY']] = $ensureValue($profile->city);
         $formData[self::ANNEX1_FORM_FIELDS['PROVINCE']] = $ensureValue($profile->province);
         $formData[self::ANNEX1_FORM_FIELDS['ZIP_CODE']] = $ensureValue(null, '0000'); // Default zip code
@@ -1118,7 +1136,7 @@ class PdfController extends Controller
         // Family Information
         $formData[self::ANNEX1_FORM_FIELDS['FATHER_LIVING_DECEASED_NAME']] = $ensureValue($profile->father_name);
         $formData[self::ANNEX1_FORM_FIELDS['MOTHER_LIVING_DECEASED_NAME']] = $ensureValue($profile->mother_name);
-        
+
         // Build full address for parents (same as student address if not specified separately)
         $parentAddress = '';
         if ($profile->father_address ?? null) {
@@ -1128,11 +1146,11 @@ class PdfController extends Controller
                 $profile->street ?? '',
                 $profile->barangay ?? '',
                 $profile->city ?? '',
-                $profile->province ?? ''
-            ], fn($part) => !empty(trim($part)));
-            $parentAddress = !empty($addressParts) ? implode(', ', $addressParts) : self::DEFAULT_VALUES['DEFAULT_ADDRESS'];
+                $profile->province ?? '',
+            ], fn ($part) => ! empty(trim($part)));
+            $parentAddress = ! empty($addressParts) ? implode(', ', $addressParts) : self::DEFAULT_VALUES['DEFAULT_ADDRESS'];
         }
-        
+
         $formData[self::ANNEX1_FORM_FIELDS['FATHER_LIVING_DECEASED_ADDRESS']] = $ensureValue($parentAddress);
         $formData[self::ANNEX1_FORM_FIELDS['FATHER_LIVING_DECEASED_OCCUPATION']] = $ensureValue($profile->father_occupation);
         $formData[self::ANNEX1_FORM_FIELDS['MOTHER_LIVING_DECEASED_ADDRESS']] = $ensureValue($profile->mother_address ?? $parentAddress);
@@ -1150,26 +1168,26 @@ class PdfController extends Controller
         $formData[self::ANNEX1_FORM_FIELDS['ID_PICTURE_AF_IMAGE']] = $photoPath;
 
         // Signature
-        $formData[self::ANNEX1_FORM_FIELDS['SIGNATURE_OVER_PRINTED_NAME_OF_APPLICANT']] = $ensureValue($user->first_name . ' ' . $user->last_name);
+        $formData[self::ANNEX1_FORM_FIELDS['SIGNATURE_OVER_PRINTED_NAME_OF_APPLICANT']] = $ensureValue($user->first_name.' '.$user->last_name);
 
         // Handle checkboxes/radio buttons - these have special field names
         // Set checkboxes to 'Yes' or 'On' based on the data
-        
+
         // Sex: male checkbox - check if sex is male
         $formData[self::ANNEX1_FORM_FIELDS['SEX_MALE']] = (strtolower($profile->sex ?? '') === 'male') ? 'Yes' : 'Off';
-        
+
         // School sector: public - default to checked since most users likely from public schools
         $formData[self::ANNEX1_FORM_FIELDS['SCHOOL_SECTOR_PUBLIC']] = 'Yes'; // Default to public
-        
+
         // Father living/deceased: living - assume living unless specified otherwise
         $formData[self::ANNEX1_FORM_FIELDS['FATHER_LIVING_DECEASED_LIVING']] = 'Yes'; // Default to living
-        
+
         // Mother living/deceased: living - assume living unless specified otherwise
         $formData[self::ANNEX1_FORM_FIELDS['MOTHER_LIVING_DECEASED_LIVING']] = 'Yes'; // Default to living
-        
+
         // Other educational assistance: yes - check if user has existing scholarships
-        $formData[self::ANNEX1_FORM_FIELDS['OTHER_EDUCATIONAL_ASSISTANCE_YES']] = !empty($profile->existing_scholarships) ? 'Yes' : 'Off';
-        
+        $formData[self::ANNEX1_FORM_FIELDS['OTHER_EDUCATIONAL_ASSISTANCE_YES']] = ! empty($profile->existing_scholarships) ? 'Yes' : 'Off';
+
         // CHED Regional Office: IV-B - default to region IV-B
         $formData[self::ANNEX1_FORM_FIELDS['CHED_REGIONAL_OFFICE_IV_B']] = 'Yes'; // Default to region IV-B
 
@@ -1189,24 +1207,24 @@ class PdfController extends Controller
 
         // Check that all expected fields from CHED_FORM_FIELDS are present
         foreach (self::CHED_FORM_FIELDS as $key => $fieldName) {
-            if (!array_key_exists($fieldName, $formData)) {
+            if (! array_key_exists($fieldName, $formData)) {
                 $missingFields[] = $fieldName;
             } elseif (empty(trim($formData[$fieldName] ?? ''))) {
                 $emptyFields[] = $fieldName;
             }
         }
 
-        if (!empty($missingFields)) {
-            throw new Exception('Missing CHED form fields: ' . implode(', ', $missingFields));
+        if (! empty($missingFields)) {
+            throw new Exception('Missing CHED form fields: '.implode(', ', $missingFields));
         }
 
-        if (!empty($emptyFields)) {
+        if (! empty($emptyFields)) {
             // Log warning but don't throw exception since we have default values
-            logger()->warning('Empty CHED form fields detected (will use defaults): ' . implode(', ', $emptyFields));
+            logger()->warning('Empty CHED form fields detected (will use defaults): '.implode(', ', $emptyFields));
         }
 
         // Log successful validation
-        logger()->info('All ' . count(self::CHED_FORM_FIELDS) . ' CHED form fields are present and filled');
+        logger()->info('All '.count(self::CHED_FORM_FIELDS).' CHED form fields are present and filled');
     }
 
     /**
@@ -1219,24 +1237,24 @@ class PdfController extends Controller
 
         // Check that all expected fields from ANNEX1_FORM_FIELDS are present
         foreach (self::ANNEX1_FORM_FIELDS as $key => $fieldName) {
-            if (!array_key_exists($fieldName, $formData)) {
+            if (! array_key_exists($fieldName, $formData)) {
                 $missingFields[] = $fieldName;
             } elseif (empty(trim($formData[$fieldName] ?? ''))) {
                 $emptyFields[] = $fieldName;
             }
         }
 
-        if (!empty($missingFields)) {
-            throw new Exception('Missing Annex 1 form fields: ' . implode(', ', $missingFields));
+        if (! empty($missingFields)) {
+            throw new Exception('Missing Annex 1 form fields: '.implode(', ', $missingFields));
         }
 
-        if (!empty($emptyFields)) {
+        if (! empty($emptyFields)) {
             // Log warning but don't throw exception since we have default values
-            logger()->warning('Empty Annex 1 form fields detected (will use defaults): ' . implode(', ', $emptyFields));
+            logger()->warning('Empty Annex 1 form fields detected (will use defaults): '.implode(', ', $emptyFields));
         }
 
         // Log successful validation
-        logger()->info('All ' . count(self::ANNEX1_FORM_FIELDS) . ' Annex 1 form fields are present and filled');
+        logger()->info('All '.count(self::ANNEX1_FORM_FIELDS).' Annex 1 form fields are present and filled');
     }
 
     /**
@@ -1247,7 +1265,7 @@ class PdfController extends Controller
         if (empty($fullCourseName)) {
             return self::DEFAULT_VALUES['DEFAULT_TEXT'];
         }
-        
+
         return self::COURSE_ABBREVIATIONS[$fullCourseName] ?? $fullCourseName;
     }
 
@@ -1286,12 +1304,12 @@ class PdfController extends Controller
     {
         try {
             $formData = $this->prepareChedFormData($user);
-            
+
             $preview = [
                 'total_fields' => count($formData),
                 'filled_with_data' => 0,
                 'filled_with_defaults' => 0,
-                'field_details' => []
+                'field_details' => [],
             ];
 
             foreach ($formData as $fieldName => $value) {
@@ -1305,7 +1323,7 @@ class PdfController extends Controller
                     self::DEFAULT_VALUES['DEFAULT_PHONE'],
                     self::DEFAULT_VALUES['DEFAULT_ADDRESS'],
                     self::DEFAULT_VALUES['DEFAULT_DATE'],
-                    'Filipino', 'Public', 'College/University', 'Living', 'No', 'None', '0000'
+                    'Filipino', 'Public', 'College/University', 'Living', 'No', 'None', '0000',
                 ]);
 
                 if ($isDefault) {
@@ -1317,14 +1335,14 @@ class PdfController extends Controller
                 $preview['field_details'][$fieldName] = [
                     'value' => $value,
                     'is_default' => $isDefault,
-                    'is_empty' => empty(trim($value))
+                    'is_empty' => empty(trim($value)),
                 ];
             }
 
             return $preview;
         } catch (Exception $e) {
             return [
-                'error' => 'Failed to generate CHED form data preview: ' . $e->getMessage()
+                'error' => 'Failed to generate CHED form data preview: '.$e->getMessage(),
             ];
         }
     }
@@ -1336,12 +1354,12 @@ class PdfController extends Controller
     {
         try {
             $formData = $this->prepareAnnex1FormData($user);
-            
+
             $preview = [
                 'total_fields' => count($formData),
                 'filled_with_data' => 0,
                 'filled_with_defaults' => 0,
-                'field_details' => []
+                'field_details' => [],
             ];
 
             foreach ($formData as $fieldName => $value) {
@@ -1355,7 +1373,7 @@ class PdfController extends Controller
                     self::DEFAULT_VALUES['DEFAULT_PHONE'],
                     self::DEFAULT_VALUES['DEFAULT_ADDRESS'],
                     self::DEFAULT_VALUES['DEFAULT_DATE'],
-                    'Filipino', 'Public', 'College/University', 'Living', 'No', 'None', '0000', 'Yes', 'Off'
+                    'Filipino', 'Public', 'College/University', 'Living', 'No', 'None', '0000', 'Yes', 'Off',
                 ]);
 
                 if ($isDefault) {
@@ -1367,14 +1385,14 @@ class PdfController extends Controller
                 $preview['field_details'][$fieldName] = [
                     'value' => $value,
                     'is_default' => $isDefault,
-                    'is_empty' => empty(trim($value))
+                    'is_empty' => empty(trim($value)),
                 ];
             }
 
             return $preview;
         } catch (Exception $e) {
             return [
-                'error' => 'Failed to generate Annex 1 form data preview: ' . $e->getMessage()
+                'error' => 'Failed to generate Annex 1 form data preview: '.$e->getMessage(),
             ];
         }
     }
@@ -1385,7 +1403,7 @@ class PdfController extends Controller
     public function testAllChedFieldsFilled(User $user): array
     {
         $formData = $this->prepareChedFormData($user);
-        
+
         $report = [
             'success' => true,
             'total_fields' => count(self::CHED_FORM_FIELDS),
@@ -1393,21 +1411,21 @@ class PdfController extends Controller
             'all_fields_present' => count(self::CHED_FORM_FIELDS) === count($formData),
             'empty_fields' => [],
             'null_fields' => [],
-            'field_analysis' => []
+            'field_analysis' => [],
         ];
 
         // Analyze each field
         foreach (self::CHED_FORM_FIELDS as $key => $fieldName) {
             $value = $formData[$fieldName] ?? null;
-            
+
             $analysis = [
                 'key' => $key,
                 'field_name' => $fieldName,
                 'value' => $value,
-                'is_filled' => !empty(trim($value ?? '')),
+                'is_filled' => ! empty(trim($value ?? '')),
                 'is_null' => $value === null,
                 'is_empty_string' => $value === '',
-                'length' => strlen($value ?? '')
+                'length' => strlen($value ?? ''),
             ];
 
             if ($value === null) {
@@ -1427,8 +1445,8 @@ class PdfController extends Controller
         $expectedFields = array_values(self::CHED_FORM_FIELDS);
         $actualFields = array_keys($formData);
         $missingFields = array_diff($expectedFields, $actualFields);
-        
-        if (!empty($missingFields)) {
+
+        if (! empty($missingFields)) {
             $report['missing_fields'] = $missingFields;
             $report['success'] = false;
         }
@@ -1442,7 +1460,7 @@ class PdfController extends Controller
     public function testAllAnnex1FieldsFilled(User $user): array
     {
         $formData = $this->prepareAnnex1FormData($user);
-        
+
         $report = [
             'success' => true,
             'total_fields' => count(self::ANNEX1_FORM_FIELDS),
@@ -1450,21 +1468,21 @@ class PdfController extends Controller
             'all_fields_present' => count(self::ANNEX1_FORM_FIELDS) === count($formData),
             'empty_fields' => [],
             'null_fields' => [],
-            'field_analysis' => []
+            'field_analysis' => [],
         ];
 
         // Analyze each field
         foreach (self::ANNEX1_FORM_FIELDS as $key => $fieldName) {
             $value = $formData[$fieldName] ?? null;
-            
+
             $analysis = [
                 'key' => $key,
                 'field_name' => $fieldName,
                 'value' => $value,
-                'is_filled' => !empty(trim($value ?? '')),
+                'is_filled' => ! empty(trim($value ?? '')),
                 'is_null' => $value === null,
                 'is_empty_string' => $value === '',
-                'length' => strlen($value ?? '')
+                'length' => strlen($value ?? ''),
             ];
 
             if ($value === null) {
@@ -1484,8 +1502,8 @@ class PdfController extends Controller
         $expectedFields = array_values(self::ANNEX1_FORM_FIELDS);
         $actualFields = array_keys($formData);
         $missingFields = array_diff($expectedFields, $actualFields);
-        
-        if (!empty($missingFields)) {
+
+        if (! empty($missingFields)) {
             $report['missing_fields'] = $missingFields;
             $report['success'] = false;
         }
@@ -1510,6 +1528,7 @@ class PdfController extends Controller
         $envCmd = env('PDFTK_COMMAND');
         if ($envCmd && $this->testPdftkCommand($envCmd)) {
             logger()->info("Found working pdftk from PDFTK_COMMAND environment: $envCmd");
+
             return $envCmd;
         }
 
@@ -1517,6 +1536,7 @@ class PdfController extends Controller
         $envCmd = env('PDFTK_CMD');
         if ($envCmd && $this->testPdftkCommand($envCmd)) {
             logger()->info("Found working pdftk from PDFTK_CMD environment: $envCmd");
+
             return $envCmd;
         }
 
@@ -1556,30 +1576,31 @@ class PdfController extends Controller
                 '/app/.apt/usr/bin/pdftk',
             ];
         }
-        
-        logger()->info("Environment: " . app()->environment() . " (isLocal: " . ($isLocal ? 'true' : 'false') . ", isProduction: " . ($isProduction ? 'true' : 'false') . ")");
-        logger()->info("Trying PDFTK commands in order: " . implode(', ', array_slice($commands, 0, 5)) . "...");
-        
+
+        logger()->info('Environment: '.app()->environment().' (isLocal: '.($isLocal ? 'true' : 'false').', isProduction: '.($isProduction ? 'true' : 'false').')');
+        logger()->info('Trying PDFTK commands in order: '.implode(', ', array_slice($commands, 0, 5)).'...');
+
         foreach ($commands as $cmd) {
             if ($this->testPdftkCommand($cmd)) {
                 logger()->info("Found working pdftk command: $cmd");
+
                 return $cmd;
             }
         }
-        
+
         // Log which commands we tried
-        logger()->warning('PDFTK not available. Tried commands: ' . implode(', ', $commands));
-        
+        logger()->warning('PDFTK not available. Tried commands: '.implode(', ', $commands));
+
         // Try to see what's actually installed
         exec('which pdftk* 2>&1', $output, $returnCode);
-        logger()->info('Available pdftk variants: ' . implode("\n", $output));
-        
+        logger()->info('Available pdftk variants: '.implode("\n", $output));
+
         // Also check what's in the apt directory on Heroku
         if (is_dir('/app/.apt/usr/bin/')) {
             $files = glob('/app/.apt/usr/bin/*pdftk*');
-            logger()->info('Found pdftk files in /app/.apt/usr/bin/: ' . implode(', ', $files));
+            logger()->info('Found pdftk files in /app/.apt/usr/bin/: '.implode(', ', $files));
         }
-        
+
         return null;
     }
 
@@ -1590,41 +1611,41 @@ class PdfController extends Controller
     {
         $output = [];
         $returnCode = 0;
-        
+
         // Windows: quote paths containing spaces
         $cmdToTest = $cmd;
         if (PHP_OS_FAMILY === 'Windows' && preg_match('/\s/', $cmdToTest)) {
-            $cmdToTest = '"' . $cmdToTest . '"';
+            $cmdToTest = '"'.$cmdToTest.'"';
         }
-    
+
         // Set up environment with Java path for Heroku
         $env = $_ENV;
         if (is_dir('/app/.apt/usr/lib/jvm/java-21-openjdk-amd64')) {
             $env['JAVA_HOME'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64';
-            $env['PATH'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64/bin:/app/.apt/usr/bin:' . ($_ENV['PATH'] ?? '');
+            $env['PATH'] = '/app/.apt/usr/lib/jvm/java-21-openjdk-amd64/bin:/app/.apt/usr/bin:'.($_ENV['PATH'] ?? '');
             // Create empty security properties file to bypass security initialization
-            $securityFile = sys_get_temp_dir() . '/java.security.empty';
+            $securityFile = sys_get_temp_dir().'/java.security.empty';
             file_put_contents($securityFile, '# Empty security properties');
-            $env['JAVA_OPTS'] = '-Djava.awt.headless=true ' .
-                               '-Djava.security.manager= ' .
-                               '-Djava.security.properties=' . $securityFile . ' ' .
-                               '-Djava.security.policy= ' .
-                               '-Djava.security.auth.login.config= ' .
-                               '-Djava.security.egd=file:/dev/./urandom ' .
-                               '-Dfile.encoding=UTF-8 ' .
-                               '-Djava.net.useSystemProxies=false ' .
-                               '-Djava.util.prefs.systemRoot=/tmp ' .
+            $env['JAVA_OPTS'] = '-Djava.awt.headless=true '.
+                               '-Djava.security.manager= '.
+                               '-Djava.security.properties='.$securityFile.' '.
+                               '-Djava.security.policy= '.
+                               '-Djava.security.auth.login.config= '.
+                               '-Djava.security.egd=file:/dev/./urandom '.
+                               '-Dfile.encoding=UTF-8 '.
+                               '-Djava.net.useSystemProxies=false '.
+                               '-Djava.util.prefs.systemRoot=/tmp '.
                                '-Djava.util.prefs.userRoot=/tmp';
         }
-        
+
         // Test the command with proper environment
         $descriptorspec = [
-            0 => ["pipe", "r"],
-            1 => ["pipe", "w"],
-            2 => ["pipe", "w"]
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
         ];
-        
-        $process = proc_open($cmdToTest . ' --version', $descriptorspec, $pipes, null, $env);
+
+        $process = proc_open($cmdToTest.' --version', $descriptorspec, $pipes, null, $env);
 
         if (is_resource($process)) {
             fclose($pipes[0]);
@@ -1633,23 +1654,23 @@ class PdfController extends Controller
             fclose($pipes[1]);
             fclose($pipes[2]);
             $returnCode = proc_close($process);
-            
+
             if ($returnCode === 0) {
                 return true;
             } else {
                 logger()->debug("Command '$cmd' failed with code $returnCode. Error: $error");
             }
         }
-        
+
         // Check what's in the apt directory on Heroku for additional debugging
         if (is_dir('/app/.apt/usr/bin/')) {
             $aptBinFiles = scandir('/app/.apt/usr/bin/');
-            $pdftkFiles = array_filter($aptBinFiles, function($file) {
+            $pdftkFiles = array_filter($aptBinFiles, function ($file) {
                 return strpos($file, 'pdftk') !== false;
             });
-            logger()->info('PDFTK files in /app/.apt/usr/bin/: ' . implode(', ', $pdftkFiles));
+            logger()->info('PDFTK files in /app/.apt/usr/bin/: '.implode(', ', $pdftkFiles));
         }
-        
+
         return false;
     }
 }

@@ -24,7 +24,7 @@ export default function InterviewList({ interviews }: Props) {
   };
 
   const setRescheduleInterview = (interview: Interview) => {
-    router.visit(route('scholarships.interviews.reschedule', interview.id), {
+    router.visit(route('student.interviews.reschedule', interview.id), {
       method: 'get',
       preserveState: true,
     });
@@ -63,9 +63,9 @@ export default function InterviewList({ interviews }: Props) {
                   {interview.status}
                 </Badge>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
+              <td className="px-6 py-4 whitespace-nowrap text-sm">                
                 <Link
-                  href={route('scholarships.interviews.show', interview.id)}
+                  href={route('student.interviews.show', interview.id)}
                   className="text-indigo-600 hover:text-indigo-900 mr-4"
                 >
                   View Details

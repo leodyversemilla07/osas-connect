@@ -16,14 +16,15 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->enum('type', [
-                'Merit-Based',
-                'Need-Based',
-                'Research',
-                'Athletic',
-                'Cultural',
-                'Student Assistantship',
+                'academic_full',
+                'academic_partial',
+                'student_assistantship',
+                'performing_arts_full',
+                'performing_arts_partial',
+                'economic_assistance',
             ]);
             $table->decimal('amount', 10, 2);
+            $table->decimal('stipend_amount', 10, 2)->nullable();
             $table->date('deadline');
             $table->integer('slots')->default(0);
             $table->integer('beneficiaries')->default(0);

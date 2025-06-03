@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchProvinces, fetchCities, fetchBarangays } from '@/lib/location-service';
 import type { PSGCLocation } from '@/types/locations';
 
@@ -9,57 +9,74 @@ export default function useLocationData(
     const [provinces, setProvinces] = useState<PSGCLocation[]>([]);
     const [cities, setCities] = useState<PSGCLocation[]>([]);
     const [barangays, setBarangays] = useState<PSGCLocation[]>([]);
-
     useEffect(() => {
-        fetchProvinces().then(setProvinces);
-    }, []);
-
-    useEffect(() => {
-        if (data.province && provinces.length > 0) {
+        fetchProvinces().then(allProvinces => {
+            // Filter to only show specific provinces
+            const allowedProvinces = [
+                'Oriental Mindoro',
+                'Occidental Mindoro', 
+                'Palawan',
+                'Marinduque'
+            ];
+            const filteredProvinces = allProvinces.filter(province => 
+                allowedProvinces.includes(province.name)
+            );
+            setProvinces(filteredProvinces);
+        });
+    }, []);    useEffect(() => {
+        if (data.province && provinces.length > 0 && cities.length === 0) {
             const selectedProvince = provinces.find(p => p.name === data.province);
             if (selectedProvince) {
                 fetchCities(selectedProvince.code).then(setCities);
             }
         }
-    }, [data.province, provinces]);
+    }, [data.province, provinces, cities.length]);
 
     useEffect(() => {
-        if (data.city && cities.length > 0) {
+        if (data.city && cities.length > 0 && barangays.length === 0) {
             const selectedCity = cities.find(c => c.name === data.city);
             if (selectedCity) {
                 fetchBarangays(selectedCity.code).then(setBarangays);
             }
         }
-    }, [data.city, cities]);
-
-    const handleProvinceChange = (value: string) => {
+    }, [data.city, cities, barangays.length]);const handleProvinceChange = useCallback((value: string) => {
         const selectedProvince = provinces.find(p => p.code === value);
         if (selectedProvince) {
+            // Clear dependent fields first
+            setCities([]);
+            setBarangays([]);
+            
+            // Update form data
             setData("province", selectedProvince.name);
             setData("city", "");
             setData("barangay", "");
-            setCities([]);
-            setBarangays([]);
+            
+            // Fetch new cities
             fetchCities(value).then(setCities);
         }
-    };
+    }, [provinces, setData]);
 
-    const handleCityChange = (value: string) => {
+    const handleCityChange = useCallback((value: string) => {
         const selectedCity = cities.find(c => c.code === value);
         if (selectedCity) {
+            // Clear dependent fields first
+            setBarangays([]);
+            
+            // Update form data
             setData("city", selectedCity.name);
             setData("barangay", "");
-            setBarangays([]);
+            
+            // Fetch new barangays
             fetchBarangays(value).then(setBarangays);
         }
-    };
+    }, [cities, setData]);
 
-    const handleBarangayChange = (value: string) => {
+    const handleBarangayChange = useCallback((value: string) => {
         const selectedBarangay = barangays.find(b => b.code === value);
         if (selectedBarangay) {
             setData("barangay", selectedBarangay.name);
         }
-    };
+    }, [barangays, setData]);
 
     return {
         provinces,

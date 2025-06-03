@@ -33,6 +33,12 @@ class ProfileController extends Controller
         switch ($user->role) {
             case 'student':
                 $profile = $user->studentProfile;
+                // Debug logging for student profile
+                Log::info('ProfileController - Student profile data:', [
+                    'profile' => $profile ? $profile->toArray() : null,
+                    'year_level' => $profile?->year_level,
+                    'existing_scholarships' => $profile?->existing_scholarships,
+                ]);
                 break;
             case 'osas_staff':
                 $profile = $user->osasStaffProfile;
@@ -67,6 +73,13 @@ class ProfileController extends Controller
                 $profileData[$field] = (bool) $profileData[$field];
             }
         }
+
+        // Debug logging for final profile data
+        Log::info('ProfileController - Final profile data before Inertia:', [
+            'profileData' => $profileData,
+            'year_level' => $profileData['year_level'] ?? 'NOT_SET',
+            'existing_scholarships' => $profileData['existing_scholarships'] ?? 'NOT_SET',
+        ]);
 
         return Inertia::render('settings/profile', [
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
@@ -164,9 +177,9 @@ class ProfileController extends Controller
             // ✅ Log the date_of_birth specifically for debugging
             Log::info('Date of birth in profile fields: ', [
                 'date_of_birth' => $profileFields['date_of_birth'] ?? 'NOT SET',
-                'all_date_fields' => array_filter($profileFields, function($key) {
+                'all_date_fields' => array_filter($profileFields, function ($key) {
                     return strpos($key, 'date') !== false || strpos($key, 'birth') !== false;
-                }, ARRAY_FILTER_USE_KEY)
+                }, ARRAY_FILTER_USE_KEY),
             ]);
 
             $studentProfile->update($profileFields);
@@ -177,12 +190,12 @@ class ProfileController extends Controller
 
         // Refresh the user model to ensure we get the latest data
         $user->refresh();
-        
+
         // Log the updated photo info for debugging
         Log::info('Updated user photo info:', [
             'user_id' => $user->id,
             'photo_id' => $user->photo_id,
-            'avatar_url' => $user->avatar
+            'avatar_url' => $user->avatar,
         ]);
 
         return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');

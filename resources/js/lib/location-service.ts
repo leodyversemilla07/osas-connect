@@ -1,6 +1,6 @@
 import type { PSGCLocation } from '@/types/locations';
 
-const sortLocations = (data: PSGCLocation[]) => 
+const sortLocations = (data: PSGCLocation[]) =>
     data.sort((a, b) => a.name.localeCompare(b.name));
 
 export const fetchProvinces = async (): Promise<PSGCLocation[]> => {

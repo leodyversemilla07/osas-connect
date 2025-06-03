@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_active',
         'last_login_at',
         'photo_id',
     ];
@@ -59,6 +60,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'last_login_at' => 'datetime',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -142,5 +144,13 @@ class User extends Authenticatable
         }
 
         return null;
+    }
+
+    /**
+     * Get scholarship notifications for the user.
+     */
+    public function scholarshipNotifications()
+    {
+        return $this->hasMany(ScholarshipNotification::class);
     }
 }

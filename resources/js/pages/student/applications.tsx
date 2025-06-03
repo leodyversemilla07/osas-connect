@@ -3,7 +3,6 @@ import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/student-application-management/data-table';
 import { columns } from '@/components/student-application-management/columns';
-import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,65 +20,25 @@ interface Application {
     progress: number;
     amount: string;
     deadline: string;
+    can_edit?: boolean;
     verifier_comments?: string;
     interview_schedule?: string;
 }
 
 interface MyApplicationsProps {
-    applications: {
-        data: Application[];
-        current_page: number;
-        from: number;
-        last_page: number;
-        per_page: number;
-        to: number;
+    applications: Application[];
+    stats: {
         total: number;
+        pending: number;
+        approved: number;
+        draft: number;
     };
     filters?: {
         search?: string;
     };
 }
 
-export default function MyApplications({ applications }: MyApplicationsProps) {
-    // Sample data for demonstration
-    const sampleApplications: Application[] = applications?.data?.length > 0 ? applications.data : [
-        {
-            id: 1,
-            scholarship_name: 'Academic Scholarship (Full)',
-            scholarship_type: 'Academic',
-            status: 'under_evaluation',
-            submitted_at: '2025-05-15',
-            updated_at: '2025-05-20',
-            progress: 80,
-            amount: '₱500/month',
-            deadline: '2025-06-30',
-            verifier_comments: 'All documents verified successfully.',
-        },
-        {
-            id: 2,
-            scholarship_name: 'Economic Assistance Program',
-            scholarship_type: 'Economic Assistance',
-            status: 'approved',
-            submitted_at: '2025-04-20',
-            updated_at: '2025-05-10',
-            progress: 100,
-            amount: '₱400/month',
-            deadline: '2025-05-30',
-        },
-        {
-            id: 3,
-            scholarship_name: 'Student Assistantship Program',
-            scholarship_type: 'Student Assistantship',
-            status: 'incomplete',
-            submitted_at: '2025-05-25',
-            updated_at: '2025-05-26',
-            progress: 30,
-            amount: 'Based on hours',
-            deadline: '2025-06-15',
-            verifier_comments: 'Missing birth certificate. Please upload a PSA-issued copy.',
-        }
-    ];
-
+export default function MyApplications({ applications, stats }: MyApplicationsProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head>
@@ -94,16 +53,53 @@ export default function MyApplications({ applications }: MyApplicationsProps) {
                             <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">Applications</h1>
                             <p className="text-base text-gray-500 dark:text-gray-400">Track and manage your scholarship applications</p>
                         </div>
-                        <Button asChild>
-                            <Link href="/scholarships/available">
-                                <Plus className="h-4 w-4 mr-2" />
-                                Apply for Scholarship
-                            </Link>
-                        </Button>
+                        <Link
+                            href={route('student.scholarships.index')}
+                            className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 border-b border-transparent hover:border-gray-300 dark:hover:border-gray-600 pb-1"
+                        >
+                            <Plus className="h-4 w-4 mr-2 inline" />
+                            Apply for Scholarship
+                        </Link>
                     </div>
                 </div>
 
-                <DataTable columns={columns} data={sampleApplications} />
+                {/* Statistics Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Applications</p>
+                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{stats?.total || 0}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pending</p>
+                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{stats?.pending || 0}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Approved</p>
+                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{stats?.approved || 0}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Draft</p>
+                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{stats?.draft || 0}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <DataTable columns={columns} data={applications || []} />
             </div>
         </AppLayout>
     );

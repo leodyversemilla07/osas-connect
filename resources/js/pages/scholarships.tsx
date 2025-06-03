@@ -9,7 +9,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowRight, GraduationCap, Calendar, Search, Filter } from 'lucide-react';
-import { GeneralRequirementsList, RequirementsList } from '@/components/scholarships/requirements-list';
 
 interface Scholarship {
     id: number;
@@ -30,6 +29,39 @@ interface ScholarshipsProps {
             email: string;
             role: string;
         } | null;
+    };
+    scholarships: Scholarship[];
+    headerContent?: {
+        logo_text?: string;
+        tagline?: string;
+        navigation?: Array<{
+            label: string;
+            url: string;
+            active: boolean;
+            children?: Array<{ label: string; url: string }>;
+        }>;
+    };
+    footerContent?: {
+        cta?: {
+            title?: string;
+            description?: string;
+            button_text?: string;
+            button_url?: string;
+        };
+        about?: {
+            title?: string;
+            description?: string;
+        };
+        contact?: {
+            address?: string;
+            email?: string;
+            viber?: string;
+            hours?: string;
+        };
+        social_links?: Array<{
+            platform: string;
+            url: string;
+        }>;
     };
 }
 
@@ -60,93 +92,6 @@ const scholarshipColors: Record<Scholarship['type'], {
     }
 };
 
-const scholarships: Scholarship[] = [
-    {
-        id: 1,
-        name: 'Academic Scholarship (Full)',
-        amount: 'PHP 500/month',
-        deadline: '2025-05-30',
-        daysRemaining: 11,
-        type: 'Academic Scholarship',
-        description: 'President\'s Lister Scholarship for exceptional academic achievement',        
-        requirements: [
-            'GWA between 1.000 - 1.450',
-            'No grade below 1.75 in any course',
-            'No Dropped/Deferred/Failed marks',
-            'Minimum of 18 units enrollment'
-        ]
-    },
-    {
-        id: 2,
-        name: 'Academic Scholarship (Partial)',
-        amount: 'PHP 300/month',
-        deadline: '2025-05-30',
-        daysRemaining: 11,
-        type: 'Academic Scholarship',
-        description: 'Dean\'s Lister Scholarship for outstanding academic performance',        
-        requirements: [
-            'GWA between 1.460 - 1.750',
-            'No grade below 1.75 in any course',
-            'No Dropped/Deferred/Failed marks',
-            'Minimum of 18 units enrollment'
-        ]
-    },
-    {
-        id: 3,
-        name: 'Student Assistantship Program',
-        amount: 'Student Rate',
-        deadline: '2025-05-30',
-        daysRemaining: 11,
-        type: 'Student Assistantship Program',
-        description: 'Work opportunity for students to earn while studying',        
-        requirements: [
-            'Maximum load of 21 units',
-            'No failing grades from previous semester',
-            'Must pass pre-hiring screening',
-            'Must submit parent\'s consent'
-        ]
-    },
-    {
-        id: 4,
-        name: 'MinSU Performing Arts (Full)',
-        amount: 'Full Scholarship',
-        deadline: '2025-05-30',
-        daysRemaining: 11,
-        type: 'Performing Arts Scholarship',
-        description: 'For active members of MinSU performing arts groups',        
-        requirements: [            
-            'Active member for at least 1 year',
-            'Participated in major local/regional/national events',
-            'Must be recommended by coach/adviser'
-        ]
-    },
-    {
-        id: 5,
-        name: 'MinSU Performing Arts (Partial)',
-        amount: 'Partial Scholarship',
-        deadline: '2025-05-30',
-        daysRemaining: 11,
-        type: 'Performing Arts Scholarship',
-        description: 'For members of MinSU performing arts groups',        requirements: [
-            'Member for at least 1 semester',
-            'Performed in 2+ major University activities',
-            'Must be recommended by coach/adviser'
-        ]
-    },
-    {
-        id: 6,
-        name: 'Economic Assistance Grant',
-        amount: 'Financial Aid',
-        deadline: '2025-05-30',
-        daysRemaining: 11,
-        type: 'Economic Assistance',
-        description: 'Financial support for economically disadvantaged students',        requirements: [
-            'General Weighted Average of 2.25',
-            'Must provide MSWDO Indigency Certificate'
-        ]
-    }
-];
-
 function ScholarshipCard({ scholarship, isAuthenticated }: { scholarship: Scholarship; isAuthenticated: boolean }) {
     const colors = scholarshipColors[scholarship.type];
 
@@ -170,12 +115,21 @@ function ScholarshipCard({ scholarship, isAuthenticated }: { scholarship: Schola
                         {scholarship.daysRemaining} days left
                     </div>
                 </div>
-                <RequirementsList
-                    title="Program Requirements"
-                    requirements={scholarship.requirements}
-                />
+                <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                        Program Requirements
+                    </h4>
+                    <ul className="space-y-1">
+                        {scholarship.requirements.map((requirement, index) => (
+                            <li key={index} className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full flex-shrink-0" />
+                                {requirement}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
                 {isAuthenticated ? (
-                    <Link href={`/scholarships/${scholarship.id}/apply`} className="block">
+                    <Link href={`/student/scholarships/${scholarship.id}/apply`} className="block">
                         <Button className="mt-4 w-full" variant="default">
                             Apply Now
                             <ArrowRight className="ml-2 h-4 w-4" />
@@ -194,15 +148,15 @@ function ScholarshipCard({ scholarship, isAuthenticated }: { scholarship: Schola
     );
 }
 
-export default function Scholarships({ auth }: ScholarshipsProps) {
+export default function Scholarships({ auth, scholarships, headerContent, footerContent }: ScholarshipsProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedType, setSelectedType] = useState<string>('all');
     const isAuthenticated = !!auth?.user;
 
     // Filter scholarships based on search and type
-    const filteredScholarships = scholarships.filter(scholarship => {
+    const filteredScholarships = (scholarships || []).filter(scholarship => {
         const matchesSearch = scholarship.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            scholarship.description.toLowerCase().includes(searchTerm.toLowerCase());
+            scholarship.description.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesType = selectedType === 'all' || scholarship.type === selectedType;
         return matchesSearch && matchesType;
     });
@@ -215,7 +169,7 @@ export default function Scholarships({ auth }: ScholarshipsProps) {
             </Head>
 
             <div className="flex min-h-screen flex-col items-center bg-[#f3f2f2] text-[#010002] dark:bg-[#121212] dark:text-[#f3f2f2]">
-                <SiteHeader />
+                <SiteHeader content={headerContent} />
 
                 <main className="mt-16 w-full flex-1 p-6 lg:p-8">
                     <div className="mx-auto max-w-7xl">
@@ -277,14 +231,12 @@ export default function Scholarships({ auth }: ScholarshipsProps) {
                                 </span>
                                 <h2 className="text-3xl font-bold text-[#005a2d]">Available Scholarships</h2>
                                 <p className="mt-4 max-w-2xl mx-auto text-lg text-[#010002]/70 dark:text-[#f3f2f2]/70">
-                                    {isAuthenticated 
+                                    {isAuthenticated
                                         ? 'Find and apply for scholarships that match your qualifications'
                                         : 'Discover scholarship opportunities - login to apply'
                                     }
                                 </p>
-                            </div>                            
-
-                            <GeneralRequirementsList />
+                            </div>
 
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                                 {filteredScholarships.map((scholarship) => (
@@ -326,7 +278,7 @@ export default function Scholarships({ auth }: ScholarshipsProps) {
                     </div>
                 </main>
 
-                <SiteFooter />
+                <SiteFooter content={footerContent} />
             </div>
         </>
     );

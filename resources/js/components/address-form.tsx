@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import InputError from "@/components/input-error";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useLocationData from "@/hooks/use-location-data";
+import { useCallback } from "react";
 
 interface AddressFormProps {
     data: {
@@ -10,8 +11,9 @@ interface AddressFormProps {
         barangay: string;
         city: string;
         province: string;
+        zip_code: string;
     };
-    setData: (field: 'street' | 'barangay' | 'city' | 'province', value: string) => void;
+    setData: (field: 'street' | 'barangay' | 'city' | 'province' | 'zip_code', value: string) => void;
     errors: Record<string, string>;
     processing: boolean;
 }
@@ -24,11 +26,19 @@ export default function AddressForm({ data, setData, errors, processing }: Addre
         handleProvinceChange,
         handleCityChange,
         handleBarangayChange
-    } = useLocationData(data, setData);
+    } = useLocationData(data, setData);    // Memoized handlers to prevent unnecessary re-renders
+    const handleStreetChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setData("street", e.target.value);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const handleZipCodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setData("zip_code", e.target.value);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="grid gap-2">
-            <Label>Complete Address *</Label>
             <div className="rounded-md border p-4 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="grid gap-2">
@@ -94,20 +104,31 @@ export default function AddressForm({ data, setData, errors, processing }: Addre
                             </SelectContent>
                         </Select>
                         <InputError message={errors.barangay} />
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="street">Street/Sitio *</Label>
+                    </div>                    <div className="grid gap-2">
+                        <Label htmlFor="street">Street/Sitio *</Label>                        
                         <Input
                             id="street"
                             type="text"
                             required
                             value={data.street}
-                            onChange={(e) => setData("street", e.target.value)}
+                            onChange={handleStreetChange}
                             disabled={processing}
                             placeholder="House No., Street, or Sitio"
                         />
                         <InputError message={errors.street} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="zip_code">Zip Code</Label>                        
+                        <Input
+                            id="zip_code"
+                            type="text"
+                            value={data.zip_code}
+                            onChange={handleZipCodeChange}
+                            disabled={processing}
+                            placeholder="e.g. 5203"
+                        />
+                        <InputError message={errors.zip_code} />
                     </div>
                 </div>
             </div>

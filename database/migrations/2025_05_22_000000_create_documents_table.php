@@ -19,7 +19,7 @@ return new class extends Migration
                 'recommendation',
                 'transcripts',
                 'recommendation_letter',
-                'financial_statement'
+                'financial_statement',
             ]);
             $table->string('file_path');
             $table->string('original_name')->nullable();

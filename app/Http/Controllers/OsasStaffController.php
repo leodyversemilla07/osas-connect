@@ -7,6 +7,7 @@ use App\Models\Scholarship;
 use App\Models\StaffInvitation;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
 
 class OsasStaffController extends Controller
 {
@@ -29,14 +29,14 @@ class OsasStaffController extends Controller
                 'id' => 1,
                 'title' => 'Staff Meeting',
                 'date' => '2025-04-10',
-                'content' => 'Monthly staff meeting at 2:00 PM in the Conference Room.'
+                'content' => 'Monthly staff meeting at 2:00 PM in the Conference Room.',
             ],
             [
                 'id' => 2,
                 'title' => 'Upcoming Training',
                 'date' => '2025-04-18',
-                'content' => 'Mandatory training session on the new student support system.'
-            ]
+                'content' => 'Mandatory training session on the new student support system.',
+            ],
         ];
 
         // Sample pending applications - replace with actual data from database
@@ -47,7 +47,7 @@ class OsasStaffController extends Controller
                 'scholarshipName' => 'Academic Merit Scholarship',
                 'dateSubmitted' => '2025-04-05',
                 'status' => 'pending',
-                'studentId' => 'ST-2025-1001'
+                'studentId' => 'ST-2025-1001',
             ],
             [
                 'id' => 2,
@@ -55,7 +55,7 @@ class OsasStaffController extends Controller
                 'scholarshipName' => 'Need-Based Financial Aid',
                 'dateSubmitted' => '2025-04-03',
                 'status' => 'pending',
-                'studentId' => 'ST-2025-1042'
+                'studentId' => 'ST-2025-1042',
             ],
             [
                 'id' => 3,
@@ -63,8 +63,8 @@ class OsasStaffController extends Controller
                 'scholarshipName' => 'Student Assistantship Program',
                 'dateSubmitted' => '2025-04-01',
                 'status' => 'pending',
-                'studentId' => 'ST-2025-1089'
-            ]
+                'studentId' => 'ST-2025-1089',
+            ],
         ];
 
         // Sample document submissions - replace with actual data from database
@@ -74,22 +74,22 @@ class OsasStaffController extends Controller
                 'studentName' => 'Pedro Garcia',
                 'documentType' => 'Transcript of Records',
                 'submissionDate' => '2025-04-07',
-                'status' => 'pending'
+                'status' => 'pending',
             ],
             [
                 'id' => 2,
                 'studentName' => 'Sofia Lopez',
                 'documentType' => 'Certificate of Registration',
                 'submissionDate' => '2025-04-06',
-                'status' => 'approved'
+                'status' => 'approved',
             ],
             [
                 'id' => 3,
                 'studentName' => 'Carlo Tan',
                 'documentType' => 'Income Tax Return',
                 'submissionDate' => '2025-04-05',
-                'status' => 'rejected'
-            ]
+                'status' => 'rejected',
+            ],
         ];
 
         return Inertia::render('osas_staff/dashboard', [
@@ -111,16 +111,16 @@ class OsasStaffController extends Controller
             ->first();
 
         // Check if invitation exists and is valid
-        if (!$invitation) {
+        if (! $invitation) {
             return Inertia::render('auth/invitation-error', [
-                'message' => 'This invitation is either invalid or has already been used.'
+                'message' => 'This invitation is either invalid or has already been used.',
             ]);
         }
 
         // Check if invitation has expired
         if ($invitation->hasExpired()) {
             return Inertia::render('auth/invitation-error', [
-                'message' => 'This invitation has expired. Please request a new invitation.'
+                'message' => 'This invitation has expired. Please request a new invitation.',
             ]);
         }
 
@@ -287,49 +287,83 @@ class OsasStaffController extends Controller
 
         // Load the student profile with all necessary details
         $user->load('studentProfile');
-        
+
         // Sanitize monetary fields before accessing them to prevent decimal casting errors
         if ($user->studentProfile) {
             $monetaryFields = [
-                'father_monthly_income', 'mother_monthly_income',
-                'combined_annual_pay_parents', 'combined_annual_pay_siblings',
-                'income_from_business', 'income_from_land_rentals', 'income_from_building_rentals',
-                'retirement_benefits_pension', 'commissions', 'support_from_relatives',
-                'bank_deposits', 'other_income_amount', 'total_annual_income',
-                'house_rental', 'food_grocery', 'school_bus_payment', 'transportation_expense',
-                'education_plan_premiums', 'insurance_policy_premiums', 'health_insurance_premium',
-                'sss_gsis_pagibig_loans', 'clothing_expense', 'utilities_expense',
-                'communication_expense', 'medicine_expense', 'doctor_expense',
-                'hospital_expense', 'recreation_expense', 'total_monthly_expenses',
-                'annualized_monthly_expenses', 'school_tuition_fee', 'withholding_tax',
-                'sss_gsis_pagibig_contribution', 'subtotal_annual_expenses', 'total_annual_expenses'
+                'father_monthly_income',
+                'mother_monthly_income',
+                'combined_annual_pay_parents',
+                'combined_annual_pay_siblings',
+                'income_from_business',
+                'income_from_land_rentals',
+                'income_from_building_rentals',
+                'retirement_benefits_pension',
+                'commissions',
+                'support_from_relatives',
+                'bank_deposits',
+                'other_income_amount',
+                'total_annual_income',
+                'house_rental',
+                'food_grocery',
+                'school_bus_payment',
+                'transportation_expense',
+                'education_plan_premiums',
+                'insurance_policy_premiums',
+                'health_insurance_premium',
+                'sss_gsis_pagibig_loans',
+                'clothing_expense',
+                'utilities_expense',
+                'communication_expense',
+                'medicine_expense',
+                'doctor_expense',
+                'hospital_expense',
+                'recreation_expense',
+                'total_monthly_expenses',
+                'annualized_monthly_expenses',
+                'school_tuition_fee',
+                'withholding_tax',
+                'sss_gsis_pagibig_contribution',
+                'subtotal_annual_expenses',
+                'total_annual_expenses',
             ];
-            
+
             // Get raw attributes and sanitize them
             $attributes = $user->studentProfile->getAttributes();
             $sanitizedAttributes = [];
-            
+
             foreach ($attributes as $key => $value) {
                 if (in_array($key, $monetaryFields)) {
                     // Convert non-numeric values to 0 to prevent decimal casting errors
-                    if (is_null($value) || $value === '' || !is_numeric($value)) {
+                    if (is_null($value) || $value === '' || ! is_numeric($value)) {
                         $sanitizedAttributes[$key] = '0.00';
                     } else {
-                        $sanitizedAttributes[$key] = number_format((float)$value, 2, '.', '');
+                        $sanitizedAttributes[$key] = number_format((float) $value, 2, '.', '');
                     }
                 } else {
                     $sanitizedAttributes[$key] = $value;
                 }
             }
-            
+
             // Handle boolean fields
             $booleanFields = [
-                'is_pwd', 'has_tv', 'has_radio_speakers_karaoke', 'has_musical_instruments',
-                'has_computer', 'has_stove', 'has_laptop', 'has_refrigerator',
-                'has_microwave', 'has_air_conditioner', 'has_electric_fan',
-                'has_washing_machine', 'has_cellphone', 'has_gaming_box', 'has_dslr_camera',
+                'is_pwd',
+                'has_tv',
+                'has_radio_speakers_karaoke',
+                'has_musical_instruments',
+                'has_computer',
+                'has_stove',
+                'has_laptop',
+                'has_refrigerator',
+                'has_microwave',
+                'has_air_conditioner',
+                'has_electric_fan',
+                'has_washing_machine',
+                'has_cellphone',
+                'has_gaming_box',
+                'has_dslr_camera',
             ];
-            
+
             foreach ($booleanFields as $field) {
                 if (array_key_exists($field, $sanitizedAttributes)) {
                     $sanitizedAttributes[$field] = (bool) $sanitizedAttributes[$field];
@@ -337,7 +371,7 @@ class OsasStaffController extends Controller
                     $sanitizedAttributes[$field] = false;
                 }
             }
-            
+
             // Handle date fields
             if (isset($sanitizedAttributes['date_of_birth']) && $sanitizedAttributes['date_of_birth']) {
                 try {
@@ -346,15 +380,15 @@ class OsasStaffController extends Controller
                     $sanitizedAttributes['date_of_birth'] = null;
                 }
             }
-            
+
             // Handle siblings array data if exists
             if (isset($sanitizedAttributes['siblings']) && is_string($sanitizedAttributes['siblings'])) {
                 $sanitizedAttributes['siblings'] = json_decode($sanitizedAttributes['siblings'], true) ?? [];
-            } elseif (!isset($sanitizedAttributes['siblings'])) {
+            } elseif (! isset($sanitizedAttributes['siblings'])) {
                 $sanitizedAttributes['siblings'] = [];
             }
         }
-        
+
         // Prepare base user data with all required fields
         $userData = [
             'id' => $user->id,
@@ -368,12 +402,12 @@ class OsasStaffController extends Controller
             'created_at' => $user->created_at,
             'full_name' => $user->full_name,
         ];
-        
+
         // Organize student data by sections
         if ($user->studentProfile && isset($sanitizedAttributes)) {
             // Use sanitized attributes instead of model accessors to avoid casting errors
             $attrs = $sanitizedAttributes;
-            
+
             // Academic Information section
             $academicInfo = [
                 'student_id' => $attrs['student_id'] ?? null,
@@ -382,7 +416,7 @@ class OsasStaffController extends Controller
                 'year_level' => $attrs['year_level'] ?? null,
                 'scholarships' => $attrs['existing_scholarships'] ?? null,
             ];
-            
+
             // Personal Information section
             $personalInfo = [
                 'civil_status' => $attrs['civil_status'] ?? null,
@@ -394,7 +428,7 @@ class OsasStaffController extends Controller
                 'religion' => $attrs['religion'] ?? null,
                 'residence_type' => $attrs['residence_type'] ?? null,
             ];
-            
+
             // Contact Information section
             $contactInfo = [
                 'mobile_number' => $attrs['mobile_number'] ?? null,
@@ -402,7 +436,7 @@ class OsasStaffController extends Controller
                 'email' => $user->email,
                 'residence_type' => $attrs['residence_type'] ?? null,
             ];
-            
+
             // Address Information section
             $addressInfo = [
                 'street' => $attrs['street'] ?? null,
@@ -410,7 +444,7 @@ class OsasStaffController extends Controller
                 'city' => $attrs['city'] ?? null,
                 'province' => $attrs['province'] ?? null,
             ];
-            
+
             // Family Background section
             $familyInfo = [
                 'status_of_parents' => $attrs['status_of_parents'] ?? null,
@@ -418,7 +452,7 @@ class OsasStaffController extends Controller
                 'siblings' => $attrs['siblings'] ?? [],
                 'guardian_name' => $attrs['guardian_name'] ?? null,
             ];
-            
+
             // Father's Information section
             $fatherInfo = [
                 'father_name' => $attrs['father_name'] ?? null,
@@ -429,13 +463,13 @@ class OsasStaffController extends Controller
                 'father_email' => $attrs['father_email'] ?? null,
                 'father_occupation' => $attrs['father_occupation'] ?? null,
                 'father_company' => $attrs['father_company'] ?? null,
-                'father_monthly_income' => $attrs['father_monthly_income'] ?? "0.00",
+                'father_monthly_income' => $attrs['father_monthly_income'] ?? '0.00',
                 'father_years_service' => $attrs['father_years_service'] ?? null,
                 'father_education' => $attrs['father_education'] ?? null,
                 'father_school' => $attrs['father_school'] ?? null,
                 'father_unemployment_reason' => $attrs['father_unemployment_reason'] ?? null,
             ];
-            
+
             // Mother's Information section
             $motherInfo = [
                 'mother_name' => $attrs['mother_name'] ?? null,
@@ -446,29 +480,29 @@ class OsasStaffController extends Controller
                 'mother_email' => $attrs['mother_email'] ?? null,
                 'mother_occupation' => $attrs['mother_occupation'] ?? null,
                 'mother_company' => $attrs['mother_company'] ?? null,
-                'mother_monthly_income' => $attrs['mother_monthly_income'] ?? "0.00",
+                'mother_monthly_income' => $attrs['mother_monthly_income'] ?? '0.00',
                 'mother_years_service' => $attrs['mother_years_service'] ?? null,
                 'mother_education' => $attrs['mother_education'] ?? null,
                 'mother_school' => $attrs['mother_school'] ?? null,
                 'mother_unemployment_reason' => $attrs['mother_unemployment_reason'] ?? null,
             ];
-            
+
             // Income Information section
             $incomeInfo = [
-                'combined_annual_pay_parents' => $attrs['combined_annual_pay_parents'] ?? "0.00",
-                'combined_annual_pay_siblings' => $attrs['combined_annual_pay_siblings'] ?? "0.00",
-                'income_from_business' => $attrs['income_from_business'] ?? "0.00",
-                'income_from_land_rentals' => $attrs['income_from_land_rentals'] ?? "0.00",
-                'income_from_building_rentals' => $attrs['income_from_building_rentals'] ?? "0.00",
-                'retirement_benefits_pension' => $attrs['retirement_benefits_pension'] ?? "0.00",
-                'commissions' => $attrs['commissions'] ?? "0.00",
-                'support_from_relatives' => $attrs['support_from_relatives'] ?? "0.00",
-                'bank_deposits' => $attrs['bank_deposits'] ?? "0.00",
+                'combined_annual_pay_parents' => $attrs['combined_annual_pay_parents'] ?? '0.00',
+                'combined_annual_pay_siblings' => $attrs['combined_annual_pay_siblings'] ?? '0.00',
+                'income_from_business' => $attrs['income_from_business'] ?? '0.00',
+                'income_from_land_rentals' => $attrs['income_from_land_rentals'] ?? '0.00',
+                'income_from_building_rentals' => $attrs['income_from_building_rentals'] ?? '0.00',
+                'retirement_benefits_pension' => $attrs['retirement_benefits_pension'] ?? '0.00',
+                'commissions' => $attrs['commissions'] ?? '0.00',
+                'support_from_relatives' => $attrs['support_from_relatives'] ?? '0.00',
+                'bank_deposits' => $attrs['bank_deposits'] ?? '0.00',
                 'other_income_description' => $attrs['other_income_description'] ?? null,
-                'other_income_amount' => $attrs['other_income_amount'] ?? "0.00",
-                'total_annual_income' => $attrs['total_annual_income'] ?? "0.00",
+                'other_income_amount' => $attrs['other_income_amount'] ?? '0.00',
+                'total_annual_income' => $attrs['total_annual_income'] ?? '0.00',
             ];
-            
+
             // Home Appliances Information section
             $appliancesInfo = [
                 'has_tv' => $attrs['has_tv'] ?? false,
@@ -486,42 +520,42 @@ class OsasStaffController extends Controller
                 'has_gaming_box' => $attrs['has_gaming_box'] ?? false,
                 'has_dslr_camera' => $attrs['has_dslr_camera'] ?? false,
             ];
-            
+
             // Expenses Information section
             $expensesInfo = [
-                'house_rental' => $attrs['house_rental'] ?? "0.00",
-                'food_grocery' => $attrs['food_grocery'] ?? "0.00",
+                'house_rental' => $attrs['house_rental'] ?? '0.00',
+                'food_grocery' => $attrs['food_grocery'] ?? '0.00',
                 'car_loan_details' => $attrs['car_loan_details'] ?? null,
                 'other_loan_details' => $attrs['other_loan_details'] ?? null,
-                'school_bus_payment' => $attrs['school_bus_payment'] ?? "0.00",
-                'transportation_expense' => $attrs['transportation_expense'] ?? "0.00",
-                'education_plan_premiums' => $attrs['education_plan_premiums'] ?? "0.00",
-                'insurance_policy_premiums' => $attrs['insurance_policy_premiums'] ?? "0.00",
-                'health_insurance_premium' => $attrs['health_insurance_premium'] ?? "0.00",
-                'sss_gsis_pagibig_loans' => $attrs['sss_gsis_pagibig_loans'] ?? "0.00",
-                'clothing_expense' => $attrs['clothing_expense'] ?? "0.00",
-                'utilities_expense' => $attrs['utilities_expense'] ?? "0.00",
-                'communication_expense' => $attrs['communication_expense'] ?? "0.00",
+                'school_bus_payment' => $attrs['school_bus_payment'] ?? '0.00',
+                'transportation_expense' => $attrs['transportation_expense'] ?? '0.00',
+                'education_plan_premiums' => $attrs['education_plan_premiums'] ?? '0.00',
+                'insurance_policy_premiums' => $attrs['insurance_policy_premiums'] ?? '0.00',
+                'health_insurance_premium' => $attrs['health_insurance_premium'] ?? '0.00',
+                'sss_gsis_pagibig_loans' => $attrs['sss_gsis_pagibig_loans'] ?? '0.00',
+                'clothing_expense' => $attrs['clothing_expense'] ?? '0.00',
+                'utilities_expense' => $attrs['utilities_expense'] ?? '0.00',
+                'communication_expense' => $attrs['communication_expense'] ?? '0.00',
                 'helper_details' => $attrs['helper_details'] ?? null,
                 'driver_details' => $attrs['driver_details'] ?? null,
-                'medicine_expense' => $attrs['medicine_expense'] ?? "0.00",
-                'doctor_expense' => $attrs['doctor_expense'] ?? "0.00",
-                'hospital_expense' => $attrs['hospital_expense'] ?? "0.00",
-                'recreation_expense' => $attrs['recreation_expense'] ?? "0.00",
+                'medicine_expense' => $attrs['medicine_expense'] ?? '0.00',
+                'doctor_expense' => $attrs['doctor_expense'] ?? '0.00',
+                'hospital_expense' => $attrs['hospital_expense'] ?? '0.00',
+                'recreation_expense' => $attrs['recreation_expense'] ?? '0.00',
                 'other_monthly_expense_details' => $attrs['other_monthly_expense_details'] ?? null,
-                'total_monthly_expenses' => $attrs['total_monthly_expenses'] ?? "0.00",
-                'annualized_monthly_expenses' => $attrs['annualized_monthly_expenses'] ?? "0.00",
-                'school_tuition_fee' => $attrs['school_tuition_fee'] ?? "0.00",
-                'withholding_tax' => $attrs['withholding_tax'] ?? "0.00",
-                'sss_gsis_pagibig_contribution' => $attrs['sss_gsis_pagibig_contribution'] ?? "0.00",
+                'total_monthly_expenses' => $attrs['total_monthly_expenses'] ?? '0.00',
+                'annualized_monthly_expenses' => $attrs['annualized_monthly_expenses'] ?? '0.00',
+                'school_tuition_fee' => $attrs['school_tuition_fee'] ?? '0.00',
+                'withholding_tax' => $attrs['withholding_tax'] ?? '0.00',
+                'sss_gsis_pagibig_contribution' => $attrs['sss_gsis_pagibig_contribution'] ?? '0.00',
                 'other_annual_expense_details' => $attrs['other_annual_expense_details'] ?? null,
-                'subtotal_annual_expenses' => $attrs['subtotal_annual_expenses'] ?? "0.00",
-                'total_annual_expenses' => $attrs['total_annual_expenses'] ?? "0.00",
+                'subtotal_annual_expenses' => $attrs['subtotal_annual_expenses'] ?? '0.00',
+                'total_annual_expenses' => $attrs['total_annual_expenses'] ?? '0.00',
             ];
-            
+
             // Create a safe student profile object using sanitized attributes
             $safeStudentProfile = (object) $attrs;
-            
+
             // Merge organized sections into user data
             $userData = array_merge($userData, [
                 // Add sections to user data
@@ -535,7 +569,7 @@ class OsasStaffController extends Controller
                 'incomeInfo' => $incomeInfo,
                 'appliancesInfo' => $appliancesInfo,
                 'expensesInfo' => $expensesInfo,
-                
+
                 // Also add top-level fields for backward compatibility
                 'student_id' => $attrs['student_id'] ?? null,
                 'course' => $attrs['course'] ?? null,
@@ -548,7 +582,7 @@ class OsasStaffController extends Controller
                 'street' => $attrs['street'] ?? null,
                 'barangay' => $attrs['barangay'] ?? null,
                 'city' => $attrs['city'] ?? null,
-                
+
                 // Include the safe student profile for complete access
                 'studentProfile' => $safeStudentProfile,
             ]);
@@ -573,7 +607,7 @@ class OsasStaffController extends Controller
         $user->load('studentProfile');
 
         // Check if student profile exists
-        if (!$user->studentProfile) {
+        if (! $user->studentProfile) {
             return redirect()->back()->withErrors(['error' => 'Student profile not found.']);
         }
 
@@ -595,13 +629,24 @@ class OsasStaffController extends Controller
 
         // Process student profile data
         $studentProfileData = $user->studentProfile->toArray();
-        
+
         // Ensure boolean fields are properly typed
         $booleanFields = [
-            'is_pwd', 'has_tv', 'has_radio_speakers_karaoke', 'has_musical_instruments',
-            'has_computer', 'has_stove', 'has_laptop', 'has_refrigerator',
-            'has_microwave', 'has_air_conditioner', 'has_electric_fan',
-            'has_washing_machine', 'has_cellphone', 'has_gaming_box', 'has_dslr_camera',
+            'is_pwd',
+            'has_tv',
+            'has_radio_speakers_karaoke',
+            'has_musical_instruments',
+            'has_computer',
+            'has_stove',
+            'has_laptop',
+            'has_refrigerator',
+            'has_microwave',
+            'has_air_conditioner',
+            'has_electric_fan',
+            'has_washing_machine',
+            'has_cellphone',
+            'has_gaming_box',
+            'has_dslr_camera',
         ];
 
         foreach ($booleanFields as $field) {
@@ -609,7 +654,7 @@ class OsasStaffController extends Controller
                 $studentProfileData[$field] = (bool) $studentProfileData[$field];
             }
         }
-        
+
         // Handle date fields
         if (isset($studentProfileData['date_of_birth']) && $studentProfileData['date_of_birth']) {
             try {
@@ -618,14 +663,14 @@ class OsasStaffController extends Controller
                 $studentProfileData['date_of_birth'] = null;
             }
         }
-        
+
         // Handle siblings array data if exists
         if (isset($studentProfileData['siblings']) && is_string($studentProfileData['siblings'])) {
             $studentProfileData['siblings'] = json_decode($studentProfileData['siblings'], true) ?? [];
-        } elseif (!isset($studentProfileData['siblings'])) {
+        } elseif (! isset($studentProfileData['siblings'])) {
             $studentProfileData['siblings'] = [];
         }
-        
+
         $userData['studentProfile'] = $studentProfileData;
 
         return Inertia::render('osas_staff/student-edit', [
@@ -647,7 +692,7 @@ class OsasStaffController extends Controller
         $user->load('studentProfile');
 
         // Check if student profile exists
-        if (!$user->studentProfile) {
+        if (! $user->studentProfile) {
             return redirect()->back()->withErrors(['error' => 'Student profile not found.']);
         }
 
@@ -656,7 +701,7 @@ class OsasStaffController extends Controller
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'student_id' => 'required|string|max:255',
             'course' => 'required|string|max:255',
             'major' => 'nullable|string|max:255',
@@ -715,8 +760,8 @@ class OsasStaffController extends Controller
             ]);
 
             // Prepare student profile data
-            $studentProfileData = array_filter($validatedData, function($key) {
-                return !in_array($key, ['first_name', 'middle_name', 'last_name', 'email']);
+            $studentProfileData = array_filter($validatedData, function ($key) {
+                return ! in_array($key, ['first_name', 'middle_name', 'last_name', 'email']);
             }, ARRAY_FILTER_USE_KEY);
 
             // Handle boolean fields
@@ -729,11 +774,11 @@ class OsasStaffController extends Controller
 
             return redirect()->route('osas.students.details', $user->id)
                 ->with('success', 'Student profile updated successfully.');
-
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->back()
-                ->withErrors(['error' => 'Failed to update student profile: ' . $e->getMessage()])
+                ->withErrors(['error' => 'Failed to update student profile: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -751,9 +796,9 @@ class OsasStaffController extends Controller
         // Apply search filter
         if ($request->search) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%')
-                  ->orWhere('type', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%')
+                    ->orWhere('type', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -775,38 +820,38 @@ class OsasStaffController extends Controller
         $scholarships = $query->paginate(15);
 
         // Transform scholarships data
-        $scholarships->getCollection()->transform(function($scholarship) {
+        $scholarships->getCollection()->transform(function ($scholarship) {
             return [
-            'id' => $scholarship->id,
-            'name' => $scholarship->name,
-            'description' => $scholarship->description,
-            'type' => $scholarship->type,
-            'amount' => $scholarship->amount,
-            'status' => $scholarship->status,
-            'deadline' => $scholarship->deadline ? $scholarship->deadline->format('Y-m-d') : null,
-            'slots' => $scholarship->slots,
-            'slots_available' => $scholarship->slots_available,
-            'beneficiaries' => $scholarship->beneficiaries,
-            'funding_source' => $scholarship->funding_source,
-            'eligibility_criteria' => $scholarship->eligibility_criteria,
-            'required_documents' => $scholarship->required_documents,
-            'stipend_schedule' => $scholarship->stipend_schedule,
-            'criteria' => $scholarship->criteria,
-            'renewal_criteria' => $scholarship->renewal_criteria,
-            'formatted_criteria' => $scholarship->getFormattedEligibilityCriteria(),
-            'total_applications' => $scholarship->total_applications,
-            'approved_applications' => $scholarship->approved_applications,
-            'remaining_slots' => $scholarship->getRemainingSlots(),
-            'is_accepting_applications' => $scholarship->isAcceptingApplications(),
-            'admin_remarks' => $scholarship->admin_remarks,
-            'created_at' => $scholarship->created_at,
-            'updated_at' => $scholarship->updated_at,
+                'id' => $scholarship->id,
+                'name' => $scholarship->name,
+                'description' => $scholarship->description,
+                'type' => $scholarship->type,
+                'amount' => $scholarship->amount,
+                'status' => $scholarship->status,
+                'deadline' => $scholarship->deadline ? $scholarship->deadline->format('Y-m-d') : null,
+                'slots' => $scholarship->slots,
+                'slots_available' => $scholarship->slots_available,
+                'beneficiaries' => $scholarship->beneficiaries,
+                'funding_source' => $scholarship->funding_source,
+                'eligibility_criteria' => $scholarship->eligibility_criteria,
+                'required_documents' => $scholarship->required_documents,
+                'stipend_schedule' => $scholarship->stipend_schedule,
+                'criteria' => $scholarship->criteria,
+                'renewal_criteria' => $scholarship->renewal_criteria,
+                'formatted_criteria' => $scholarship->getFormattedEligibilityCriteria(),
+                'total_applications' => $scholarship->total_applications,
+                'approved_applications' => $scholarship->approved_applications,
+                'remaining_slots' => $scholarship->getRemainingSlots(),
+                'is_accepting_applications' => $scholarship->isAcceptingApplications(),
+                'admin_remarks' => $scholarship->admin_remarks,
+                'created_at' => $scholarship->created_at,
+                'updated_at' => $scholarship->updated_at,
             ];
         });
 
         // Get statistics
         $totalScholarships = \App\Models\Scholarship::count();
-        $activeScholarships = \App\Models\Scholarship::where('status', 'open')->count();
+        $activeScholarships = \App\Models\Scholarship::where('status', 'active')->count();
         $totalApplications = \App\Models\ScholarshipApplication::count();
         $totalBeneficiaries = \App\Models\ScholarshipApplication::where('status', 'approved')->count();
 
@@ -841,7 +886,8 @@ class OsasStaffController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'type' => 'required|string|max:100',
+            'type' => 'required|string|in:academic_full,academic_partial,student_assistantship,performing_arts_full,performing_arts_partial,economic_assistance,others',
+            'type_specification' => 'required_if:type,others|nullable|string|max:255',
             'amount' => 'required|numeric|min:0',
             'status' => 'required|in:draft,active,inactive,upcoming',
             'deadline' => 'nullable|date|after:today',
@@ -857,6 +903,7 @@ class OsasStaffController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'type' => $request->type,
+            'type_specification' => $request->type_specification,
             'amount' => $request->amount,
             'status' => $request->status,
             'deadline' => $request->deadline,
@@ -882,7 +929,8 @@ class OsasStaffController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'type' => 'required|string|max:100',
+            'type' => 'required|string|in:academic_full,academic_partial,student_assistantship,performing_arts_full,performing_arts_partial,economic_assistance,others',
+            'type_specification' => 'required_if:type,others|nullable|string|max:255',
             'amount' => 'required|numeric|min:0',
             'status' => 'required|in:draft,active,inactive,upcoming',
             'deadline' => 'nullable|date',
@@ -898,15 +946,14 @@ class OsasStaffController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'type' => $request->type,
+            'type_specification' => $request->type_specification,
             'amount' => $request->amount,
             'status' => $request->status,
             'deadline' => $request->deadline,
-            'slots' => $request->slots_available, // Map slots_available to slots
-            'funding_source' => $request->funding_source,
-            'eligibility_criteria' => $request->criteria, // Map criteria to eligibility_criteria
-            'required_documents' => $request->required_documents,
             'slots_available' => $request->slots_available,
-            'criteria' => $request->criteria, // Keep both for compatibility
+            'funding_source' => $request->funding_source,
+            'eligibility_criteria' => $request->criteria,
+            'required_documents' => $request->required_documents,
         ]);
 
         return redirect()->route('osas.manage.scholarships')
@@ -914,8 +961,30 @@ class OsasStaffController extends Controller
     }
 
     /**
-     * Show the events page for OSAS staff.
+     * Delete a scholarship.
      */
+    public function destroyScholarship(Scholarship $scholarship)
+    {
+        try {
+            // Check if there are any approved applications
+            $approvedApplicationsCount = $scholarship->applications()->where('status', 'approved')->count();
+
+            if ($approvedApplicationsCount > 0) {
+                return redirect()->route('osas.manage.scholarships')
+                    ->with('error', 'Cannot delete scholarship with approved applications. Please contact the administrator.');
+            }
+
+            $scholarshipName = $scholarship->name;
+            $scholarship->delete();
+
+            return redirect()->route('osas.manage.scholarships')
+                ->with('success', "Scholarship '{$scholarshipName}' has been deleted successfully.");
+        } catch (\Exception $e) {
+            return redirect()->route('osas.manage.scholarships')
+                ->with('error', 'Failed to delete scholarship. Please try again.');
+        }
+    }
+
     public function events(): Response
     {
         // You can load events data here as needed
@@ -944,7 +1013,7 @@ class OsasStaffController extends Controller
      */
     public function scholarshipApplications(Request $request): Response
     {
-        $query = \App\Models\ScholarshipApplication::with(['student.user', 'scholarship', 'documents'])
+        $query = \App\Models\ScholarshipApplication::with(['user', 'scholarship', 'documents'])
             ->latest();
 
         // Apply filters
@@ -953,7 +1022,7 @@ class OsasStaffController extends Controller
         }
 
         if ($request->scholarship_type) {
-            $query->whereHas('scholarship', function($q) use ($request) {
+            $query->whereHas('scholarship', function ($q) use ($request) {
                 $q->where('type', $request->scholarship_type);
             });
         }
@@ -963,34 +1032,37 @@ class OsasStaffController extends Controller
         }
 
         if ($request->search) {
-            $query->whereHas('student.user', function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
-            })->orWhereHas('student', function($q) use ($request) {
-                $q->where('student_id', 'like', '%' . $request->search . '%');
-            })->orWhereHas('scholarship', function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%');
+            $query->where(function ($query) use ($request) {
+                $query->whereHas('user', function ($q) use ($request) {
+                    $q->where('first_name', 'like', '%'.$request->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$request->search.'%')
+                        ->orWhere('email', 'like', '%'.$request->search.'%');
+                })->orWhereHas('user.studentProfile', function ($q) use ($request) {
+                    $q->where('student_id', 'like', '%'.$request->search.'%');
+                })->orWhereHas('scholarship', function ($q) use ($request) {
+                    $q->where('name', 'like', '%'.$request->search.'%');
+                });
             });
         }
 
         // Apply sorting
-        $sortBy = $request->sort_by ?? 'submitted_at';
+        $sortBy = $request->sort_by ?? 'applied_at';
         $sortDirection = $request->sort_direction ?? 'desc';
         $query->orderBy($sortBy, $sortDirection);
 
         $applications = $query->paginate(15);
 
         // Transform applications data
-        $applications->getCollection()->transform(function($application) {
+        $applications->getCollection()->transform(function ($application) {
             return [
                 'id' => $application->id,
                 'student' => [
-                    'id' => $application->student->id,
-                    'name' => $application->student->user->name,
-                    'student_id' => $application->student->student_id,
-                    'email' => $application->student->user->email,
-                    'course' => $application->student->course,
-                    'year_level' => $application->student->year_level,
+                    'id' => $application->user->id,
+                    'name' => $application->user->full_name,
+                    'student_id' => $application->user->studentProfile->student_id,
+                    'email' => $application->user->email,
+                    'course' => $application->user->studentProfile->course,
+                    'year_level' => $application->user->studentProfile->year_level,
                 ],
                 'scholarship' => [
                     'id' => $application->scholarship->id,
@@ -999,13 +1071,13 @@ class OsasStaffController extends Controller
                     'amount' => $application->scholarship->amount,
                 ],
                 'status' => $application->status,
-                'submitted_at' => $application->applied_at?->format('Y-m-d H:i:s') ?? $application->created_at->format('Y-m-d H:i:s'),
+                'submitted_at' => $application->applied_at ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d H:i:s') : $application->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $application->updated_at->format('Y-m-d H:i:s'),
                 'priority' => $application->priority ?? 'medium',
                 'documents_count' => $application->documents->count(),
                 'verified_documents_count' => $application->documents->where('status', 'verified')->count(),
                 'interview_scheduled' => $application->interview_schedule !== null,
-                'deadline' => $application->scholarship->deadline,
+                'deadline' => ($application->scholarship && $application->scholarship->deadline instanceof \Carbon\Carbon) ? $application->scholarship->deadline->format('Y-m-d H:i:s') : null,
                 'reviewer' => $application->reviewer ? [
                     'name' => $application->reviewer->name,
                     'id' => $application->reviewer->id,
@@ -1019,7 +1091,7 @@ class OsasStaffController extends Controller
             ->whereYear('created_at', now()->year)->count();
         $lastMonthCount = \App\Models\ScholarshipApplication::whereMonth('created_at', now()->subMonth()->month)
             ->whereYear('created_at', now()->subMonth()->year)->count();
-        
+
         $completedApplications = \App\Models\ScholarshipApplication::whereIn('status', ['approved', 'rejected'])->count();
         $completionRate = $totalApplications > 0 ? ($completedApplications / $totalApplications) * 100 : 0;
 
@@ -1054,7 +1126,7 @@ class OsasStaffController extends Controller
      */
     public function reviewApplication(\App\Models\ScholarshipApplication $application): Response
     {
-        $application->load(['student.user', 'scholarship', 'documents.verifiedBy', 'comments.user']);
+        $application->load(['user.studentProfile', 'scholarship', 'documents.verifiedBy', 'comments.user']);
 
         // Get application history/timeline
         $timeline = $this->buildApplicationTimeline($application);
@@ -1064,28 +1136,33 @@ class OsasStaffController extends Controller
                 'id' => $application->id,
                 'status' => $application->status,
                 'priority' => $application->priority ?? 'medium',
-                'submitted_at' => $application->applied_at?->format('Y-m-d H:i:s') ?? $application->created_at->format('Y-m-d H:i:s'),
+                'submitted_at' => $application->applied_at ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d H:i:s') : $application->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $application->updated_at->format('Y-m-d H:i:s'),
-                'deadline' => $application->scholarship->deadline,
+                'deadline' => optional($application->scholarship->deadline)->format('Y-m-d H:i:s'),
                 'purpose_letter' => $application->purpose_letter,
                 'academic_year' => $application->academic_year,
                 'semester' => $application->semester,
                 'verifier_comments' => $application->verifier_comments,
                 'interview_scheduled' => $application->interview_schedule !== null,
-                'interview_date' => $application->interview_schedule?->format('Y-m-d H:i:s'),
+                'interview_date' => $application->interview_schedule ? \Carbon\Carbon::parse($application->interview_schedule)->format('Y-m-d H:i:s') : null,
                 'interview_notes' => $application->interview_notes,
                 'student' => [
-                    'id' => $application->student->id,
-                    'name' => $application->student->user->name,
-                    'student_id' => $application->student->student_id,
-                    'email' => $application->student->user->email,
-                    'phone' => $application->student->phone,
-                    'course' => $application->student->course,
-                    'year_level' => $application->student->year_level,
-                    'major' => $application->student->major,
-                    'gpa' => $application->student->gpa,
-                    'address' => $application->student->address,
-                    'photo_url' => $application->student->photo_url,
+                    'id' => $application->user->id,
+                    'name' => $application->user->full_name,
+                    'student_id' => $application->user->studentProfile->student_id,
+                    'email' => $application->user->email,
+                    'phone' => $application->user->studentProfile->mobile_number,
+                    'course' => $application->user->studentProfile->course,
+                    'year_level' => $application->user->studentProfile->year_level,
+                    'major' => $application->user->studentProfile->major,
+                    'gpa' => $application->user->studentProfile->current_gwa,
+                    'address' => implode(', ', array_filter([
+                        $application->user->studentProfile->street,
+                        $application->user->studentProfile->barangay,
+                        $application->user->studentProfile->city,
+                        $application->user->studentProfile->province,
+                    ])),
+                    'photo_url' => $application->user->avatar,
                 ],
                 'scholarship' => [
                     'id' => $application->scholarship->id,
@@ -1097,7 +1174,7 @@ class OsasStaffController extends Controller
                     'requirements' => explode("\n", $application->scholarship->requirements ?? ''),
                     'deadline' => $application->scholarship->deadline,
                 ],
-                'documents' => $application->documents->map(function($doc) {
+                'documents' => $application->documents->map(function ($doc) {
                     return [
                         'id' => $doc->id,
                         'name' => $doc->type,
@@ -1109,8 +1186,8 @@ class OsasStaffController extends Controller
                         'is_verified' => $doc->status === 'verified',
                         'verified_at' => $doc->verified_at?->format('Y-m-d H:i:s'),
                         'verified_by' => $doc->verifiedBy ? [
-                            'name' => $doc->verifiedBy->name ?? 'Unknown',
-                            'id' => $doc->verifiedBy->id ?? 0,
+                            'name' => $doc->verifiedBy->first_name.' '.$doc->verifiedBy->last_name,
+                            'id' => $doc->verifiedBy->id,
                         ] : null,
                         'uploaded_at' => $doc->created_at->format('Y-m-d H:i:s'),
                         'status' => $doc->status ?? 'pending',
@@ -1120,7 +1197,7 @@ class OsasStaffController extends Controller
                 'timeline' => $timeline,
                 'progress' => [
                     'submitted' => true,
-                    'documents_verified' => $application->documents->every(fn($doc) => $doc->status === 'verified'),
+                    'documents_verified' => $application->documents->every(fn ($doc) => $doc->status === 'verified'),
                     'interview_completed' => $application->interview_schedule !== null && $application->interview_notes !== null,
                     'review_completed' => in_array($application->status, ['approved', 'rejected']),
                 ],
@@ -1128,7 +1205,7 @@ class OsasStaffController extends Controller
                     'name' => Auth::user()->name,
                     'id' => Auth::user()->id,
                 ] : null,
-                'comments' => $application->comments->map(function($comment) {
+                'comments' => $application->comments->map(function ($comment) {
                     return [
                         'id' => $comment->id,
                         'comment' => $comment->comment,
@@ -1182,7 +1259,7 @@ class OsasStaffController extends Controller
 
         // Check if all documents are verified, update application status
         $application = $document->application;
-        $allDocumentsVerified = $application->documents->every(function($doc) {
+        $allDocumentsVerified = $application->documents->every(function ($doc) {
             return $doc->status === 'verified';
         });
 
@@ -1229,7 +1306,7 @@ class OsasStaffController extends Controller
         }
 
         if ($request->scholarship_type) {
-            $query->whereHas('scholarship', function($q) use ($request) {
+            $query->whereHas('scholarship', function ($q) use ($request) {
                 $q->where('type', $request->scholarship_type);
             });
         }
@@ -1239,23 +1316,23 @@ class OsasStaffController extends Controller
         }
 
         if ($request->search) {
-            $query->whereHas('student.user', function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
-            })->orWhereHas('student', function($q) use ($request) {
-                $q->where('student_id', 'like', '%' . $request->search . '%');
-            })->orWhereHas('scholarship', function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%');
+            $query->whereHas('student.user', function ($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('email', 'like', '%'.$request->search.'%');
+            })->orWhereHas('student', function ($q) use ($request) {
+                $q->where('student_id', 'like', '%'.$request->search.'%');
+            })->orWhereHas('scholarship', function ($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->search.'%');
             });
         }
 
         $applications = $query->get();
 
-        $filename = 'scholarship_applications_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $filename = 'scholarship_applications_'.now()->format('Y-m-d_H-i-s').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
         $columns = [
@@ -1277,18 +1354,18 @@ class OsasStaffController extends Controller
             'Deadline',
         ];
 
-        $callback = function() use ($applications, $columns) {
+        $callback = function () use ($applications, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
             foreach ($applications as $application) {
                 $row = [
                     $application->id,
-                    $application->student->user->name,
-                    $application->student->student_id,
-                    $application->student->user->email,
-                    $application->student->course,
-                    $application->student->year_level,
+                    $application->user->name,
+                    $application->user->studentProfile->student_id ?? $application->user->studentProfile->id,
+                    $application->user->email,
+                    $application->user->studentProfile->course ?? 'N/A',
+                    $application->user->studentProfile->year_level ?? 'N/A',
                     $application->scholarship->name,
                     $application->scholarship->type,
                     $application->scholarship->amount,
@@ -1325,7 +1402,7 @@ class OsasStaffController extends Controller
             $timeline[] = [
                 'title' => 'Application Submitted',
                 'description' => 'Application submitted for review.',
-                'date' => $application->applied_at->format('F j, Y'),
+                'date' => \Carbon\Carbon::parse($application->applied_at)->format('F j, Y'),
                 'status' => 'completed',
                 'icon' => 'check-circle',
             ];

@@ -14,10 +14,9 @@ export default function RescheduleModal({ isOpen, setIsOpen, interview }: Props)
   const form = useForm({
     reason: '',
   });
-
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    form.post(route('scholarships.interviews.reschedule', interview.id), {
+    form.post(route('student.interviews.reschedule', interview.id), {
       onSuccess: () => {
         setIsOpen(false);
         form.reset();

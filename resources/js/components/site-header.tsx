@@ -3,7 +3,23 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 
-export default function SiteHeader() {
+interface NavigationItem {
+    label: string;
+    url: string;
+    active: boolean;
+}
+
+interface HeaderContent {
+    logo_text?: string;
+    tagline?: string;
+    navigation?: NavigationItem[];
+}
+
+interface Props {
+    content?: HeaderContent;
+}
+
+export default function SiteHeader({ content }: Props) {
     const { auth } = usePage<SharedData>().props;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
@@ -11,6 +27,15 @@ export default function SiteHeader() {
     const navRef = useRef<HTMLDivElement>(null);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+    // Default navigation if no CMS content provided
+    const defaultNavigation = [
+        { label: 'Home', url: '/', active: true },
+        { label: 'About', url: '/about', active: true },
+        { label: 'Scholarships', url: '/scholarships', active: true },
+        { label: 'Announcements', url: '/announcements', active: true },
+        { label: 'Contact', url: '/contact', active: true },
+    ];
 
     // Handle click outside to close dropdown
     useEffect(() => {
@@ -115,8 +140,7 @@ export default function SiteHeader() {
             role="navigation"
         >
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <header className="relative flex h-16 items-center justify-between">
-                    {/* Logo Section */}
+                <header className="relative flex h-16 items-center justify-between">                    {/* Logo Section */}
                     <div className="flex flex-shrink-0 items-center">
                         <Link href="/" className="flex items-center">
                             <img
@@ -127,8 +151,12 @@ export default function SiteHeader() {
                                     e.currentTarget.src = "https://placehold.co/32x32/005a2d/febd12?text=OC";
                                 }}
                             />
-                            <span className="text-xl font-semibold text-white">OSAS Connect</span>
-                            <span className="ml-2 hidden text-xs text-[#febd12] sm:block">Scholarship Management</span>
+                            <span className="text-xl font-semibold text-white">
+                                {content?.logo_text || 'OSAS Connect'}
+                            </span>
+                            <span className="ml-2 hidden text-xs text-[#febd12] sm:block">
+                                {content?.tagline || 'Scholarship Management'}
+                            </span>
                         </Link>
                     </div>
 
@@ -136,57 +164,19 @@ export default function SiteHeader() {
                     <nav
                         className="hidden md:block"
                         aria-label="Primary navigation"
-                    >
-                        <ul className="flex space-x-8" role="menubar">
-                            <li role="none">
-                                <Link
-                                    href="/"
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('home') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
-                                    aria-current={route().current('home') ? 'page' : undefined}
-                                    role="menuitem"
-                                >
-                                    Home
-                                </Link>
-                            </li>
-                            <li role="none">
-                                <Link
-                                    href="/about"
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('about') || route().current('about.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
-                                    aria-current={route().current('about') || route().current('about.*') ? 'page' : undefined}
-                                    role="menuitem"
-                                >
-                                    About
-                                </Link>
-                            </li>
-                            <li role="none">                                <Link
-                                    href={route('scholarships.available')}
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('scholarships.available') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
-                                    aria-current={route().current('scholarships.available') ? 'page' : undefined}
-                                    role="menuitem"
-                                >
-                                    Scholarships
-                                </Link>
-                            </li>
-                            <li role="none">
-                                <Link
-                                    href="/announcements"
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('announcements') || route().current('announcements.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
-                                    aria-current={route().current('announcements') || route().current('announcements.*') ? 'page' : undefined}
-                                    role="menuitem"
-                                >
-                                    Announcements
-                                </Link>
-                            </li>
-                            <li role="none">
-                                <Link
-                                    href="/contact"
-                                    className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('contact') || route().current('contact.*') ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
-                                    aria-current={route().current('contact') || route().current('contact.*') ? 'page' : undefined}
-                                    role="menuitem"
-                                >
-                                    Contact
-                                </Link>
-                            </li>
+                    >                        <ul className="flex space-x-8" role="menubar">
+                            {(content?.navigation || defaultNavigation).map((item, index) => (
+                                <li key={index} role="none">
+                                    <Link
+                                        href={item.url}
+                                        className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current() === item.url.replace('/', '') || (item.url === '/' && route().current('home')) ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
+                                        aria-current={route().current() === item.url.replace('/', '') || (item.url === '/' && route().current('home')) ? 'page' : undefined}
+                                        role="menuitem"
+                                    >
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </nav>
 
@@ -247,51 +237,21 @@ export default function SiteHeader() {
                 id="mobile-menu"
                 ref={mobileMenuRef}
                 aria-expanded={isMenuOpen}
-            >
-                <nav
+            >                <nav
                     className="space-y-1 bg-[#004020] px-4 pb-3 pt-2 sm:px-6"
                     aria-label="Mobile navigation"
                 >
-                    <Link
-                        href="/"
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('home') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
-                        aria-current={route().current('home') ? 'page' : undefined}
-                        role="menuitem"
-                    >
-                        Home
-                    </Link>
-                    <Link
-                        href="/about"
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('about') || route().current('about.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
-                        aria-current={route().current('about') || route().current('about.*') ? 'page' : undefined}
-                        role="menuitem"
-                    >
-                        About
-                    </Link>
-                    <Link
-                        href={route('scholarships.index')}
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('scholarships.index') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
-                        aria-current={route().current('scholarships.index') ? 'page' : undefined}
-                        role="menuitem"
-                    >
-                        Scholarships
-                    </Link>
-                    <Link
-                        href="/announcements"
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('announcements') || route().current('announcements.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
-                        aria-current={route().current('announcements') || route().current('announcements.*') ? 'page' : undefined}
-                        role="menuitem"
-                    >
-                        Announcements
-                    </Link>
-                    <Link
-                        href="/contact"
-                        className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current('contact') || route().current('contact.*') ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
-                        aria-current={route().current('contact') || route().current('contact.*') ? 'page' : undefined}
-                        role="menuitem"
-                    >
-                        Contact
-                    </Link>
+                    {(content?.navigation || defaultNavigation).map((item, index) => (
+                        <Link
+                            key={index}
+                            href={item.url}
+                            className={`flex items-center rounded-md px-3 py-2 text-base font-medium text-white transition-all duration-200 hover:bg-[#005a2d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current() === item.url.replace('/', '') || (item.url === '/' && route().current('home')) ? 'bg-[#005a2d] text-[#febd12]' : ''}`}
+                            aria-current={route().current() === item.url.replace('/', '') || (item.url === '/' && route().current('home')) ? 'page' : undefined}
+                            role="menuitem"
+                        >
+                            {item.label}
+                        </Link>
+                    ))}
 
                     <div className="mt-4 border-t border-[#006a3d] pt-4">
                         {auth.user ? (

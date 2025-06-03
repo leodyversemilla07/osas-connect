@@ -190,13 +190,13 @@ export const columns: ColumnDef<Application>[] = [
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-40">
                             <DropdownMenuItem asChild>
-                                <Link href={`/scholarships/applications/${application.id}`} className="text-base cursor-pointer">
+                                <Link href={`/student/scholarships/applications/${application.id}`} className="text-base cursor-pointer">
                                     View
                                 </Link>
                             </DropdownMenuItem>
                             {application.status === 'incomplete' && (
                                 <DropdownMenuItem asChild>
-                                    <Link href={`/scholarships/applications/${application.id}/complete`} className="text-base cursor-pointer">
+                                    <Link href={`/student/scholarships/applications/${application.id}/complete`} className="text-base cursor-pointer">
                                         Edit
                                     </Link>
                                 </DropdownMenuItem>

@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Scholarship extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
         'type',
+        'type_specification',
         'description',
-        'status',
         'amount',
         'deadline',
         'slots',
@@ -26,6 +27,7 @@ class Scholarship extends Model
         'slots_available',
         'criteria',
         'renewal_criteria',
+        'status',
         'admin_remarks',
     ];
 
@@ -38,29 +40,25 @@ class Scholarship extends Model
         'amount' => 'decimal:2',
     ];
 
-    // Scholarship Types
-    const TYPE_ACADEMIC_FULL = 'Academic';
+    // MinSU Institutional Scholarship Types
+    const TYPES = [
+        'academic_full' => 'Academic Scholarship (Full) - President\'s Lister',
+        'academic_partial' => 'Academic Scholarship (Partial) - Dean\'s Lister',
+        'student_assistantship' => 'Student Assistantship Program',
+        'performing_arts_full' => 'MinSU Accredited Performing Arts Group (Full Scholar)',
+        'performing_arts_partial' => 'MinSU Accredited Performing Arts Group (Partial Scholar)',
+        'economic_assistance' => 'Economically Deprived/Marginalized Student',
+        'others' => 'Others (Custom Type)',
+    ];
 
-    const TYPE_ACADEMIC_PARTIAL = 'Academic';
+    const STATUSES = [
+        'draft' => 'Draft',
+        'active' => 'Active',
+        'inactive' => 'Inactive',
+        'upcoming' => 'Upcoming',
+    ];
 
-    const TYPE_STUDENT_ASSISTANTSHIP = 'Student Assistantship';
-
-    const TYPE_PERFORMING_ARTS = 'Performing Arts';
-
-    const TYPE_ECONOMIC_ASSISTANCE = 'Economic Assistance';
-
-    // Payment Schedules
-    const SCHEDULE_MONTHLY = 'monthly';
-
-    const SCHEDULE_SEMESTRAL = 'semestral';
-
-    // Status Types
-    const STATUS_OPEN = 'open';
-
-    const STATUS_CLOSED = 'closed';
-
-    const STATUS_UPCOMING = 'upcoming';
-
+    // MinSU-specific GWA requirements
     protected $gwa_requirements = [
         'academic_full' => [
             'min' => 1.000,
@@ -70,18 +68,28 @@ class Scholarship extends Model
             'min' => 1.460,
             'max' => 1.750,
         ],
+        'student_assistantship' => [
+            'max' => 2.250, // No failing grades requirement
+        ],
+        'performing_arts_full' => [
+            'max' => 2.250, // No specific GWA but reasonable academic standing
+        ],
+        'performing_arts_partial' => [
+            'max' => 2.250, // No specific GWA but reasonable academic standing
+        ],
         'economic_assistance' => [
             'max' => 2.250,
         ],
     ];
 
+    // MinSU-specific stipend amounts
     protected $stipend_amounts = [
         'academic_full' => 500,
         'academic_partial' => 300,
+        'student_assistantship' => null, // Based on work hours
         'performing_arts_full' => 500,
         'performing_arts_partial' => 300,
         'economic_assistance' => 400,
-        // Student Assistantship rate is based on work hours
     ];
 
     /**
@@ -90,6 +98,161 @@ class Scholarship extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(ScholarshipApplication::class);
+    }
+
+    /**
+     * Scope a query to only include active scholarships.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    /**
+     * Get the minimum GWA requirement for this scholarship.
+     */
+    public function getMinimumGwa()
+    {
+        $requirement = $this->getGwaRequirement();
+
+        return $requirement['min'] ?? null;
+    }
+
+    /**
+     * Get the maximum GWA requirement for this scholarship.
+     */
+    public function getMaximumGwa()
+    {
+        $requirement = $this->getGwaRequirement();
+
+        return $requirement['max'] ?? null;
+    }
+
+    /**
+     * Get MinSU-specific required documents for scholarship type.
+     */
+    public function getRequiredDocuments(): array
+    {
+        $common_docs = [
+            'transcript_of_records' => 'Official Transcript of Records',
+            'registration_form' => 'Certificate of Registration',
+            'birth_certificate' => 'Birth Certificate',
+            'id_photo' => '2x2 ID Photo',
+        ];
+
+        $specific_docs = [];
+
+        switch ($this->type) {
+            case 'academic_full':
+            case 'academic_partial':
+                $specific_docs = [
+                    'grade_reports' => 'Previous Semester Grade Reports',
+                    'good_moral' => 'Certificate of Good Moral Character',
+                ];
+                break;
+
+            case 'student_assistantship':
+                $specific_docs = [
+                    'parent_consent' => 'Parent/Guardian Consent Form',
+                    'medical_certificate' => 'Medical Certificate',
+                    'application_letter' => 'Application Letter',
+                ];
+                break;
+
+            case 'performing_arts_full':
+            case 'performing_arts_partial':
+                $specific_docs = [
+                    'coach_recommendation' => 'Coach/Adviser Recommendation Letter',
+                    'performance_portfolio' => 'Portfolio of Performances/Activities',
+                    'membership_certificate' => 'Group Membership Certificate',
+                ];
+                break;
+
+            case 'economic_assistance':
+                $specific_docs = [
+                    'indigency_certificate' => 'Certificate of Indigency from MSWDO',
+                    'income_certificate' => 'Family Income Certificate',
+                    'barangay_certificate' => 'Barangay Certificate',
+                ];
+                break;
+        }
+
+        return array_merge($common_docs, $specific_docs);
+    }
+
+    /**
+     * Get MinSU-specific eligibility criteria for scholarship type.
+     */
+    public function getEligibilityCriteria(): array
+    {
+        $common_criteria = [
+            'Must be a currently enrolled MinSU student',
+            'Must maintain good moral character',
+            'No disciplinary cases or pending charges',
+        ];
+
+        $specific_criteria = [];
+
+        switch ($this->type) {
+            case 'academic_full':
+                $specific_criteria = [
+                    'GWA of 1.000 - 1.450 (President\'s Lister)',
+                    'No grade below 1.75',
+                    'No dropped, deferred, or failed subjects',
+                    'Must be enrolled in at least 18 units',
+                    'Must not be receiving any other scholarship',
+                ];
+                break;
+
+            case 'academic_partial':
+                $specific_criteria = [
+                    'GWA of 1.460 - 1.750 (Dean\'s Lister)',
+                    'No grade below 2.00',
+                    'No dropped, deferred, or failed subjects',
+                    'Must be enrolled in at least 18 units',
+                    'Must not be receiving any other scholarship',
+                ];
+                break;
+
+            case 'student_assistantship':
+                $specific_criteria = [
+                    'Maximum of 21 units enrollment per semester',
+                    'No failing grades in previous semester',
+                    'Must undergo pre-hiring screening',
+                    'Parental consent required',
+                    'Must be available for assigned work schedule',
+                ];
+                break;
+
+            case 'performing_arts_full':
+                $specific_criteria = [
+                    'Active member of MinSU accredited performing arts group for 1+ year',
+                    'Participated in major performances/competitions',
+                    'Coach/adviser recommendation required',
+                    'Demonstrated excellence in artistic field',
+                ];
+                break;
+
+            case 'performing_arts_partial':
+                $specific_criteria = [
+                    'Member of MinSU accredited performing arts group for 1+ semester',
+                    'Performed in at least 2 major activities',
+                    'Coach/adviser recommendation required',
+                    'Showed commitment to group activities',
+                ];
+                break;
+
+            case 'economic_assistance':
+                $specific_criteria = [
+                    'Maximum GWA of 2.25',
+                    'Valid Certificate of Indigency from MSWDO',
+                    'Demonstrated financial need',
+                    'Family income below poverty threshold',
+                ];
+                break;
+        }
+
+        return array_merge($common_criteria, $specific_criteria);
     }
 
     /**
@@ -108,12 +271,17 @@ class Scholarship extends Model
     }
 
     /**
-     * Get stipend amount for a scholarship type.
-     *
-     * @param  string  $subtype  Optional subtype for scholarships with variations
+     * Get stipend amount for a scholarship.
+     * Now uses the database amount field instead of hardcoded values.
      */
     public function getStipendAmount(?string $subtype = null): ?float
     {
+        // Return the amount from database if set
+        if ($this->amount !== null) {
+            return (float) $this->amount;
+        }
+
+        // Fallback to predefined amounts if database amount is not set
         $key = strtolower($this->type);
         if ($subtype) {
             $key .= '_'.strtolower($subtype);
@@ -122,14 +290,12 @@ class Scholarship extends Model
         return $this->stipend_amounts[$key] ?? null;
     }
 
-    /**
-     * Check if the scholarship is currently accepting applications.
-     */
     public function isAcceptingApplications(): bool
     {
-        return $this->status === self::STATUS_OPEN
-            && $this->deadline >= now()
-            && $this->slots_available > 0;
+        return $this->status === 'active' &&
+               $this->deadline &&
+               now()->lte($this->deadline) &&
+               $this->applications()->where('status', 'approved')->count() < $this->slots_available;
     }
 
     /**
@@ -145,26 +311,13 @@ class Scholarship extends Model
      */
     public function getFormattedEligibilityCriteria(): string
     {
-        $criteria = [];
-
-        // Add GWA requirement if applicable
-        if ($gwa = $this->getGwaRequirement()) {
-            $gwa_text = isset($gwa['min'])
-                ? "GWA between {$gwa['min']} - {$gwa['max']}"
-                : "GWA not lower than {$gwa['max']}";
-            $criteria[] = $gwa_text;
-        }
+        $criteria = $this->getEligibilityCriteria();
 
         // Add stipend amount if applicable
         if ($amount = $this->getStipendAmount()) {
             $criteria[] = 'Monthly stipend: ₱'.number_format($amount, 2);
         }
 
-        // Add other criteria from the database
-        if (! empty($this->criteria)) {
-            $criteria = array_merge($criteria, $this->criteria);
-        }
-
-        return implode("\n• ", $criteria);
+        return '• '.implode("\n• ", $criteria);
     }
 }

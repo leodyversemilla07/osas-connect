@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
+import PlaceOfBirthForm from '@/components/place-of-birth-form';
 import { cn } from '@/lib/utils';
 
 interface StudentWithProfile extends UserType {
@@ -347,16 +348,16 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                         </FormField>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                        <FormField label="Place of Birth" error={errors.place_of_birth}>
-                            <Input
-                                id="place_of_birth"
-                                value={data.place_of_birth}
-                                onChange={(e) => setData('place_of_birth', e.target.value)}
-                                className="border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-gray-400 dark:focus-visible:border-gray-500"
-                                placeholder="Birth place"
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">                        <div className="grid gap-2">
+                            <PlaceOfBirthForm
+                                data={{
+                                    place_of_birth: data.place_of_birth || '',
+                                }}
+                                setData={(field, value) => setData(field, value)}
+                                errors={errors}
+                                processing={processing}
                             />
-                        </FormField>
+                        </div>
 
                         <FormField label="Religion" error={errors.religion}>
                             <Input
@@ -593,6 +594,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                         </FormField>
                     </div>
 
+                    
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                         <FormField label="Monthly Income" error={errors.father_monthly_income}>
                             <Input

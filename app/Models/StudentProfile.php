@@ -21,6 +21,9 @@ class StudentProfile extends Model
         'course',
         'major',
         'year_level',
+        'current_gwa',
+        'enrollment_status',
+        'units',
         'existing_scholarships',
 
         // Personal Information
@@ -32,6 +35,7 @@ class StudentProfile extends Model
         'barangay',
         'city',
         'province',
+        'zip_code',
         'mobile_number',
         'telephone_number',
         'is_pwd',
@@ -147,6 +151,8 @@ class StudentProfile extends Model
     protected $casts = [
         'date_of_birth' => 'datetime',
         'is_pwd' => 'boolean',
+        'current_gwa' => 'decimal:3',
+        'units' => 'integer',
 
         // Siblings Information
         'siblings' => 'array',
@@ -256,6 +262,9 @@ class StudentProfile extends Model
         'father_monthly_income' => 'decimal:2',
         'mother_monthly_income' => 'decimal:2',
 
+        // GWA
+        'current_gwa' => 'decimal:3',
+
         // Parent Years Service
         'father_years_service' => 'integer',
         'mother_years_service' => 'integer',
@@ -274,7 +283,7 @@ class StudentProfile extends Model
      */
     public function scholarshipApplications()
     {
-        return $this->hasMany(ScholarshipApplication::class, 'student_id');
+        return $this->hasMany(ScholarshipApplication::class, 'user_id', 'user_id');
     }
 
     /**
@@ -282,7 +291,7 @@ class StudentProfile extends Model
      */
     public function applications()
     {
-        return $this->hasMany(ScholarshipApplication::class, 'student_id', 'id');
+        return $this->hasMany(ScholarshipApplication::class, 'user_id', 'user_id');
     }
 
     /**
@@ -322,9 +331,9 @@ class StudentProfile extends Model
     {
         return $this->scholarshipApplications()
             ->whereIn('status', [
-                ScholarshipApplication::STATUS_APPROVED,
-                ScholarshipApplication::STATUS_UNDER_EVALUATION,
-                ScholarshipApplication::STATUS_VERIFIED,
+                'approved',
+                'under_review',
+                'interview_scheduled',
             ]);
     }
 
@@ -340,10 +349,10 @@ class StudentProfile extends Model
         }
 
         if ($type === 'full') {
-            return $this->gwa >= 1.000 && $this->gwa <= 1.450 && ! $this->hasGradeBelow(1.75);
+            return $this->current_gwa >= 1.000 && $this->current_gwa <= 1.450 && ! $this->hasGradeBelow(1.75);
         }
 
-        return $this->gwa >= 1.460 && $this->gwa <= 1.750 && ! $this->hasGradeBelow(2.00);
+        return $this->current_gwa >= 1.460 && $this->current_gwa <= 1.750 && ! $this->hasGradeBelow(2.00);
     }
 
     /**
@@ -359,7 +368,7 @@ class StudentProfile extends Model
      */
     public function isEligibleForEconomicAssistance(): bool
     {
-        return $this->gwa <= 2.25;
+        return $this->current_gwa <= 2.25;
     }
 
     /**
@@ -374,16 +383,16 @@ class StudentProfile extends Model
             ->get()
             ->filter(function ($scholarship) {
                 switch ($scholarship->type) {
-                    case Scholarship::TYPE_ACADEMIC_FULL:
-                    case Scholarship::TYPE_ACADEMIC_PARTIAL:
+                    case 'academic_full':
+                    case 'academic_partial':
                         $isFullScholarship = str_contains(strtolower($scholarship->name), 'full');
 
                         return $this->isEligibleForAcademicScholarship($isFullScholarship ? 'full' : 'partial');
 
-                    case Scholarship::TYPE_STUDENT_ASSISTANTSHIP:
+                    case 'student_assistantship':
                         return $this->isEligibleForStudentAssistantship();
 
-                    case Scholarship::TYPE_ECONOMIC_ASSISTANCE:
+                    case 'economic_assistance':
                         return $this->isEligibleForEconomicAssistance();
 
                     default:

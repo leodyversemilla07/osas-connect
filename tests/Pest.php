@@ -15,6 +15,10 @@ pest()->extend(Tests\TestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
+pest()->extend(Tests\TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Unit');
+
 /*
 |--------------------------------------------------------------------------
 | Expectations
@@ -41,7 +45,45 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Create a user for testing purposes
+ */
+function createUser(array $attributes = []): \App\Models\User
 {
-    // ..
+    return \App\Models\User::factory()->create($attributes);
+}
+
+/**
+ * Create an authenticated user and return the user instance
+ */
+function actingAsUser(array $attributes = []): \App\Models\User
+{
+    $user = createUser($attributes);
+    test()->actingAs($user);
+
+    return $user;
+}
+
+/**
+ * Create a scholarship for testing
+ */
+function createScholarship(array $attributes = []): \App\Models\Scholarship
+{
+    return \App\Models\Scholarship::factory()->create($attributes);
+}
+
+/**
+ * Create a scholarship application for testing
+ */
+function createScholarshipApplication(array $attributes = []): \App\Models\ScholarshipApplication
+{
+    return \App\Models\ScholarshipApplication::factory()->create($attributes);
+}
+
+/**
+ * Assert that a response redirects to login
+ */
+function assertRedirectsToLogin($response): void
+{
+    $response->assertRedirect(route('login'));
 }

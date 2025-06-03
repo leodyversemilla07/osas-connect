@@ -10,22 +10,26 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { 
-    MoreVertical, 
-    Eye, 
-    FileText, 
-    Calendar, 
-    Clock, 
-    CheckCircle, 
-    XCircle, 
-    AlertCircle,
+import {
+    MoreVertical,
+    Eye,
+    FileText,
+    Calendar,
+    Clock,
+    CheckCircle,
+    XCircle,
     ArrowUpDown,
-    User
+    User,
+    ShieldCheck,
+    AlertTriangle,
+    Pause,
+    GraduationCap,
+    HelpCircle
 } from "lucide-react"
 import { Link } from "@inertiajs/react"
 import { cn } from "@/lib/utils"
 
-// Application type definition
+// Updated Application type definition to match backend
 export type Application = {
     id: number;
     student: {
@@ -42,7 +46,8 @@ export type Application = {
         type: string;
         amount: string;
     };
-    status: 'pending' | 'under_review' | 'approved' | 'rejected' | 'on_hold';
+    // Updated to match actual backend status values
+    status: 'submitted' | 'under_verification' | 'verified' | 'under_evaluation' | 'approved' | 'rejected' | 'incomplete' | 'on_hold' | 'pending' | 'under_review';
     submitted_at: string;
     updated_at: string;
     priority: 'high' | 'medium' | 'low';
@@ -56,17 +61,28 @@ export type Application = {
     };
 }
 
-// Status configuration
+// Updated comprehensive status configuration
 const statusConfig = {
-    pending: {
-        label: 'Pending',
-        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-        icon: Clock,
-    },
-    under_review: {
-        label: 'Under Review',
+    // Backend status values
+    submitted: {
+        label: 'Submitted',
         color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        icon: CheckCircle,
+    },
+    under_verification: {
+        label: 'Under Verification',
+        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
         icon: Eye,
+    },
+    verified: {
+        label: 'Verified',
+        color: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+        icon: ShieldCheck,
+    },
+    under_evaluation: {
+        label: 'Under Evaluation',
+        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+        icon: GraduationCap,
     },
     approved: {
         label: 'Approved',
@@ -78,12 +94,50 @@ const statusConfig = {
         color: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
         icon: XCircle,
     },
+    incomplete: {
+        label: 'Incomplete',
+        color: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+        icon: AlertTriangle,
+    },
     on_hold: {
         label: 'On Hold',
         color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
-        icon: AlertCircle,
+        icon: Pause,
+    },
+    // Legacy frontend status values (for backward compatibility)
+    pending: {
+        label: 'Pending',
+        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
+        icon: Clock,
+    },
+    under_review: {
+        label: 'Under Review',
+        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        icon: Eye,
     },
 } as const;
+
+// Safe status component with fallback
+const StatusCell = ({ status }: { status: string }) => {
+    const config = statusConfig[status as keyof typeof statusConfig];
+
+    // Fallback configuration for unknown statuses
+    const fallbackConfig = {
+        label: status ? status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' ') : 'Unknown',
+        color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
+        icon: HelpCircle,
+    };
+
+    const finalConfig = config || fallbackConfig;
+    const StatusIcon = finalConfig.icon;
+
+    return (
+        <Badge className={cn(finalConfig.color)}>
+            <StatusIcon className="h-3 w-3 mr-1" />
+            {finalConfig.label}
+        </Badge>
+    );
+};
 
 export const columns: ColumnDef<Application>[] = [
     {
@@ -153,6 +207,11 @@ export const columns: ColumnDef<Application>[] = [
                 </div>
             );
         },
+        accessorFn: (row) => {
+            // Create a searchable string for the student column
+            const student = row.student;
+            return `${student.name} ${student.student_id} ${student.email} ${student.course} ${student.year_level}`;
+        },
     },
     {
         accessorKey: "scholarship",
@@ -184,15 +243,8 @@ export const columns: ColumnDef<Application>[] = [
             )
         },
         cell: ({ row }) => {
-            const status = row.getValue("status") as Application["status"];
-            const StatusIcon = statusConfig[status].icon;
-            
-            return (
-                <Badge className={cn(statusConfig[status].color)}>
-                    <StatusIcon className="h-3 w-3 mr-1" />
-                    {statusConfig[status].label}
-                </Badge>
-            );
+            const status = row.getValue("status") as string;
+            return <StatusCell status={status} />;
         },
     },
     {
@@ -213,9 +265,9 @@ export const columns: ColumnDef<Application>[] = [
             const priority = row.getValue("priority") as Application["priority"];
             return (
                 <Badge variant={
-                    priority === 'high' ? 'destructive' : 
-                    priority === 'medium' ? 'default' : 
-                    'secondary'
+                    priority === 'high' ? 'destructive' :
+                        priority === 'medium' ? 'default' :
+                            'secondary'
                 }>
                     {priority}
                 </Badge>
@@ -229,15 +281,15 @@ export const columns: ColumnDef<Application>[] = [
             const documentsCount = row.original.documents_count;
             const verifiedCount = row.original.verified_documents_count;
             const percentage = documentsCount > 0 ? (verifiedCount / documentsCount) * 100 : 0;
-            
+
             return (
                 <div className="space-y-1">
                     <div className="text-sm">
                         {verifiedCount}/{documentsCount} verified
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                        <div 
-                            className="bg-blue-600 h-1.5 rounded-full transition-all" 
+                        <div
+                            className="bg-blue-600 h-1.5 rounded-full transition-all"
                             style={{ width: `${percentage}%` }}
                         />
                     </div>
@@ -283,9 +335,20 @@ export const columns: ColumnDef<Application>[] = [
             )
         },
         cell: ({ row }) => {
-            const deadline = new Date(row.getValue("deadline"));
-            const isOverdue = deadline < new Date() && row.original.status === 'pending';
-            
+            const deadlineValue = row.getValue("deadline");
+
+            // Handle null/undefined deadline
+            if (!deadlineValue) {
+                return (
+                    <div className="text-sm text-muted-foreground">
+                        No deadline
+                    </div>
+                );
+            }
+
+            const deadline = new Date(deadlineValue as string);
+            const isOverdue = deadline < new Date() && ['submitted', 'pending', 'under_verification', 'under_review'].includes(row.original.status);
+
             return (
                 <div className={cn(
                     "text-sm",
@@ -302,7 +365,7 @@ export const columns: ColumnDef<Application>[] = [
         header: "Actions",
         cell: ({ row }) => {
             const application = row.original;
-            
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

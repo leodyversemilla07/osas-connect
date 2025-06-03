@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ScholarshipNotification extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'title',
@@ -21,6 +24,10 @@ class ScholarshipNotification extends Model
     protected $casts = [
         'data' => 'array',
         'read_at' => 'datetime',
+    ];
+
+    protected $appends = [
+        'is_read',
     ];
 
     const TYPE_APPLICATION_STATUS = 'application_status';
@@ -47,6 +54,14 @@ class ScholarshipNotification extends Model
     public function notifiable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get the is_read attribute (for backward compatibility).
+     */
+    public function getIsReadAttribute(): bool
+    {
+        return ! is_null($this->read_at);
     }
 
     /**

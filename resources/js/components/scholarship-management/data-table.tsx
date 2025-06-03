@@ -89,51 +89,43 @@ export function DataTable<TData, TValue>({
                         {table.getFilteredSelectedRowModel().rows.length} selected
                     </div>
                 )}
-            </div>            <div className="border-b border-gray-100 dark:border-gray-800">
+            </div>
+            
+            <div className="border-b border-gray-100 dark:border-gray-800">
                 <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-transparent">
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id} className="h-12 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                    className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="py-4">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center text-base text-gray-500 dark:text-gray-400">
-                                    No scholarships found
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
+                    <TableHeader>{table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-transparent">{headerGroup.headers.map((header) => {
+                            return (
+                                <TableHead key={header.id} className="h-12 text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{header.isPlaceholder
+                                    ? null
+                                    : flexRender(
+                                        header.column.columnDef.header,
+                                        header.getContext()
+                                    )}</TableHead>
+                            )
+                        })}</TableRow>
+                    ))}</TableHeader>
+                    <TableBody>{table.getRowModel().rows?.length ? (
+                        table.getRowModel().rows.map((row) => (
+                            <TableRow
+                                key={row.id}
+                                data-state={row.getIsSelected() && "selected"}
+                                className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
+                            >{row.getVisibleCells().map((cell) => (
+                                <TableCell key={cell.id} className="py-4">{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                            ))}</TableRow>
+                        ))
+                    ) : (
+                        <TableRow>
+                            <TableCell colSpan={columns.length} className="h-24 text-center text-base text-gray-500 dark:text-gray-400">
+                                No scholarships found
+                            </TableCell>
+                        </TableRow>
+                    )}</TableBody>
                 </Table>
-            </div>{/* Pagination */}
+            </div>
+            
+            {/* Pagination */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center space-x-2">
                     <p className="text-sm font-medium">Rows per page</p>

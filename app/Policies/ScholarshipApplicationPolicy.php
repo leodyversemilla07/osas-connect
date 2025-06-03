@@ -14,7 +14,7 @@ class ScholarshipApplicationPolicy
     {
         // Students can only view their own applications
         if ($user->isStudent()) {
-            return $application->student_id === $user->id;
+            return $application->user_id === $user->id;
         }
 
         // Admin and OSAS staff can view all applications
@@ -48,11 +48,8 @@ class ScholarshipApplicationPolicy
     {
         // Students can only update their own applications if they're in draft or incomplete status
         if ($user->isStudent()) {
-            return $application->student_id === $user->id &&
-                   in_array($application->status, [
-                       ScholarshipApplication::STATUS_DRAFT,
-                       ScholarshipApplication::STATUS_INCOMPLETE,
-                   ]);
+            return $application->user_id === $user->id &&
+                   in_array($application->status, ['draft', 'incomplete']);
         }
 
         // Admin and OSAS staff can update any application

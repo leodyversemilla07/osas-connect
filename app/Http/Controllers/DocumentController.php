@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Document;
 use App\Models\ScholarshipApplication;
 use App\Services\StorageService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
 {
+    use AuthorizesRequests;
+
     public function store(Request $request, ScholarshipApplication $application)
     {
         // Authorize that user can update this application
@@ -41,7 +43,7 @@ class DocumentController extends Controller
                 'original_name' => $document->original_name,
                 'status' => $document->status,
                 'uploaded_at' => $document->created_at->format('Y-m-d H:i:s'),
-            ]
+            ],
         ]);
     }
 

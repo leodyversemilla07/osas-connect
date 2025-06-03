@@ -27,24 +27,24 @@ class SendApplicationStatusNotification implements ShouldQueue
     {
         $application = $event->application;
         $student = $application->student;
-        
+
         // Don't send email for draft status
         if ($application->status === 'draft') {
             return;
         }
-        
+
         // Send email to the student
         Mail::to($student->user->email)
             ->send(new StatusChangedMail($application, $event->previousStatus));
-        
+
         // Optionally, also notify OSAS staff for certain status changes
         if (in_array($application->status, ['submitted', 'incomplete'])) {
             // Get OSAS staff emails (you might want to implement this differently)
-            $osasEmails = \App\Models\User::whereHas('roles', function($query) {
+            $osasEmails = \App\Models\User::whereHas('roles', function ($query) {
                 $query->where('name', 'osas_staff');
             })->pluck('email')->toArray();
-            
-            if (!empty($osasEmails)) {
+
+            if (! empty($osasEmails)) {
                 Mail::to($osasEmails)
                     ->send(new StatusChangedMail($application, $event->previousStatus));
             }

@@ -33,7 +33,7 @@ class ProfileUpdateRequest extends FormRequest
         ];
 
         // Common base for email validation, ensuring it's required, a valid email, and unique (ignoring the current user)
-        $emailValidationBase = ['required', 'string', 'email:rfc,dns', 'max:255', Rule::unique(User::class)->ignore($user->id)];
+        $emailValidationBase = ['required', 'string', 'email:rfc', 'max:255', Rule::unique(User::class)->ignore($user->id)];
 
         if ($user->role === 'admin') {
             $adminRules = [

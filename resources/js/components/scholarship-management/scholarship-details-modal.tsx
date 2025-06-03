@@ -56,7 +56,7 @@ export function ScholarshipDetailsModal({ scholarship, isOpen, onClose, showAppl
     const isApplicationOpen = scholarship.status === 'open' && daysLeft > 0;
 
     const handleApplyNow = () => {
-        router.visit(`/scholarships/${scholarship.id}/apply`);
+        router.visit(`/student/scholarships/${scholarship.id}/apply`);
     };
 
     return (

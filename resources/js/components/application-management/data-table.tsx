@@ -42,7 +42,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
     columns,
     data,
-    searchKey = "student.name",
+    searchKey = "student",
     searchPlaceholder = "Search applications...",
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([])
@@ -80,7 +80,8 @@ export function DataTable<TData, TValue>({
         table.setPageSize(pageSize)
     }, [pageSize, table])
 
-    return (        <div className="space-y-4">
+    return (
+        <div className="space-y-4">
             {/* Search and Selection */}
             <div className="flex items-center justify-between">
                 <Input
@@ -193,7 +194,9 @@ export function DataTable<TData, TValue>({
                             <ChevronRightIcon className="h-4 w-4" />
                         </Button>
                     </div>
-                </div>                <div className="flex items-center space-x-2">
+                </div>
+                
+                <div className="flex items-center space-x-2">
                     <p className="text-sm font-medium">
                         Showing {table.getRowModel().rows.length} of{" "}
                         {table.getFilteredRowModel().rows.length} applications

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('course');
             $table->string('major')->default('None');
             $table->string('year_level');
+            $table->decimal('current_gwa', 4, 3)->nullable();
             $table->string('guardian_name')->default('Not Applicable');
             $table->string('existing_scholarships')->nullable();
 

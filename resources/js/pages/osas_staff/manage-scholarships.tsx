@@ -2,7 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/osas-scholarship-management/data-table';
-import { createColumns } from '@/components/osas-scholarship-management/columns';
+import { createColumns, getScholarshipTypeDisplay } from '@/components/osas-scholarship-management/columns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +20,7 @@ import { Plus, X, Loader2, CalendarIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import InputError from '@/components/input-error';
+import { type ColumnDef } from '@tanstack/react-table';
 import {
     Popover,
     PopoverContent,
@@ -46,8 +47,9 @@ interface Scholarship {
     name: string;
     description: string;
     type: string;
+    type_specification?: string;
     amount: number;
-    status: 'open' | 'closed' | 'upcoming';
+    status: 'active' | 'inactive' | 'upcoming' | 'draft';
     deadline: string | null;
     slots_available: number;
     total_applications: number;
@@ -79,6 +81,7 @@ interface CreateScholarshipForm {
     name: string;
     description: string;
     type: string;
+    type_specification: string; // For custom "Others" type
     amount: number | string;
     status: string;
     deadline: string;
@@ -122,6 +125,7 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
         name: '',
         description: '',
         type: '',
+        type_specification: '',
         amount: '',
         status: 'upcoming',
         deadline: '',
@@ -136,6 +140,7 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
         name: '',
         description: '',
         type: '',
+        type_specification: '',
         amount: '',
         status: 'upcoming',
         deadline: '',
@@ -188,6 +193,7 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
             name: scholarship.name,
             description: scholarship.description,
             type: scholarship.type,
+            type_specification: scholarship.type_specification || '',
             amount: scholarship.amount.toString(),
             status: scholarship.status,
             deadline: scholarship.deadline || '',
@@ -255,7 +261,6 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
         if (selectedScholarship) {
             // Call the delete route with the scholarship ID
             post(route('osas.scholarships.destroy', selectedScholarship.id), {
-                _method: 'DELETE',
                 onSuccess: () => {
                     setIsDeleteDialogOpen(false);
                     setSelectedScholarship(null);
@@ -271,6 +276,248 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
             });
         }
     };
+
+    // Function to handle scholarship type change and set default amount, criteria, and documents
+    const handleTypeChange = (type: string) => {
+        setData('type', type);
+
+        // Clear type specification when not "others"
+        if (type !== 'others') {
+            setData('type_specification', '');
+        }
+
+        // Set default amounts, criteria, and documents based on MinSU scholarship types
+        switch (type) {
+            case 'academic_full':
+                setData('amount', '500');
+                setData('criteria', [
+                    'General Weighted Average (GWA) between 1.000 - 1.450',
+                    'No grade below 1.75 in any course',
+                    'No Dropped/Deferred/Failed marks',
+                    'Minimum of 18 units enrollment'
+                ]);
+                setData('required_documents', [
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment',
+                    'Certificate of Good Moral Character',
+                    'Recent ID Picture (2x2)'
+                ]);
+                break;
+            case 'academic_partial':
+                setData('amount', '300');
+                setData('criteria', [
+                    'General Weighted Average (GWA) between 1.460 - 1.750',
+                    'No grade below 1.75 in any course',
+                    'No Dropped/Deferred/Failed marks',
+                    'Minimum of 18 units enrollment'
+                ]);
+                setData('required_documents', [
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment',
+                    'Certificate of Good Moral Character',
+                    'Recent ID Picture (2x2)'
+                ]);
+                break;
+            case 'student_assistantship':
+                setData('amount', '');
+                setData('criteria', [
+                    'General Weighted Average (GWA) not below 2.25',
+                    'No failing grades',
+                    'Available for minimum 15 hours/week work commitment',
+                    'Enrolled in at least 12 units'
+                ]);
+                setData('required_documents', [
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment',
+                    'Certificate of Good Moral Character',
+                    'Work Schedule Commitment Letter',
+                    'Recommendation from Department Head'
+                ]);
+                break;
+            case 'performing_arts_full':
+                setData('amount', '500');
+                setData('criteria', [
+                    'Member of MinSU accredited performing arts group',
+                    'Member for at least one (1) semester',
+                    'Participated in at least two (2) major University activities',
+                    'Recommended by group coach/adviser',
+                    'Maintaining reasonable academic standing'
+                ]);
+                setData('required_documents', [
+                    'Certificate of Group Membership',
+                    'Recommendation Letter from Coach/Adviser',
+                    'List of Performances/Activities',
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment'
+                ]);
+                break;
+            case 'performing_arts_partial':
+                setData('amount', '300');
+                setData('criteria', [
+                    'Member of MinSU accredited performing arts group',
+                    'Member for at least one (1) semester',
+                    'Participated in at least two (2) major University activities',
+                    'Recommended by group coach/adviser',
+                    'Maintaining reasonable academic standing'
+                ]);
+                setData('required_documents', [
+                    'Certificate of Group Membership',
+                    'Recommendation Letter from Coach/Adviser',
+                    'List of Performances/Activities',
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment'
+                ]);
+                break;
+            case 'economic_assistance':
+                setData('amount', '400');
+                setData('criteria', [
+                    'General Weighted Average (GWA) of at least 2.25',
+                    'From economically disadvantaged family',
+                    'MSWDO Indigency Certificate required',
+                    'Full-time student status'
+                ]);
+                setData('required_documents', [
+                    'MSWDO Indigency Certificate',
+                    'Income Tax Return or Certificate of Non-Filing',
+                    'Barangay Certificate of Residency',
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment',
+                    'Family Income Statement'
+                ]);
+                break;
+            case 'others':
+                // Clear defaults for custom types - let user define everything
+                setData('amount', '');
+                setData('criteria', []);
+                setData('required_documents', []);
+                break;
+            default:
+                // Clear defaults for unknown types
+                setData('criteria', []);
+                setData('required_documents', []);
+                break;
+        }
+    };
+
+    // Function to handle edit type change and set default amount, criteria, and documents
+    const handleEditTypeChange = (type: string) => {
+        setEditData('type', type);
+
+        // Clear type specification when not "others"
+        if (type !== 'others') {
+            setEditData('type_specification', '');
+        }
+
+        // Set default amounts, criteria, and documents based on MinSU scholarship types
+        switch (type) {
+            case 'academic_full':
+                setEditData('amount', '500');
+                setEditData('criteria', [
+                    'General Weighted Average (GWA) between 1.000 - 1.450',
+                    'No grade below 1.75 in any course',
+                    'No Dropped/Deferred/Failed marks',
+                    'Minimum of 18 units enrollment'
+                ]);
+                setEditData('required_documents', [
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment',
+                    'Certificate of Good Moral Character',
+                    'Recent ID Picture (2x2)'
+                ]);
+                break;
+            case 'academic_partial':
+                setEditData('amount', '300');
+                setEditData('criteria', [
+                    'General Weighted Average (GWA) between 1.460 - 1.750',
+                    'No grade below 1.75 in any course',
+                    'No Dropped/Deferred/Failed marks',
+                    'Minimum of 18 units enrollment'
+                ]);
+                setEditData('required_documents', [
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment',
+                    'Certificate of Good Moral Character',
+                    'Recent ID Picture (2x2)'
+                ]);
+                break;
+            case 'student_assistantship':
+                setEditData('amount', '');
+                setEditData('criteria', [
+                    'General Weighted Average (GWA) not below 2.25',
+                    'No failing grades',
+                    'Available for minimum 15 hours/week work commitment',
+                    'Enrolled in at least 12 units'
+                ]);
+                setEditData('required_documents', [
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment',
+                    'Certificate of Good Moral Character',
+                    'Work Schedule Commitment Letter',
+                    'Recommendation from Department Head'
+                ]);
+                break;
+            case 'performing_arts_full':
+                setEditData('amount', '500');
+                setEditData('criteria', [
+                    'Member of MinSU accredited performing arts group',
+                    'Member for at least one (1) semester',
+                    'Participated in at least two (2) major University activities',
+                    'Recommended by group coach/adviser',
+                    'Maintaining reasonable academic standing'
+                ]);
+                setEditData('required_documents', [
+                    'Certificate of Group Membership',
+                    'Recommendation Letter from Coach/Adviser',
+                    'List of Performances/Activities',
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment'
+                ]);
+                break;
+            case 'performing_arts_partial':
+                setEditData('amount', '300');
+                setEditData('criteria', [
+                    'Member of MinSU accredited performing arts group',
+                    'Member for at least one (1) semester',
+                    'Participated in at least two (2) major University activities',
+                    'Recommended by group coach/adviser',
+                    'Maintaining reasonable academic standing'
+                ]);
+                setEditData('required_documents', [
+                    'Certificate of Group Membership',
+                    'Recommendation Letter from Coach/Adviser',
+                    'List of Performances/Activities',
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment'
+                ]);
+                break;
+            case 'economic_assistance':
+                setEditData('amount', '400');
+                setEditData('criteria', [
+                    'General Weighted Average (GWA) of at least 2.25',
+                    'From economically disadvantaged family',
+                    'MSWDO Indigency Certificate required',
+                    'Full-time student status'
+                ]);
+                setEditData('required_documents', [
+                    'MSWDO Indigency Certificate',
+                    'Income Tax Return or Certificate of Non-Filing',
+                    'Barangay Certificate of Residency',
+                    'Official Transcript of Records',
+                    'Certificate of Enrollment',
+                    'Family Income Statement'
+                ]);
+                break;
+            case 'others':
+                // Clear defaults for custom types - let user define everything
+                setEditData('amount', '');
+                setEditData('criteria', []);
+                setEditData('required_documents', []);
+                break;
+            default:
+                // Keep current values for unknown types
+                break;
+        }
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Manage Scholarships" />
@@ -282,71 +529,49 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                         <div>
                             <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">Scholarship Management</h1>
                             <p className="text-base text-gray-500 dark:text-gray-400">Manage scholarship programs and applications</p>
-                        </div>                        <Button
-                            variant="ghost"
+                        </div>
+                        <button
                             onClick={() => setIsDialogOpen(true)}
-                            className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 border-0 hover:bg-gray-50 dark:hover:bg-gray-800"
+                            className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 border-b border-transparent hover:border-gray-300 dark:hover:border-gray-600 pb-1"
                         >
-                            <Plus className="mr-2 h-4 w-4" />
+                            <Plus className="h-4 w-4 mr-2 inline" />
                             Add Scholarship
-                        </Button>
+                        </button>
                     </div>
                 </div>
 
                 {/* Statistics Cards */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                        <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 className="tracking-tight text-sm font-medium">Total Scholarships</h3>
-                            <svg className="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M16 22h2a2 2 0 0 0 2-2V7l-5-5H5a2 2 0 0 0-2 2v3" />
-                                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-                                <circle cx="8" cy="16" r="6" />
-                                <path d="m6 18 1.5-1.5L9 18l3-3" />
-                            </svg>
-                        </div>
-                        <div className="p-6 pt-0">
-                            <div className="text-2xl font-bold">{statistics.total_scholarships}</div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Scholarships</p>
+                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{statistics.total_scholarships}</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                        <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 className="tracking-tight text-sm font-medium">Active Programs</h3>
-                            <svg className="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                            </svg>
-                        </div>
-                        <div className="p-6 pt-0">
-                            <div className="text-2xl font-bold">{statistics.active_scholarships}</div>
+                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Programs</p>
+                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{statistics.active_scholarships}</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                        <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 className="tracking-tight text-sm font-medium">Total Applications</h3>
-                            <svg className="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                                <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
-                            </svg>
-                        </div>
-                        <div className="p-6 pt-0">
-                            <div className="text-2xl font-bold">{statistics.total_applications}</div>
+                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Applications</p>
+                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{statistics.total_applications}</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                        <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 className="tracking-tight text-sm font-medium">Total Beneficiaries</h3>
-                            <svg className="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                                <circle cx="9" cy="7" r="4" />
-                                <path d="m22 21-2-2" />
-                                <path d="m18 19-2-2" />
-                            </svg>
-                        </div>
-                        <div className="p-6 pt-0">
-                            <div className="text-2xl font-bold">{statistics.total_beneficiaries}</div>
+                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Beneficiaries</p>
+                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{statistics.total_beneficiaries}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -356,7 +581,7 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                         onEdit: openEditDialog,
                         onView: openViewDialog,
                         onDelete: openDeleteDialog
-                    })}
+                    }) as ColumnDef<Scholarship, unknown>[]}
                     data={scholarships.data}
                 />
             </div>
@@ -397,16 +622,18 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                                         Type
                                     </label>
                                     <div className="mt-1.5">
-                                        <Select value={data.type} onValueChange={(value) => setData('type', value)}>
+                                        <Select value={data.type} onValueChange={handleTypeChange}>
                                             <SelectTrigger className={`border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent px-0 focus:ring-0 focus:border-gray-400 dark:focus:border-gray-500 ${errors.type ? "border-red-300 focus:border-red-400" : ""}`}>
                                                 <SelectValue placeholder="Select type" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="Academic">Academic</SelectItem>
-                                                <SelectItem value="Athletic">Athletic</SelectItem>
-                                                <SelectItem value="Need-based">Need-based</SelectItem>
-                                                <SelectItem value="Merit-based">Merit-based</SelectItem>
-                                                <SelectItem value="Special">Special</SelectItem>
+                                                <SelectItem value="academic_full">Academic (Full Scholarship)</SelectItem>
+                                                <SelectItem value="academic_partial">Academic (Partial Scholarship)</SelectItem>
+                                                <SelectItem value="student_assistantship">Student Assistantship</SelectItem>
+                                                <SelectItem value="performing_arts_full">Performing Arts (Full Scholarship)</SelectItem>
+                                                <SelectItem value="performing_arts_partial">Performing Arts (Partial Scholarship)</SelectItem>
+                                                <SelectItem value="economic_assistance">Economic Assistance</SelectItem>
+                                                <SelectItem value="others">Others (Custom Type)</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         {errors.type && <InputError message={errors.type} />}
@@ -433,6 +660,26 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Conditional Type Specification Field */}
+                            {data.type === 'others' && (
+                                <div>
+                                    <label htmlFor="type_specification" className="text-sm font-medium leading-6 text-gray-700 dark:text-gray-300">
+                                        Custom Scholarship Type
+                                    </label>
+                                    <div className="mt-1.5">
+                                        <Input
+                                            id="type_specification"
+                                            value={data.type_specification}
+                                            onChange={(e) => setData('type_specification', e.target.value)}
+                                            placeholder="Enter custom scholarship type name"
+                                            className={`border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-gray-400 dark:focus-visible:border-gray-500 placeholder:text-gray-500 dark:placeholder:text-gray-400 ${errors.type_specification ? "border-red-300 focus-visible:border-red-400" : ""}`}
+                                            required
+                                        />
+                                        {errors.type_specification && <InputError message={errors.type_specification} />}
+                                    </div>
+                                </div>
+                            )}
 
                             <div>
                                 <label htmlFor="description" className="text-sm font-medium leading-6 text-gray-700 dark:text-gray-300">
@@ -725,16 +972,18 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                                         Type
                                     </label>
                                     <div className="mt-1.5">
-                                        <Select key={`type-${editData.id}`} value={editData.type} onValueChange={(value) => setEditData('type', value)}>
+                                        <Select key={`type-${editData.id}`} value={editData.type} onValueChange={handleEditTypeChange}>
                                             <SelectTrigger className={`border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-gray-400 dark:focus-visible:border-gray-500 ${editErrors.type ? "border-red-300 focus-visible:border-red-400" : ""}`}>
                                                 <SelectValue placeholder="Select type" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="Academic">Academic</SelectItem>
-                                                <SelectItem value="Athletic">Athletic</SelectItem>
-                                                <SelectItem value="Need-based">Need-based</SelectItem>
-                                                <SelectItem value="Merit-based">Merit-based</SelectItem>
-                                                <SelectItem value="Special">Special</SelectItem>
+                                                <SelectItem value="academic_full">Academic (Full Scholarship)</SelectItem>
+                                                <SelectItem value="academic_partial">Academic (Partial Scholarship)</SelectItem>
+                                                <SelectItem value="student_assistantship">Student Assistantship</SelectItem>
+                                                <SelectItem value="performing_arts_full">Performing Arts (Full Scholarship)</SelectItem>
+                                                <SelectItem value="performing_arts_partial">Performing Arts (Partial Scholarship)</SelectItem>
+                                                <SelectItem value="economic_assistance">Economic Assistance</SelectItem>
+                                                <SelectItem value="others">Others (Custom Type)</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         {editErrors.type && <InputError message={editErrors.type} />}
@@ -761,6 +1010,26 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Conditional Type Specification Field for Edit Form */}
+                            {editData.type === 'others' && (
+                                <div>
+                                    <label htmlFor="edit_type_specification" className="text-sm font-medium leading-6 text-gray-700 dark:text-gray-300">
+                                        Custom Scholarship Type
+                                    </label>
+                                    <div className="mt-1.5">
+                                        <Input
+                                            id="edit_type_specification"
+                                            value={editData.type_specification}
+                                            onChange={(e) => setEditData('type_specification', e.target.value)}
+                                            placeholder="Enter custom scholarship type name"
+                                            className={`border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-gray-400 dark:focus-visible:border-gray-500 placeholder:text-gray-500 dark:placeholder:text-gray-400 ${editErrors.type_specification ? "border-red-300 focus-visible:border-red-400" : ""}`}
+                                            required
+                                        />
+                                        {editErrors.type_specification && <InputError message={editErrors.type_specification} />}
+                                    </div>
+                                </div>
+                            )}
 
                             <div>
                                 <label htmlFor="edit_description" className="text-sm font-medium leading-6 text-gray-700 dark:text-gray-300">
@@ -984,7 +1253,7 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                                 type="submit"
                                 disabled={editProcessing}
                                 variant="ghost"
-                                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-gray-50 dark:hover:bg-blue-900/20"
                             >
                                 {editProcessing ? (
                                     <>
@@ -1023,7 +1292,7 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
                                         <p className="mt-1">
                                             <Badge variant="outline" className="text-xs">
-                                                {selectedScholarship.type}
+                                                {getScholarshipTypeDisplay(selectedScholarship.type)}
                                             </Badge>
                                         </p>
                                     </div>
@@ -1040,8 +1309,9 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                                         <p className="mt-1">
                                             <Badge
-                                                variant={selectedScholarship.status === 'open' ? 'default' :
-                                                    selectedScholarship.status === 'closed' ? 'destructive' : 'secondary'}
+                                                variant={selectedScholarship.status === 'active' ? 'default' :
+                                                    selectedScholarship.status === 'inactive' ? 'destructive' :
+                                                        selectedScholarship.status === 'upcoming' ? 'outline' : 'secondary'}
                                                 className="text-xs"
                                             >
                                                 {selectedScholarship.status.charAt(0).toUpperCase() + selectedScholarship.status.slice(1)}
@@ -1080,24 +1350,30 @@ export default function ManageScholarships({ scholarships, statistics }: ManageS
                             {/* Application Statistics */}
                             <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                                 <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Application Statistics</h4>
-                                <div className="grid gap-4 md:grid-cols-3">
-                                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                                            {selectedScholarship.total_applications}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Applications</p>
+                                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{selectedScholarship.total_applications}</p>
+                                            </div>
                                         </div>
-                                        <div className="text-sm text-blue-600 dark:text-blue-400">Total Applications</div>
                                     </div>
-                                    <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-                                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                            {selectedScholarship.approved_applications}
+                                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Approved Applications</p>
+                                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{selectedScholarship.approved_applications}</p>
+                                            </div>
                                         </div>
-                                        <div className="text-sm text-green-600 dark:text-green-400">Approved Applications</div>
                                     </div>
-                                    <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
-                                        <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                                            {selectedScholarship.remaining_slots}
+                                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Remaining Slots</p>
+                                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{selectedScholarship.remaining_slots}</p>
+                                            </div>
                                         </div>
-                                        <div className="text-sm text-orange-600 dark:text-orange-400">Remaining Slots</div>
                                     </div>
                                 </div>
                             </div>

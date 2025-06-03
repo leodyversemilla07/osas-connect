@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('scholarship_applications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained('student_profiles')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('scholarship_id')->constrained('scholarships')->onDelete('cascade');
 
             // Application Status
@@ -40,6 +40,7 @@ return new class extends Migration
 
             // Application Content
             $table->text('purpose_letter')->nullable();
+            $table->json('application_data')->nullable();
             $table->json('uploaded_documents')->nullable();
             $table->decimal('evaluation_score', 5, 2)->nullable();
             $table->text('verifier_comments')->nullable();

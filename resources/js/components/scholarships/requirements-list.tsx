@@ -1,107 +1,133 @@
-/** @jsxImportSource react */
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { InfoIcon, GraduationCap } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface RequirementsListProps {
+interface Requirement {
+    id: string;
     title: string;
-    requirements: string[];
+    description: string;
+    type: 'required' | 'optional' | 'recommended';
+    status?: 'completed' | 'pending' | 'missing';
 }
 
-export const RequirementsList: React.FC<RequirementsListProps> = ({ title, requirements }) => {
-    return (
-        <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-4">{title}</h3>
-            <ul className="space-y-2">
-                {requirements.map((requirement, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                        <div className="mt-1">
-                            <div className="w-1 h-1 rounded-full bg-[#febd12]" />
-                        </div>
-                        <span className="text-sm text-muted-foreground">{requirement}</span>
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+interface RequirementsListProps {
+    requirements: Requirement[];
+    title?: string;
+    description?: string;
+}
+
+interface GeneralRequirementsListProps {
+    className?: string;
+}
+
+const getRequirementIcon = (status?: string) => {
+    switch (status) {
+        case 'completed':
+            return <CheckCircle className="h-4 w-4 text-green-600" />;
+        case 'pending':
+            return <Clock className="h-4 w-4 text-yellow-600" />;
+        case 'missing':
+            return <AlertCircle className="h-4 w-4 text-red-600" />;
+        default:
+            return <Clock className="h-4 w-4 text-gray-400" />;
+    }
 };
 
-const generalRequirements = [
-    'Must be a bona fide student of MinSU',
-    'Must be enrolled with a regular load per semester',
-    'Must have good moral character',
-    'Must have no failing subjects',
-    'Must have complete grades from the previous semester',
-    'Must not have any existing scholarship or grant from private/public agencies',
-    'Must pass the Scholarship Committee interview',
-    'Must submit complete application requirements'
-] as const;
+const getRequirementBadge = (type: string) => {
+    switch (type) {
+        case 'required':
+            return <Badge variant="destructive" className="text-xs">Required</Badge>;
+        case 'optional':
+            return <Badge variant="secondary" className="text-xs">Optional</Badge>;
+        case 'recommended':
+            return <Badge variant="outline" className="text-xs">Recommended</Badge>;
+        default:
+            return null;
+    }
+};
 
-const importantNotes = [
-    'All scholarships are awarded on a per-semester basis and require renewal.',
-    'Applications must be submitted within the announced application period.',
-    'Students can only avail one scholarship program at a time.',
-    'Failure to maintain eligibility requirements will result in scholarship termination.'
-] as const;
-
-export function GeneralRequirementsList(): React.ReactElement {
+export function RequirementsList({ requirements, title = "Requirements", description }: RequirementsListProps) {
     return (
-        <div className="mt-12 mb-12">
-            <Card className="bg-gradient-to-r from-[#005a2d]/95 to-[#008040]/90 text-white relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                        <pattern id="pattern-circles-req" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
-                            <circle id="pattern-circle-req" cx="10" cy="10" r="1.6" fill="#fff"></circle>
-                        </pattern>
-                        <rect id="rect-req" x="0" y="0" width="100%" height="100%" fill="url(#pattern-circles-req)"></rect>
-                    </svg>
-                </div>
-
-                <CardContent className="relative z-10 p-8">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="rounded-full bg-[#febd12] p-2">
-                            <GraduationCap className="h-6 w-6 text-[#005a2d]" />
-                        </div>
-                        <Badge variant="outline" className="bg-[#febd12]/20 text-[#febd12] border-[#febd12]">
-                            <InfoIcon className="w-3 h-3 mr-1" />
-                            Required for All Scholarships
-                        </Badge>
-                    </div>
-
-                    <h3 className="text-xl font-bold mb-4">General Qualification Requirements</h3>
-                    <p className="mb-6 text-white/90">
-                        To be eligible for any MinSU Scholarship and Financial Assistantship Program, all applicants must meet these basic requirements:
-                    </p>
-                    
-                    <div className="grid gap-4 md:grid-cols-2">
-                        {generalRequirements.map((req, index) => (
-                            <div key={index} className="flex items-start gap-3">
-                                <div className="mt-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#febd12]" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
+        <Card>
+            <CardHeader>
+                <CardTitle>{title}</CardTitle>
+                {description && <CardDescription>{description}</CardDescription>}
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-3">
+                    {requirements.map((requirement) => (
+                        <div
+                            key={requirement.id}
+                            className="flex items-start gap-3 p-3 border border-gray-200 dark:border-gray-800 rounded-lg"
+                        >
+                            {getRequirementIcon(requirement.status)}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {requirement.title}
+                                    </h4>
+                                    {getRequirementBadge(requirement.type)}
                                 </div>
-                                <span className="text-white/90">{req}</span>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {requirement.description}
+                                </p>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
-                    <div className="mt-8">
-                        <h4 className="font-semibold mb-3">Important Notes:</h4>
-                        <ul className="space-y-2">
-                            {importantNotes.map((note, index) => (
-                                <li key={index} className="flex items-start gap-2 text-white/90 text-sm">
-                                    <div className="mt-1.5">
-                                        <div className="w-1 h-1 rounded-full bg-[#febd12]" />
-                                    </div>
-                                    {note}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </CardContent>
-            </Card>
+export function GeneralRequirementsList({ className }: GeneralRequirementsListProps) {
+    const generalRequirements: Requirement[] = [
+        {
+            id: 'enrollment',
+            title: 'Current Enrollment',
+            description: 'Must be currently enrolled as a regular student at the university',
+            type: 'required'
+        },
+        {
+            id: 'gpa',
+            title: 'Academic Standing',
+            description: 'Maintain a minimum GPA of 2.5 (may vary by scholarship type)',
+            type: 'required'
+        },
+        {
+            id: 'financial-need',
+            title: 'Financial Need Assessment',
+            description: 'Demonstrate financial need through required documentation',
+            type: 'required'
+        },
+        {
+            id: 'documents',
+            title: 'Supporting Documents',
+            description: 'Submit all required documents including transcripts, certificates, and recommendations',
+            type: 'required'
+        },
+        {
+            id: 'interview',
+            title: 'Interview',
+            description: 'Participate in an interview process when requested',
+            type: 'recommended'
+        },
+        {
+            id: 'community-service',
+            title: 'Community Service',
+            description: 'Active participation in community service or university activities',
+            type: 'optional'
+        }
+    ];
+
+    return (
+        <div className={className}>
+            <RequirementsList
+                requirements={generalRequirements}
+                title="General Scholarship Requirements"
+                description="Basic requirements that apply to most scholarship programs"
+            />
         </div>
     );
 }

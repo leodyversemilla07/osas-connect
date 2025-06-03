@@ -51,6 +51,7 @@ export interface StudentProfile {
     barangay: string;
     city: string;
     province: string;
+    zip_code: string;
     mobile_number: string;
     telephone_number: string;
     is_pwd: boolean;

@@ -21,12 +21,14 @@ class TestPdfGeneration extends Command
 
             if (! $user) {
                 $this->error('Test user not found!');
+
                 return 1;
             }
 
             // Check if user is a student
             if ($user->role !== 'student') {
                 $this->error('Test user must be a student!');
+
                 return 1;
             }
 
@@ -34,11 +36,12 @@ class TestPdfGeneration extends Command
             $user->load('studentProfile');
             if (! $user->studentProfile) {
                 $this->error('Test user does not have a student profile!');
+
                 return 1;
             }
 
-            $this->info('Found test user: ' . $user->first_name . ' ' . $user->last_name);
-            $this->info('Student ID: ' . ($user->studentProfile->student_id ?? 'Not set'));
+            $this->info('Found test user: '.$user->first_name.' '.$user->last_name);
+            $this->info('Student ID: '.($user->studentProfile->student_id ?? 'Not set'));
 
             $pdfController = new PdfController;
             $response = $pdfController->generatePdf(request(), $user);
@@ -46,40 +49,43 @@ class TestPdfGeneration extends Command
             // Check if response is a BinaryFileResponse (success case)
             if ($response instanceof \Symfony\Component\HttpFoundation\BinaryFileResponse) {
                 $this->info('PDF generated successfully!');
-                $this->info('PDF file path: ' . $response->getFile()->getPathname());
-                
+                $this->info('PDF file path: '.$response->getFile()->getPathname());
+
                 // Check if file actually exists and has content
                 $filePath = $response->getFile()->getPathname();
                 if (file_exists($filePath)) {
                     $fileSize = filesize($filePath);
-                    $this->info('PDF file size: ' . number_format($fileSize) . ' bytes');
-                    
+                    $this->info('PDF file size: '.number_format($fileSize).' bytes');
+
                     if ($fileSize > 0) {
                         $this->info('✅ PDF generation test PASSED!');
+
                         return 0;
                     } else {
                         $this->error('❌ PDF file is empty!');
+
                         return 1;
                     }
                 } else {
                     $this->error('❌ PDF file was not created!');
+
                     return 1;
                 }
             } else {
                 // Handle error responses
                 $statusCode = $response->getStatusCode();
                 $content = $response->getContent();
-                
+
                 $this->error('❌ PDF generation failed!');
-                $this->error('Status Code: ' . $statusCode);
-                $this->error('Error: ' . $content);
-                
+                $this->error('Status Code: '.$statusCode);
+                $this->error('Error: '.$content);
+
                 return 1;
             }
         } catch (\Exception $e) {
-            $this->error('❌ Exception occurred: ' . $e->getMessage());
-            $this->error('Stack trace: ' . $e->getTraceAsString());
-            
+            $this->error('❌ Exception occurred: '.$e->getMessage());
+            $this->error('Stack trace: '.$e->getTraceAsString());
+
             return 1;
         }
     }

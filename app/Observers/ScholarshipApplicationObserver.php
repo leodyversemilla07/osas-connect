@@ -34,7 +34,7 @@ class ScholarshipApplicationObserver
         // Check if status was changed
         if ($scholarshipApplication->wasChanged('status')) {
             $previousStatus = $scholarshipApplication->original_status ?? $scholarshipApplication->getOriginal('status');
-            
+
             // Fire the event
             event(new ScholarshipApplicationStatusChanged($scholarshipApplication, $previousStatus));
         }

@@ -417,8 +417,6 @@ function PersonalInfoCard({ user }: { user: UserWithProfile }) {
       <UserAvatar user={user} />
 
       <div className="mt-6 space-y-4">
-        <InfoItem icon={Mail} label="Email" value={user.email} />
-
         {user.role === 'student' && (
           <>
             <InfoItem

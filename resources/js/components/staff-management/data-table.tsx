@@ -83,7 +83,8 @@ export function DataTable<TData, TValue>({
                         {table.getFilteredSelectedRowModel().rows.length} selected
                     </div>
                 )}
-            </div>            <div className="border-b border-gray-100 dark:border-gray-800">
+            </div>
+            <div className="border-b border-gray-100 dark:border-gray-800">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -122,7 +123,8 @@ export function DataTable<TData, TValue>({
                                 </TableRow>
                             ))
                         ) : (
-                            <TableRow>                                <TableCell
+                            <TableRow>
+                                <TableCell
                                     colSpan={columns.length}
                                     className="h-24 text-center text-base text-gray-500 dark:text-gray-400"
                                 >
@@ -132,7 +134,8 @@ export function DataTable<TData, TValue>({
                         )}
                     </TableBody>
                 </Table>
-            </div>            {/* Pagination */}
+            </div>
+            {/* Pagination */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center space-x-2">
                     <p className="text-sm font-medium">Rows per page</p>

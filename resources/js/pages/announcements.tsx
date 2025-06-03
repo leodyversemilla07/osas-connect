@@ -16,41 +16,43 @@ interface Announcement {
     priority: keyof typeof priorityColors;
 }
 
-// Mock announcements data - replace with real data from your backend
-const announcements: Announcement[] = [
-    {
-        id: 1,
-        title: 'New Scholarship Programs Available',
-        description: 'Several new scholarship opportunities have been added for the upcoming academic year. Check them out in the scholarships section.',
-        date: '2025-05-15',
-        category: 'Scholarship',
-        priority: 'high'
-    },
-    {
-        id: 2,
-        title: 'Application Deadline Extension',
-        description: 'The deadline for Merit-Based Scholarship applications has been extended to June 30, 2025. Make sure to submit your applications before the new deadline.',
-        date: '2025-05-10',
-        category: 'Deadlines',
-        priority: 'medium'
-    },
-    {
-        id: 3,
-        title: 'Scholarship Orientation Schedule',
-        description: 'Mandatory orientation for all new scholarship recipients will be held next week. Check the schedule for your assigned time slot.',
-        date: '2025-05-05',
-        category: 'Events',
-        priority: 'high'
-    },
-    {
-        id: 4,
-        title: 'Document Submission Reminder',
-        description: 'This is a reminder for all scholarship holders to submit their mid-term grades by May 25, 2025.',
-        date: '2025-05-01',
-        category: 'Requirements',
-        priority: 'medium'
-    }
-];
+interface AnnouncementsProps {
+    announcements: Announcement[];
+    headerContent?: {
+        logo_text?: string;
+        tagline?: string;
+        navigation?: Array<{
+            label: string;
+            url: string;
+            active: boolean;
+            children?: Array<{ label: string; url: string }>;
+        }>;
+    };
+    footerContent?: {
+        cta?: {
+            title?: string;
+            description?: string;
+            button_text?: string;
+            button_url?: string;
+        };
+        about?: {
+            title?: string;
+            description?: string;
+        };
+        contact?: {
+            address?: string;
+            email?: string;
+            viber?: string;
+            hours?: string;
+        };
+        social_links?: Array<{
+            platform: string;
+            url: string;
+        }>;
+    };
+}
+
+// Mock announcements data - replaced with dynamic data from backend
 
 const priorityColors: Record<'high' | 'medium' | 'low', string> = {
     high: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
@@ -65,7 +67,7 @@ const categoryColors: Record<'Scholarship' | 'Deadlines' | 'Events' | 'Requireme
     Requirements: 'bg-[#23b14d]/10 text-[#23b14d] dark:bg-[#23b14d]/20 dark:text-[#23b14d]'
 };
 
-export default function Announcements() {
+export default function Announcements({ announcements, headerContent, footerContent }: AnnouncementsProps) {
     const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -82,7 +84,7 @@ export default function Announcements() {
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
             <div className="flex min-h-screen flex-col items-center bg-[#f3f2f2] text-[#010002] dark:bg-[#121212] dark:text-[#f3f2f2]">
-                <SiteHeader />
+                <SiteHeader content={headerContent} />
 
                 <main className="mt-16 w-full flex-1 p-6 lg:p-8">
                     <div className="mx-auto max-w-7xl">
@@ -106,12 +108,10 @@ export default function Announcements() {
                                     </p>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Announcements Section */}
+                        </div>                        {/* Announcements Section */}
                         <section className="mt-16">
                             <div className="grid gap-6">
-                                {announcements.map((announcement) => (
+                                {(announcements || []).map((announcement) => (
                                     <Card key={announcement.id} className="overflow-hidden transition-all duration-200 hover:shadow-lg cursor-pointer" onClick={() => handleAnnouncementClick(announcement)}>
                                         <CardContent className="p-6">
                                             <div className="flex flex-col space-y-4">
@@ -184,7 +184,7 @@ export default function Announcements() {
                     </div>
                 </main>
 
-                <SiteFooter />
+                <SiteFooter content={footerContent} />
             </div>
 
             {/* Announcement Detail Dialog */}
