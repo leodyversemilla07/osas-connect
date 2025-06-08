@@ -95,13 +95,9 @@ class CMSController extends Controller
      */
     public function update(Request $request, Page $page)
     {
-        \Log::info('CMS Update - Raw request data:', [
-            'request_data' => $request->all(),
-        ]);
-
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:cms_pages,slug,'.$page->id,
+            'slug' => 'required|string|max:255|unique:cms_pages,slug,' . $page->id,
             'content' => 'required|array',
         ]);
 
@@ -111,13 +107,8 @@ class CMSController extends Controller
             return redirect()->route('admin.cms.edit', $page)
                 ->with('success', 'Page updated successfully');
         } catch (\Exception $e) {
-            \Log::error('Failed to update page:', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
             return back()->withErrors([
-                'error' => 'Failed to update page: '.$e->getMessage(),
+                'error' => 'Failed to update page: ' . $e->getMessage(),
             ]);
         }
     }

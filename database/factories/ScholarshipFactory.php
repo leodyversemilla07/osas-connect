@@ -24,7 +24,6 @@ class ScholarshipFactory extends Factory
             'type' => $this->faker->randomElement($types),
             'description' => $this->faker->paragraphs(3, true),
             'amount' => $this->faker->randomFloat(2, 100, 1000),
-            'stipend_amount' => $this->faker->randomFloat(2, 100, 500),
             'deadline' => $this->faker->dateTimeBetween('+1 week', '+3 months'),
             'slots' => $this->faker->numberBetween(5, 50),
             'beneficiaries' => $this->faker->numberBetween(0, 10),

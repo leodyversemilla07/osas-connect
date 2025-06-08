@@ -29,9 +29,8 @@ class ScholarshipApplicationSeeder extends Seeder
         }
 
         if ($students->isEmpty()) {
-            $this->command->warn('No students found. Creating sample students...');
-            // Create sample students with real data
-            $students = collect($this->createSampleStudents());
+            $this->command->warn('No students found. Please run StudentSeeder first.');
+            return;
         }
 
         $this->command->info("Found {$scholarships->count()} scholarships and {$students->count()} students.");
@@ -183,7 +182,7 @@ class ScholarshipApplicationSeeder extends Seeder
             'user_id' => $student->id,
             'scholarship_id' => $scholarship->id,
             'status' => $status,
-            'priority' => collect(['low', 'medium', 'high'])->random(),
+            'priority' => collect(['low', 'medium', 'high', 'urgent'])->random(),
             'reviewer_id' => $reviewerId,
             'applied_at' => $appliedAt,
             'verified_at' => $verifiedAt,
@@ -406,156 +405,5 @@ class ScholarshipApplicationSeeder extends Seeder
         ];
 
         return $steps[$status] ?? 1;
-    }
-
-    /**
-     * Create sample students with real data (no Faker)
-     */
-    private function createSampleStudents()
-    {
-        $sampleStudents = [
-            [
-                'first_name' => 'Maria',
-                'last_name' => 'Santos',
-                'email' => 'maria.santos@minsu.edu.ph',
-                'student_id' => '2023-00001',
-                'course' => 'Bachelor of Science in Computer Science',
-                'year_level' => '3rd Year',
-                'current_gwa' => 1.25,
-            ],
-            [
-                'first_name' => 'Juan',
-                'last_name' => 'Dela Cruz',
-                'email' => 'juan.delacruz@minsu.edu.ph',
-                'student_id' => '2023-00002',
-                'course' => 'Bachelor of Science in Information Technology',
-                'year_level' => '2nd Year',
-                'current_gwa' => 1.75,
-            ],
-            [
-                'first_name' => 'Ana',
-                'last_name' => 'Garcia',
-                'email' => 'ana.garcia@minsu.edu.ph',
-                'student_id' => '2023-00003',
-                'course' => 'Bachelor of Elementary Education',
-                'year_level' => '4th Year',
-                'current_gwa' => 1.35,
-            ],
-            [
-                'first_name' => 'Miguel',
-                'last_name' => 'Rodriguez',
-                'email' => 'miguel.rodriguez@minsu.edu.ph',
-                'student_id' => '2023-00004',
-                'course' => 'Bachelor of Business Administration',
-                'year_level' => '1st Year',
-                'current_gwa' => 2.00,
-            ],
-            [
-                'first_name' => 'Sofia',
-                'last_name' => 'Lopez',
-                'email' => 'sofia.lopez@minsu.edu.ph',
-                'student_id' => '2023-00005',
-                'course' => 'Bachelor of Science in Nursing',
-                'year_level' => '3rd Year',
-                'current_gwa' => 1.50,
-            ],
-            [
-                'first_name' => 'Carlos',
-                'last_name' => 'Reyes',
-                'email' => 'carlos.reyes@minsu.edu.ph',
-                'student_id' => '2023-00006',
-                'course' => 'Bachelor of Science in Engineering',
-                'year_level' => '2nd Year',
-                'current_gwa' => 1.80,
-            ],
-            [
-                'first_name' => 'Isabella',
-                'last_name' => 'Mendoza',
-                'email' => 'isabella.mendoza@minsu.edu.ph',
-                'student_id' => '2023-00007',
-                'course' => 'Bachelor of Arts in English',
-                'year_level' => '4th Year',
-                'current_gwa' => 1.40,
-            ],
-            [
-                'first_name' => 'Rafael',
-                'last_name' => 'Torres',
-                'email' => 'rafael.torres@minsu.edu.ph',
-                'student_id' => '2023-00008',
-                'course' => 'Bachelor of Science in Mathematics',
-                'year_level' => '1st Year',
-                'current_gwa' => 2.10,
-            ],
-            [
-                'first_name' => 'Lucia',
-                'last_name' => 'Fernandez',
-                'email' => 'lucia.fernandez@minsu.edu.ph',
-                'student_id' => '2023-00009',
-                'course' => 'Bachelor of Science in Psychology',
-                'year_level' => '3rd Year',
-                'current_gwa' => 1.60,
-            ],
-            [
-                'first_name' => 'Diego',
-                'last_name' => 'Morales',
-                'email' => 'diego.morales@minsu.edu.ph',
-                'student_id' => '2023-00010',
-                'course' => 'Bachelor of Science in Agriculture',
-                'year_level' => '2nd Year',
-                'current_gwa' => 1.90,
-            ],
-        ];
-
-        $createdStudents = collect();
-
-        foreach ($sampleStudents as $studentData) {
-            // Create user
-            $user = User::create([
-                'first_name' => $studentData['first_name'],
-                'last_name' => $studentData['last_name'],
-                'email' => $studentData['email'],
-                'email_verified_at' => now(),
-                'password' => bcrypt('password123'),
-                'role' => 'student',
-            ]);
-
-            // Create student profile
-            StudentProfile::create([
-                'user_id' => $user->id,
-                'student_id' => $studentData['student_id'],
-                'course' => $studentData['course'],
-                'major' => 'None',
-                'year_level' => $studentData['year_level'],
-                'current_gwa' => $studentData['current_gwa'],
-                'enrollment_status' => 'enrolled',
-                'units' => 18,
-                'existing_scholarships' => null,
-
-                // Personal Information
-                'civil_status' => 'Single',
-                'sex' => collect(['Male', 'Female'])->random(),
-                'date_of_birth' => now()->subYears(rand(18, 24))->format('Y-m-d'),
-                'place_of_birth' => 'Butig, Lanao del Sur',
-                'street' => 'MinSU Campus',
-                'barangay' => 'Butig',
-                'city' => 'Butig',
-                'province' => 'Lanao del Sur',
-                'zip_code' => '9307',
-                'mobile_number' => '+63912345'.str_pad($user->id, 4, '0', STR_PAD_LEFT),
-                'telephone_number' => null,
-                'is_pwd' => false,
-                'disability_type' => null,
-                'religion' => 'Islam',
-                'residence_type' => 'Boarding House',
-
-                // Family Background
-                'status_of_parents' => 'Living Together',
-                'guardian_name' => 'Not Applicable',
-            ]);
-
-            $createdStudents->push($user->load('studentProfile'));
-        }
-
-        return $createdStudents;
     }
 }

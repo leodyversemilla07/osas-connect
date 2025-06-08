@@ -5,6 +5,7 @@ import { DataTable } from '@/components/osas-scholarship-management/data-table';
 import { createAdminColumns } from '@/components/admin-scholarship-management/columns';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScholarshipDetailsDialog } from '@/components/admin-scholarship-management/scholarship-details-dialog';
 import { useState } from 'react';
 import { 
@@ -177,75 +178,97 @@ export default function AdminScholarshipsIndex({ scholarships, filters, statisti
             <Head>
                 <title>Scholarships Overview</title>
                 <meta name="description" content="Administrative overview of all scholarships in the system" />
-            </Head>
-
-            <div className="flex h-full flex-1 flex-col space-y-6 p-6">
+            </Head>            <div className="flex h-full flex-1 flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 lg:space-y-8 lg:p-8">
                 {/* Header Section */}
-                <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                <div className="border-b border-gray-100 dark:border-gray-800 pb-4 lg:pb-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">
+                            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 sm:text-3xl lg:text-4xl">
                                 Scholarships Overview
                             </h1>
-                            <p className="text-base text-gray-500 dark:text-gray-400">
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 sm:text-base lg:text-lg">
                                 Administrative view of all scholarships and their performance metrics
                             </p>
                         </div>
                     </div>
                 </div>                {/* Statistics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Total Scholarships
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6 xl:gap-8">
+                    <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+                        <CardHeader className="pb-3 lg:pb-4">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Total Scholarships
+                                </CardTitle>
+                                <Award className="h-4 w-4 text-gray-400 lg:h-5 lg:w-5" />
                             </div>
-                            <Award className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <div className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">
-                            {statistics.total_scholarships}
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">All scholarships in system</p>
-                    </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100 lg:text-3xl">
+                                {statistics.total_scholarships}
+                            </div>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 lg:text-sm">
+                                All scholarships in system
+                            </p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Active Scholarships
+                    <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+                        <CardHeader className="pb-3 lg:pb-4">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Active Scholarships
+                                </CardTitle>
+                                <GraduationCap className="h-4 w-4 text-gray-400 lg:h-5 lg:w-5" />
                             </div>
-                            <GraduationCap className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <div className="text-3xl font-semibold text-green-600 dark:text-green-500 mt-2">
-                            {statistics.active_scholarships}
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Currently accepting applications</p>
-                    </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            <div className="text-2xl font-semibold text-green-600 dark:text-green-500 lg:text-3xl">
+                                {statistics.active_scholarships}
+                            </div>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 lg:text-sm">
+                                Currently accepting applications
+                            </p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Total Applications
+                    <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+                        <CardHeader className="pb-3 lg:pb-4">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Total Applications
+                                </CardTitle>
+                                <Users className="h-4 w-4 text-gray-400 lg:h-5 lg:w-5" />
                             </div>
-                            <Users className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <div className="text-3xl font-semibold text-blue-600 dark:text-blue-500 mt-2">
-                            {statistics.total_applications}
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">All submitted applications</p>
-                    </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            <div className="text-2xl font-semibold text-blue-600 dark:text-blue-500 lg:text-3xl">
+                                {statistics.total_applications}
+                            </div>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 lg:text-sm">
+                                All submitted applications
+                            </p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Approved Applications
+                    <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+                        <CardHeader className="pb-3 lg:pb-4">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Approved Applications
+                                </CardTitle>
+                                <DollarSign className="h-4 w-4 text-gray-400 lg:h-5 lg:w-5" />
                             </div>
-                            <DollarSign className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <div className="text-3xl font-semibold text-green-600 dark:text-green-500 mt-2">
-                            {statistics.approved_applications}
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Currently receiving benefits</p>
-                    </div>
-                </div>                {/* Filters and Search */}
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            <div className="text-2xl font-semibold text-green-600 dark:text-green-500 lg:text-3xl">
+                                {statistics.approved_applications}
+                            </div>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 lg:text-sm">
+                                Currently receiving benefits
+                            </p>
+                        </CardContent>
+                    </Card>
+                </div>{/* Filters and Search */}
                 <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
                     <div className="flex items-center gap-2 mb-6">
                         <Filter className="h-5 w-5 text-gray-500 dark:text-gray-400" />

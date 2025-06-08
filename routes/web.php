@@ -147,8 +147,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/osas-staff/documents/{document}/verify', [OsasStaffController::class, 'verifyDocument'])->name('osas.documents.verify');
 
         // Interview scheduling and management
-        Route::post('/osas-staff/scholarships/applications/{application}/interview', [UnifiedScholarshipController::class, 'scheduleInterview'])
-            ->name('osas.scholarships.applications.interview.schedule');
+        Route::get('/osas-staff/applications/{application}/interview', [OsasStaffController::class, 'scheduleInterviewForm'])->name('osas.applications.interview');
+        Route::post('/osas-staff/applications/{application}/interview', [UnifiedScholarshipController::class, 'scheduleInterview'])
+            ->name('osas.scholarships.interview.store');
 
         // Stipend recording
         Route::post('/osas-staff/scholarships/applications/{application}/stipend', [UnifiedScholarshipController::class, 'recordStipend'])

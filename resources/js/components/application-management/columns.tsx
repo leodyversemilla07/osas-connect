@@ -13,7 +13,6 @@ import {
 import {
     MoreVertical,
     Eye,
-    FileText,
     Calendar,
     Clock,
     CheckCircle,
@@ -382,18 +381,18 @@ export const columns: ColumnDef<Application>[] = [
                                 Review Application
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <FileText className="h-4 w-4 mr-2" />
-                            View Documents
-                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <Calendar className="h-4 w-4 mr-2" />
-                            Schedule Interview
+                        <DropdownMenuItem asChild>
+                            <Link href={route('osas.applications.interview', application.id)}>
+                                <Calendar className="h-4 w-4 mr-2" />
+                                Schedule Interview
+                            </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <User className="h-4 w-4 mr-2" />
-                            View Student Profile
+                        <DropdownMenuItem asChild>
+                            <Link href={route('osas.students.details', application.student.id)}>
+                                <User className="h-4 w-4 mr-2" />
+                                View Student Profile
+                            </Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

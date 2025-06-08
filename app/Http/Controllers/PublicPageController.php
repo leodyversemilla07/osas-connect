@@ -103,7 +103,7 @@ class PublicPageController extends Controller
             $pageContent = $this->getDefaultHomeContent();
         }
 
-return Inertia::render('home', [
+        return Inertia::render('home', [
             'pageContent' => $pageContent,
             'cmsTheme' => $page ? $page->getTheme() : null,
             'cmsColorScheme' => $page ? $page->getEffectiveColorScheme() : null,
@@ -152,7 +152,7 @@ return Inertia::render('home', [
             abort(404);
         }
 
-return Inertia::render('public-page', [
+        return Inertia::render('public-page', [
             'page' => $page,
             'cmsTheme' => $page->getTheme(),
             'cmsColorScheme' => $page->getEffectiveColorScheme(),
@@ -215,7 +215,7 @@ return Inertia::render('public-page', [
                     'Transparent selection criteria',
                     'Real-time status tracking',
                     'Comprehensive document management',
-                    'Equal opportunity access'
+                    'Equal opportunity access',
                 ],
                 'image' => 'https://img.freepik.com/free-photo/portrait-female-teacher-holding-notepad-green-wall_651396-1833.jpg',
             ],
@@ -227,19 +227,19 @@ return Inertia::render('public-page', [
                     [
                         'icon' => 'Users',
                         'title' => 'Inclusivity',
-                        'description' => 'Ensuring equal opportunities for all students regardless of their background.'
+                        'description' => 'Ensuring equal opportunities for all students regardless of their background.',
                     ],
                     [
                         'icon' => 'Shield',
                         'title' => 'Integrity',
-                        'description' => 'Maintaining transparency and fairness in all our processes.'
+                        'description' => 'Maintaining transparency and fairness in all our processes.',
                     ],
                     [
                         'icon' => 'Heart',
                         'title' => 'Compassion',
-                        'description' => 'Understanding and supporting students in their educational journey.'
-                    ]
-                ]
+                        'description' => 'Understanding and supporting students in their educational journey.',
+                    ],
+                ],
             ],
             'team' => [
                 'badge' => 'Our Team',
@@ -249,15 +249,15 @@ return Inertia::render('public-page', [
                     [
                         'name' => 'OSAS Connect Team',
                         'position' => 'Student Support Services',
-                        'image' => 'https://via.placeholder.com/150x150/005a2d/ffffff?text=Team'
-                    ]
-                ]
+                        'image' => 'https://via.placeholder.com/150x150/005a2d/ffffff?text=Team',
+                    ],
+                ],
             ],
             'cta' => [
                 'title' => 'Ready to Start Your Journey?',
                 'description' => 'Join thousands of students who have successfully received scholarships through OSAS Connect.',
                 'button_text' => 'Apply Now',
-                'button_link' => '/login'
+                'button_link' => '/login',
             ],
         ];
     }

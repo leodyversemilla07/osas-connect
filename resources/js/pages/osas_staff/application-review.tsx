@@ -491,7 +491,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                         </Card>
 
                         {/* Documents */}
-                        <Card>
+                        <Card id="documents">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <FileText className="h-5 w-5" />

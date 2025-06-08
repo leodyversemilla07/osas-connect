@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Page;
-use App\Models\SiteComponent;
 use App\Models\Scholarship;
+use App\Models\SiteComponent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -75,7 +75,7 @@ class ContentController extends Controller
             return [
                 'id' => $scholarship->id,
                 'name' => $scholarship->name,
-                'amount' => $scholarship->amount ? '₱' . number_format($scholarship->amount, 2) : 'TBD',
+                'amount' => $scholarship->amount ? '₱'.number_format($scholarship->amount, 2) : 'TBD',
                 'deadline' => $scholarship->deadline ? $scholarship->deadline->format('M d, Y') : 'No deadline',
                 'daysRemaining' => $daysRemaining,
                 'type' => $typeMapping[$scholarship->type] ?? 'Academic Scholarship',
@@ -134,7 +134,7 @@ class ContentController extends Controller
         return response()->json([
             'id' => $scholarship->id,
             'name' => $scholarship->name,
-            'amount' => $scholarship->amount ? '₱' . number_format($scholarship->amount, 2) : 'TBD',
+            'amount' => $scholarship->amount ? '₱'.number_format($scholarship->amount, 2) : 'TBD',
             'deadline' => $scholarship->deadline ? $scholarship->deadline->format('M d, Y') : 'No deadline',
             'daysRemaining' => $daysRemaining,
             'type' => $typeMapping[$scholarship->type] ?? 'Academic Scholarship',

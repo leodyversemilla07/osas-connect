@@ -84,19 +84,17 @@ function DraggableComponent({ item }: DraggableComponentProps) {
     const style = transform ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
         zIndex: 1000,
-    } : undefined;
-
-    const IconComponent = iconMap[item.icon as keyof typeof iconMap] || Layout;
+    } : undefined;    const IconComponent = iconMap[item.icon as keyof typeof iconMap] || Layout;
 
     return (
         <div
             ref={setNodeRef}
             style={style}
-            className={`cursor-grab active:cursor-grabbing select-none ${isDragging ? 'opacity-50 z-50' : 'hover:scale-102'
+            className={`cursor-grab active:cursor-grabbing select-none touch-none ${isDragging ? 'opacity-50 z-50' : 'hover:scale-102'
                 }`}
             {...listeners}
             {...attributes}
-        >            <Card className="h-full border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 transition-colors">
+        ><Card className="h-full border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 transition-colors">
                 <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">

@@ -14,6 +14,12 @@ class DatabaseSeeder extends Seeder
         // Call the admin seeder to create initial admin users
         $this->call(AdminSeeder::class);
 
+        // Call the OSAS staff seeder to create staff users
+        $this->call(OsasStaffSeeder::class);
+
+        // Call the student seeder to create student users (60 students)
+        $this->call(StudentSeeder::class);
+
         // Seed MinSU scholarships
         $this->call(MinSUScholarshipsSeeder::class);
 

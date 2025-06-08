@@ -94,7 +94,7 @@ class PageSeeder extends Seeder
                             'Transparent selection criteria',
                             'Real-time status tracking',
                             'Comprehensive document management',
-                            'Equal opportunity access'
+                            'Equal opportunity access',
                         ],
                         'image' => 'https://img.freepik.com/free-photo/portrait-female-teacher-holding-notepad-green-wall_651396-1833.jpg',
                     ],
@@ -128,25 +128,25 @@ class PageSeeder extends Seeder
                             [
                                 'name' => 'Dr. Maria Santos',
                                 'position' => 'Director, Office of Student Affairs',
-                                'image' => 'https://via.placeholder.com/150x150/005a2d/ffffff?text=MS'
+                                'image' => 'https://via.placeholder.com/150x150/005a2d/ffffff?text=MS',
                             ],
                             [
                                 'name' => 'Prof. Juan dela Cruz',
                                 'position' => 'Scholarship Coordinator',
-                                'image' => 'https://via.placeholder.com/150x150/005a2d/ffffff?text=JC'
+                                'image' => 'https://via.placeholder.com/150x150/005a2d/ffffff?text=JC',
                             ],
                             [
                                 'name' => 'Ms. Ana Rodriguez',
                                 'position' => 'Student Support Services',
-                                'image' => 'https://via.placeholder.com/150x150/005a2d/ffffff?text=AR'
-                            ]
-                        ]
+                                'image' => 'https://via.placeholder.com/150x150/005a2d/ffffff?text=AR',
+                            ],
+                        ],
                     ],
                     'cta' => [
                         'title' => 'Ready to Start Your Journey?',
                         'description' => 'Join thousands of students who have successfully received scholarships through OSAS Connect.',
                         'button_text' => 'Apply Now',
-                        'button_link' => '/login'
+                        'button_link' => '/login',
                     ],
                 ],
             ],

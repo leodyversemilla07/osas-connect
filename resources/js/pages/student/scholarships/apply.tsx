@@ -103,7 +103,7 @@ export default function Apply({ scholarship, userProfile }: Props) {
             ...uploadedFiles,
             [documentType]: file.name,
         });
-    };      const handleSubmit = (e: React.FormEvent) => {
+    }; const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         // Basic client-side validation
@@ -171,258 +171,256 @@ export default function Apply({ scholarship, userProfile }: Props) {
     // Add scholarship type-specific field renderer
     const renderScholarshipSpecificFields = () => {
         switch (scholarship.type) {
-            case 'student_assistantship':
-                return (
-                    <>
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                Parent/Guardian Consent *
+            case 'student_assistantship': return (
+                <>
+                    <div className="space-y-3">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                            Parent/Guardian Consent *
+                        </Label>
+                        <div className="flex items-center space-x-3 min-h-[44px]">
+                            <input
+                                type="checkbox"
+                                id="parent_consent"
+                                checked={data.application_data.parent_consent_provided}
+                                onChange={(e) => setData('application_data', {
+                                    ...data.application_data,
+                                    parent_consent_provided: e.target.checked
+                                })}
+                                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 lg:h-5 lg:w-5"
+                            />
+                            <Label htmlFor="parent_consent" className="text-sm lg:text-base leading-relaxed">
+                                I have parental/guardian consent for this application
                             </Label>
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    type="checkbox"
-                                    id="parent_consent"
-                                    checked={data.application_data.parent_consent_provided}
-                                    onChange={(e) => setData('application_data', {
-                                        ...data.application_data,
-                                        parent_consent_provided: e.target.checked
-                                    })}
-                                    className="rounded border-gray-300 dark:border-gray-600"
-                                />
-                                <Label htmlFor="parent_consent" className="text-sm">
-                                    I have parental/guardian consent for this application
-                                </Label>
-                            </div>
-                            {formErrors['application_data.parent_consent_provided'] && (
-                                <p className="text-red-600 text-sm mt-1">{formErrors['application_data.parent_consent_provided']}</p>
-                            )}
                         </div>
+                        {formErrors['application_data.parent_consent_provided'] && (
+                            <p className="text-red-600 text-sm mt-2 lg:text-base">{formErrors['application_data.parent_consent_provided']}</p>
+                        )}
+                    </div>
 
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                Pre-hiring Screening Status *
+                    <div className="space-y-3">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                            Pre-hiring Screening Status *
+                        </Label>
+                        <div className="flex items-center space-x-3 min-h-[44px]">
+                            <input
+                                type="checkbox"
+                                id="pre_hiring"
+                                checked={data.application_data.pre_hiring_completed}
+                                onChange={(e) => setData('application_data', {
+                                    ...data.application_data,
+                                    pre_hiring_completed: e.target.checked
+                                })}
+                                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 lg:h-5 lg:w-5"
+                            />
+                            <Label htmlFor="pre_hiring" className="text-sm lg:text-base leading-relaxed">
+                                I have completed the pre-hiring screening process
                             </Label>
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    type="checkbox"
-                                    id="pre_hiring"
-                                    checked={data.application_data.pre_hiring_completed}
-                                    onChange={(e) => setData('application_data', {
-                                        ...data.application_data,
-                                        pre_hiring_completed: e.target.checked
-                                    })}
-                                    className="rounded border-gray-300 dark:border-gray-600"
-                                />
-                                <Label htmlFor="pre_hiring" className="text-sm">
-                                    I have completed the pre-hiring screening process
-                                </Label>
-                            </div>
-                            {formErrors['application_data.pre_hiring_completed'] && (
-                                <p className="text-red-600 text-sm mt-1">{formErrors['application_data.pre_hiring_completed']}</p>
-                            )}
                         </div>
-                    </>
-                );
+                        {formErrors['application_data.pre_hiring_completed'] && (
+                            <p className="text-red-600 text-sm mt-2 lg:text-base">{formErrors['application_data.pre_hiring_completed']}</p>
+                        )}
+                    </div>
+                </>
+            );
 
             case 'performing_arts_full':
-            case 'performing_arts_partial':
-                return (
-                    <>
-                        <div className="space-y-2">
-                            <Label htmlFor="membership_duration" className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                Membership Duration (months) *
-                            </Label>
-                            <Input
-                                id="membership_duration"
-                                type="number"
-                                min="0"
-                                value={data.application_data.membership_duration}
+            case 'performing_arts_partial': return (
+                <>
+                    <div className="space-y-3">
+                        <Label htmlFor="membership_duration" className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                            Membership Duration (months) *
+                        </Label>
+                        <Input
+                            id="membership_duration"
+                            type="number"
+                            min="0"
+                            value={data.application_data.membership_duration}
+                            onChange={(e) => setData('application_data', {
+                                ...data.application_data,
+                                membership_duration: e.target.value
+                            })}
+                            className="min-h-[44px] border-gray-200 dark:border-gray-800 lg:text-base"
+                        />
+                        {formErrors['application_data.membership_duration'] && (
+                            <p className="text-red-600 text-sm mt-2 lg:text-base">{formErrors['application_data.membership_duration']}</p>
+                        )}
+                    </div>
+
+                    <div className="space-y-3">
+                        <Label htmlFor="major_activities" className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                            Number of Major Activities Participated *
+                        </Label>
+                        <Input
+                            id="major_activities"
+                            type="number"
+                            min="0"
+                            value={data.application_data.major_activities_count}
+                            onChange={(e) => setData('application_data', {
+                                ...data.application_data,
+                                major_activities_count: parseInt(e.target.value) || 0
+                            })}
+                            className="min-h-[44px] border-gray-200 dark:border-gray-800 lg:text-base"
+                        />
+                        {formErrors['application_data.major_activities_count'] && (
+                            <p className="text-red-600 text-sm mt-2 lg:text-base">{formErrors['application_data.major_activities_count']}</p>
+                        )}
+                    </div>
+
+                    <div className="space-y-3">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                            Major Performances
+                        </Label>
+                        <div className="flex items-center space-x-3 min-h-[44px]">
+                            <input
+                                type="checkbox"
+                                id="major_performances"
+                                checked={data.application_data.major_performances}
                                 onChange={(e) => setData('application_data', {
                                     ...data.application_data,
-                                    membership_duration: e.target.value
+                                    major_performances: e.target.checked
                                 })}
-                                className="mt-1 border-gray-200 dark:border-gray-800"
+                                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 lg:h-5 lg:w-5"
                             />
-                            {formErrors['application_data.membership_duration'] && (
-                                <p className="text-red-600 text-sm mt-1">{formErrors['application_data.membership_duration']}</p>
-                            )}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="major_activities" className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                Number of Major Activities Participated *
+                            <Label htmlFor="major_performances" className="text-sm lg:text-base leading-relaxed">
+                                I have participated in major performances
                             </Label>
-                            <Input
-                                id="major_activities"
-                                type="number"
-                                min="0"
-                                value={data.application_data.major_activities_count}
-                                onChange={(e) => setData('application_data', {
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        <Label className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                            Coach Recommendation *
+                        </Label>
+                        <div className="flex items-center space-x-3 min-h-[44px]">
+                            <input
+                                type="checkbox"
+                                id="coach_recommendation"
+                                checked={data.application_data.coach_recommendation_provided} onChange={(e) => setData('application_data', {
                                     ...data.application_data,
-                                    major_activities_count: parseInt(e.target.value) || 0
+                                    coach_recommendation_provided: e.target.checked
                                 })}
-                                className="mt-1 border-gray-200 dark:border-gray-800"
+                                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 lg:h-5 lg:w-5"
                             />
-                            {formErrors['application_data.major_activities_count'] && (
-                                <p className="text-red-600 text-sm mt-1">{formErrors['application_data.major_activities_count']}</p>
-                            )}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                Major Performances
+                            <Label htmlFor="coach_recommendation" className="text-sm lg:text-base leading-relaxed">
+                                I have coach recommendation for this application
                             </Label>
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    type="checkbox"
-                                    id="major_performances"
-                                    checked={data.application_data.major_performances}
-                                    onChange={(e) => setData('application_data', {
-                                        ...data.application_data,
-                                        major_performances: e.target.checked
-                                    })}
-                                    className="rounded border-gray-300 dark:border-gray-600"
-                                />
-                                <Label htmlFor="major_performances" className="text-sm">
-                                    I have participated in major performances
-                                </Label>
-                            </div>
                         </div>
+                        {formErrors['application_data.coach_recommendation_provided'] && (
+                            <p className="text-red-600 text-sm mt-2 lg:text-base">{formErrors['application_data.coach_recommendation_provided']}</p>
+                        )}
+                    </div>
+                </>
+            );
 
-                        <div className="space-y-2">
-                            <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                Coach Recommendation *
-                            </Label>
-                            <div className="flex items-center space-x-2">
-                                <input
-                                    type="checkbox"
-                                    id="coach_recommendation"
-                                    checked={data.application_data.coach_recommendation_provided}
-                                    onChange={(e) => setData('application_data', {
-                                        ...data.application_data,
-                                        coach_recommendation_provided: e.target.checked
-                                    })}
-                                    className="rounded border-gray-300 dark:border-gray-600"
-                                />
-                                <Label htmlFor="coach_recommendation" className="text-sm">
-                                    I have coach recommendation for this application
-                                </Label>
-                            </div>
-                            {formErrors['application_data.coach_recommendation_provided'] && (
-                                <p className="text-red-600 text-sm mt-1">{formErrors['application_data.coach_recommendation_provided']}</p>
-                            )}
-                        </div>
-                    </>
-                );
+            case 'economic_assistance': return (
+                <>
+                    <div className="space-y-3">
+                        <Label htmlFor="family_income" className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                            Annual Family Income (₱) *
+                        </Label>
+                        <Input
+                            id="family_income"
+                            type="number"
+                            min="0"
+                            value={data.application_data.family_income}
+                            onChange={(e) => setData('application_data', {
+                                ...data.application_data,
+                                family_income: e.target.value
+                            })}
+                            className="min-h-[44px] border-gray-200 dark:border-gray-800 lg:text-base"
+                            placeholder="Enter your family's annual income"
+                        />
+                        <p className="text-sm text-gray-500 dark:text-gray-400 lg:text-base">
+                            Must be ₱250,000 or below to qualify for economic assistance
+                        </p>
+                        {formErrors['application_data.family_income'] && (
+                            <p className="text-red-600 text-sm mt-2 lg:text-base">{formErrors['application_data.family_income']}</p>
+                        )}
+                    </div>
 
-            case 'economic_assistance':
-                return (
-                    <>
-                        <div className="space-y-2">
-                            <Label htmlFor="family_income" className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                Annual Family Income (₱) *
-                            </Label>
-                            <Input
-                                id="family_income"
-                                type="number"
-                                min="0"
-                                value={data.application_data.family_income}
-                                onChange={(e) => setData('application_data', {
-                                    ...data.application_data,
-                                    family_income: e.target.value
-                                })}
-                                className="mt-1 border-gray-200 dark:border-gray-800"
-                                placeholder="Enter your family's annual income"
-                            />
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Must be ₱250,000 or below to qualify for economic assistance
-                            </p>
-                            {formErrors['application_data.family_income'] && (
-                                <p className="text-red-600 text-sm mt-1">{formErrors['application_data.family_income']}</p>
-                            )}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="indigency_date" className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                Indigency Certificate Issue Date *
-                            </Label>
-                            <Input
-                                id="indigency_date"
-                                type="date"
-                                value={data.application_data.indigency_certificate_issue_date}
-                                onChange={(e) => setData('application_data', {
-                                    ...data.application_data,
-                                    indigency_certificate_issue_date: e.target.value
-                                })}
-                                className="mt-1 border-gray-200 dark:border-gray-800"
-                            />
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Certificate must be issued within the last 6 months
-                            </p>
-                            {formErrors['application_data.indigency_certificate_issue_date'] && (
-                                <p className="text-red-600 text-sm mt-1">{formErrors['application_data.indigency_certificate_issue_date']}</p>
-                            )}
-                        </div>
-                    </>
-                );
+                    <div className="space-y-3">
+                        <Label htmlFor="indigency_date" className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                            Indigency Certificate Issue Date *
+                        </Label>
+                        <Input
+                            id="indigency_date"
+                            type="date"
+                            value={data.application_data.indigency_certificate_issue_date}
+                            onChange={(e) => setData('application_data', {
+                                ...data.application_data,
+                                indigency_certificate_issue_date: e.target.value
+                            })}
+                            className="min-h-[44px] border-gray-200 dark:border-gray-800 lg:text-base"
+                        />
+                        <p className="text-sm text-gray-500 dark:text-gray-400 lg:text-base">
+                            Certificate must be issued within the last 6 months
+                        </p>
+                        {formErrors['application_data.indigency_certificate_issue_date'] && (
+                            <p className="text-red-600 text-sm mt-2 lg:text-base">{formErrors['application_data.indigency_certificate_issue_date']}</p>
+                        )}
+                    </div>
+                </>
+            );
 
             default:
                 return null;
         }
-    };
-
-    return (
+    }; return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Apply for ${scholarship.name}`} />
 
-            <div className="flex h-full flex-1 flex-col space-y-6 p-6">
-                <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+            <div className="flex h-full flex-1 flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 lg:space-y-8 lg:p-8">
+                <div className="border-b border-gray-100 dark:border-gray-800 pb-6 lg:pb-8">
                     <div>
-                        <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">Apply for Scholarship</h1>
-                        <p className="text-base text-gray-500 dark:text-gray-400">Complete the application form below to apply for this scholarship.</p>
+                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 sm:text-3xl">Apply for Scholarship</h1>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 sm:text-base">Complete the application form below to apply for this scholarship.</p>
                     </div>
-                </div>                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    {/* Scholarship Details Sidebar */}
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6 xl:gap-8">                    {/* Scholarship Details Sidebar */}
                     <div className="lg:col-span-1">
-                        <Card className="sticky top-6 border-gray-200 dark:border-gray-800">                            <CardHeader>
-                            <CardTitle className="text-xl text-gray-900 dark:text-gray-100">{scholarship.name}</CardTitle>
-                            <CardDescription>
-                                <Badge variant="secondary" className="mb-2">
-                                    {scholarship.typeLabel || scholarship.type}
-                                </Badge>
-                            </CardDescription>
-                        </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex items-center space-x-2">
-                                    <DollarSign className="h-4 w-4 text-green-600" />
-                                    <span className="text-sm font-medium">{formatAmount(scholarship.stipendAmount)}</span>
+                        <Card className="sticky top-6 border-gray-200 dark:border-gray-800">
+                            <CardHeader className="pb-4 lg:pb-6">
+                                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 lg:text-xl">{scholarship.name}</CardTitle>
+                                <CardDescription>
+                                    <Badge variant="secondary" className="mb-2">
+                                        {scholarship.typeLabel || scholarship.type}
+                                    </Badge>
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4 pt-0 lg:space-y-6">
+                                <div className="flex items-center space-x-3">
+                                    <DollarSign className="h-4 w-4 text-green-600 lg:h-5 lg:w-5" />
+                                    <span className="text-sm font-medium lg:text-base">{formatAmount(scholarship.stipendAmount)}</span>
                                 </div>
 
                                 {scholarship.availableSlots && (
-                                    <div className="flex items-center space-x-2">
-                                        <Users className="h-4 w-4 text-blue-600" />
-                                        <span className="text-sm">{scholarship.availableSlots} slots available</span>
+                                    <div className="flex items-center space-x-3">
+                                        <Users className="h-4 w-4 text-blue-600 lg:h-5 lg:w-5" />
+                                        <span className="text-sm lg:text-base">{scholarship.availableSlots} slots available</span>
                                     </div>
                                 )}
 
-                                <div className="flex items-center space-x-2">
-                                    <Clock className="h-4 w-4 text-orange-600" />
-                                    <span className="text-sm">Deadline: {new Date(scholarship.deadline).toLocaleDateString()}</span>
-                                </div>                                {scholarship.description && (
-                                    <div>
-                                        <h4 className="font-medium text-sm mb-2 text-gray-900 dark:text-gray-100">Description</h4>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">{scholarship.description}</p>
+                                <div className="flex items-center space-x-3">
+                                    <Clock className="h-4 w-4 text-orange-600 lg:h-5 lg:w-5" />
+                                    <span className="text-sm lg:text-base">Deadline: {new Date(scholarship.deadline).toLocaleDateString()}</span>
+                                </div>
+
+                                {scholarship.description && (
+                                    <div className="space-y-2">
+                                        <h4 className="font-medium text-sm mb-2 text-gray-900 dark:text-gray-100 lg:text-base">Description</h4>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 lg:text-base leading-relaxed">{scholarship.description}</p>
                                     </div>
                                 )}
 
                                 {scholarship.requirements && scholarship.requirements.length > 0 && (
-                                    <div>
-                                        <h4 className="font-medium text-sm mb-2 text-gray-900 dark:text-gray-100">Requirements</h4>
-                                        <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                                    <div className="space-y-3">
+                                        <h4 className="font-medium text-sm mb-3 text-gray-900 dark:text-gray-100 lg:text-base">Requirements</h4>
+                                        <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2 lg:text-base">
                                             {scholarship.requirements.map((req, index) => (
-                                                <li key={index} className="flex items-start space-x-2">
-                                                    <CheckCircle className="h-3 w-3 text-green-600 mt-0.5 flex-shrink-0" />
-                                                    <span>{req}</span>
+                                                <li key={index} className="flex items-start space-x-3">
+                                                    <CheckCircle className="h-3 w-3 text-green-600 mt-0.5 flex-shrink-0 lg:h-4 lg:w-4 lg:mt-1" />
+                                                    <span className="leading-relaxed">{req}</span>
                                                 </li>
                                             ))}
                                         </ul>
@@ -432,163 +430,167 @@ export default function Apply({ scholarship, userProfile }: Props) {
                         </Card>
                     </div>                    {/* Application Form */}
                     <div className="lg:col-span-2">
-                        <Card className="border-gray-200 dark:border-gray-800">                            <CardHeader>
-                            <CardTitle className="text-gray-900 dark:text-gray-100">Application Form</CardTitle>
-                            <CardDescription className="text-gray-500 dark:text-gray-400">
-                                Please fill out all required fields to submit your application.
-                            </CardDescription>
-                        </CardHeader>
-                            <CardContent>                                <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
-                                {/* Personal Statement */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="personal_statement" className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        Personal Statement *
-                                    </Label>
-                                    <Textarea
-                                        id="personal_statement"
-                                        placeholder="Tell us about yourself, your background, and why you're applying for this scholarship..."
-                                        value={data.personal_statement}
-                                        onChange={(e) => setData('personal_statement', e.target.value)}
-                                        rows={4}
-                                        className="mt-1 border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600"
-                                    />
-                                    {errors.personal_statement && (
-                                        <p className="text-red-600 text-sm mt-1">{errors.personal_statement}</p>
-                                    )}
-                                </div>
-
-                                {/* Academic Goals */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="academic_goals" className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        Academic Goals *
-                                    </Label>
-                                    <Textarea
-                                        id="academic_goals"
-                                        placeholder="Describe your academic goals and how this scholarship will help you achieve them..."
-                                        value={data.academic_goals}
-                                        onChange={(e) => setData('academic_goals', e.target.value)}
-                                        rows={3}
-                                        className="mt-1 border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600"
-                                    />
-                                    {errors.academic_goals && (
-                                        <p className="text-red-600 text-sm mt-1">{errors.academic_goals}</p>
-                                    )}
-                                </div>
-
-                                {/* Financial Need Statement */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="financial_need_statement" className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        Financial Need Statement *
-                                    </Label>
-                                    <Textarea
-                                        id="financial_need_statement"
-                                        placeholder="Explain your financial situation and why you need this scholarship..."
-                                        value={data.financial_need_statement}
-                                        onChange={(e) => setData('financial_need_statement', e.target.value)}
-                                        rows={3}
-                                        className="mt-1 border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600"
-                                    />
-                                    {errors.financial_need_statement && (
-                                        <p className="text-red-600 text-sm mt-1">{errors.financial_need_statement}</p>
-                                    )}
-                                </div>                                    {/* Required Documents */}
-                                {scholarship.requiredDocuments && formatDocuments(scholarship.requiredDocuments).length > 0 && (
-                                    <div className="space-y-4">
-                                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Required Documents</h3>
-                                        <div className="space-y-4">
-                                            {formatDocuments(scholarship.requiredDocuments).map((doc, index) => (
-                                                <div key={index} className="space-y-2">
-                                                    <Label htmlFor={`document_${index}`} className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {doc} *
-                                                    </Label>
-                                                    <Input
-                                                        id={`document_${index}`}
-                                                        type="file"
-                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                        onChange={(e) => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) {
-                                                                handleFileUpload(doc, file);
-                                                            }
-                                                        }}
-                                                        className="mt-1 border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600" />
-                                                    {uploadedFiles[doc] && (
-                                                        <p className="text-green-600 text-sm mt-1">
-                                                            <CheckCircle className="h-4 w-4 inline mr-1" />
-                                                            {uploadedFiles[doc]} uploaded
-                                                        </p>
-                                                    )}
-                                                    {formErrors[`documents.${doc}`] && (
-                                                        <p className="text-red-600 text-sm mt-1">{formErrors[`documents.${doc}`]}</p>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Additional Comments */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="additional_comments" className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        Additional Comments
-                                    </Label>
-                                    <Textarea
-                                        id="additional_comments"
-                                        placeholder="Any additional information you'd like to share (optional)..."
-                                        value={data.additional_comments}
-                                        onChange={(e) => setData('additional_comments', e.target.value)}
-                                        rows={2}
-                                        className="mt-1 border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600"
-                                    />
-                                </div>
-
-                                {/* Scholarship type-specific fields */}
-                                {renderScholarshipSpecificFields() && (
-                                    <div className="space-y-4 border-t pt-6">
-                                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                            Additional Requirements for {scholarship.typeLabel || scholarship.type}
-                                        </h3>
-                                        {renderScholarshipSpecificFields()}
-                                    </div>
-                                )}
-
-                                {/* Enhanced Student Profile Summary with eligibility checking */}
-                                <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
-                                    <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                    <AlertDescription className="text-gray-900 dark:text-gray-100">
-                                        <strong>Application Summary:</strong><br />
-                                        Student ID: {userProfile.student_profile?.student_id || 'N/A'}<br />
-                                        Current GWA: {userProfile.student_profile?.current_gwa ? userProfile.student_profile.current_gwa.toFixed(2) : 'Not yet available'}<br />
-                                        Course: {userProfile.student_profile?.course || 'N/A'}<br />
-                                        Year Level: {userProfile.student_profile?.year_level || 'N/A'}<br />
-                                        Enrollment Status: {userProfile.student_profile?.enrollment_status || 'N/A'}<br />
-                                        Units Enrolled: {userProfile.student_profile?.units || 'N/A'}<br />
-                                        <br />
-                                        <strong>Eligibility Status:</strong><br />
-                                        {userProfile.student_profile?.enrollment_status !== 'enrolled' && (
-                                            <span className="text-red-600">⚠️ Must be currently enrolled</span>
+                        <Card className="border-gray-200 dark:border-gray-800">
+                            <CardHeader className="pb-4 lg:pb-6">
+                                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 lg:text-xl">Application Form</CardTitle>
+                                <CardDescription className="text-gray-500 dark:text-gray-400">
+                                    Please fill out all required fields to submit your application.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="pt-0">
+                                <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6 lg:space-y-8">                                {/* Personal Statement */}
+                                    <div className="space-y-3">
+                                        <Label htmlFor="personal_statement" className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                                            Personal Statement *
+                                        </Label>
+                                        <Textarea id="personal_statement"
+                                            placeholder="Tell us about yourself, your background, and why you're applying for this scholarship..."
+                                            value={data.personal_statement}
+                                            onChange={(e) => setData('personal_statement', e.target.value)}
+                                            rows={4}
+                                            className="min-h-[44px] border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 lg:text-base"
+                                        />
+                                        {errors.personal_statement && (
+                                            <p className="text-red-600 text-sm mt-2 lg:text-base">{errors.personal_statement}</p>
                                         )}
-                                        {(scholarship.type === 'academic_full' || scholarship.type === 'academic_partial') &&
-                                            userProfile.student_profile?.units && userProfile.student_profile.units < 18 && (
-                                                <span className="text-red-600">⚠️ Must be enrolled in at least 18 units</span>
-                                            )}
-                                        {scholarship.type === 'student_assistantship' &&
-                                            userProfile.student_profile?.units && userProfile.student_profile.units > 21 && (
-                                                <span className="text-red-600">⚠️ Must be enrolled in 21 units or less for student assistantship</span>
-                                            )}
-                                    </AlertDescription>
-                                </Alert>
+                                    </div>
 
-                                {/* Submit Button */}
-                                <div className="flex justify-end space-x-4">
-                                    <Button type="button" variant="outline" asChild>
-                                        <Link href="/student/scholarships">Cancel</Link>
-                                    </Button>
-                                    <Button type="submit" disabled={processing}>
-                                        {processing ? 'Submitting...' : 'Submit Application'}
-                                    </Button>
-                                </div>
-                            </form>
+                                    {/* Academic Goals */}
+                                    <div className="space-y-3">
+                                        <Label htmlFor="academic_goals" className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                                            Academic Goals *
+                                        </Label>
+                                        <Textarea
+                                            id="academic_goals"
+                                            placeholder="Describe your academic goals and how this scholarship will help you achieve them..."
+                                            value={data.academic_goals}
+                                            onChange={(e) => setData('academic_goals', e.target.value)}
+                                            rows={3}
+                                            className="min-h-[44px] border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 lg:text-base"
+                                        />
+                                        {errors.academic_goals && (
+                                            <p className="text-red-600 text-sm mt-2 lg:text-base">{errors.academic_goals}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Financial Need Statement */}
+                                    <div className="space-y-3">
+                                        <Label htmlFor="financial_need_statement" className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                                            Financial Need Statement *
+                                        </Label>
+                                        <Textarea
+                                            id="financial_need_statement"
+                                            placeholder="Explain your financial situation and why you need this scholarship..."
+                                            value={data.financial_need_statement}
+                                            onChange={(e) => setData('financial_need_statement', e.target.value)}
+                                            rows={3}
+                                            className="min-h-[44px] border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 lg:text-base"
+                                        />
+                                        {errors.financial_need_statement && (
+                                            <p className="text-red-600 text-sm mt-2 lg:text-base">{errors.financial_need_statement}</p>
+                                        )}
+                                    </div>                                {/* Scholarship type-specific fields */}
+                                    {renderScholarshipSpecificFields() && (
+                                        <div className="space-y-4 border-t border-gray-200 dark:border-gray-800 pt-6 lg:space-y-6 lg:pt-8">
+                                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 lg:text-xl">
+                                                Additional Requirements for {scholarship.typeLabel || scholarship.type}
+                                            </h3>
+                                            <div className="space-y-4 lg:space-y-6">
+                                                {renderScholarshipSpecificFields()}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Required Documents */}
+                                    {scholarship.requiredDocuments && formatDocuments(scholarship.requiredDocuments).length > 0 && (
+                                        <div className="space-y-4 border-t border-gray-200 dark:border-gray-800 pt-6 lg:space-y-6 lg:pt-8">
+                                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 lg:text-xl">Required Documents</h3>
+                                            <div className="space-y-4 lg:space-y-6">
+                                                {formatDocuments(scholarship.requiredDocuments).map((doc, index) => (
+                                                    <div key={index} className="space-y-3">
+                                                        <Label htmlFor={`document_${index}`} className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                                                            {doc} *
+                                                        </Label>
+                                                        <Input
+                                                            id={`document_${index}`}
+                                                            type="file"
+                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    handleFileUpload(doc, file);
+                                                                }
+                                                            }}
+                                                            className="min-h-[44px] border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 lg:text-base file:mr-4 file:rounded-md file:border-0 file:bg-gray-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-900 dark:file:bg-gray-800 dark:file:text-gray-100"
+                                                        />
+                                                        {uploadedFiles[doc] && (
+                                                            <p className="text-green-600 text-sm mt-2 lg:text-base flex items-center">
+                                                                <CheckCircle className="h-4 w-4 mr-2 lg:h-5 lg:w-5" />
+                                                                {uploadedFiles[doc]} uploaded
+                                                            </p>
+                                                        )}
+                                                        {formErrors[`documents.${doc}`] && (
+                                                            <p className="text-red-600 text-sm mt-2 lg:text-base">{formErrors[`documents.${doc}`]}</p>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Additional Comments */}
+                                    <div className="space-y-3 border-t border-gray-200 dark:border-gray-800 pt-6 lg:pt-8">
+                                        <Label htmlFor="additional_comments" className="text-sm font-medium text-gray-900 dark:text-gray-100 lg:text-base">
+                                            Additional Comments
+                                        </Label>
+                                        <Textarea
+                                            id="additional_comments"
+                                            placeholder="Any additional information you'd like to share (optional)..."
+                                            value={data.additional_comments}
+                                            onChange={(e) => setData('additional_comments', e.target.value)}
+                                            rows={2}
+                                            className="min-h-[44px] border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 lg:text-base"
+                                        />
+                                    </div>                                {/* Enhanced Student Profile Summary with eligibility checking */}
+                                    <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950 p-4 lg:p-6">
+                                        <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400 lg:h-5 lg:w-5" />
+                                        <AlertDescription className="text-gray-900 dark:text-gray-100 text-sm lg:text-base leading-relaxed space-y-2">
+                                            <div>
+                                                <strong>Application Summary:</strong><br />
+                                                Student ID: {userProfile.student_profile?.student_id || 'N/A'}<br />
+                                                Current GWA: {userProfile.student_profile?.current_gwa ? userProfile.student_profile.current_gwa.toFixed(2) : 'Not yet available'}<br />
+                                                Course: {userProfile.student_profile?.course || 'N/A'}<br />
+                                                Year Level: {userProfile.student_profile?.year_level || 'N/A'}<br />
+                                                Enrollment Status: {userProfile.student_profile?.enrollment_status || 'N/A'}<br />
+                                                Units Enrolled: {userProfile.student_profile?.units || 'N/A'}
+                                            </div>
+                                            <div className="pt-2 border-t border-blue-200 dark:border-blue-700">
+                                                <strong>Eligibility Status:</strong><br />
+                                                {userProfile.student_profile?.enrollment_status !== 'enrolled' && (
+                                                    <span className="text-red-600 font-medium">⚠️ Must be currently enrolled</span>
+                                                )}
+                                                {(scholarship.type === 'academic_full' || scholarship.type === 'academic_partial') &&
+                                                    userProfile.student_profile?.units && userProfile.student_profile.units < 18 && (
+                                                        <span className="text-red-600 font-medium">⚠️ Must be enrolled in at least 18 units</span>
+                                                    )}
+                                                {scholarship.type === 'student_assistantship' &&
+                                                    userProfile.student_profile?.units && userProfile.student_profile.units > 21 && (
+                                                        <span className="text-red-600 font-medium">⚠️ Must be enrolled in 21 units or less for student assistantship</span>
+                                                    )}
+                                            </div>
+                                        </AlertDescription>
+                                    </Alert>
+
+                                    {/* Submit Button */}
+                                    <div className="flex flex-col space-y-4 border-t border-gray-200 dark:border-gray-800 pt-6 sm:flex-row sm:justify-end sm:space-x-4 sm:space-y-0 lg:pt-8">
+                                        <Button type="button" variant="outline" className="min-h-[44px] px-6 lg:px-8" asChild>
+                                            <Link href="/student/scholarships">Cancel</Link>
+                                        </Button>
+                                        <Button type="submit" disabled={processing} className="min-h-[44px] px-6 lg:px-8">
+                                            {processing ? 'Submitting...' : 'Submit Application'}
+                                        </Button>
+                                    </div>
+                                </form>
                             </CardContent>
                         </Card>
                     </div>

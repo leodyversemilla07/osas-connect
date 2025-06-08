@@ -9,7 +9,9 @@ import {
     TouchSensor,
     useSensor,
     useSensors,
-    closestCenter
+    pointerWithin,
+    closestCenter,
+    CollisionDetection
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { SortableItem } from './sortable-item';
@@ -20,6 +22,37 @@ import { generateId } from './utils';
 import { Button } from '@/components/ui/button';
 import { Eye, Save, Smartphone, Monitor, Tablet } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+
+// Separate Canvas component to ensure droppable is properly registered
+function CanvasDroppable({
+    children,
+    isDragging,
+    className,
+    style
+}: {
+    children: React.ReactNode;
+    isDragging: boolean;
+    className: string;
+    style: React.CSSProperties;
+}) {
+    const { setNodeRef, isOver } = useDroppable({
+        id: 'page-builder-canvas',
+        data: {
+            type: 'canvas'
+        }
+    });
+
+    return (
+        <div
+            ref={setNodeRef}
+            data-testid="page-builder-canvas"
+            className={`${className} ${isDragging || isOver ? 'border-primary bg-primary/5' : 'border-border'}`}
+            style={style}
+        >
+            {children}
+        </div>
+    );
+}
 
 interface PageBuilderProps {
     initialContent?: ContentBlock[];
@@ -36,22 +69,27 @@ export function PageBuilder({ initialContent = [], onSave, onPreview }: PageBuil
     const sensors = useSensors(
         useSensor(MouseSensor, {
             activationConstraint: {
-                distance: 1, // Very small distance for immediate dragging
+                distance: 8, // Require a small movement to start dragging
             },
         }),
         useSensor(TouchSensor, {
             activationConstraint: {
-                delay: 0, // No delay for immediate touch response
-                tolerance: 3,
+                delay: 100, // Small delay for touch
+                tolerance: 5,
             },
         })
-    );// Canvas droppable
-    const { setNodeRef: setCanvasRef, isOver: isOverCanvas } = useDroppable({
-        id: 'page-builder-canvas',
-        data: {
-            type: 'canvas'
+    );    // Clean collision detection function
+    const collisionDetection: CollisionDetection = (args) => {
+        // Try pointerWithin first for precise detection
+        const pointerCollisions = pointerWithin(args);
+
+        if (pointerCollisions.length > 0) {
+            return pointerCollisions;
         }
-    });
+
+        // Fallback to closestCenter for sortable items
+        return closestCenter(args);
+    };
 
     const createNewBlock = useCallback((type: ContentBlockType): ContentBlock => {
         const id = generateId();
@@ -140,11 +178,8 @@ export function PageBuilder({ initialContent = [], onSave, onPreview }: PageBuil
             id,
             ...templates[type]
         };
-    }, []);    const handleDragStart = useCallback((event: DragStartEvent) => {
+    }, []); const handleDragStart = useCallback((event: DragStartEvent) => {
         setIsDragging(true);
-        
-        // Debug logging
-        console.log('Drag started:', event.active.id, event.active.data);
 
         // Set active block for drag overlay
         if (event.active.id.toString().startsWith('palette-')) {
@@ -158,21 +193,13 @@ export function PageBuilder({ initialContent = [], onSave, onPreview }: PageBuil
             const block = blocks.find(b => b.id === event.active.id);
             setActiveBlock(block || null);
         }
-    }, [blocks]);    const handleDragEnd = useCallback((event: DragEndEvent) => {
+    }, [blocks]); const handleDragEnd = useCallback((event: DragEndEvent) => {
         setIsDragging(false);
         setActiveBlock(null);
 
         const { active, over } = event;
-        
-        // Debug logging
-        console.log('Drag ended:', {
-            activeId: active.id,
-            overId: over?.id,
-            overData: over?.data
-        });
 
         if (!over) {
-            console.log('No drop target found');
             return;
         }
 
@@ -180,16 +207,12 @@ export function PageBuilder({ initialContent = [], onSave, onPreview }: PageBuil
         if (active.id.toString().startsWith('palette-')) {
             const componentType = active.id.toString().replace('palette-', '') as ContentBlockType;
             const newBlock = createNewBlock(componentType);
-            
-            console.log('Adding new block:', componentType, 'to', over.id);
 
             // Check if we're dropping on the canvas or between blocks
             if (over.id === 'page-builder-canvas') {
                 // Add to the end if dropping directly on canvas
                 setBlocks(prev => [...prev, newBlock]);
-                // Select the newly added block
                 setSelectedBlock(newBlock);
-                console.log('Added block to canvas end');
             } else {
                 // Insert at specific position if dropping between blocks
                 const overIndex = blocks.findIndex(block => block.id === over.id);
@@ -199,14 +222,11 @@ export function PageBuilder({ initialContent = [], onSave, onPreview }: PageBuil
                         newBlocks.splice(overIndex, 0, newBlock);
                         return newBlocks;
                     });
-                    // Select the newly added block
                     setSelectedBlock(newBlock);
-                    console.log('Inserted block at position:', overIndex);
                 } else {
                     // Fallback: add to the end
                     setBlocks(prev => [...prev, newBlock]);
                     setSelectedBlock(newBlock);
-                    console.log('Added block to end (fallback)');
                 }
             }
             return;
@@ -218,7 +238,6 @@ export function PageBuilder({ initialContent = [], onSave, onPreview }: PageBuil
 
         if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
             setBlocks(arrayMove(blocks, activeIndex, overIndex));
-            console.log('Reordered blocks:', activeIndex, '->', overIndex);
         }
     }, [blocks, createNewBlock]);
 
@@ -257,8 +276,8 @@ export function PageBuilder({ initialContent = [], onSave, onPreview }: PageBuil
 
     const handleSave = () => {
         onSave(blocks);
-    };    
-    
+    };
+
     const handlePreview = () => {
         onPreview?.(blocks);
     };
@@ -334,141 +353,144 @@ export function PageBuilder({ initialContent = [], onSave, onPreview }: PageBuil
         }
     };
 
-    return (        <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            autoScroll={{ enabled: true }}
-        >
-            <div className="flex h-full max-h-screen">                
+    return (<DndContext
+        sensors={sensors}
+        collisionDetection={collisionDetection}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        autoScroll={{ enabled: true }}
+    >
+        <div className="flex h-full max-h-screen">
+            {/* Component Palette */}
+            <div className="w-80 border-r border bg-muted">
+                <ComponentPalette onTemplateSelect={handleTemplateSelect} />
+            </div>
 
-                {/* Component Palette */}
-                <div className="w-80 border-r border bg-muted">
-                    <ComponentPalette onTemplateSelect={handleTemplateSelect} />
-                </div>
-
-                {/* Main Canvas */}
-                <div className="flex-1 flex flex-col bg-background">
-                    {/* Toolbar */}
-                    <div className="border-b border p-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant={previewMode === 'desktop' ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={() => setPreviewMode('desktop')}
-                                >
-                                    <Monitor className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                    variant={previewMode === 'tablet' ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={() => setPreviewMode('tablet')}
-                                >
-                                    <Tablet className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                    variant={previewMode === 'mobile' ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={() => setPreviewMode('mobile')}
-                                >
-                                    <Smartphone className="w-4 h-4" />
-                                </Button>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <Button variant="outline" onClick={handlePreview}>
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    Preview
-                                </Button>
-                                <Button onClick={handleSave}>
-                                    <Save className="w-4 h-4 mr-2" />
-                                    Save Page
-                                </Button>
-                            </div>
-                        </div>
-                    </div>                    {/* Canvas */}
-                    <div
-                        className="flex-1 p-4"
-                    >
-                        <div
-                            className={`mx-auto transition-all duration-300 ${previewMode === 'mobile' ? 'max-w-sm' :
-                                previewMode === 'tablet' ? 'max-w-2xl' :
-                                    'max-w-6xl'
-                                }`}
-                        >                            <div
-                                ref={setCanvasRef}
-                                className={`min-h-96 w-full rounded-lg border-2 border-dashed transition-colors ${isDragging || isOverCanvas
-                                    ? 'border-primary bg-primary/5'
-                                    : 'border-border'
-                                    }`}
-                                style={{ minHeight: '500px' }}
+            {/* Main Canvas */}
+            <div className="flex-1 flex flex-col bg-background">
+                {/* Toolbar */}
+                <div className="border-b border p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant={previewMode === 'desktop' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setPreviewMode('desktop')}
                             >
-                                {blocks.length === 0 ? (
-                                    <div className="flex items-center justify-center h-full w-full">
-                                        <div className="text-center text-muted-foreground p-12 pointer-events-none">
-                                            <p className="text-lg font-medium mb-2">Start building your page</p>
-                                            <p>Drag components from the palette to get started</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <SortableContext items={blocks.map(block => block.id)} strategy={verticalListSortingStrategy}>
-                                        <div className="space-y-4 p-4">
-                                            {blocks.map((block) => (
-                                                <SortableItem
-                                                    key={block.id}
-                                                    id={block.id}
-                                                    block={block}
-                                                    isSelected={selectedBlock?.id === block.id}
-                                                    onSelect={() => setSelectedBlock(block)}
-                                                    onDuplicate={() => duplicateBlock(block.id)}
-                                                    onDelete={() => deleteBlock(block.id)}
-                                                />
-                                            ))}
-                                        </div>
-                                    </SortableContext>
-                                )}
-                            </div>
+                                <Monitor className="w-4 h-4" />
+                            </Button>
+                            <Button
+                                variant={previewMode === 'tablet' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setPreviewMode('tablet')}
+                            >
+                                <Tablet className="w-4 h-4" />
+                            </Button>
+                            <Button
+                                variant={previewMode === 'mobile' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setPreviewMode('mobile')}
+                            >
+                                <Smartphone className="w-4 h-4" />
+                            </Button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline" onClick={handlePreview}>
+                                <Eye className="w-4 h-4 mr-2" />
+                                Preview
+                            </Button>
+                            <Button onClick={handleSave}>
+                                <Save className="w-4 h-4 mr-2" />
+                                Save Page
+                            </Button>
                         </div>
                     </div>
-                </div>{/* Property Panel */}
-                {selectedBlock && (
-                    <div className="w-80 border-l border bg-muted">
-                        <ComponentEditor
-                            block={selectedBlock}
-                            onUpdate={(updates) => updateBlock(selectedBlock.id, updates)}
-                            onClose={() => setSelectedBlock(null)}
-                        />
-                    </div>
-                )}
-            </div>            <DragOverlay 
-                dropAnimation={{
-                    duration: 150,
-                    easing: 'ease-out',
-                }}
-                style={{ zIndex: 9999 }}
-            >
-                {activeBlock && (
-                    <Card className="w-full max-w-md opacity-90 shadow-2xl border-primary border-2 bg-white dark:bg-gray-800 pointer-events-none">
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-md bg-primary/20 flex items-center justify-center">
-                                    <div className="w-4 h-4 bg-primary rounded-sm"></div>
+                </div>                    {/* Canvas */}
+                <div className="flex-1 p-4">
+                    <div
+                        className={`mx-auto transition-all duration-300 ${previewMode === 'mobile' ? 'max-w-sm' :
+                            previewMode === 'tablet' ? 'max-w-2xl' :
+                                'max-w-6xl'
+                            }`}
+                    >
+                        <CanvasDroppable
+                            isDragging={isDragging}
+                            className="min-h-96 w-full rounded-lg border-2 border-dashed transition-colors"
+                            style={{
+                                minHeight: '500px',
+                                width: '100%',
+                                position: 'relative'
+                            }}
+                        >
+                            {blocks.length === 0 ? (
+                                <div className="flex items-center justify-center h-full w-full text-center text-muted-foreground p-12">
+                                    <div>
+                                        <p className="text-lg font-medium mb-2">Start building your page</p>
+                                        <p>Drag components from the palette to get started</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div className="text-sm font-semibold text-primary">
-                                        {activeBlock.type.charAt(0).toUpperCase() + activeBlock.type.slice(1)} Section
+                            ) : (
+                                <SortableContext items={blocks.map(block => block.id)} strategy={verticalListSortingStrategy}>
+                                    <div className="space-y-4 p-4">
+                                        {blocks.map((block) => (
+                                            <SortableItem
+                                                key={block.id}
+                                                id={block.id}
+                                                block={block}
+                                                isSelected={selectedBlock?.id === block.id}
+                                                onSelect={() => setSelectedBlock(block)}
+                                                onDuplicate={() => duplicateBlock(block.id)}
+                                                onDelete={() => deleteBlock(block.id)}
+                                            />
+                                        ))}
                                     </div>
-                                    <div className="text-xs text-muted-foreground">
-                                        Drop to add to page
-                                    </div>
+                                </SortableContext>
+                            )}
+                        </CanvasDroppable>
+                    </div>
+                </div>
+            </div>
+
+            {/* Property Panel */}
+            {selectedBlock && (
+                <div className="w-80 border-l border bg-muted">
+                    <ComponentEditor
+                        block={selectedBlock}
+                        onUpdate={(updates) => updateBlock(selectedBlock.id, updates)}
+                        onClose={() => setSelectedBlock(null)}
+                    />
+                </div>
+            )}
+        </div>
+
+        <DragOverlay
+            dropAnimation={{
+                duration: 150,
+                easing: 'ease-out',
+            }}
+            style={{ zIndex: 9999 }}
+        >
+            {activeBlock && (
+                <Card className="w-full max-w-md opacity-90 shadow-2xl border-primary border-2 bg-white dark:bg-gray-800 pointer-events-none">
+                    <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-md bg-primary/20 flex items-center justify-center">
+                                <div className="w-4 h-4 bg-primary rounded-sm"></div>
+                            </div>
+                            <div>
+                                <div className="text-sm font-semibold text-primary">
+                                    {activeBlock.type.charAt(0).toUpperCase() + activeBlock.type.slice(1)} Section
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                    Drop to add to page
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
-                )}
-            </DragOverlay>
-        </DndContext>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+        </DragOverlay>
+    </DndContext>
     );
 }

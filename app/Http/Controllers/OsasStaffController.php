@@ -1458,4 +1458,44 @@ class OsasStaffController extends Controller
 
         return $timeline;
     }
+
+    /**
+     * Show the interview scheduling form for an application
+     */
+    public function scheduleInterviewForm(\App\Models\ScholarshipApplication $application): Response|RedirectResponse
+    {
+        // Load the application with related data
+        $application->load(['user.studentProfile', 'scholarship']);
+
+        // Ensure the application is in a state where interviews can be scheduled
+        $allowedStatuses = ['verified', 'under_evaluation', 'approved'];
+        if (!in_array($application->status, $allowedStatuses)) {
+            return redirect()->route('osas.applications.review', $application->id)
+                ->with('error', 'Interview can only be scheduled for verified or approved applications.');
+        }
+
+        return Inertia::render('osas_staff/interview-schedule', [
+            'application' => [
+                'id' => $application->id,
+                'status' => $application->status,
+                'student' => [
+                    'id' => $application->user->id,
+                    'name' => $application->user->full_name,
+                    'student_id' => $application->user->studentProfile->student_id,
+                    'email' => $application->user->email,
+                    'phone' => $application->user->studentProfile->mobile_number,
+                    'course' => $application->user->studentProfile->course,
+                    'year_level' => $application->user->studentProfile->year_level,
+                ],
+                'scholarship' => [
+                    'id' => $application->scholarship->id,
+                    'name' => $application->scholarship->name,
+                    'type' => $application->scholarship->type,
+                ],
+                'interview_scheduled' => $application->interview_schedule !== null,
+                'interview_date' => $application->interview_schedule ? 
+                    \Carbon\Carbon::parse($application->interview_schedule)->format('Y-m-d H:i:s') : null,
+            ],
+        ]);
+    }
 }

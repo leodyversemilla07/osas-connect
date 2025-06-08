@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Separator } from '@/components/ui/separator';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,11 +17,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const statusColors = {
-    pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-    approved: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-    rejected: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'
-} as const;
+const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    const variants: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
+        pending: 'outline',
+        approved: 'default',
+        rejected: 'destructive'
+    };
+    return variants[status] || 'secondary';
+};
 
 export default function StaffDashboard() {
     const { auth: pageAuth, announcements = [], pendingApplications = [], recentDocuments = [] } = usePage<SharedData & {
@@ -60,6 +64,8 @@ export default function StaffDashboard() {
                         <p className="text-muted-foreground">Manage scholarship applications and student support services</p>
                     </CardContent>
                 </Card>
+
+                <Separator />
 
                 {/* Main Stats */}
                 <div className="grid gap-4 md:grid-cols-3">
@@ -123,8 +129,8 @@ export default function StaffDashboard() {
                                             </div>
                                             <p className="text-muted-foreground">{announcement.content}</p>
                                             <div className="mt-3 flex justify-end gap-2">
-                                                <Button size="sm" variant="ghost">Edit</Button>
-                                                <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 dark:text-red-400">Delete</Button>
+                                                <Button size="sm" variant="outline">Edit</Button>
+                                                <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950">Delete</Button>
                                             </div>
                                         </div>
                                     ))}
@@ -152,7 +158,7 @@ export default function StaffDashboard() {
                                                 <p className="text-xs text-muted-foreground">{new Date(doc.submissionDate).toLocaleDateString()}</p>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Badge className={statusColors[doc.status as keyof typeof statusColors]}>
+                                                <Badge variant={getStatusVariant(doc.status)}>
                                                     {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
                                                 </Badge>
                                                 <Button size="sm" variant="outline">Review</Button>
