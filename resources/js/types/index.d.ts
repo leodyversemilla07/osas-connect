@@ -40,6 +40,9 @@ export interface StudentProfile {
     course: string;
     major: string;
     year_level: string;
+    current_gwa: number | null;
+    enrollment_status: string;
+    units: number | null;
 
     // Personal Information
     photo_id: string | null;

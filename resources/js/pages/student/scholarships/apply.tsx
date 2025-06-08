@@ -558,7 +558,7 @@ export default function Apply({ scholarship, userProfile }: Props) {
                                             <div>
                                                 <strong>Application Summary:</strong><br />
                                                 Student ID: {userProfile.student_profile?.student_id || 'N/A'}<br />
-                                                Current GWA: {userProfile.student_profile?.current_gwa ? userProfile.student_profile.current_gwa.toFixed(2) : 'Not yet available'}<br />
+                                                Current GWA: {userProfile.student_profile?.current_gwa ? Number(userProfile.student_profile.current_gwa).toFixed(2) : 'Not yet available'}<br />
                                                 Course: {userProfile.student_profile?.course || 'N/A'}<br />
                                                 Year Level: {userProfile.student_profile?.year_level || 'N/A'}<br />
                                                 Enrollment Status: {userProfile.student_profile?.enrollment_status || 'N/A'}<br />
