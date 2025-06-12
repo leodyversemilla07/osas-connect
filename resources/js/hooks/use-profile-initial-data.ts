@@ -12,11 +12,6 @@ export function useProfileInitialData(
     isStudent: boolean
 ): ProfileFormData {
     const initialData = useMemo(() => {
-        // Debug logging to see what data is being passed
-        console.log('useProfileInitialData - Raw profile:', profile);
-        console.log('useProfileInitialData - User:', user);
-        console.log('useProfileInitialData - isStudent:', isStudent);
-        
         // Helper function for safe data extraction
         const safeString = (value: unknown, fallback: string = ''): string => {
             if (value === null || value === undefined) return fallback;
@@ -72,8 +67,8 @@ export function useProfileInitialData(
                 }
             }
             return fallback;
-        };        
-        
+        };
+
         return {
             // Basic Information with better fallbacks
             photo_id: null,
@@ -91,28 +86,14 @@ export function useProfileInitialData(
             ),
             admin_id: safeString(profile.admin_id,
                 user.role === 'admin' ? (user.admin_profile?.admin_id || user.id?.toString()) || '' : ''
-            ),            // Student-specific data
+            ),
+
+            // Student-specific data
             ...(isStudent && {
                 course: safeString(profile.course),
-                major: safeString(profile.major),
-                year_level: (() => {
-                    const value = safeString(profile.year_level);
-                    console.log('useProfileInitialData - year_level processing:', { 
-                        raw: profile.year_level, 
-                        processed: value 
-                    });
-                    return value;
-                })(),                current_gwa: safeNullableNumber(profile.current_gwa),
+                major: safeString(profile.major), year_level: safeString(profile.year_level), current_gwa: safeNullableNumber(profile.current_gwa),
                 enrollment_status: safeString(profile.enrollment_status),
-                units: safeNullableNumber(profile.units),
-                existing_scholarships: (() => {
-                    const value = safeNullableString(profile.existing_scholarships);
-                    console.log('useProfileInitialData - existing_scholarships processing:', { 
-                        raw: profile.existing_scholarships, 
-                        processed: value 
-                    });
-                    return value;
-                })(),
+                units: safeNullableNumber(profile.units), existing_scholarships: safeNullableString(profile.existing_scholarships),
 
                 // Personal Information
                 civil_status: safeString(profile.civil_status),
@@ -133,8 +114,8 @@ export function useProfileInitialData(
                 guardian_name: safeNullableString(profile.guardian_name),
 
                 // Family Background
-                status_of_parents: safeNullableString(profile.status_of_parents),                
-                
+                status_of_parents: safeNullableString(profile.status_of_parents),
+
                 // Father's Information
                 father_name: safeNullableString(profile.father_name),
                 father_age: safeNullableNumber(profile.father_age),
@@ -156,7 +137,7 @@ export function useProfileInitialData(
                 mother_address: safeNullableString(profile.mother_address),
                 mother_telephone: safeNullableString(profile.mother_telephone),
                 mother_mobile: safeNullableString(profile.mother_mobile),
-                mother_email: safeNullableString(profile.mother_email),                mother_occupation: safeNullableString(profile.mother_occupation),
+                mother_email: safeNullableString(profile.mother_email), mother_occupation: safeNullableString(profile.mother_occupation),
                 mother_company: safeNullableString(profile.mother_company),
                 mother_monthly_income: safeNullableNumber(profile.mother_monthly_income),
                 mother_years_service: safeNullableNumber(profile.mother_years_service),

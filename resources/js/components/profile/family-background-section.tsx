@@ -54,8 +54,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                 <CardDescription>Information about your family members</CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
-                {/* Parents Status */}
-                <FormField label="Status of Parents" error={errors.status_of_parents}>
+                {/* Parents Status */}                <FormField label="Status of Parents" error={errors.status_of_parents}>
                     <Select
                         value={data.status_of_parents || ''}
                         onValueChange={(value) => updateField('status_of_parents', value)}
@@ -64,12 +63,11 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             <SelectValue placeholder="Select parents status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="married">Married</SelectItem>
-                            <SelectItem value="separated">Separated</SelectItem>
-                            <SelectItem value="single_parent">Single Parent</SelectItem>
-                            <SelectItem value="both_deceased">Both Deceased</SelectItem>
-                            <SelectItem value="father_deceased">Father Deceased</SelectItem>
-                            <SelectItem value="mother_deceased">Mother Deceased</SelectItem>
+                            <SelectItem value="Living Together">Living Together</SelectItem>
+                            <SelectItem value="Separated">Separated</SelectItem>
+                            <SelectItem value="Single Parent">Single Parent</SelectItem>
+                            <SelectItem value="Mother Deceased">Mother Deceased</SelectItem>
+                            <SelectItem value="Father Deceased">Father Deceased</SelectItem>
                         </SelectContent>
                     </Select>
                 </FormField>

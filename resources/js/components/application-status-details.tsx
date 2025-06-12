@@ -4,13 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { 
-    Clock, 
-    FileText, 
-    MessageSquare, 
-    User, 
-    Calendar, 
-    CheckCircle, 
+import {
+    Clock,
+    FileText,
+    MessageSquare,
+    User,
+    Calendar,
+    CheckCircle,
     XCircle,
     Eye,
     FileCheck,
@@ -19,9 +19,9 @@ import {
     DollarSign,
     Upload
 } from 'lucide-react';
-import { 
+import {
     ApplicationStatusData,
-    DocumentVerificationStatus 
+    DocumentVerificationStatus
 } from '@/types/application-status';
 import {
     getStatusBadgeConfig,
@@ -31,7 +31,7 @@ import {
     formatCurrency,
     formatDate,
     formatDateTime
-} from '@/utils/application-status';
+} from '@/lib/application-status';
 
 // Props interface using the imported types
 interface ApplicationStatusDetailsProps {
@@ -52,7 +52,7 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
     // Document status icons
     const getDocumentStatusIcon = (status: string, uploaded: boolean) => {
         if (!uploaded) return <Upload className="h-4 w-4 text-gray-400" />;
-        
+
         switch (status) {
             case 'verified': return <CheckCircle className="h-4 w-4 text-green-600" />;
             case 'rejected': return <XCircle className="h-4 w-4 text-red-600" />;
@@ -64,7 +64,7 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
     // Timeline icons
     const getTimelineIcon = (iconName: string, status: string) => {
         const iconClass = `h-4 w-4 ${status === 'completed' ? 'text-green-600' : status === 'current' ? 'text-blue-600' : 'text-gray-400'}`;
-        
+
         switch (iconName) {
             case 'document-plus': return <FileText className={iconClass} />;
             case 'check-circle': return <CheckCircle className={iconClass} />;
@@ -91,8 +91,8 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                                 <p className="text-gray-600 dark:text-gray-400 mt-1">
                                     Application #{application.id}
                                 </p>
-                            </div>                            <Badge 
-                                variant={getStatusBadgeConfig(application.status).variant} 
+                            </div>                            <Badge
+                                variant={getStatusBadgeConfig(application.status).variant}
                                 className={`text-sm ${getStatusBadgeConfig(application.status).className || ''}`}
                             >
                                 {application.statusLabel}
@@ -157,13 +157,13 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">                                <div>
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Scholarship Type
-                                    </label>
-                                    <p className="text-gray-900 dark:text-gray-100 capitalize">
-                                        {getScholarshipTypeLabel(application.scholarship.type)}
-                                    </p>
-                                </div>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Scholarship Type
+                                </label>
+                                <p className="text-gray-900 dark:text-gray-100 capitalize">
+                                    {getScholarshipTypeLabel(application.scholarship.type)}
+                                </p>
+                            </div>
                                 <div>
                                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                         Monthly Amount
@@ -229,7 +229,7 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                                                 )}
                                             </div>
                                         </div>                                        <div className="flex items-center gap-2">
-                                            <Badge 
+                                            <Badge
                                                 variant={getDocumentStatusConfig(doc.status as DocumentVerificationStatus, doc.uploaded).variant}
                                                 className="text-xs"
                                             >
@@ -276,13 +276,13 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>                                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                                    <p className="font-medium text-blue-900 dark:text-blue-100">
-                                        {formatDateTime(application.interviewSchedule)}
-                                    </p>
-                                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                                        Please arrive 15 minutes early for your interview.
-                                    </p>
-                                </div>
+                                <p className="font-medium text-blue-900 dark:text-blue-100">
+                                    {formatDateTime(application.interviewSchedule)}
+                                </p>
+                                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                                    Please arrive 15 minutes early for your interview.
+                                </p>
+                            </div>
                                 {application.interviewNotes && (
                                     <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                         <h4 className="font-medium mb-2">Interview Notes</h4>
@@ -432,11 +432,10 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                                             {getTimelineIcon(step.icon, step.status)}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className={`text-sm font-medium ${
-                                                step.status === 'completed' ? 'text-green-700 dark:text-green-300' : 
-                                                step.status === 'current' ? 'text-blue-700 dark:text-blue-300' : 
-                                                'text-gray-500 dark:text-gray-400'
-                                            }`}>
+                                            <p className={`text-sm font-medium ${step.status === 'completed' ? 'text-green-700 dark:text-green-300' :
+                                                step.status === 'current' ? 'text-blue-700 dark:text-blue-300' :
+                                                    'text-gray-500 dark:text-gray-400'
+                                                }`}>
                                                 {step.title}
                                             </p>
                                             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">

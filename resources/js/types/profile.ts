@@ -29,6 +29,7 @@ export interface PersonalData {
     barangay?: string;
     city?: string;
     province?: string;
+    zip_code?: string;
     mobile_number?: string;
     telephone_number?: string | null;
     is_pwd?: boolean;
@@ -184,4 +185,5 @@ export interface ProfileSectionProps {
     errors: ProfileFormErrors;
     updateField: <T extends keyof ProfileFormData>(field: T, value: ProfileFormData[T]) => void;
     processing?: boolean;
+    handleCourseChange?: (courseValue: string) => void;
 }

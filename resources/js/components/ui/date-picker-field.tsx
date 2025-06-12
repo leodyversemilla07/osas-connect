@@ -90,6 +90,7 @@ export const DatePickerField: React.FC<DatePickerFieldProps> = ({
                             return false;
                         }}
                         initialFocus
+                        captionLayout="dropdown"
                     />
                 </PopoverContent>
             </Popover>

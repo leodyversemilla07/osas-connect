@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import InputError from "@/components/input-error";
 import { VALIDATION } from "@/lib/validation";
-import type { RegisterForm } from "@/hooks/useRegistrationForm";
+import type { RegisterForm } from "@/hooks/use-registration-form";
 
 interface AccountSetupStepProps {
     data: RegisterForm;

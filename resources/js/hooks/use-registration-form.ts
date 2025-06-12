@@ -88,8 +88,8 @@ export function useRegistrationForm() {
     }, [setData]);
 
     const handleCourseChange = useCallback((courseValue: string) => {
-        const newMajor = (courseValue !== "Bachelor of Secondary Education" && 
-                         courseValue !== "Bachelor of Elementary Education") ? 'None' : data.major;
+        const newMajor = (courseValue !== "Bachelor of Secondary Education" &&
+            courseValue !== "Bachelor of Elementary Education") ? 'None' : data.major;
         updateMultipleFields({ course: courseValue, major: newMajor });
     }, [data.major, updateMultipleFields]);
 
@@ -120,7 +120,7 @@ export function useRegistrationForm() {
             },
             onError: (errors: ValidationErrors) => {
                 console.error('Registration errors:', errors);
-                
+
                 // Navigate to the step with errors
                 if (errors.email || errors.password || errors.password_confirmation) {
                     onStepError(3);

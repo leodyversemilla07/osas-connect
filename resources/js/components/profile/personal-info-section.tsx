@@ -43,15 +43,14 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                                 <SelectValue placeholder="Select civil status" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="single">Single</SelectItem>
-                                <SelectItem value="married">Married</SelectItem>
-                                <SelectItem value="widowed">Widowed</SelectItem>
-                                <SelectItem value="separated">Separated</SelectItem>
-                                <SelectItem value="divorced">Divorced</SelectItem>
+                                <SelectItem value="Single">Single</SelectItem>
+                                <SelectItem value="Married">Married</SelectItem>
+                                <SelectItem value="Widowed">Widowed</SelectItem>
+                                <SelectItem value="Separated">Separated</SelectItem>
+                                <SelectItem value="Divorced">Divorced</SelectItem>
                             </SelectContent>
                         </Select>
                     </FormField>
-
                     <FormField label="Sex" error={errors.sex}>
                         <Select
                             value={data.sex || ''}
@@ -61,8 +60,8 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                                 <SelectValue placeholder="Select sex" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="male">Male</SelectItem>
-                                <SelectItem value="female">Female</SelectItem>
+                                <SelectItem value="Male">Male</SelectItem>
+                                <SelectItem value="Female">Female</SelectItem>
                             </SelectContent>
                         </Select>
                     </FormField>
@@ -127,16 +126,27 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                             data-testid="city-input"
                         />
                     </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <TextField
+                            label="Province"
+                            id="province"
+                            value={data.province || ''}
+                            onChange={(value) => updateField('province', value)}
+                            error={errors.province}
+                            placeholder="Enter province"
+                            data-testid="province-input"
+                        />
 
-                    <TextField
-                        label="Province"
-                        id="province"
-                        value={data.province || ''}
-                        onChange={(value) => updateField('province', value)}
-                        error={errors.province}
-                        placeholder="Enter province"
-                        data-testid="province-input"
-                    />
+                        <TextField
+                            label="Zip Code"
+                            id="zip_code"
+                            value={String(data.zip_code || '')}
+                            onChange={(value) => updateField('zip_code', value)}
+                            error={errors.zip_code}
+                            placeholder="Enter zip code"
+                            data-testid="zip-code-input"
+                        />
+                    </div>
                 </div>
 
                 {/* Contact Information */}
@@ -206,9 +216,7 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                         error={errors.religion}
                         placeholder="Enter religion"
                         data-testid="religion-input"
-                    />
-
-                    <FormField label="Residence Type" error={errors.residence_type}>
+                    />                    <FormField label="Residence Type" error={errors.residence_type}>
                         <Select
                             value={data.residence_type || ''}
                             onValueChange={(value) => updateField('residence_type', value)}
@@ -217,25 +225,26 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                                 <SelectValue placeholder="Select residence type" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="owned">Owned</SelectItem>
-                                <SelectItem value="rented">Rented</SelectItem>
-                                <SelectItem value="boarding">Boarding</SelectItem>
-                                <SelectItem value="with_relatives">With Relatives</SelectItem>
-                                <SelectItem value="dormitory">Dormitory</SelectItem>
+                                <SelectItem value="Parent's House">Parent's House</SelectItem>
+                                <SelectItem value="Boarding House">Boarding House</SelectItem>
+                                <SelectItem value="With Guardian">With Guardian</SelectItem>
                             </SelectContent>
                         </Select>
                     </FormField>
                 </div>
 
-                <TextField
-                    label="Guardian Name"
-                    id="guardian_name"
-                    value={data.guardian_name || ''}
-                    onChange={(value) => updateField('guardian_name', value)}
-                    error={errors.guardian_name}
-                    placeholder="Enter guardian name (if applicable)"
-                    data-testid="guardian-name-input"
-                />
+                {/* Guardian Name - Only show when residence type is "With Guardian" */}
+                {data.residence_type === 'With Guardian' && (
+                    <TextField
+                        label="Guardian Name"
+                        id="guardian_name"
+                        value={data.guardian_name || ''}
+                        onChange={(value) => updateField('guardian_name', value)}
+                        error={errors.guardian_name}
+                        placeholder="Enter guardian's full name"
+                        data-testid="guardian-name-input"
+                    />
+                )}
             </CardContent>
         </Card>
     );

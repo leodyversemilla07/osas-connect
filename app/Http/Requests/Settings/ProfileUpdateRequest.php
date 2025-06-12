@@ -72,13 +72,14 @@ class ProfileUpdateRequest extends FormRequest
                 'barangay' => ['nullable', 'string', 'max:255'],
                 'city' => ['nullable', 'string', 'max:255'],
                 'province' => ['nullable', 'string', 'max:255'],
+                'zip_code' => ['nullable', 'string', 'max:255'],
                 'mobile_number' => ['required', 'string', 'max:255'],
                 'telephone_number' => ['nullable', 'string', 'max:255'],
                 'is_pwd' => ['required', 'boolean'],
                 'disability_type' => ['nullable', 'string', 'max:255'],
                 'religion' => ['nullable', 'string', 'max:255'],
-                'residence_type' => ['required', 'string', 'max:255'],
-                'guardian_name' => ['nullable', 'string', 'max:255'],
+                'residence_type' => ['required', 'string', 'in:Parent\'s House,Boarding House,With Guardian'],
+                'guardian_name' => ['nullable', 'string', 'max:255', 'required_if:residence_type,With Guardian'],
                 'email' => $studentEmailValidation, // Apply student-specific email validation
 
                 // Family Background

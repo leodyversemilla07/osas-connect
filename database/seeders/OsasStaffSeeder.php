@@ -11,12 +11,12 @@ class OsasStaffSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     */    
+     */
     public function run(): void
     {
         // Create specific OSAS staff user first
         $this->createSpecificStaff();
-        
+
         // Create OSAS staff users
         $staffMembers = [
             [
@@ -67,7 +67,7 @@ class OsasStaffSeeder extends Seeder
                 'last_name' => 'Valdez',
                 'email' => 'sofia.valdez@minsu.edu.ph',
                 'staff_id' => 'STAFF007',
-            ],            
+            ],
             [
                 'first_name' => 'Carlos',
                 'middle_name' => 'Eduardo',
@@ -113,7 +113,6 @@ class OsasStaffSeeder extends Seeder
             );
         }
 
-        
         $this->command->info('Created 10 OSAS staff users with profiles.');
     }
 

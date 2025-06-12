@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import TextLink from "@/components/text-link";
 import { LoaderCircle } from "lucide-react";
 import StepProgress from "@/components/ui/step-progress";
-import PersonalInformationStep from "@/components/registration/PersonalInformationStep";
-import AcademicInformationStep from "@/components/registration/AcademicInformationStep";
-import AccountSetupStep from "@/components/registration/AccountSetupStep";
-import ReviewSubmitStep from "@/components/registration/ReviewSubmitStep";
-import { useRegistrationForm } from "@/hooks/useRegistrationForm";
-import { useRegistrationSteps, STEP_TITLES } from "@/hooks/useRegistrationSteps";
+import PersonalInformationStep from "@/components/registration/personal-information-step";
+import AcademicInformationStep from "@/components/registration/academic-information-step";
+import AccountSetupStep from "@/components/registration/account-setup-step";
+import ReviewSubmitStep from "@/components/registration/review-submit-step";
+import { useRegistrationForm } from "@/hooks/use-registration-form";
+import { useRegistrationSteps, STEP_TITLES } from "@/hooks/use-registration-steps";
 
 export default function Register() {
     // Custom hooks for cleaner state management

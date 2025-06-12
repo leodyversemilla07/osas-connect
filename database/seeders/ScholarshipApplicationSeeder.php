@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
-use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +29,7 @@ class ScholarshipApplicationSeeder extends Seeder
 
         if ($students->isEmpty()) {
             $this->command->warn('No students found. Please run StudentSeeder first.');
+
             return;
         }
 

@@ -16,7 +16,7 @@ class AdminSeeder extends Seeder
     {
         // Create specific admin user first
         $this->createSpecificAdmin();
-        
+
         // Create admin users
         $adminUsers = [
             [

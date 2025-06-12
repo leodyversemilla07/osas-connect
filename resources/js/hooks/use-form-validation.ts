@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { VALIDATION } from "@/lib/validation";
-import type { RegisterForm } from "./useRegistrationForm";
+import type { RegisterForm } from "./use-registration-form";
 
 export function useFormValidation() {
     // Validation rules as a memoized object

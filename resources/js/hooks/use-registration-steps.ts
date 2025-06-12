@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { VALIDATION } from "@/lib/validation";
-import type { RegisterForm } from "./useRegistrationForm";
+import type { RegisterForm } from "./use-registration-form";
 
 export const STEP_TITLES = [
     "Personal Information",

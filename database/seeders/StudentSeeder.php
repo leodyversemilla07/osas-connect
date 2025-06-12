@@ -11,13 +11,13 @@ class StudentSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     */    
+     */
     public function run(): void
     {
         // Create specific student user first
         $this->createSpecificStudent();
         $this->createAdditionalTestStudents();
-        
+
         // Create 55 additional student users with comprehensive profiles
         $courses = [
             'Bachelor of Arts in Political Science',
@@ -34,7 +34,7 @@ class StudentSeeder extends Seeder
         $yearLevels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
         $civilStatuses = ['Single', 'Married', 'Widowed', 'Separated'];
         $sexes = ['Male', 'Female'];
-        $residenceTypes = ["Parent's House", "Boarding House", "With Guardian"];
+        $residenceTypes = ["Parent's House", 'Boarding House', 'With Guardian'];
         $statusOfParents = ['Living Together', 'Separated', 'Single Parent', 'Mother Deceased', 'Father Deceased'];
 
         // Filipino names arrays
@@ -44,30 +44,30 @@ class StudentSeeder extends Seeder
             'Carlos', 'Milagros', 'Fernando', 'Concepcion', 'Roberto', 'Soledad', 'Eduardo', 'Gloria', 'Rafael', 'Josefa',
             'Daniel', 'Angela', 'Gabriel', 'Cristina', 'Alejandro', 'Patricia', 'Pablo', 'Isabel', 'Martin', 'Dolores',
             'Diego', 'Sofia', 'Adrian', 'Monica', 'Sergio', 'Beatriz', 'Jorge', 'Victoria', 'Raul', 'Lucia',
-            'Omar', 'Fatima', 'Hassan', 'Khadija', 'Ali', 'Aisha', 'Ahmed', 'Zeinab', 'Ibrahim', 'Maryam'
+            'Omar', 'Fatima', 'Hassan', 'Khadija', 'Ali', 'Aisha', 'Ahmed', 'Zeinab', 'Ibrahim', 'Maryam',
         ];
 
         $middleNames = [
             'Santos', 'Reyes', 'Cruz', 'Bautista', 'Ocampo', 'Garcia', 'Mendoza', 'Torres', 'Tomas', 'Andres',
-            'Marquez', 'Castillo', 'Iglesias', 'Moreno', 'Aquino', 'Ramos', 'Fidel', 'Valdez', 'Jimenez', 'Herrera'
+            'Marquez', 'Castillo', 'Iglesias', 'Moreno', 'Aquino', 'Ramos', 'Fidel', 'Valdez', 'Jimenez', 'Herrera',
         ];
 
         $lastNames = [
             'Dela Cruz', 'Garcia', 'Reyes', 'Ramos', 'Mendoza', 'Santos', 'Flores', 'Gonzales', 'Bautista', 'Manalo',
             'Ocampo', 'Torres', 'Castillo', 'Morales', 'Aquino', 'Valdez', 'Villanueva', 'Francisco', 'Soriano', 'Ignacio',
             'Fernandez', 'Vargas', 'Gutierrez', 'Romero', 'Herrera', 'Medina', 'Aguilar', 'Jimenez', 'Moreno', 'Muñoz',
-            'Maranao', 'Dimaporo', 'Alonto', 'Disomangcop', 'Amilbangsa', 'Ampuan', 'Adiong', 'Lucman', 'Mama', 'Saber'
+            'Maranao', 'Dimaporo', 'Alonto', 'Disomangcop', 'Amilbangsa', 'Ampuan', 'Adiong', 'Lucman', 'Mama', 'Saber',
         ];
 
         for ($i = 1; $i <= 55; $i++) {
             $studentIdNumber = str_pad($i, 4, '0', STR_PAD_LEFT);
-            $studentId = 'MBC2024-' . $studentIdNumber;
+            $studentId = 'MBC2024-'.$studentIdNumber;
 
             // Generate realistic Filipino names
             $firstName = $firstNames[array_rand($firstNames)];
             $middleName = $middleNames[array_rand($middleNames)];
             $lastName = $lastNames[array_rand($lastNames)];
-            $email = strtolower($firstName . '.' . $lastName . $studentIdNumber) . '@minsu.edu.ph';
+            $email = strtolower($firstName.'.'.$lastName.$studentIdNumber).'@minsu.edu.ph';
 
             // Create user
             $user = User::firstOrCreate(
@@ -102,21 +102,21 @@ class StudentSeeder extends Seeder
                     'current_gwa' => round(mt_rand(1000, 3000) / 1000, 3),
                     'enrollment_status' => 'enrolled',
                     'units' => rand(15, 21),
-                    'guardian_name' => rand(1, 10) <= 3 ? $firstNames[array_rand($firstNames)] . ' ' . $lastNames[array_rand($lastNames)] : 'Not Applicable',
+                    'guardian_name' => rand(1, 10) <= 3 ? $firstNames[array_rand($firstNames)].' '.$lastNames[array_rand($lastNames)] : 'Not Applicable',
                     'existing_scholarships' => rand(1, 10) <= 2 ? 'Previous scholarship recipient' : null,
 
                     // Personal Information
                     'civil_status' => $civilStatus,
                     'sex' => $sex,
-                    'date_of_birth' => date('Y-m-d', strtotime('-' . rand(17, 25) . ' years')),
+                    'date_of_birth' => date('Y-m-d', strtotime('-'.rand(17, 25).' years')),
                     'place_of_birth' => 'Butig, Lanao del Sur',
-                    'street' => 'Street ' . rand(1, 100),
-                    'barangay' => 'Barangay ' . $lastNames[array_rand($lastNames)],
+                    'street' => 'Street '.rand(1, 100),
+                    'barangay' => 'Barangay '.$lastNames[array_rand($lastNames)],
                     'city' => 'Butig',
                     'province' => 'Lanao del Sur',
                     'zip_code' => '9307',
-                    'mobile_number' => '09' . rand(100000000, 999999999),
-                    'telephone_number' => rand(1, 10) <= 4 ? '063-' . rand(1000, 9999) : null,
+                    'mobile_number' => '09'.rand(100000000, 999999999),
+                    'telephone_number' => rand(1, 10) <= 4 ? '063-'.rand(1000, 9999) : null,
                     'is_pwd' => rand(1, 100) <= 10,
                     'disability_type' => rand(1, 100) <= 10 ? ['Visual Impairment', 'Hearing Impairment', 'Physical Disability', 'Learning Disability'][array_rand(['Visual Impairment', 'Hearing Impairment', 'Physical Disability', 'Learning Disability'])] : null,
                     'religion' => ['Catholic', 'Protestant', 'Islam', 'Buddhism', 'Other'][array_rand(['Catholic', 'Protestant', 'Islam', 'Buddhism', 'Other'])],
@@ -126,12 +126,12 @@ class StudentSeeder extends Seeder
                     'status_of_parents' => $statusOfParentsValue,
 
                     // Father's Information
-                    'father_name' => $firstNames[array_rand($firstNames)] . ' ' . $lastNames[array_rand($lastNames)],
+                    'father_name' => $firstNames[array_rand($firstNames)].' '.$lastNames[array_rand($lastNames)],
                     'father_age' => rand(40, 70),
                     'father_address' => 'Butig, Lanao del Sur',
-                    'father_telephone' => rand(1, 10) <= 5 ? '063-' . rand(1000, 9999) : null,
-                    'father_mobile' => rand(1, 10) <= 7 ? '09' . rand(100000000, 999999999) : null,
-                    'father_email' => rand(1, 10) <= 3 ? strtolower($firstNames[array_rand($firstNames)]) . '@email.com' : null,
+                    'father_telephone' => rand(1, 10) <= 5 ? '063-'.rand(1000, 9999) : null,
+                    'father_mobile' => rand(1, 10) <= 7 ? '09'.rand(100000000, 999999999) : null,
+                    'father_email' => rand(1, 10) <= 3 ? strtolower($firstNames[array_rand($firstNames)]).'@email.com' : null,
                     'father_occupation' => ['Farmer', 'Driver', 'Carpenter', 'Teacher', 'Engineer', 'Businessman'][array_rand(['Farmer', 'Driver', 'Carpenter', 'Teacher', 'Engineer', 'Businessman'])],
                     'father_company' => rand(1, 10) <= 6 ? 'Company Name Inc.' : null,
                     'father_monthly_income' => rand(15000, 80000),
@@ -140,12 +140,12 @@ class StudentSeeder extends Seeder
                     'father_unemployment_reason' => rand(1, 10) <= 2 ? ['Retirement', 'Health Issues', 'Economic Downturn', 'Company Closure'][array_rand(['Retirement', 'Health Issues', 'Economic Downturn', 'Company Closure'])] : null,
 
                     // Mother's Information
-                    'mother_name' => $firstNames[array_rand($firstNames)] . ' ' . $lastNames[array_rand($lastNames)],
+                    'mother_name' => $firstNames[array_rand($firstNames)].' '.$lastNames[array_rand($lastNames)],
                     'mother_age' => rand(35, 65),
                     'mother_address' => 'Butig, Lanao del Sur',
-                    'mother_telephone' => rand(1, 10) <= 5 ? '063-' . rand(1000, 9999) : null,
-                    'mother_mobile' => rand(1, 10) <= 8 ? '09' . rand(100000000, 999999999) : null,
-                    'mother_email' => rand(1, 10) <= 4 ? strtolower($firstNames[array_rand($firstNames)]) . '@email.com' : null,
+                    'mother_telephone' => rand(1, 10) <= 5 ? '063-'.rand(1000, 9999) : null,
+                    'mother_mobile' => rand(1, 10) <= 8 ? '09'.rand(100000000, 999999999) : null,
+                    'mother_email' => rand(1, 10) <= 4 ? strtolower($firstNames[array_rand($firstNames)]).'@email.com' : null,
                     'mother_occupation' => ['Housewife', 'Teacher', 'Nurse', 'Seamstress', 'Vendor', 'Government Employee'][array_rand(['Housewife', 'Teacher', 'Nurse', 'Seamstress', 'Vendor', 'Government Employee'])],
                     'mother_company' => rand(1, 10) <= 5 ? 'Company Name Corp.' : null,
                     'mother_monthly_income' => rand(12000, 60000),
@@ -232,16 +232,18 @@ class StudentSeeder extends Seeder
     {
         $occupations = ['Student', 'Teacher', 'Engineer', 'Driver', 'Nurse', 'Unemployed'];
         $names = ['Juan', 'Maria', 'Jose', 'Ana', 'Carlos', 'Sofia', 'Miguel', 'Elena'];
-        
+
         $siblings = [];
         for ($i = 0; $i < $count; $i++) {
             $siblings[] = [
-                'name' => $names[array_rand($names)] . ' Sibling',
+                'name' => $names[array_rand($names)].' Sibling',
                 'age' => rand(5, 35),
                 'occupation' => rand(1, 10) <= 7 ? $occupations[array_rand($occupations)] : 'Student',
                 'monthly_income' => rand(0, 25000),
             ];
-        }        return $siblings;
+        }
+
+return $siblings;
     }
 
     /**
@@ -341,7 +343,7 @@ class StudentSeeder extends Seeder
                         'age' => 16,
                         'occupation' => 'Student',
                         'monthly_income' => 0,
-                    ]
+                    ],
                 ],
 
                 // Income Information
@@ -406,7 +408,8 @@ class StudentSeeder extends Seeder
                 'subtotal_annual_expenses' => 73000,
                 'total_annual_expenses' => 607000,
             ]
-        );        $this->command->info('Created specific student: Leodyver Semilla');
+        );
+        $this->command->info('Created specific student: Leodyver Semilla');
     }
 
     /**
@@ -425,10 +428,10 @@ class StudentSeeder extends Seeder
                 'major' => 'Software Engineering',
                 'year_level' => '3rd Year',
                 'current_gwa' => 1.100, // President's Lister
-                'scenario' => 'honor_student'
+                'scenario' => 'honor_student',
             ],
             [
-                'email' => 'average.student@minsu.edu.ph', 
+                'email' => 'average.student@minsu.edu.ph',
                 'first_name' => 'Juan',
                 'middle_name' => 'Carlos',
                 'last_name' => 'Reyes',
@@ -437,7 +440,7 @@ class StudentSeeder extends Seeder
                 'major' => 'None',
                 'year_level' => '2nd Year',
                 'current_gwa' => 1.650, // Dean's Lister
-                'scenario' => 'dean_lister'
+                'scenario' => 'dean_lister',
             ],
             [
                 'email' => 'working.student@minsu.edu.ph',
@@ -449,7 +452,7 @@ class StudentSeeder extends Seeder
                 'major' => 'None',
                 'year_level' => '4th Year',
                 'current_gwa' => 2.100,
-                'scenario' => 'working_student'
+                'scenario' => 'working_student',
             ],
             [
                 'email' => 'arts.student@minsu.edu.ph',
@@ -461,7 +464,7 @@ class StudentSeeder extends Seeder
                 'major' => 'None',
                 'year_level' => '3rd Year',
                 'current_gwa' => 1.800,
-                'scenario' => 'performing_arts'
+                'scenario' => 'performing_arts',
             ],
             [
                 'email' => 'indigent.student@minsu.edu.ph',
@@ -473,7 +476,7 @@ class StudentSeeder extends Seeder
                 'major' => 'None',
                 'year_level' => '1st Year',
                 'current_gwa' => 2.300,
-                'scenario' => 'indigent_student'
+                'scenario' => 'indigent_student',
             ],
         ];
 
@@ -494,7 +497,7 @@ class StudentSeeder extends Seeder
 
             // Create profile based on scenario
             $profileData = $this->getProfileDataForScenario($studentData);
-            
+
             StudentProfile::firstOrCreate(
                 ['user_id' => $user->id],
                 $profileData

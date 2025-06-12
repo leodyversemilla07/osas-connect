@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import InputError from "@/components/input-error";
 import TextLink from "@/components/text-link";
-import type { RegisterForm } from "@/hooks/useRegistrationForm";
+import type { RegisterForm } from "@/hooks/use-registration-form";
 
 interface ReviewSubmitStepProps {
     data: RegisterForm;

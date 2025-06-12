@@ -1469,7 +1469,7 @@ class OsasStaffController extends Controller
 
         // Ensure the application is in a state where interviews can be scheduled
         $allowedStatuses = ['verified', 'under_evaluation', 'approved'];
-        if (!in_array($application->status, $allowedStatuses)) {
+        if (! in_array($application->status, $allowedStatuses)) {
             return redirect()->route('osas.applications.review', $application->id)
                 ->with('error', 'Interview can only be scheduled for verified or approved applications.');
         }
@@ -1493,7 +1493,7 @@ class OsasStaffController extends Controller
                     'type' => $application->scholarship->type,
                 ],
                 'interview_scheduled' => $application->interview_schedule !== null,
-                'interview_date' => $application->interview_schedule ? 
+                'interview_date' => $application->interview_schedule ?
                     \Carbon\Carbon::parse($application->interview_schedule)->format('Y-m-d H:i:s') : null,
             ],
         ]);

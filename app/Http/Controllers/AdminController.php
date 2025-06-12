@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Scholarship;
+use App\Models\ScholarshipApplication;
+use App\Services\StorageService;
+use Illuminate\Support\Str;
+
 
 class AdminController extends Controller
 {
@@ -28,14 +33,14 @@ class AdminController extends Controller
         $pendingInvitations = StaffInvitation::where('status', 'pending')->count();
 
         // Get scholarship and application stats
-        $totalScholarships = \App\Models\Scholarship::count();
-        $totalApplications = \App\Models\ScholarshipApplication::count();
-        $pendingApplications = \App\Models\ScholarshipApplication::where('status', 'submitted')->count();
-        $approvedApplications = \App\Models\ScholarshipApplication::where('status', 'approved')->count();
-        $rejectedApplications = \App\Models\ScholarshipApplication::where('status', 'rejected')->count();
+        $totalScholarships = Scholarship::count();
+        $totalApplications = ScholarshipApplication::count();
+        $pendingApplications = ScholarshipApplication::where('status', 'submitted')->count();
+        $approvedApplications = ScholarshipApplication::where('status', 'approved')->count();
+        $rejectedApplications = ScholarshipApplication::where('status', 'rejected')->count();
 
         // Calculate funding and success rate
-        $totalFundsAllocated = \App\Models\ScholarshipApplication::where('status', 'approved')
+        $totalFundsAllocated = ScholarshipApplication::where('status', 'approved')
             ->sum('amount_received') ?? 0;
         $applicationSuccessRate = $totalApplications > 0
             ? round(($approvedApplications / $totalApplications) * 100)
@@ -76,7 +81,7 @@ class AdminController extends Controller
             });
 
         // Get recent applications (last 10)
-        $recentApplications = \App\Models\ScholarshipApplication::with(['user', 'scholarship'])
+        $recentApplications = ScholarshipApplication::with(['user', 'scholarship'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
@@ -322,7 +327,7 @@ class AdminController extends Controller
                 $user->load('adminProfile');
             } else {
                 // Fallback for any other role types - construct the relationship name carefully
-                $relationshipName = $user->role.'Profile';
+                $relationshipName = $user->role . 'Profile';
                 if (method_exists($user, $relationshipName)) {
                     $user->load($relationshipName);
                 }
@@ -585,7 +590,7 @@ class AdminController extends Controller
         }
 
         // Get photo URL from user record since photo_id is stored in users table
-        $photoUrl = $user->photo_id ? \App\Services\StorageService::url($user->photo_id) : null;
+        $photoUrl = $user->photo_id ? StorageService::url($user->photo_id) : null;
 
         // Prepare the base user data
         $userData = [
@@ -674,14 +679,14 @@ class AdminController extends Controller
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
         ];
 
         // Add role-specific validation rules
         if ($user->role === 'student') {
             $rules = array_merge($commonRules, [
                 // Academic Information
-                'student_id' => ['required', 'string', 'max:255', 'unique:student_profiles,student_id,'.$user->studentProfile->id],
+                'student_id' => ['required', 'string', 'max:255', 'unique:student_profiles,student_id,' . $user->studentProfile->id],
                 'course' => ['required', 'string', 'max:255'],
                 'major' => ['nullable', 'string', 'max:255'],
                 'year_level' => ['required', 'string', 'in:1st Year,2nd Year,3rd Year,4th Year'],
@@ -738,7 +743,7 @@ class AdminController extends Controller
             ]);
         } elseif ($user->role === 'osas_staff') {
             $rules = array_merge($commonRules, [
-                'staff_id' => ['required', 'string', 'max:255', 'unique:osas_staff_profiles,staff_id,'.$user->osasStaffProfile->id],
+                'staff_id' => ['required', 'string', 'max:255', 'unique:osas_staff_profiles,staff_id,' . $user->osasStaffProfile->id],
             ]);
         } else {
             return back()->withErrors(['error' => 'Invalid user role.']);
@@ -793,7 +798,7 @@ class AdminController extends Controller
             DB::rollBack();
 
             return back()
-                ->withErrors(['error' => 'Failed to update user: '.$e->getMessage()])
+                ->withErrors(['error' => 'Failed to update user: ' . $e->getMessage()])
                 ->withInput();
         }
     }
@@ -865,7 +870,7 @@ class AdminController extends Controller
         // Add all invitations (regardless of status)
         foreach ($allInvitations as $invitation) {
             $combinedData->push([
-                'id' => 'invitation_'.$invitation->id,
+                'id' => 'invitation_' . $invitation->id,
                 'type' => 'invitation',
                 'first_name' => null,
                 'last_name' => null,
@@ -981,7 +986,7 @@ class AdminController extends Controller
         $status = $request->query('status');
         $type = $request->query('type');
 
-        $query = \App\Models\Scholarship::withCount(['applications'])
+        $query = Scholarship::withCount(['applications'])
             ->with(['applications' => function ($query) {
                 $query->where('status', 'approved');
             }])
@@ -1028,10 +1033,10 @@ class AdminController extends Controller
         });
 
         // Get summary statistics
-        $totalScholarships = \App\Models\Scholarship::count();
-        $activeScholarships = \App\Models\Scholarship::where('status', 'active')->count();
-        $draftScholarships = \App\Models\Scholarship::where('status', 'draft')->count();
-        $closedScholarships = \App\Models\Scholarship::where('status', 'inactive')->count();
+        $totalScholarships = Scholarship::count();
+        $activeScholarships = Scholarship::where('status', 'active')->count();
+        $draftScholarships = Scholarship::where('status', 'draft')->count();
+        $closedScholarships = Scholarship::where('status', 'inactive')->count();
 
         return Inertia::render('admin/scholarships/index', [
             'scholarships' => $scholarships,
@@ -1054,7 +1059,7 @@ class AdminController extends Controller
      */
     public function scholarshipApplications(Request $request)
     {
-        $query = \App\Models\ScholarshipApplication::with([
+        $query = ScholarshipApplication::with([
             'user.studentProfile',  // Fix: Should be 'user.studentProfile' not 'user.user.studentProfile'
             'scholarship',
             'documents',
@@ -1065,14 +1070,14 @@ class AdminController extends Controller
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->whereHas('user', function ($userQuery) use ($request) {
-                    $userQuery->where('name', 'like', '%'.$request->search.'%')
-                        ->orWhere('email', 'like', '%'.$request->search.'%');
+                    $userQuery->where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('email', 'like', '%' . $request->search . '%');
                 })
                     ->orWhereHas('user.studentProfile', function ($profileQuery) use ($request) {
-                        $profileQuery->where('student_id', 'like', '%'.$request->search.'%');
+                        $profileQuery->where('student_id', 'like', '%' . $request->search . '%');
                     })
                     ->orWhereHas('scholarship', function ($scholarshipQuery) use ($request) {
-                        $scholarshipQuery->where('name', 'like', '%'.$request->search.'%');
+                        $scholarshipQuery->where('name', 'like', '%' . $request->search . '%');
                     });
             });
         }
@@ -1254,7 +1259,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:pages,slug,'.$page->id,
+            'slug' => 'required|string|max:255|unique:pages,slug,' . $page->id,
             'content' => 'required|string',
         ]);
 
@@ -1316,7 +1321,7 @@ class AdminController extends Controller
             'date' => 'nullable|date',
         ]);
 
-        $slug = \Illuminate\Support\Str::slug($request->title.'-'.now()->format('Y-m-d-H-i-s'));
+        $slug = \Illuminate\Support\Str::slug($request->title . '-' . now()->format('Y-m-d-H-i-s'));
 
         Page::create([
             'title' => $request->title,
@@ -1435,7 +1440,7 @@ class AdminController extends Controller
             'requirements.*' => 'required|string',
         ]);
 
-        $slug = \Illuminate\Support\Str::slug($request->name.'-'.now()->format('Y-m-d-H-i-s'));
+        $slug = Str::slug($request->name . '-' . now()->format('Y-m-d-H-i-s'));
 
         // Calculate days remaining
         $deadline = Carbon::parse($request->deadline);
@@ -1508,7 +1513,7 @@ class AdminController extends Controller
 
         $page->update([
             'title' => $request->name,
-            'slug' => \Illuminate\Support\Str::slug($request->name.'-'.now()->format('Y-m-d-H-i-s')),
+            'slug' => Str::slug($request->name . '-' . now()->format('Y-m-d-H-i-s')),
             'content' => array_merge($content, [
                 'type' => 'scholarship',
                 'updated_at' => now()->toDateTimeString(),
@@ -1535,7 +1540,7 @@ class AdminController extends Controller
     /**
      * Display a specific scholarship application for admin view.
      */
-    public function showScholarshipApplication(\App\Models\ScholarshipApplication $application): Response
+    public function showScholarshipApplication(ScholarshipApplication $application): Response
     {
         // Fix: Load the correct relationships
         $application->load([

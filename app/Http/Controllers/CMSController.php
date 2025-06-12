@@ -97,7 +97,7 @@ class CMSController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:cms_pages,slug,' . $page->id,
+            'slug' => 'required|string|max:255|unique:cms_pages,slug,'.$page->id,
             'content' => 'required|array',
         ]);
 
@@ -108,7 +108,7 @@ class CMSController extends Controller
                 ->with('success', 'Page updated successfully');
         } catch (\Exception $e) {
             return back()->withErrors([
-                'error' => 'Failed to update page: ' . $e->getMessage(),
+                'error' => 'Failed to update page: '.$e->getMessage(),
             ]);
         }
     }

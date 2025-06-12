@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import InputError from "@/components/input-error";
-import type { RegisterForm } from "@/hooks/useRegistrationForm";
+import type { RegisterForm } from "@/hooks/use-registration-form";
 
 interface AcademicInformationStepProps {
     data: RegisterForm;
@@ -18,9 +18,6 @@ const AcademicInformationStep = memo<AcademicInformationStepProps>(({
     onFieldChange,
     onCourseChange,
 }) => {
-    const isEducationCourse = data.course === "Bachelor of Secondary Education" || 
-                             data.course === "Bachelor of Elementary Education";
-
     return (
         <div className="space-y-6">
             <div>
@@ -48,59 +45,58 @@ const AcademicInformationStep = memo<AcademicInformationStepProps>(({
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="Bachelor of Science in Information Technology">
-                            Bachelor of Science in Information Technology
+                            BSIT - Bachelor of Science in Information Technology
                         </SelectItem>
-                        <SelectItem value="Bachelor of Science in Computer Science">
-                            Bachelor of Science in Computer Science
+                        <SelectItem value="Bachelor of Science in Computer Engineering">
+                            BSCpE - Bachelor of Science in Computer Engineering
                         </SelectItem>
-                        <SelectItem value="Bachelor of Science in Business Administration">
-                            Bachelor of Science in Business Administration
+                        <SelectItem value="Bachelor of Science in Tourism Management">
+                            BSTM - Bachelor of Science in Tourism Management
                         </SelectItem>
-                        <SelectItem value="Bachelor of Arts in Communication">
-                            Bachelor of Arts in Communication
+                        <SelectItem value="Bachelor of Science in Hospitality Management">
+                            BSHM - Bachelor of Science in Hospitality Management
                         </SelectItem>
-                        <SelectItem value="Bachelor of Secondary Education">
-                            Bachelor of Secondary Education
+                        <SelectItem value="Bachelor of Science in Entrepreneurship">
+                            BSENTREP - Bachelor of Science in Entrepreneurship
                         </SelectItem>
-                        <SelectItem value="Bachelor of Elementary Education">
-                            Bachelor of Elementary Education
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Science in Psychology">
-                            Bachelor of Science in Psychology
+                        <SelectItem value="Bachelor of Arts in Political Science">
+                            ABPolSci - Bachelor of Arts in Political Science
                         </SelectItem>
                         <SelectItem value="Bachelor of Science in Criminology">
-                            Bachelor of Science in Criminology
+                            BSCrim - Bachelor of Science in Criminology
                         </SelectItem>
-                        <SelectItem value="Bachelor of Science in Engineering">
-                            Bachelor of Science in Engineering
+                        <SelectItem value="Bachelor of Science in Fisheries">
+                            BSFI - Bachelor of Science in Fisheries
                         </SelectItem>
-                        <SelectItem value="Bachelor of Science in Nursing">
-                            Bachelor of Science in Nursing
+                        <SelectItem value="Bachelor of Secondary Education">
+                            BSEd - Bachelor of Secondary Education
+                        </SelectItem>
+                        <SelectItem value="Bachelor of Elementary Education">
+                            BEEd - Bachelor of Elementary Education
                         </SelectItem>
                     </SelectContent>
                 </Select>
                 <InputError message={errors.course} className="mt-1" />
             </div>
-
-            {isEducationCourse && (
+            {(data.course === "Bachelor of Secondary Education" || data.course === "Bachelor of Science in Entrepreneurship") && (
                 <div>
                     <Label htmlFor="major" className="text-sm font-medium">
-                        Major <span className="text-red-500">*</span>
-                    </Label>
-                    <Select value={data.major} onValueChange={(value) => onFieldChange('major', value)}>
+                        {data.course === "Bachelor of Secondary Education" ? "Major" : "Specialization"} <span className="text-red-500">*</span>
+                    </Label>                    <Select value={data.major} onValueChange={(value) => onFieldChange('major', value)}>
                         <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Select your major" />
+                            <SelectValue placeholder={data.course === "Bachelor of Secondary Education" ? "Select your major" : "Select your specialization"} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Mathematics">Mathematics</SelectItem>
-                            <SelectItem value="English">English</SelectItem>
-                            <SelectItem value="Science">Science</SelectItem>
-                            <SelectItem value="Social Studies">Social Studies</SelectItem>
-                            <SelectItem value="Physical Education">Physical Education</SelectItem>
-                            <SelectItem value="Technology and Livelihood Education">
-                                Technology and Livelihood Education
-                            </SelectItem>
-                            <SelectItem value="General Education">General Education</SelectItem>
+                            {data.course === "Bachelor of Secondary Education" ? (
+                                <>
+                                    <SelectItem value="Mathematics">Mathematics</SelectItem>
+                                    <SelectItem value="English">English</SelectItem>
+                                    <SelectItem value="Science">Science</SelectItem>
+                                </>) : (
+                                <>
+                                    <SelectItem value="Farm Business">Farm Business</SelectItem>
+                                </>
+                            )}
                         </SelectContent>
                     </Select>
                     <InputError message={errors.major} className="mt-1" />

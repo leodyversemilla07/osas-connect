@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
-import { NumberFormatter } from '@/utils/numberFormatter';
+import { NumberFormatter } from '@/lib/number-formatter';
 
 // Base form field component
 interface FormFieldProps {
