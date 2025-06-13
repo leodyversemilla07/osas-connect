@@ -3,21 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Page;
+use App\Models\Scholarship;
+use App\Models\ScholarshipApplication;
 use App\Models\StaffInvitation;
 use App\Models\User;
+use App\Services\StorageService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\Scholarship;
-use App\Models\ScholarshipApplication;
-use App\Services\StorageService;
-use Illuminate\Support\Str;
-
 
 class AdminController extends Controller
 {
@@ -327,7 +326,7 @@ class AdminController extends Controller
                 $user->load('adminProfile');
             } else {
                 // Fallback for any other role types - construct the relationship name carefully
-                $relationshipName = $user->role . 'Profile';
+                $relationshipName = $user->role.'Profile';
                 if (method_exists($user, $relationshipName)) {
                     $user->load($relationshipName);
                 }
@@ -679,14 +678,14 @@ class AdminController extends Controller
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
         ];
 
         // Add role-specific validation rules
         if ($user->role === 'student') {
             $rules = array_merge($commonRules, [
                 // Academic Information
-                'student_id' => ['required', 'string', 'max:255', 'unique:student_profiles,student_id,' . $user->studentProfile->id],
+                'student_id' => ['required', 'string', 'max:255', 'unique:student_profiles,student_id,'.$user->studentProfile->id],
                 'course' => ['required', 'string', 'max:255'],
                 'major' => ['nullable', 'string', 'max:255'],
                 'year_level' => ['required', 'string', 'in:1st Year,2nd Year,3rd Year,4th Year'],
@@ -743,7 +742,7 @@ class AdminController extends Controller
             ]);
         } elseif ($user->role === 'osas_staff') {
             $rules = array_merge($commonRules, [
-                'staff_id' => ['required', 'string', 'max:255', 'unique:osas_staff_profiles,staff_id,' . $user->osasStaffProfile->id],
+                'staff_id' => ['required', 'string', 'max:255', 'unique:osas_staff_profiles,staff_id,'.$user->osasStaffProfile->id],
             ]);
         } else {
             return back()->withErrors(['error' => 'Invalid user role.']);
@@ -798,7 +797,7 @@ class AdminController extends Controller
             DB::rollBack();
 
             return back()
-                ->withErrors(['error' => 'Failed to update user: ' . $e->getMessage()])
+                ->withErrors(['error' => 'Failed to update user: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -870,7 +869,7 @@ class AdminController extends Controller
         // Add all invitations (regardless of status)
         foreach ($allInvitations as $invitation) {
             $combinedData->push([
-                'id' => 'invitation_' . $invitation->id,
+                'id' => 'invitation_'.$invitation->id,
                 'type' => 'invitation',
                 'first_name' => null,
                 'last_name' => null,
@@ -1070,14 +1069,14 @@ class AdminController extends Controller
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->whereHas('user', function ($userQuery) use ($request) {
-                    $userQuery->where('name', 'like', '%' . $request->search . '%')
-                        ->orWhere('email', 'like', '%' . $request->search . '%');
+                    $userQuery->where('name', 'like', '%'.$request->search.'%')
+                        ->orWhere('email', 'like', '%'.$request->search.'%');
                 })
                     ->orWhereHas('user.studentProfile', function ($profileQuery) use ($request) {
-                        $profileQuery->where('student_id', 'like', '%' . $request->search . '%');
+                        $profileQuery->where('student_id', 'like', '%'.$request->search.'%');
                     })
                     ->orWhereHas('scholarship', function ($scholarshipQuery) use ($request) {
-                        $scholarshipQuery->where('name', 'like', '%' . $request->search . '%');
+                        $scholarshipQuery->where('name', 'like', '%'.$request->search.'%');
                     });
             });
         }
@@ -1259,7 +1258,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:pages,slug,' . $page->id,
+            'slug' => 'required|string|max:255|unique:pages,slug,'.$page->id,
             'content' => 'required|string',
         ]);
 
@@ -1321,7 +1320,7 @@ class AdminController extends Controller
             'date' => 'nullable|date',
         ]);
 
-        $slug = \Illuminate\Support\Str::slug($request->title . '-' . now()->format('Y-m-d-H-i-s'));
+        $slug = \Illuminate\Support\Str::slug($request->title.'-'.now()->format('Y-m-d-H-i-s'));
 
         Page::create([
             'title' => $request->title,
@@ -1440,7 +1439,7 @@ class AdminController extends Controller
             'requirements.*' => 'required|string',
         ]);
 
-        $slug = Str::slug($request->name . '-' . now()->format('Y-m-d-H-i-s'));
+        $slug = Str::slug($request->name.'-'.now()->format('Y-m-d-H-i-s'));
 
         // Calculate days remaining
         $deadline = Carbon::parse($request->deadline);
@@ -1513,7 +1512,7 @@ class AdminController extends Controller
 
         $page->update([
             'title' => $request->name,
-            'slug' => Str::slug($request->name . '-' . now()->format('Y-m-d-H-i-s')),
+            'slug' => Str::slug($request->name.'-'.now()->format('Y-m-d-H-i-s')),
             'content' => array_merge($content, [
                 'type' => 'scholarship',
                 'updated_at' => now()->toDateTimeString(),

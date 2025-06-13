@@ -33,15 +33,17 @@ import {
     Clock,
     CheckCircle,
     XCircle,
-    AlertCircle,
+    AlertTriangle,
     User,
     GraduationCap,
     Mail,
     Phone,
     MapPin,
     FileCheck,
-    MessageSquare, History,
-    Send
+    MessageSquare, 
+    History,
+    Send,
+    ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -108,7 +110,7 @@ interface Application {
     id: number;
     student: Student;
     scholarship: Scholarship;
-    status: 'pending' | 'under_review' | 'approved' | 'rejected' | 'on_hold';
+    status: 'draft' | 'submitted' | 'under_verification' | 'incomplete' | 'verified' | 'under_evaluation' | 'approved' | 'rejected' | 'end';
     priority: 'high' | 'medium' | 'low';
     submitted_at: string;
     updated_at: string;
@@ -138,17 +140,37 @@ interface ApplicationReviewProps {
     application: Application;
 }
 
-// Status configuration
+// Status configuration (aligned with ScholarshipApplication model)
 const statusConfig = {
-    pending: {
-        label: 'Pending',
-        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-        icon: Clock,
+    draft: {
+        label: 'Draft',
+        color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
+        icon: FileCheck,
     },
-    under_review: {
-        label: 'Under Review',
+    submitted: {
+        label: 'Submitted',
         color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        icon: CheckCircle,
+    },
+    under_verification: {
+        label: 'Under Verification',
+        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
         icon: Eye,
+    },
+    incomplete: {
+        label: 'Incomplete',
+        color: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+        icon: AlertTriangle,
+    },
+    verified: {
+        label: 'Verified',
+        color: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+        icon: ShieldCheck,
+    },
+    under_evaluation: {
+        label: 'Under Evaluation',
+        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+        icon: GraduationCap,
     },
     approved: {
         label: 'Approved',
@@ -160,10 +182,10 @@ const statusConfig = {
         color: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
         icon: XCircle,
     },
-    on_hold: {
-        label: 'On Hold',
+    end: {
+        label: 'Completed',
         color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
-        icon: AlertCircle,
+        icon: CheckCircle,
     },
 } as const;
 
@@ -242,7 +264,7 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
     };
 
     const StatusIcon = statusConfig[application.status]?.icon || Clock;
-    const isOverdue = new Date(application.deadline) < new Date() && application.status === 'pending';
+    const isOverdue = new Date(application.deadline) < new Date() && ['submitted', 'under_verification', 'incomplete'].includes(application.status);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -279,16 +301,19 @@ export default function ApplicationReview({ application }: ApplicationReviewProp
                                 <div className="space-y-4">
                                     <div>
                                         <Label htmlFor="status">Status</Label>
-                                        <Select value={statusData.status} onValueChange={(value) => setStatusData('status', value as 'pending' | 'under_review' | 'approved' | 'rejected' | 'on_hold')}>
+                                        <Select value={statusData.status} onValueChange={(value) => setStatusData('status', value as 'draft' | 'submitted' | 'under_verification' | 'incomplete' | 'verified' | 'under_evaluation' | 'approved' | 'rejected' | 'end')}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select status" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="pending">Pending</SelectItem>
-                                                <SelectItem value="under_review">Under Review</SelectItem>
+                                                <SelectItem value="submitted">Submitted</SelectItem>
+                                                <SelectItem value="under_verification">Under Verification</SelectItem>
+                                                <SelectItem value="incomplete">Incomplete</SelectItem>
+                                                <SelectItem value="verified">Verified</SelectItem>
+                                                <SelectItem value="under_evaluation">Under Evaluation</SelectItem>
                                                 <SelectItem value="approved">Approved</SelectItem>
                                                 <SelectItem value="rejected">Rejected</SelectItem>
-                                                <SelectItem value="on_hold">On Hold</SelectItem>
+                                                <SelectItem value="end">Completed</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>

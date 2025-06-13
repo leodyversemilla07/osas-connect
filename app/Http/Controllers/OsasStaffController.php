@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -1013,7 +1014,7 @@ class OsasStaffController extends Controller
      */
     public function scholarshipApplications(Request $request): Response
     {
-        $query = \App\Models\ScholarshipApplication::with(['user', 'scholarship', 'documents'])
+        $query = \App\Models\ScholarshipApplication::with(['user.studentProfile', 'scholarship', 'documents'])
             ->latest();
 
         // Apply filters
@@ -1050,19 +1051,21 @@ class OsasStaffController extends Controller
         $sortDirection = $request->sort_direction ?? 'desc';
         $query->orderBy($sortBy, $sortDirection);
 
-        $applications = $query->paginate(15);
+        $applications = $query->get();
 
         // Transform applications data
-        $applications->getCollection()->transform(function ($application) {
+        $applications = $applications->map(function ($application) {
+            $studentProfile = $application->user->studentProfile;
+            
             return [
                 'id' => $application->id,
                 'student' => [
                     'id' => $application->user->id,
-                    'name' => $application->user->full_name,
-                    'student_id' => $application->user->studentProfile->student_id,
+                    'name' => $application->user->full_name ?? $application->user->first_name . ' ' . $application->user->last_name,
+                    'student_id' => $studentProfile ? $studentProfile->student_id : 'N/A',
                     'email' => $application->user->email,
-                    'course' => $application->user->studentProfile->course,
-                    'year_level' => $application->user->studentProfile->year_level,
+                    'course' => $studentProfile ? $studentProfile->course : 'N/A',
+                    'year_level' => $studentProfile ? $studentProfile->year_level : 'N/A',
                 ],
                 'scholarship' => [
                     'id' => $application->scholarship->id,
@@ -1097,11 +1100,13 @@ class OsasStaffController extends Controller
 
         $statistics = [
             'total' => $totalApplications,
-            'pending' => \App\Models\ScholarshipApplication::where('status', 'submitted')->count(),
-            'under_review' => \App\Models\ScholarshipApplication::where('status', 'under_verification')->count(),
+            'submitted' => \App\Models\ScholarshipApplication::where('status', 'submitted')->count(),
+            'under_verification' => \App\Models\ScholarshipApplication::where('status', 'under_verification')->count(),
+            'incomplete' => \App\Models\ScholarshipApplication::where('status', 'incomplete')->count(),
+            'verified' => \App\Models\ScholarshipApplication::where('status', 'verified')->count(),
+            'under_evaluation' => \App\Models\ScholarshipApplication::where('status', 'under_evaluation')->count(),
             'approved' => \App\Models\ScholarshipApplication::where('status', 'approved')->count(),
             'rejected' => \App\Models\ScholarshipApplication::where('status', 'rejected')->count(),
-            'on_hold' => \App\Models\ScholarshipApplication::where('status', 'on_hold')->count(),
             'this_month_count' => $thisMonthCount,
             'last_month_count' => $lastMonthCount,
             'completion_rate' => round($completionRate, 1),

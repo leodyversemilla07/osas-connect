@@ -64,7 +64,7 @@ const getStatusColor = (status: string): string => {
         'approved': 'text-emerald-800 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-800',
         'rejected': 'text-red-800 bg-red-100 dark:text-red-300 dark:bg-red-800',
         'incomplete': 'text-orange-800 bg-orange-100 dark:text-orange-300 dark:bg-orange-800',
-        'pending': 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-800',
+        'end': 'text-gray-800 bg-gray-100 dark:text-gray-300 dark:bg-gray-800',
     };
     return colors[status] || 'text-gray-800 bg-gray-100 dark:text-gray-300 dark:bg-gray-800';
 };
@@ -79,6 +79,7 @@ const getStatusLabel = (status: string): string => {
         'approved': 'Approved',
         'rejected': 'Rejected',
         'incomplete': 'Incomplete Documents',
+        'end': 'Completed',
     };
     return labels[status] || status;
 };

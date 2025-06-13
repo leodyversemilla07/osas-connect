@@ -14,16 +14,15 @@ import {
     MoreVertical,
     Eye,
     Calendar,
-    Clock,
     CheckCircle,
     XCircle,
     ArrowUpDown,
     User,
     ShieldCheck,
     AlertTriangle,
-    Pause,
     GraduationCap,
-    HelpCircle
+    HelpCircle,
+    FileText
 } from "lucide-react"
 import { Link } from "@inertiajs/react"
 import { cn } from "@/lib/utils"
@@ -45,8 +44,8 @@ export type Application = {
         type: string;
         amount: string;
     };
-    // Updated to match actual backend status values
-    status: 'submitted' | 'under_verification' | 'verified' | 'under_evaluation' | 'approved' | 'rejected' | 'incomplete' | 'on_hold' | 'pending' | 'under_review';
+    // Updated to match actual backend status values (aligned with ScholarshipApplication model)
+    status: 'draft' | 'submitted' | 'under_verification' | 'incomplete' | 'verified' | 'under_evaluation' | 'approved' | 'rejected' | 'end';
     submitted_at: string;
     updated_at: string;
     priority: 'high' | 'medium' | 'low';
@@ -60,9 +59,14 @@ export type Application = {
     };
 }
 
-// Updated comprehensive status configuration
+// Updated comprehensive status configuration (removed extra statuses)
 const statusConfig = {
-    // Backend status values
+    // Backend status values (matching ScholarshipApplication model)
+    draft: {
+        label: 'Draft',
+        color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
+        icon: FileText,
+    },
     submitted: {
         label: 'Submitted',
         color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
@@ -98,23 +102,60 @@ const statusConfig = {
         color: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
         icon: AlertTriangle,
     },
-    on_hold: {
-        label: 'On Hold',
+    end: {
+        label: 'Completed',
         color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
-        icon: Pause,
-    },
-    // Legacy frontend status values (for backward compatibility)
-    pending: {
-        label: 'Pending',
-        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-        icon: Clock,
-    },
-    under_review: {
-        label: 'Under Review',
-        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-        icon: Eye,
+        icon: CheckCircle,
     },
 } as const;
+
+// Scholarship type mappings for better display
+const SCHOLARSHIP_TYPES = {
+    'academic_full': 'Academic (Full)',
+    'academic_partial': 'Academic (Partial)',
+    'student_assistantship': 'Student Assistantship',
+    'performing_arts_full': 'Performing Arts (Full)',
+    'performing_arts_partial': 'Performing Arts (Partial)',
+    'economic_assistance': 'Economic Assistance',
+    'others': 'Custom Type',
+} as const;
+
+const getScholarshipTypeDisplay = (type: string): string => {
+    return SCHOLARSHIP_TYPES[type as keyof typeof SCHOLARSHIP_TYPES] || type;
+};
+
+const getScholarshipTypeColor = (type: string): string => {
+    const colors = {
+        'academic_full': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        'academic_partial': 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300',
+        'student_assistantship': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+        'performing_arts_full': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+        'performing_arts_partial': 'bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-300',
+        'economic_assistance': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300',
+        'others': 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
+    };
+    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
+};
+
+// Format currency amount for display
+const formatCurrency = (amount: string): string => {
+    // Remove any existing currency symbols and clean the string
+    const cleanAmount = amount.replace(/[₱$,]/g, '');
+    const numericAmount = parseFloat(cleanAmount);
+
+    // Return formatted currency if it's a valid number
+    if (!isNaN(numericAmount)) {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        }).format(numericAmount);
+    }
+
+    // Return original amount if it's not a valid number (e.g., "Full Tuition", "Variable")
+    return amount;
+};
 
 // Safe status component with fallback
 const StatusCell = ({ status }: { status: string }) => {
@@ -179,7 +220,7 @@ export const columns: ColumnDef<Application>[] = [
         ),
     },
     {
-        accessorKey: "student",
+        id: "student",
         header: ({ column }) => {
             return (
                 <Button
@@ -193,7 +234,7 @@ export const columns: ColumnDef<Application>[] = [
             )
         },
         cell: ({ row }) => {
-            const student = row.getValue("student") as Application["student"];
+            const student = row.original.student;
             return (
                 <div className="flex items-center space-x-2">
                     <User className="h-4 w-4 text-muted-foreground" />
@@ -213,22 +254,27 @@ export const columns: ColumnDef<Application>[] = [
         },
     },
     {
-        accessorKey: "scholarship",
+        id: "scholarship",
         header: "Scholarship",
         cell: ({ row }) => {
-            const scholarship = row.getValue("scholarship") as Application["scholarship"];
+            const scholarship = row.original.scholarship;
             return (
                 <div>
                     <div className="font-medium">{scholarship.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                        {scholarship.type} • {scholarship.amount}
+                    <div className="flex items-center gap-2 mt-1">
+                        <Badge className={cn(getScholarshipTypeColor(scholarship.type))}>
+                            {getScholarshipTypeDisplay(scholarship.type)}
+                        </Badge>
+                        <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                            {formatCurrency(scholarship.amount)}
+                        </span>
                     </div>
                 </div>
             );
         },
     },
     {
-        accessorKey: "status",
+        id: "status",
         header: ({ column }) => {
             return (
                 <Button
@@ -242,12 +288,13 @@ export const columns: ColumnDef<Application>[] = [
             )
         },
         cell: ({ row }) => {
-            const status = row.getValue("status") as string;
+            const status = row.original.status;
             return <StatusCell status={status} />;
         },
+        accessorFn: (row) => row.status,
     },
     {
-        accessorKey: "priority",
+        id: "priority",
         header: ({ column }) => {
             return (
                 <Button
@@ -261,7 +308,7 @@ export const columns: ColumnDef<Application>[] = [
             )
         },
         cell: ({ row }) => {
-            const priority = row.getValue("priority") as Application["priority"];
+            const priority = row.original.priority;
             return (
                 <Badge variant={
                     priority === 'high' ? 'destructive' :
@@ -272,9 +319,10 @@ export const columns: ColumnDef<Application>[] = [
                 </Badge>
             );
         },
+        accessorFn: (row) => row.priority,
     },
     {
-        accessorKey: "documents",
+        id: "documents",
         header: "Documents",
         cell: ({ row }) => {
             const documentsCount = row.original.documents_count;
@@ -297,7 +345,7 @@ export const columns: ColumnDef<Application>[] = [
         },
     },
     {
-        accessorKey: "submitted_at",
+        id: "submitted_at",
         header: ({ column }) => {
             return (
                 <Button
@@ -311,16 +359,17 @@ export const columns: ColumnDef<Application>[] = [
             )
         },
         cell: ({ row }) => {
-            const date = new Date(row.getValue("submitted_at"));
+            const date = new Date(row.original.submitted_at);
             return (
                 <div className="text-sm">
                     {date.toLocaleDateString()}
                 </div>
             );
         },
+        accessorFn: (row) => row.submitted_at,
     },
     {
-        accessorKey: "deadline",
+        id: "deadline",
         header: ({ column }) => {
             return (
                 <Button
@@ -334,7 +383,7 @@ export const columns: ColumnDef<Application>[] = [
             )
         },
         cell: ({ row }) => {
-            const deadlineValue = row.getValue("deadline");
+            const deadlineValue = row.original.deadline;
 
             // Handle null/undefined deadline
             if (!deadlineValue) {
@@ -345,8 +394,8 @@ export const columns: ColumnDef<Application>[] = [
                 );
             }
 
-            const deadline = new Date(deadlineValue as string);
-            const isOverdue = deadline < new Date() && ['submitted', 'pending', 'under_verification', 'under_review'].includes(row.original.status);
+            const deadline = new Date(deadlineValue);
+            const isOverdue = deadline < new Date() && ['submitted', 'under_verification'].includes(row.original.status);
 
             return (
                 <div className={cn(
@@ -358,10 +407,10 @@ export const columns: ColumnDef<Application>[] = [
                 </div>
             );
         },
+        accessorFn: (row) => row.deadline,
     },
     {
         id: "actions",
-        header: "Actions",
         cell: ({ row }) => {
             const application = row.original;
 

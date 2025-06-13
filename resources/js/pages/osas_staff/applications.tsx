@@ -3,11 +3,18 @@ import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/application-management/data-table';
 import { columns } from '@/components/application-management/columns';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
 import {
-    Download,
     TrendingUp,
     TrendingDown,
-    BarChart3
+    BarChart3,
+    FileText,
+    Clock,
+    CheckCircle,
+    AlertCircle
 } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -38,7 +45,7 @@ interface Application {
         type: string;
         amount: string;
     };
-    status: 'pending' | 'under_review' | 'approved' | 'rejected' | 'on_hold';
+    status: 'draft' | 'submitted' | 'under_verification' | 'incomplete' | 'verified' | 'under_evaluation' | 'approved' | 'rejected' | 'end';
     submitted_at: string;
     updated_at: string;
     priority: 'high' | 'medium' | 'low';
@@ -53,20 +60,16 @@ interface Application {
 }
 
 interface ApplicationsPageProps {
-    applications: {
-        data: Application[];
-        current_page: number;
-        last_page: number;
-        total: number;
-        per_page: number;
-    };
+    applications: Application[];
     statistics: {
         total: number;
-        pending: number;
-        under_review: number;
+        submitted: number;
+        under_verification: number;
+        verified: number;
+        under_evaluation: number;
         approved: number;
         rejected: number;
-        on_hold: number;
+        incomplete: number;
         this_month_count: number;
         last_month_count: number;
         completion_rate: number;
@@ -92,97 +95,127 @@ export default function ApplicationsPage({ applications, statistics }: Applicati
         };
     };
 
-    const trend = calculateTrend(); return (
+    const trend = calculateTrend();
+
+    const urgentApplications = statistics.submitted + statistics.under_verification + statistics.incomplete;
+
+    return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Application Management" />
 
             <div className="flex h-full flex-1 flex-col space-y-6 p-6">
                 {/* Header Section */}
-                <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">Application Management</h1>
-                            <p className="text-base text-gray-500 dark:text-gray-400">Review and manage scholarship applications from students</p>
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="text-3xl">Application Management</CardTitle>
+                                <CardDescription className="text-base mt-2">
+                                    Review and manage scholarship applications from students
+                                </CardDescription>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <button className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 border-b border-transparent hover:border-gray-300 dark:hover:border-gray-600 pb-1">
-                                <Download className="h-4 w-4 mr-2 inline" />
-                                Export
-                            </button>
-                            <button className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 border-b border-transparent hover:border-gray-300 dark:hover:border-gray-600 pb-1">
-                                <BarChart3 className="h-4 w-4 mr-2 inline" />
-                                Reports
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                    </CardHeader>
+                </Card>
 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Applications</p>
-                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{statistics.total}</p>
-                                <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {trend.direction === 'up' ? (
-                                        <TrendingUp className="h-3 w-3 mr-1 text-green-600" />
-                                    ) : trend.direction === 'down' ? (
-                                        <TrendingDown className="h-3 w-3 mr-1 text-red-600" />
-                                    ) : null}
-                                    {trend.direction !== 'neutral' && (
-                                        <span className={trend.direction === 'up' ? 'text-green-600' : 'text-red-600'}>
-                                            {trend.value.toFixed(1)}%
-                                        </span>
-                                    )}
-                                    <span className="ml-1">from last month</span>
-                                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <Card className="hover:shadow-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{statistics.total}</div>
+                            <div className="flex items-center text-xs text-muted-foreground">
+                                {trend.direction === 'up' ? (
+                                    <TrendingUp className="h-3 w-3 mr-1 text-green-600" />
+                                ) : trend.direction === 'down' ? (
+                                    <TrendingDown className="h-3 w-3 mr-1 text-red-600" />
+                                ) : null}
+                                {trend.direction !== 'neutral' && (
+                                    <span className={trend.direction === 'up' ? 'text-green-600' : 'text-red-600'}>
+                                        {trend.value.toFixed(1)}%
+                                    </span>
+                                )}
+                                <span className="ml-1">from last month</span>
                             </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
 
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pending Review</p>
-                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{statistics.pending + statistics.under_review}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    Requires immediate attention
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <Card className="hover:shadow-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-orange-600">{urgentApplications}</div>
+                            <p className="text-xs text-muted-foreground">
+                                Requires immediate attention
+                            </p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Approved</p>
-                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{statistics.approved}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    Successfully processed
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <Card className="hover:shadow-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Approved</CardTitle>
+                            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-green-600">{statistics.approved}</div>
+                            <p className="text-xs text-muted-foreground">
+                                Successfully processed
+                            </p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Completion Rate</p>
-                                <p className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mt-2">{statistics.completion_rate.toFixed(1)}%</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    Applications processed
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <Card className="hover:shadow-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+                            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{statistics.completion_rate.toFixed(1)}%</div>
+                            <Progress value={statistics.completion_rate} className="mt-2" />
+                        </CardContent>
+                    </Card>
                 </div>
 
-                {/* Data Table */}
-                <DataTable
-                    columns={columns}
-                    data={applications.data}
-                />
+                <Separator />
+
+                {/* Application Management */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="flex items-center gap-2">
+                                    <FileText className="h-5 w-5" />
+                                    All Applications
+                                </CardTitle>
+                                <CardDescription>
+                                    Complete list of scholarship applications • {applications.length} of {statistics.total} total
+                                </CardDescription>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    {statistics.submitted} Submitted
+                                </Badge>
+                                <Badge variant="outline" className="flex items-center gap-1">
+                                    <AlertCircle className="h-3 w-3" />
+                                    {statistics.under_verification} Under Verification
+                                </Badge>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <DataTable
+                            columns={columns}
+                            data={applications}
+                            searchPlaceholder="Search by student name, ID, or email..."
+                        />
+                    </CardContent>
+                </Card>
             </div>
         </AppLayout>
     );

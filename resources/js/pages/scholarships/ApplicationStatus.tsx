@@ -64,6 +64,7 @@ const getStatusColor = (status: string): string => {
         'approved': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300',
         'rejected': 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
         'incomplete': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300',
+        'end': 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
 };
@@ -78,6 +79,7 @@ const getStatusLabel = (status: string): string => {
         'approved': 'Approved',
         'rejected': 'Rejected',
         'incomplete': 'Incomplete Documents',
+        'end': 'Completed',
     };
     return labels[status] || status;
 };
@@ -92,6 +94,7 @@ const getApplicationProgress = (status: string): number => {
         'approved': 100,
         'rejected': 100,
         'incomplete': 30,
+        'end': 100,
     };
     return progressMap[status] || 0;
 };

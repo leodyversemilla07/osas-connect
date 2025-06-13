@@ -4,6 +4,8 @@ import { type BreadcrumbItem, type User } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/osas-student-management/data-table';
 import { columns } from '@/components/osas-student-management/columns';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { GraduationCap } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,6 +28,8 @@ interface Props {
     };
     filters?: {
         search?: string;
+        year_level?: string;
+        course?: string;
     };
 }
 
@@ -38,12 +42,42 @@ export default function StudentRecords({ students }: Props) {
             </Head>
             <div className="flex h-full flex-1 flex-col space-y-6 p-6">
                 {/* Header Section */}
-                <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                    <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100">Student Records</h1>
-                    <p className="text-base text-gray-500 dark:text-gray-400">View and manage student information</p>
-                </div>
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="text-3xl">Student Records</CardTitle>
+                                <CardDescription className="text-base mt-2">
+                                    View and manage student information and academic records
+                                </CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                </Card>
 
-                <DataTable columns={columns} data={students.data} />
+                {/* Student Management */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="flex items-center gap-2">
+                                    <GraduationCap className="h-5 w-5" />
+                                    All Students
+                                </CardTitle>
+                                <CardDescription>
+                                    Complete list of registered students • {students.data.length} of {students.total} total
+                                </CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <DataTable
+                            columns={columns}
+                            data={students.data}
+                            searchPlaceholder="Search by student name, ID, or email..."
+                        />
+                    </CardContent>
+                </Card>
             </div>
         </AppLayout>
     );

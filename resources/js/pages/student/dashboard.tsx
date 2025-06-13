@@ -1,19 +1,3 @@
-/*
- * Student Dashboard Component - Enhanced with shadcn/ui components
- * 
- * shadcn/ui Components Used:
- * - Card, CardContent, CardDescription, CardHeader, CardTitle: For layout structure
- * - Button: For interactive elements and links
- * - Badge: For status indicators and labels
- * - Avatar, AvatarFallback, AvatarImage: For user profile display
- * - Progress: For application progress tracking
- * - Separator: For visual section separation
- * - Alert, AlertDescription: For important notifications and warnings
- * 
- * The design maintains the original visual structure while leveraging
- * shadcn/ui components for better consistency and accessibility.
- */
-
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import {
