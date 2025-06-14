@@ -174,11 +174,23 @@ class AdminController extends Controller
             });
 
         $users = $query->orderBy('last_name')
-            ->paginate(10)
-            ->withQueryString();
+            ->get(); // Get all students instead of paginating
+
+        // Create a manual pagination-like structure for frontend compatibility
+        $paginatedUsers = new \Illuminate\Pagination\LengthAwarePaginator(
+            $users,
+            $users->count(),
+            $users->count(), // Show all items per page
+            1, // Current page
+            [
+                'path' => $request->url(),
+                'pageName' => 'page',
+            ]
+        );
+        $paginatedUsers->appends($request->query());
 
         // Transform each user to include course, year_level, created_at, avatar, and student_profile details
-        $users->getCollection()->transform(function ($user) {
+        $paginatedUsers->getCollection()->transform(function ($user) {
             return [
                 'id' => $user->id,
                 'first_name' => $user->first_name,
@@ -201,7 +213,7 @@ class AdminController extends Controller
         });
 
         return Inertia::render('admin/manage-students', [
-            'students' => $users, // Changed from 'users' to 'students'
+            'students' => $paginatedUsers, // Send all students with pagination structure
             'filters' => [
                 'search' => $search,
             ],
@@ -1069,7 +1081,9 @@ class AdminController extends Controller
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->whereHas('user', function ($userQuery) use ($request) {
-                    $userQuery->where('name', 'like', '%'.$request->search.'%')
+                    $userQuery->where('first_name', 'like', '%'.$request->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$request->search.'%')
+                        ->orWhere('middle_name', 'like', '%'.$request->search.'%')
                         ->orWhere('email', 'like', '%'.$request->search.'%');
                 })
                     ->orWhereHas('user.studentProfile', function ($profileQuery) use ($request) {
@@ -1096,6 +1110,7 @@ class AdminController extends Controller
         $sortDirection = $request->sort_direction ?? 'desc';
         $query->orderBy($sortBy, $sortDirection);
 
+        // Use proper pagination like applications.tsx
         $applications = $query->paginate(15);
 
         // Transform the data for the frontend
@@ -1104,7 +1119,7 @@ class AdminController extends Controller
                 'id' => $application->id,
                 'student' => [
                     'id' => $application->user->id,
-                    'name' => $application->user->name,  // Changed from full_name to name
+                    'name' => $application->user->full_name,  // Changed from name to full_name
                     'email' => $application->user->email,
                     'student_id' => $application->user->studentProfile->student_id ?? 'N/A',
                     'course' => $application->user->studentProfile->course ?? 'N/A',
@@ -1122,7 +1137,7 @@ class AdminController extends Controller
                 'rejected_at' => $application->rejected_at,
                 'amount_received' => $application->amount_received,
                 'reviewer' => $application->reviewer ? [
-                    'name' => $application->reviewer->name,
+                    'name' => $application->reviewer->full_name,  // Changed from name to full_name
                     'email' => $application->reviewer->email,
                 ] : null,
                 'created_at' => $application->created_at->toISOString(),
@@ -1131,20 +1146,27 @@ class AdminController extends Controller
         });
 
         // Get statistics
+        $thisMonth = now()->startOfMonth();
+        $lastMonth = now()->subMonth()->startOfMonth();
+        $lastMonthEnd = now()->subMonth()->endOfMonth();
+
         $statistics = [
             'total_applications' => \App\Models\ScholarshipApplication::count(),
             'pending_applications' => \App\Models\ScholarshipApplication::whereIn('status', ['submitted', 'under_verification', 'verified', 'under_evaluation'])->count(),
             'approved_applications' => \App\Models\ScholarshipApplication::where('status', 'approved')->count(),
             'rejected_applications' => \App\Models\ScholarshipApplication::where('status', 'rejected')->count(),
+            'this_month_count' => \App\Models\ScholarshipApplication::where('created_at', '>=', $thisMonth)->count(),
+            'last_month_count' => \App\Models\ScholarshipApplication::whereBetween('created_at', [$lastMonth, $lastMonthEnd])->count(),
         ];
+
+        // Calculate completion rate
+        $totalProcessed = $statistics['approved_applications'] + $statistics['rejected_applications'];
+        $statistics['completion_rate'] = $statistics['total_applications'] > 0 
+            ? ($totalProcessed / $statistics['total_applications']) * 100 
+            : 0;
 
         return Inertia::render('admin/scholarship-applications/index', [
             'applications' => $applications,
-            'filters' => [
-                'search' => $request->search,
-                'status' => $request->status ?? 'all',
-                'scholarship_type' => $request->scholarship_type ?? 'all',
-            ],
             'statistics' => $statistics,
         ]);
     }
@@ -1594,6 +1616,58 @@ class AdminController extends Controller
                 ] : null,
                 'created_at' => $application->created_at,
                 'updated_at' => $application->updated_at,
+            ],
+        ]);
+    }
+
+    /**
+     * Display the specified scholarship.
+     */
+    public function showScholarship(Scholarship $scholarship): Response
+    {
+        // Load the scholarship with related data
+        $scholarship->load([
+            'applications' => function ($query) {
+                $query->with(['user.studentProfile', 'reviewer'])
+                    ->latest();
+            }
+        ]);
+
+        // Get application statistics for this scholarship
+        $totalApplications = $scholarship->applications()->count();
+        $pendingApplications = $scholarship->applications()->where('status', 'submitted')->count();
+        $approvedApplications = $scholarship->applications()->where('status', 'approved')->count();
+        $rejectedApplications = $scholarship->applications()->where('status', 'rejected')->count();
+
+        // Calculate total amount disbursed
+        $totalDisbursed = $scholarship->applications()
+            ->where('status', 'approved')
+            ->sum('amount_received') ?? 0;
+
+        // Transform scholarship data for frontend
+        $scholarshipData = [
+            'id' => $scholarship->id,
+            'name' => $scholarship->name,
+            'description' => $scholarship->description,
+            'type' => $scholarship->type,
+            'amount' => $scholarship->amount,
+            'status' => $scholarship->status,
+            'deadline' => $scholarship->deadline?->format('Y-m-d'),
+            'slots_available' => $scholarship->slots_available,
+            'requirements' => $scholarship->requirements,
+            'funding_source' => $scholarship->funding_source,
+            'created_at' => $scholarship->created_at->toISOString(),
+            'updated_at' => $scholarship->updated_at->toISOString(),
+        ];
+
+        return Inertia::render('admin/scholarships/show', [
+            'scholarship' => $scholarshipData,
+            'statistics' => [
+                'total_applications' => $totalApplications,
+                'pending_applications' => $pendingApplications,
+                'approved_applications' => $approvedApplications,
+                'rejected_applications' => $rejectedApplications,
+                'total_disbursed' => $totalDisbursed,
             ],
         ]);
     }

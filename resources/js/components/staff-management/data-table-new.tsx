@@ -127,7 +127,7 @@ export function DataTable<TData, TValue>({
     // Get unique statuses from data
     const statuses = React.useMemo(() => {
         const statusSet = new Set<string>()
-
+        
         data.forEach((item: TData) => {
             const staffData = item as StaffData
             if (staffData.status) {

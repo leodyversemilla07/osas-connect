@@ -85,6 +85,7 @@ export function DataTable<TData, TValue>({
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+    const [pageSize, setPageSize] = React.useState(10)
     const [globalFilter, setGlobalFilter] = React.useState("")
     const [statusFilter, setStatusFilter] = React.useState<string>("all")
 
@@ -127,7 +128,7 @@ export function DataTable<TData, TValue>({
     // Get unique statuses from data
     const statuses = React.useMemo(() => {
         const statusSet = new Set<string>()
-
+        
         data.forEach((item: TData) => {
             const staffData = item as StaffData
             if (staffData.status) {
@@ -135,8 +136,12 @@ export function DataTable<TData, TValue>({
             }
         })
 
-        return Array.from(statusSet).sort()
+    return Array.from(statusSet).sort()
     }, [data])
+
+    React.useEffect(() => {
+        table.setPageSize(pageSize)
+    }, [pageSize, table])
 
     return (
         <div className="space-y-4">
@@ -346,7 +351,18 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center text-base text-gray-500 dark:text-gray-400"
+                                >
+                                    No staff or invitations found
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
             {/* Pagination */}
             <div className="flex items-center justify-between px-2">
                 <div className="flex-1 text-sm text-muted-foreground">
