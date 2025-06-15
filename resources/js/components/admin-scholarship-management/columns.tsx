@@ -32,21 +32,47 @@ interface AdminColumnActions {
 
 const getStatusColor = (status: 'open' | 'closed' | 'upcoming'): string => {
     const colors = {
-        open: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-        closed: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
-        upcoming: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        open: 'bg-chart-2/10 text-chart-2 border-chart-2/20',
+        closed: 'bg-destructive/10 text-destructive border-destructive/20',
+        upcoming: 'bg-chart-1/10 text-chart-1 border-chart-1/20',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
+    return colors[status] || 'bg-muted text-muted-foreground border-border';
 };
 
 const getTypeColor = (type: string): string => {
     const colors: Record<string, string> = {
-        'Academic': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-        'Student Assistantship': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-        'Performing Arts': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
-        'Economic Assistance': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300'
+        'academic_full': 'bg-chart-1/10 text-chart-1 border-chart-1/20',
+        'academic_partial': 'bg-chart-1/10 text-chart-1 border-chart-1/20',
+        'student_assistantship': 'bg-chart-2/10 text-chart-2 border-chart-2/20',
+        'performing_arts_full': 'bg-chart-4/10 text-chart-4 border-chart-4/20',
+        'performing_arts_partial': 'bg-chart-4/10 text-chart-4 border-chart-4/20',
+        'economic_assistance': 'bg-chart-5/10 text-chart-5 border-chart-5/20',
+        'others': 'bg-chart-3/10 text-chart-3 border-chart-3/20',
+        // Legacy fallback for old format
+        'Academic': 'bg-chart-1/10 text-chart-1 border-chart-1/20',
+        'Student Assistantship': 'bg-chart-2/10 text-chart-2 border-chart-2/20',
+        'Performing Arts': 'bg-chart-4/10 text-chart-4 border-chart-4/20',
+        'Economic Assistance': 'bg-chart-5/10 text-chart-5 border-chart-5/20'
     };
-    return colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
+    return colors[type] || 'bg-muted text-muted-foreground border-border';
+};
+
+const getTypeDisplayName = (type: string): string => {
+    const typeNames: Record<string, string> = {
+        'academic_full': 'Academic Scholarship (Full)',
+        'academic_partial': 'Academic Scholarship (Partial)',
+        'student_assistantship': 'Student Assistantship',
+        'performing_arts_full': 'Performing Arts (Full)',
+        'performing_arts_partial': 'Performing Arts (Partial)',
+        'economic_assistance': 'Economic Assistance',
+        'others': 'Others',
+        // Legacy fallback for old format
+        'Academic': 'Academic',
+        'Student Assistantship': 'Student Assistantship',
+        'Performing Arts': 'Performing Arts',
+        'Economic Assistance': 'Economic Assistance'
+    };
+    return typeNames[type] || type;
 };
 
 const formatCurrency = (amount: number): string => {
@@ -60,13 +86,12 @@ const formatCurrency = (amount: number): string => {
 export const createAdminColumns = (actions: AdminColumnActions): ColumnDef<Scholarship>[] => [
     {
         accessorKey: "name",
-        header: "SCHOLARSHIP NAME",
-        cell: ({ row }) => (
+        header: "SCHOLARSHIP NAME",        cell: ({ row }) => (
             <div className="max-w-[300px]">
-                <div className="font-medium text-gray-900 dark:text-gray-100">
+                <div className="font-medium text-foreground">
                     {row.getValue("name")}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                <div className="text-sm text-muted-foreground line-clamp-2">
                     {row.original.description}
                 </div>
             </div>
@@ -74,10 +99,9 @@ export const createAdminColumns = (actions: AdminColumnActions): ColumnDef<Schol
     },
     {
         accessorKey: "type",
-        header: "TYPE",
-        cell: ({ row }) => (
-            <Badge className={getTypeColor(row.getValue("type"))}>
-                {row.getValue("type")}
+        header: "TYPE",        cell: ({ row }) => (
+            <Badge className={`border ${getTypeColor(row.getValue("type"))}`}>
+                {getTypeDisplayName(row.getValue("type"))}
             </Badge>
         ),
     },
@@ -92,9 +116,8 @@ export const createAdminColumns = (actions: AdminColumnActions): ColumnDef<Schol
     },
     {
         accessorKey: "status",
-        header: "STATUS",
-        cell: ({ row }) => (
-            <Badge className={getStatusColor(row.getValue("status"))}>
+        header: "STATUS",        cell: ({ row }) => (
+            <Badge className={`border ${getStatusColor(row.getValue("status"))}`}>
                 {(row.getValue("status") as string).charAt(0).toUpperCase() +
                     (row.getValue("status") as string).slice(1)}
             </Badge>
@@ -102,10 +125,9 @@ export const createAdminColumns = (actions: AdminColumnActions): ColumnDef<Schol
     },
     {
         accessorKey: "deadline",
-        header: "DEADLINE",
-        cell: ({ row }) => {
+        header: "DEADLINE",        cell: ({ row }) => {
             const deadline = row.getValue("deadline") as string | null;
-            if (!deadline) return <span className="text-gray-400">No deadline</span>;
+            if (!deadline) return <span className="text-muted-foreground">No deadline</span>;
 
             const deadlineDate = new Date(deadline);
             const now = new Date();
@@ -113,12 +135,12 @@ export const createAdminColumns = (actions: AdminColumnActions): ColumnDef<Schol
 
             return (
                 <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4 text-gray-400" />
+                    <Clock className="h-4 w-4 text-muted-foreground" />
                     <div>
                         <div className="text-sm font-medium">
                             {deadlineDate.toLocaleDateString()}
                         </div>
-                        <div className={`text-xs ${daysLeft <= 7 && daysLeft > 0 ? 'text-red-500' : daysLeft <= 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                        <div className={`text-xs ${daysLeft <= 7 && daysLeft > 0 ? 'text-destructive' : daysLeft <= 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
                             {daysLeft > 0 ? `${daysLeft} days left` : daysLeft === 0 ? 'Due today' : 'Expired'}
                         </div>
                     </div>
@@ -128,15 +150,14 @@ export const createAdminColumns = (actions: AdminColumnActions): ColumnDef<Schol
     },
     {
         accessorKey: "applications",
-        header: "APPLICATIONS",
-        cell: ({ row }) => (
+        header: "APPLICATIONS",        cell: ({ row }) => (
             <div className="flex items-center gap-1">
-                <Users className="h-4 w-4 text-gray-400" />
+                <Users className="h-4 w-4 text-muted-foreground" />
                 <div className="text-sm">
                     <div className="font-medium">
                         {row.original.total_applications} total
                     </div>
-                    <div className="text-gray-500">
+                    <div className="text-muted-foreground">
                         {row.original.approved_applications} approved
                     </div>
                 </div>
@@ -145,13 +166,12 @@ export const createAdminColumns = (actions: AdminColumnActions): ColumnDef<Schol
     },
     {
         accessorKey: "remaining_slots",
-        header: "SLOTS",
-        cell: ({ row }) => (
+        header: "SLOTS",        cell: ({ row }) => (
             <div className="text-sm">
                 <div className="font-medium">
                     {row.original.remaining_slots} remaining
                 </div>
-                <div className="text-gray-500">
+                <div className="text-muted-foreground">
                     of {row.original.slots_available} total
                 </div>
             </div>
@@ -163,12 +183,11 @@ export const createAdminColumns = (actions: AdminColumnActions): ColumnDef<Schol
         cell: ({ row }) => {
             const scholarship = row.original;
 
-            return (
-                <Button
+            return (                <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => actions.onView(scholarship)}
-                    className="h-8 px-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                    className="h-8 px-2 text-muted-foreground hover:text-foreground"
                 >
                     <Eye className="mr-1 h-4 w-4" />
                     View Details

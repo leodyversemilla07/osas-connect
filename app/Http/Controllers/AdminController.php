@@ -1047,8 +1047,8 @@ class AdminController extends Controller
         // Get summary statistics
         $totalScholarships = Scholarship::count();
         $activeScholarships = Scholarship::where('status', 'active')->count();
-        $draftScholarships = Scholarship::where('status', 'draft')->count();
-        $closedScholarships = Scholarship::where('status', 'inactive')->count();
+        $totalApplications = ScholarshipApplication::count();
+        $approvedApplications = ScholarshipApplication::where('status', 'approved')->count();
 
         return Inertia::render('admin/scholarships/index', [
             'scholarships' => $scholarships,
@@ -1060,8 +1060,8 @@ class AdminController extends Controller
             'statistics' => [
                 'total_scholarships' => $totalScholarships,
                 'active_scholarships' => $activeScholarships,
-                'draft_scholarships' => $draftScholarships,
-                'closed_scholarships' => $closedScholarships,
+                'total_applications' => $totalApplications,
+                'approved_applications' => $approvedApplications,
             ],
         ]);
     }

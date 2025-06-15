@@ -116,67 +116,67 @@ export default function AdminDashboard() {
 
       <div className="flex h-full flex-1 flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 lg:space-y-8 lg:p-8">
         {/* Header */}
-        <div className="border-b border-gray-100 dark:border-gray-800 pb-6 lg:pb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 dark:text-gray-100 leading-tight">
+        <div className="border-b border-border pb-6 lg:pb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-foreground leading-tight">
             Welcome, {user.first_name} {user.last_name}!
           </h1>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-500 dark:text-gray-400 mt-2 lg:mt-3 leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-2 lg:mt-3 leading-relaxed">
             Administrator dashboard for scholarship management system
           </p>
         </div>
 
         {/* Main Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-6 xl:gap-8">
-          <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+          <Card className="border-border hover:shadow-md transition-shadow">
             <CardContent className="p-4 lg:p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-1 lg:space-y-2">
-                  <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#005a2d] dark:text-[#23b14d] leading-tight">{safeStats.totalStudents}</p>
-                  <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400 font-medium">Total Students</p>
+                  <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-chart-1 leading-tight">{safeStats.totalStudents}</p>
+                  <p className="text-xs sm:text-sm lg:text-base text-muted-foreground font-medium">Total Students</p>
                 </div>
-                <div className="rounded-full bg-[#005a2d]/10 p-2 lg:p-3 dark:bg-[#005a2d]/30">
-                  <Users className="h-4 w-4 lg:h-5 lg:w-5 text-[#005a2d] dark:text-[#23b14d]" />
+                <div className="rounded-full bg-chart-1/10 p-2 lg:p-3">
+                  <Users className="h-4 w-4 lg:h-5 lg:w-5 text-chart-1" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+          <Card className="border-border hover:shadow-md transition-shadow">
             <CardContent className="p-4 lg:p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-1 lg:space-y-2">
-                  <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#febd12] dark:text-[#febd12] leading-tight">{safeStats.totalScholarships}</p>
-                  <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400 font-medium">Total Scholarships</p>
+                  <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-chart-2 leading-tight">{safeStats.totalScholarships}</p>
+                  <p className="text-xs sm:text-sm lg:text-base text-muted-foreground font-medium">Total Scholarships</p>
                 </div>
-                <div className="rounded-full bg-[#febd12]/10 p-2 lg:p-3 dark:bg-[#febd12]/30">
-                  <BookOpen className="h-4 w-4 lg:h-5 lg:w-5 text-[#febd12] dark:text-[#febd12]" />
+                <div className="rounded-full bg-chart-2/10 p-2 lg:p-3">
+                  <BookOpen className="h-4 w-4 lg:h-5 lg:w-5 text-chart-2" />
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+          <Card className="border-border hover:shadow-md transition-shadow">
             <CardContent className="p-4 lg:p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-1 lg:space-y-2">
-                  <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0070f3] dark:text-[#0070f3] leading-tight">{safeStats.totalApplications}</p>
-                  <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400 font-medium">Total Applications</p>
+                  <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-chart-3 leading-tight">{safeStats.totalApplications}</p>
+                  <p className="text-xs sm:text-sm lg:text-base text-muted-foreground font-medium">Total Applications</p>
                 </div>
-                <div className="rounded-full bg-[#0070f3]/10 p-2 lg:p-3 dark:bg-[#0070f3]/30">
-                  <ClipboardCheck className="h-4 w-4 lg:h-5 lg:w-5 text-[#0070f3] dark:text-[#0070f3]" />
+                <div className="rounded-full bg-chart-3/10 p-2 lg:p-3">
+                  <ClipboardCheck className="h-4 w-4 lg:h-5 lg:w-5 text-chart-3" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+          <Card className="border-border hover:shadow-md transition-shadow">
             <CardContent className="p-4 lg:p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-1 lg:space-y-2">
-                  <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#ff4081] dark:text-[#ff4081] leading-tight">{safeStats.pendingInvitations}</p>
-                  <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400 font-medium">Pending Invitations</p>
+                  <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-chart-4 leading-tight">{safeStats.pendingInvitations}</p>
+                  <p className="text-xs sm:text-sm lg:text-base text-muted-foreground font-medium">Pending Invitations</p>
                 </div>
-                <div className="rounded-full bg-[#ff4081]/10 p-2 lg:p-3 dark:bg-[#ff4081]/30">
-                  <UserPlus className="h-4 w-4 lg:h-5 lg:w-5 text-[#ff4081] dark:text-[#ff4081]" />
+                <div className="rounded-full bg-chart-4/10 p-2 lg:p-3">
+                  <UserPlus className="h-4 w-4 lg:h-5 lg:w-5 text-chart-4" />
                 </div>
               </div>
             </CardContent>
@@ -185,10 +185,10 @@ export default function AdminDashboard() {
 
         {/* Application Status Overview */}
         <div className="grid gap-4 sm:gap-6 lg:gap-6 xl:gap-8 grid-cols-1 lg:grid-cols-3">
-          <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+          <Card className="border-border hover:shadow-md transition-shadow">
             <CardHeader className="pb-4 lg:pb-6">
               <CardTitle className="text-base sm:text-lg lg:text-xl font-medium flex items-center gap-2 lg:gap-3">
-                <PieChart className="h-4 w-4 lg:h-5 lg:w-5 text-[#0070f3]" />
+                <PieChart className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
                 Application Status
               </CardTitle>
             </CardHeader>
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
                   </div>
                   <Progress
                     value={safeStats.totalApplications ? (safeStats.pendingApplications / safeStats.totalApplications) * 100 : 0}
-                    className="h-2 lg:h-3 bg-gray-100 dark:bg-gray-800"
+                    className="h-2 lg:h-3"
                   />
                 </div>
                 <div className="space-y-2 lg:space-y-3">
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
                   </div>
                   <Progress
                     value={safeStats.totalApplications ? (safeStats.approvedApplications / safeStats.totalApplications) * 100 : 0}
-                    className="h-2 lg:h-3 bg-gray-100 dark:bg-gray-800"
+                    className="h-2 lg:h-3"
                   />
                 </div>
                 <div className="space-y-2 lg:space-y-3">
@@ -221,17 +221,17 @@ export default function AdminDashboard() {
                   </div>
                   <Progress
                     value={safeStats.totalApplications ? (safeStats.rejectedApplications / safeStats.totalApplications) * 100 : 0}
-                    className="h-2 lg:h-3 bg-gray-100 dark:bg-gray-800"
+                    className="h-2 lg:h-3"
                   />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+          <Card className="border-border hover:shadow-md transition-shadow">
             <CardHeader className="pb-4 lg:pb-6">
               <CardTitle className="text-base sm:text-lg lg:text-xl font-medium flex items-center gap-2 lg:gap-3">
-                <DollarSign className="h-4 w-4 lg:h-5 lg:w-5 text-green-600" />
+                <DollarSign className="h-4 w-4 lg:h-5 lg:w-5 text-chart-1" />
                 Scholarship Funding
               </CardTitle>
             </CardHeader>
@@ -248,17 +248,17 @@ export default function AdminDashboard() {
                   </div>
                   <Progress
                     value={safeStats.applicationSuccessRate || 0}
-                    className="h-2 lg:h-3 bg-gray-100 dark:bg-gray-800"
+                    className="h-2 lg:h-3"
                   />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+          <Card className="border-border hover:shadow-md transition-shadow">
             <CardHeader className="pb-4 lg:pb-6">
               <CardTitle className="text-base sm:text-lg lg:text-xl font-medium flex items-center gap-2 lg:gap-3">
-                <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-orange-500" />
+                <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-chart-2" />
                 Pending Tasks
               </CardTitle>
             </CardHeader>
@@ -266,28 +266,28 @@ export default function AdminDashboard() {
               <div className="space-y-4 lg:space-y-5">
                 <div className="flex items-center justify-between min-h-[44px]">
                   <div className="flex items-center gap-2 lg:gap-3">
-                    <ClipboardCheck className="h-4 w-4 lg:h-5 lg:w-5 text-amber-500" />
+                    <ClipboardCheck className="h-4 w-4 lg:h-5 lg:w-5 text-chart-3" />
                     <span className="text-sm lg:text-base">Applications for Review</span>
                   </div>
-                  <Badge variant="outline" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 hover:bg-amber-100">
+                  <Badge variant="outline" className="bg-chart-3/10 text-chart-3 border-chart-3/20">
                     {safeStats.pendingApplications || 0}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between min-h-[44px]">
                   <div className="flex items-center gap-2 lg:gap-3">
-                    <FileCheck className="h-4 w-4 lg:h-5 lg:w-5 text-blue-500" />
+                    <FileCheck className="h-4 w-4 lg:h-5 lg:w-5 text-chart-4" />
                     <span className="text-sm lg:text-base">Documents to Verify</span>
                   </div>
-                  <Badge variant="outline" className="bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400 hover:bg-blue-100">
+                  <Badge variant="outline" className="bg-chart-4/10 text-chart-4 border-chart-4/20">
                     {safeStats.documentsNeedingVerification || 0}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between min-h-[44px]">
                   <div className="flex items-center gap-2 lg:gap-3">
-                    <UserPlus className="h-4 w-4 lg:h-5 lg:w-5 text-purple-500" />
+                    <UserPlus className="h-4 w-4 lg:h-5 lg:w-5 text-chart-5" />
                     <span className="text-sm lg:text-base">Invitations Pending</span>
                   </div>
-                  <Badge variant="outline" className="bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400 hover:bg-purple-100">
+                  <Badge variant="outline" className="bg-chart-5/10 text-chart-5 border-chart-5/20">
                     {safeStats.pendingInvitations || 0}
                   </Badge>
                 </div>
@@ -300,44 +300,44 @@ export default function AdminDashboard() {
         <div className="grid gap-4 sm:gap-6 lg:gap-6 xl:gap-8 grid-cols-2 lg:grid-cols-4">
           <Button
             variant="outline"
-            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-all p-4 lg:p-6"
+            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-card hover:bg-accent border-border hover:shadow-md transition-all p-4 lg:p-6"
             asChild
           >
             <Link href={route('admin.students')}>
-              <Users className="h-5 w-5 lg:h-6 lg:w-6 text-[#005a2d] dark:text-[#23b14d]" />
+              <Users className="h-5 w-5 lg:h-6 lg:w-6 text-chart-1" />
               <span className="text-xs sm:text-sm lg:text-base text-center font-medium">Manage Students</span>
             </Link>
           </Button>
 
           <Button
             variant="outline"
-            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-all p-4 lg:p-6"
+            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-card hover:bg-accent border-border hover:shadow-md transition-all p-4 lg:p-6"
             asChild
           >
             <Link href={route('admin.scholarships')}>
-              <School className="h-5 w-5 lg:h-6 lg:w-6 text-[#febd12] dark:text-[#febd12]" />
+              <School className="h-5 w-5 lg:h-6 lg:w-6 text-chart-2" />
               <span className="text-xs sm:text-sm lg:text-base text-center font-medium">Manage Scholarships</span>
             </Link>
           </Button>
 
           <Button
             variant="outline"
-            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-all p-4 lg:p-6"
+            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-card hover:bg-accent border-border hover:shadow-md transition-all p-4 lg:p-6"
             asChild
           >
             <Link href={route('admin.scholarship.applications')}>
-              <ClipboardCheck className="h-5 w-5 lg:h-6 lg:w-6 text-[#0070f3] dark:text-[#0070f3]" />
+              <ClipboardCheck className="h-5 w-5 lg:h-6 lg:w-6 text-chart-3" />
               <span className="text-xs sm:text-sm lg:text-base text-center font-medium">Review Applications</span>
             </Link>
           </Button>
 
           <Button
             variant="outline"
-            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-all p-4 lg:p-6"
+            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-card hover:bg-accent border-border hover:shadow-md transition-all p-4 lg:p-6"
             asChild
           >
             <Link href={route('admin.scholarships')}>
-              <BarChart4 className="h-5 w-5 lg:h-6 lg:w-6 text-[#ff4081] dark:text-[#ff4081]" />
+              <BarChart4 className="h-5 w-5 lg:h-6 lg:w-6 text-chart-4" />
               <span className="text-xs sm:text-sm lg:text-base text-center font-medium">Scholarship Analytics</span>
             </Link>
           </Button>
@@ -347,44 +347,44 @@ export default function AdminDashboard() {
         <div className="grid gap-4 sm:gap-6 lg:gap-6 xl:gap-8 grid-cols-2 lg:grid-cols-4">
           <Button
             variant="outline"
-            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-all p-4 lg:p-6"
+            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-card hover:bg-accent border-border hover:shadow-md transition-all p-4 lg:p-6"
             asChild
           >
             <Link href={route('admin.cms.index')}>
-              <FileText className="h-5 w-5 lg:h-6 lg:w-6 text-[#8b5cf6] dark:text-[#8b5cf6]" />
+              <FileText className="h-5 w-5 lg:h-6 lg:w-6 text-chart-5" />
               <span className="text-xs sm:text-sm lg:text-base text-center font-medium">Manage Pages</span>
             </Link>
           </Button>
 
           <Button
             variant="outline"
-            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-all p-4 lg:p-6"
+            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-card hover:bg-accent border-border hover:shadow-md transition-all p-4 lg:p-6"
             asChild
           >
             <Link href={route('admin.staff')}>
-              <UserPlus className="h-5 w-5 lg:h-6 lg:w-6 text-[#059669] dark:text-[#059669]" />
+              <UserPlus className="h-5 w-5 lg:h-6 lg:w-6 text-chart-1" />
               <span className="text-xs sm:text-sm lg:text-base text-center font-medium">Manage Staff</span>
             </Link>
           </Button>
 
           <Button
             variant="outline"
-            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-all p-4 lg:p-6"
+            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-card hover:bg-accent border-border hover:shadow-md transition-all p-4 lg:p-6"
             asChild
           >
             <Link href={route('admin.recent-logins')}>
-              <Clock className="h-5 w-5 lg:h-6 lg:w-6 text-[#0ea5e9] dark:text-[#0ea5e9]" />
+              <Clock className="h-5 w-5 lg:h-6 lg:w-6 text-chart-2" />
               <span className="text-xs sm:text-sm lg:text-base text-center font-medium">Recent Activity</span>
             </Link>
           </Button>
 
           <Button
             variant="outline"
-            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-all p-4 lg:p-6"
+            className="min-h-[44px] h-20 sm:h-24 lg:h-28 flex flex-col items-center justify-center gap-2 lg:gap-3 bg-card hover:bg-accent border-border hover:shadow-md transition-all p-4 lg:p-6"
             asChild
           >
             <Link href={route('admin.scholarships')}>
-              <Layers className="h-5 w-5 lg:h-6 lg:w-6 text-[#f59e0b] dark:text-[#f59e0b]" />
+              <Layers className="h-5 w-5 lg:h-6 lg:w-6 text-chart-3" />
               <span className="text-xs sm:text-sm lg:text-base text-center font-medium">System Reports</span>
             </Link>
           </Button>
@@ -394,14 +394,14 @@ export default function AdminDashboard() {
         <div className="grid gap-4 sm:gap-6 lg:gap-6 xl:gap-8 grid-cols-1 lg:grid-cols-2">
           {/* Recent Logins */}
           <div className="space-y-4 lg:space-y-6">
-            <div className="border-b border-gray-100 dark:border-gray-800 pb-4 lg:pb-6">
+            <div className="border-b border-border pb-4 lg:pb-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-1 lg:space-y-2">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 lg:gap-3">
-                    <User className="h-4 w-4 lg:h-5 lg:w-5 text-[#005a2d]" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground flex items-center gap-2 lg:gap-3">
+                    <User className="h-4 w-4 lg:h-5 lg:w-5 text-chart-1" />
                     Recent Logins
                   </h2>
-                  <p className="text-sm lg:text-base text-gray-500 dark:text-gray-400">Latest user activity</p>
+                  <p className="text-sm lg:text-base text-muted-foreground">Latest user activity</p>
                 </div>
                 <Button variant="outline" size="sm" className="min-h-[44px] px-3 lg:px-4" asChild>
                   <Link href={route('admin.recent-logins')}>
@@ -413,11 +413,11 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="rounded-md border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow">
+            <div className="rounded-md border border-border overflow-hidden hover:shadow-md transition-shadow">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                    <TableRow className="hover:bg-muted/50">
                       <TableHead className="min-w-[150px] text-sm lg:text-base font-medium py-3 lg:py-4">User</TableHead>
                       <TableHead className="min-w-[80px] text-sm lg:text-base font-medium py-3 lg:py-4">Role</TableHead>
                       <TableHead className="min-w-[100px] text-sm lg:text-base font-medium py-3 lg:py-4">Last Login</TableHead>
@@ -426,7 +426,7 @@ export default function AdminDashboard() {
                   <TableBody>
                     {safeRecentLogins && safeRecentLogins.length > 0 ? (
                       safeRecentLogins.map((login) => (
-                        <TableRow key={login.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                        <TableRow key={login.id} className="hover:bg-muted/50">
                           <TableCell className="py-3 lg:py-4">
                             <div className="flex flex-col space-y-1 lg:space-y-2">
                               <span className="font-medium text-sm lg:text-base">{login.name}</span>
@@ -438,10 +438,10 @@ export default function AdminDashboard() {
                               variant="outline"
                               className={
                                 login.role.toLowerCase() === 'admin'
-                                  ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
+                                  ? 'bg-destructive/10 text-destructive border-destructive/20'
                                   : login.role.toLowerCase() === 'staff'
-                                    ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800'
-                                    : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
+                                    ? 'bg-chart-3/10 text-chart-3 border-chart-3/20'
+                                    : 'bg-chart-1/10 text-chart-1 border-chart-1/20'
                               }
                             >
                               {login.role}
@@ -472,14 +472,14 @@ export default function AdminDashboard() {
 
           {/* Recent Applications */}
           <div className="space-y-4 lg:space-y-6">
-            <div className="border-b border-gray-100 dark:border-gray-800 pb-4 lg:pb-6">
+            <div className="border-b border-border pb-4 lg:pb-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-1 lg:space-y-2">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 lg:gap-3">
-                    <FileText className="h-4 w-4 lg:h-5 lg:w-5 text-[#0070f3]" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground flex items-center gap-2 lg:gap-3">
+                    <FileText className="h-4 w-4 lg:h-5 lg:w-5 text-chart-3" />
                     Recent Applications
                   </h2>
-                  <p className="text-sm lg:text-base text-gray-500 dark:text-gray-400">Latest scholarship applications</p>
+                  <p className="text-sm lg:text-base text-muted-foreground">Latest scholarship applications</p>
                 </div>
                 <Button variant="outline" size="sm" className="min-h-[44px] px-3 lg:px-4" asChild>
                   <Link href={route('admin.scholarship.applications')}>
@@ -491,11 +491,11 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="rounded-md border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow">
+            <div className="rounded-md border border-border overflow-hidden hover:shadow-md transition-shadow">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                    <TableRow className="hover:bg-muted/50">
                       <TableHead className="min-w-[150px] text-sm lg:text-base font-medium py-3 lg:py-4">Student</TableHead>
                       <TableHead className="min-w-[80px] text-sm lg:text-base font-medium py-3 lg:py-4">Status</TableHead>
                       <TableHead className="min-w-[100px] text-sm lg:text-base font-medium py-3 lg:py-4">Date</TableHead>
@@ -504,7 +504,7 @@ export default function AdminDashboard() {
                   <TableBody>
                     {safeRecentApplications && safeRecentApplications.length > 0 ? (
                       safeRecentApplications.map((application) => (
-                        <TableRow key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                        <TableRow key={application.id} className="hover:bg-muted/50">
                           <TableCell className="py-3 lg:py-4">
                             <div className="flex flex-col space-y-1 lg:space-y-2">
                               <span className="font-medium text-sm lg:text-base">{application.student}</span>
@@ -553,16 +553,16 @@ export default function AdminDashboard() {
         <div className="grid gap-4 sm:gap-6 lg:gap-6 xl:gap-8 grid-cols-1 lg:grid-cols-2">
           {/* Pending Invitations */}
           <div className="space-y-4 lg:space-y-6">
-            <div className="border-b border-gray-100 dark:border-gray-800 pb-4 lg:pb-6">
+            <div className="border-b border-border pb-4 lg:pb-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-1 lg:space-y-2">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 lg:gap-3">
-                    <UserPlus className="h-4 w-4 lg:h-5 lg:w-5 text-[#ff4081]" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground flex items-center gap-2 lg:gap-3">
+                    <UserPlus className="h-4 w-4 lg:h-5 lg:w-5 text-chart-4" />
                     Pending Invitations
                   </h2>
-                  <p className="text-sm lg:text-base text-gray-500 dark:text-gray-400">Staff invitations awaiting response</p>
+                  <p className="text-sm lg:text-base text-muted-foreground">Staff invitations awaiting response</p>
                 </div>
-                <Button variant="ghost" size="sm" className="min-h-[44px] px-3 lg:px-4 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 border-0 hover:bg-gray-50 dark:hover:bg-gray-800" asChild>
+                <Button variant="ghost" size="sm" className="min-h-[44px] px-3 lg:px-4 text-muted-foreground hover:text-foreground border-0 hover:bg-muted" asChild>
                   <Link href={route('admin.staff')}>
                     <span className="hidden sm:inline text-sm lg:text-base">Manage</span>
                     <span className="sm:hidden text-sm">Manage</span>
@@ -572,11 +572,11 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="rounded-md border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow">
+            <div className="rounded-md border border-border overflow-hidden hover:shadow-md transition-shadow">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                    <TableRow className="hover:bg-muted/50">
                       <TableHead className="min-w-[150px] text-sm lg:text-base font-medium py-3 lg:py-4">Email</TableHead>
                       <TableHead className="min-w-[80px] text-sm lg:text-base font-medium py-3 lg:py-4">Role</TableHead>
                       <TableHead className="min-w-[100px] text-sm lg:text-base font-medium py-3 lg:py-4">Sent Date</TableHead>
@@ -631,23 +631,23 @@ export default function AdminDashboard() {
 
           {/* Pending Tasks */}
           <div className="space-y-4 lg:space-y-6">
-            <div className="border-b border-gray-100 dark:border-gray-800 pb-4 lg:pb-6">
+            <div className="border-b border-border pb-4 lg:pb-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-1 lg:space-y-2">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 lg:gap-3">
-                    <Layers className="h-4 w-4 lg:h-5 lg:w-5 text-[#febd12]" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground flex items-center gap-2 lg:gap-3">
+                    <Layers className="h-4 w-4 lg:h-5 lg:w-5 text-chart-2" />
                     Pending Tasks
                   </h2>
-                  <p className="text-sm lg:text-base text-gray-500 dark:text-gray-400">Tasks requiring attention</p>
+                  <p className="text-sm lg:text-base text-muted-foreground">Tasks requiring attention</p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-md border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow">
+            <div className="rounded-md border border-border overflow-hidden hover:shadow-md transition-shadow">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                    <TableRow className="hover:bg-muted/50">
                       <TableHead className="min-w-[150px] text-sm lg:text-base font-medium py-3 lg:py-4">Task</TableHead>
                       <TableHead className="min-w-[80px] text-sm lg:text-base font-medium py-3 lg:py-4">Priority</TableHead>
                       <TableHead className="min-w-[100px] text-sm lg:text-base font-medium py-3 lg:py-4">Deadline</TableHead>
