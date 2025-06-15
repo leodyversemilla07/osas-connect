@@ -73,9 +73,7 @@ export default function Staff({ staff = { data: [], current_page: 1, from: 0, la
                   </CardDescription>
                 </div>
                 <Button
-                  variant="ghost"
                   onClick={() => setInviteDialogOpen(true)}
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 border-0 hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   <UserPlus className="mr-2 h-4 w-4" />
                   Invite Staff

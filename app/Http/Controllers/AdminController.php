@@ -8,6 +8,7 @@ use App\Models\ScholarshipApplication;
 use App\Models\StaffInvitation;
 use App\Models\User;
 use App\Services\StorageService;
+use App\Services\UserAgentParser;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -1177,15 +1178,23 @@ class AdminController extends Controller
     public function recentLogins(Request $request): Response
     {
         $currentUserId = Auth::id();
+        $perPage = $request->get('per_page', 10); // Default 10 items per page
 
-        // Get recent login activity by querying users with their last login times
-        // Exclude the current admin user from the list
-        $recentLogins = User::with(['studentProfile', 'osasStaffProfile', 'adminProfile'])
-            ->whereNotNull('updated_at')
-            ->where('id', '!=', $currentUserId)
-            ->orderBy('updated_at', 'desc')
-            ->limit(50)
-            ->get()
+        // Get recent login activity by querying users with their most recent sessions
+        // We need to get the most recent session for each user
+        $recentLoginsQuery = User::with(['studentProfile', 'osasStaffProfile', 'adminProfile'])
+            ->leftJoin('sessions', function($join) {
+                $join->on('users.id', '=', 'sessions.user_id')
+                     ->whereRaw('sessions.last_activity = (SELECT MAX(s2.last_activity) FROM sessions s2 WHERE s2.user_id = users.id)');
+            })
+            ->whereNotNull('users.updated_at')
+            ->where('users.id', '!=', $currentUserId)
+            ->select('users.*', 'sessions.ip_address', 'sessions.user_agent', 'sessions.last_activity as session_last_activity')
+            ->orderBy('users.updated_at', 'desc');
+
+        $paginatedUsers = $recentLoginsQuery->paginate($perPage);
+        
+        $recentLogins = $paginatedUsers->getCollection()
             ->map(function ($user) {
                 $profileInfo = null;
 
@@ -1198,7 +1207,7 @@ class AdminController extends Controller
                 } elseif ($user->role === 'osas_staff' && $user->osasStaffProfile) {
                     $profileInfo = [
                         'staff_id' => $user->osasStaffProfile->staff_id,
-                        'department' => 'OSAS',
+                        'department' => 'Office of Student Affairs & Services',
                     ];
                 } elseif ($user->role === 'admin' && $user->adminProfile) {
                     $profileInfo = [
@@ -1206,20 +1215,43 @@ class AdminController extends Controller
                     ];
                 }
 
+                // Parse user agent to extract browser and device info
+                $userAgentInfo = UserAgentParser::parse($user->user_agent);
+
+                // Format role display name properly
+                $roleDisplay = match($user->role) {
+                    'admin' => 'Administrator',
+                    'osas_staff' => 'OSAS Staff',
+                    'student' => 'Student',
+                    default => ucwords(str_replace('_', ' ', $user->role))
+                };
+
                 return [
                     'id' => $user->id,
                     'name' => $user->full_name,
                     'email' => $user->email,
-                    'role' => ucfirst(str_replace('_', ' ', $user->role)),
+                    'role' => $roleDisplay,
                     'avatar' => $user->avatar,
                     'last_activity' => $user->updated_at,
                     'is_active' => $user->is_active,
                     'profile_info' => $profileInfo,
+                    'ip_address' => $user->ip_address,
+                    'device' => $userAgentInfo['device'],
+                    'browser' => $userAgentInfo['browser'],
                 ];
             });
 
         return Inertia::render('admin/recent-logins', [
-            'recentLogins' => $recentLogins,
+            'recentLogins' => [
+                'data' => $recentLogins,
+                'current_page' => $paginatedUsers->currentPage(),
+                'last_page' => $paginatedUsers->lastPage(),
+                'per_page' => $paginatedUsers->perPage(),
+                'total' => $paginatedUsers->total(),
+                'from' => $paginatedUsers->firstItem(),
+                'to' => $paginatedUsers->lastItem(),
+                'links' => $paginatedUsers->linkCollection()->toArray(),
+            ],
         ]);
     }
 
