@@ -1,6 +1,5 @@
-import React, { memo } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { memo } from "react";
+import { InputWithLabel } from "@/components/input-with-label";
 import InputError from "@/components/input-error";
 import { VALIDATION } from "@/lib/validation";
 import type { RegisterForm } from "@/hooks/use-registration-form";
@@ -17,29 +16,27 @@ const AccountSetupStep = memo<AccountSetupStepProps>(({
     onFieldChange,
 }) => {
     const isEmailValid = data.email && data.email.toLowerCase().endsWith(VALIDATION.EMAIL.DOMAIN);
-    const doPasswordsMatch = data.password && data.password_confirmation && 
-                            data.password === data.password_confirmation;
+    const doPasswordsMatch = data.password && data.password_confirmation &&
+        data.password === data.password_confirmation;
 
     return (
         <div className="space-y-6">
             <div>
-                <Label htmlFor="email" className="text-sm font-medium">
-                    Email Address <span className="text-red-500">*</span>
-                </Label>
-                <Input
+                <InputWithLabel
                     id="email"
+                    label="Email Address"
                     type="email"
+                    required
                     value={data.email}
-                    onChange={(e) => onFieldChange('email', e.target.value)}
-                    className="mt-1"
+                    onChange={value => onFieldChange('email', value)}
                     placeholder={`Enter your email (must end with ${VALIDATION.EMAIL.DOMAIN})`}
-                    aria-describedby={errors.email ? "email-error" : "email-help"}
+                    error={errors.email}
+                    className="mt-1"
+                    pattern={`^[A-Za-z0-9._%+-]+${VALIDATION.EMAIL.DOMAIN}$`}
                 />
-                {!errors.email && (
-                    <p id="email-help" className="mt-1 text-sm text-muted-foreground">
-                        Must be a valid university email ending with {VALIDATION.EMAIL.DOMAIN}
-                    </p>
-                )}
+                <p className="mt-1 text-sm text-muted-foreground">
+                    Must be a valid university email ending with {VALIDATION.EMAIL.DOMAIN}
+                </p>
                 <InputError id="email-error" message={errors.email} className="mt-1" />
                 {data.email && !isEmailValid && !errors.email && (
                     <p className="mt-1 text-sm text-amber-600">
@@ -49,17 +46,16 @@ const AccountSetupStep = memo<AccountSetupStepProps>(({
             </div>
 
             <div>
-                <Label htmlFor="password" className="text-sm font-medium">
-                    Password <span className="text-red-500">*</span>
-                </Label>
-                <Input
+                <InputWithLabel
                     id="password"
+                    label="Password"
                     type="password"
+                    required
                     value={data.password}
-                    onChange={(e) => onFieldChange('password', e.target.value)}
-                    className="mt-1"
+                    onChange={value => onFieldChange('password', value)}
                     placeholder="Create a strong password"
-                    aria-describedby={errors.password ? "password-error" : "password-help"}
+                    error={errors.password}
+                    className="mt-1"
                 />
                 {!errors.password && (
                     <p id="password-help" className="mt-1 text-sm text-muted-foreground">
@@ -70,17 +66,16 @@ const AccountSetupStep = memo<AccountSetupStepProps>(({
             </div>
 
             <div>
-                <Label htmlFor="password_confirmation" className="text-sm font-medium">
-                    Confirm Password <span className="text-red-500">*</span>
-                </Label>
-                <Input
+                <InputWithLabel
                     id="password_confirmation"
+                    label="Confirm Password"
                     type="password"
+                    required
                     value={data.password_confirmation}
-                    onChange={(e) => onFieldChange('password_confirmation', e.target.value)}
-                    className="mt-1"
+                    onChange={value => onFieldChange('password_confirmation', value)}
                     placeholder="Re-enter your password"
-                    aria-describedby={errors.password_confirmation ? "password_confirmation-error" : undefined}
+                    error={errors.password_confirmation}
+                    className="mt-1"
                 />
                 <InputError id="password_confirmation-error" message={errors.password_confirmation} className="mt-1" />
                 {data.password && data.password_confirmation && !doPasswordsMatch && !errors.password_confirmation && (

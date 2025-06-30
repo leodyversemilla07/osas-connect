@@ -1,8 +1,6 @@
 import React, { memo } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import InputError from "@/components/input-error";
+import { SelectorWithLabel } from "@/components/selector-with-label";
+import { InputWithLabel } from "@/components/input-with-label";
 import type { RegisterForm } from "@/hooks/use-registration-form";
 
 interface AcademicInformationStepProps {
@@ -21,118 +19,97 @@ const AcademicInformationStep = memo<AcademicInformationStepProps>(({
     return (
         <div className="space-y-6">
             <div>
-                <Label htmlFor="student_id" className="text-sm font-medium">
-                    Student ID <span className="text-red-500">*</span>
-                </Label>
-                <Input
+                <InputWithLabel
                     id="student_id"
+                    label="Student ID"
+                    required
                     value={data.student_id}
-                    onChange={(e) => onFieldChange('student_id', e.target.value)}
-                    className="mt-1"
-                    placeholder="Enter your student ID"
-                    aria-describedby={errors.student_id ? "student_id-error" : undefined}
+                    onChange={value => onFieldChange('student_id', value)}
+                    placeholder="MBC2025-0001"
+                    pattern="MBC[0-9]{4}-[0-9]{4}"
+                    error={errors.student_id}
+                    className="w-full"
                 />
-                <InputError id="student_id-error" message={errors.student_id} className="mt-1" />
+                <p className="mt-1 text-sm text-muted-foreground">Format: MBCYYYY-NNNN (e.g., MBC2025-0001)</p>
             </div>
 
             <div>
-                <Label htmlFor="course" className="text-sm font-medium">
-                    Course <span className="text-red-500">*</span>
-                </Label>
-                <Select value={data.course} onValueChange={onCourseChange}>
-                    <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select your course" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Bachelor of Science in Information Technology">
-                            BSIT - Bachelor of Science in Information Technology
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Science in Computer Engineering">
-                            BSCpE - Bachelor of Science in Computer Engineering
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Science in Tourism Management">
-                            BSTM - Bachelor of Science in Tourism Management
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Science in Hospitality Management">
-                            BSHM - Bachelor of Science in Hospitality Management
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Science in Entrepreneurship">
-                            BSENTREP - Bachelor of Science in Entrepreneurship
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Arts in Political Science">
-                            ABPolSci - Bachelor of Arts in Political Science
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Science in Criminology">
-                            BSCrim - Bachelor of Science in Criminology
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Science in Fisheries">
-                            BSFI - Bachelor of Science in Fisheries
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Secondary Education">
-                            BSEd - Bachelor of Secondary Education
-                        </SelectItem>
-                        <SelectItem value="Bachelor of Elementary Education">
-                            BEEd - Bachelor of Elementary Education
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <InputError message={errors.course} className="mt-1" />
+                <SelectorWithLabel
+                    id="course"
+                    label="Course"
+                    required
+                    value={data.course}
+                    onChange={onCourseChange}
+                    options={[
+                        { value: "Bachelor of Science in Information Technology", label: "BSIT - Bachelor of Science in Information Technology" },
+                        { value: "Bachelor of Science in Computer Engineering", label: "BSCpE - Bachelor of Science in Computer Engineering" },
+                        { value: "Bachelor of Science in Tourism Management", label: "BSTM - Bachelor of Science in Tourism Management" },
+                        { value: "Bachelor of Science in Hospitality Management", label: "BSHM - Bachelor of Science in Hospitality Management" },
+                        { value: "Bachelor of Science in Entrepreneurship", label: "BSENTREP - Bachelor of Science in Entrepreneurship" },
+                        { value: "Bachelor of Arts in Political Science", label: "ABPolSci - Bachelor of Arts in Political Science" },
+                        { value: "Bachelor of Science in Criminology", label: "BSCrim - Bachelor of Science in Criminology" },
+                        { value: "Bachelor of Science in Fisheries", label: "BSFI - Bachelor of Science in Fisheries" },
+                        { value: "Bachelor of Secondary Education", label: "BSEd - Bachelor of Secondary Education" },
+                        { value: "Bachelor of Elementary Education", label: "BEEd - Bachelor of Elementary Education" },
+                    ]}
+                    placeholder="Select your course"
+                    error={errors.course}
+                    className="w-full"
+                />
             </div>
             {(data.course === "Bachelor of Secondary Education" || data.course === "Bachelor of Science in Entrepreneurship") && (
                 <div>
-                    <Label htmlFor="major" className="text-sm font-medium">
-                        {data.course === "Bachelor of Secondary Education" ? "Major" : "Specialization"} <span className="text-red-500">*</span>
-                    </Label>                    <Select value={data.major} onValueChange={(value) => onFieldChange('major', value)}>
-                        <SelectTrigger className="mt-1">
-                            <SelectValue placeholder={data.course === "Bachelor of Secondary Education" ? "Select your major" : "Select your specialization"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {data.course === "Bachelor of Secondary Education" ? (
-                                <>
-                                    <SelectItem value="Mathematics">Mathematics</SelectItem>
-                                    <SelectItem value="English">English</SelectItem>
-                                    <SelectItem value="Science">Science</SelectItem>
-                                </>) : (
-                                <>
-                                    <SelectItem value="Farm Business">Farm Business</SelectItem>
-                                </>
-                            )}
-                        </SelectContent>
-                    </Select>
-                    <InputError message={errors.major} className="mt-1" />
+                    <SelectorWithLabel
+                        id="major"
+                        label={data.course === "Bachelor of Secondary Education" ? "Major" : "Specialization"}
+                        required
+                        value={data.major}
+                        onChange={value => onFieldChange('major', value)}
+                        options={data.course === "Bachelor of Secondary Education"
+                            ? [
+                                { value: "Mathematics", label: "Mathematics" },
+                                { value: "English", label: "English" },
+                                { value: "Science", label: "Science" },
+                            ]
+                            : [
+                                { value: "Farm Business", label: "Farm Business" },
+                            ]}
+                        placeholder={data.course === "Bachelor of Secondary Education" ? "Select your major" : "Select your specialization"}
+                        error={errors.major}
+                        className="w-full"
+                    />
                 </div>
             )}
 
             <div>
-                <Label htmlFor="year_level" className="text-sm font-medium">
-                    Year Level <span className="text-red-500">*</span>
-                </Label>
-                <Select value={data.year_level} onValueChange={(value) => onFieldChange('year_level', value)}>
-                    <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select your year level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="1st Year">1st Year</SelectItem>
-                        <SelectItem value="2nd Year">2nd Year</SelectItem>
-                        <SelectItem value="3rd Year">3rd Year</SelectItem>
-                        <SelectItem value="4th Year">4th Year</SelectItem>
-                    </SelectContent>
-                </Select>
-                <InputError message={errors.year_level} className="mt-1" />
+                <SelectorWithLabel
+                    id="year_level"
+                    label="Year Level"
+                    required
+                    value={data.year_level}
+                    onChange={value => onFieldChange('year_level', value)}
+                    options={[
+                        { value: "1st Year", label: "1st Year" },
+                        { value: "2nd Year", label: "2nd Year" },
+                        { value: "3rd Year", label: "3rd Year" },
+                        { value: "4th Year", label: "4th Year" },
+                    ]}
+                    placeholder="Select your year level"
+                    error={errors.year_level}
+                    className="w-full"
+                />
             </div>
 
             <div>
-                <Label htmlFor="scholarships" className="text-sm font-medium">
-                    Current Scholarships (Optional)
-                </Label>
-                <Input
+                <InputWithLabel
                     id="scholarships"
+                    label="Current Scholarships (Optional)"
                     value={data.scholarships}
-                    onChange={(e) => onFieldChange('scholarships', e.target.value)}
-                    className="mt-1"
+                    onChange={value => onFieldChange('scholarships', value)}
                     placeholder="List any current scholarships (separate multiple with commas)"
+                    error={errors.scholarships}
+                    className="w-full"
                 />
-                <InputError message={errors.scholarships} className="mt-1" />
                 <p className="mt-1 text-sm text-muted-foreground">
                     If you have multiple scholarships, separate them with commas. Leave blank if none.
                 </p>

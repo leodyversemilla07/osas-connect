@@ -3,12 +3,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import InputError from "@/components/input-error";
 
-interface DatePickerFieldProps {
+export interface DatePickerProps {
     id: string;
     label: string;
     value?: Date;
@@ -23,20 +22,21 @@ interface DatePickerFieldProps {
     description?: string;
 }
 
-export const DatePickerField: React.FC<DatePickerFieldProps> = ({
+export const DatePicker: React.FC<DatePickerProps> = ({
     id,
     label,
     value,
     onChange,
     required = false,
     error,
-    placeholder = "Select a date",
+    placeholder = "Select date",
     disabled = false,
     minDate = new Date("1900-01-01"),
     maxDate = new Date(),
     className,
     description,
 }) => {
+    const [open, setOpen] = React.useState(false);
     const errorId = error ? `${id}-error` : undefined;
     const descriptionId = description ? `${id}-description` : undefined;
 
@@ -48,11 +48,12 @@ export const DatePickerField: React.FC<DatePickerFieldProps> = ({
         } else {
             onChange(undefined);
         }
+        setOpen(false);
     };
 
     return (
-        <div className={cn("space-y-2", className)}>
-            <Label className="text-sm font-medium">
+        <div className={cn("flex flex-col gap-3", className)}>
+            <Label htmlFor={id} className="px-1 text-sm font-medium">
                 {label} {required && <span className="text-red-500">*</span>}
             </Label>
             {description && (
@@ -60,26 +61,26 @@ export const DatePickerField: React.FC<DatePickerFieldProps> = ({
                     {description}
                 </p>
             )}
-            <Popover>
+            <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                     <Button
                         id={id}
                         variant="outline"
                         disabled={disabled}
                         className={cn(
-                            "w-full justify-start text-left font-normal",
+                            "w-48 justify-between font-normal",
                             !value && "text-muted-foreground"
                         )}
                         aria-describedby={cn(errorId, descriptionId)}
                         aria-invalid={!!error}
-                        aria-expanded="false"
+                        aria-expanded={open}
                         aria-haspopup="dialog"
                     >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {value ? format(value, "PPP") : placeholder}
+                        {value ? value.toLocaleDateString() : placeholder}
+                        <ChevronDownIcon className="ml-2 h-4 w-4" />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
                     <Calendar
                         mode="single"
                         selected={value}

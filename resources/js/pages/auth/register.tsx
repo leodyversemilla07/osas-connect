@@ -5,7 +5,7 @@ import AuthLayout from "@/layouts/auth-layout";
 import { Button } from "@/components/ui/button";
 import TextLink from "@/components/text-link";
 import { LoaderCircle } from "lucide-react";
-import StepProgress from "@/components/ui/step-progress";
+import StepProgress from "@/components/step-progress";
 import PersonalInformationStep from "@/components/registration/personal-information-step";
 import AcademicInformationStep from "@/components/registration/academic-information-step";
 import AccountSetupStep from "@/components/registration/account-setup-step";
@@ -155,8 +155,14 @@ export default function Register() {
                                 disabled={processing || !data.terms_agreement}
                                 aria-label="Submit registration"
                             >
-                                {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                                Create Account
+                                {processing ? (
+                                    <>
+                                        <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                        Creating Account...
+                                    </>
+                                ) : (
+                                    "Create Account"
+                                )}
                             </Button>
                         )}
                     </div>

@@ -9,8 +9,17 @@ interface StepProgressProps {
 
 const StepProgress = memo<StepProgressProps>(({ steps, currentStep, totalSteps }) => {
     return (
-        <div className="mb-6 sm:mb-8">
-            <div className="relative flex justify-between items-center mb-6 sm:mb-8">
+        <div className="mb-0.5 sm:mb-1"> {/* Further reduced margin for even less space below progress bar */}
+            {/* Current step indicator (moved to top) */}
+            <div className="text-center bg-muted/30 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg mx-2 sm:mx-0 mb-2">
+                <h2 className="text-sm sm:text-base font-medium text-foreground">
+                    {steps[currentStep - 1]}
+                </h2>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                    Step {currentStep} of {totalSteps}
+                </p>
+            </div>
+            <div className="relative flex justify-between items-center mb-4 sm:mb-5">
                 {/* Progress line background */}
                 <div className="absolute top-[18px] sm:top-[22px] left-0 w-full h-0.5">
                     {/* Background line */}
@@ -81,16 +90,6 @@ const StepProgress = memo<StepProgressProps>(({ steps, currentStep, totalSteps }
                         );
                     })}
                 </div>
-            </div>
-
-            {/* Current step indicator */}
-            <div className="text-center bg-muted/30 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg mx-2 sm:mx-0">
-                <h2 className="text-sm sm:text-base font-medium text-foreground">
-                    {steps[currentStep - 1]}
-                </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-                    Step {currentStep} of {totalSteps}
-                </p>
             </div>
         </div>
     );

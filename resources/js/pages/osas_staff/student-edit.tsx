@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import ErrorBoundary from '@/components/error-boundary';
-import PlaceOfBirthForm from '@/components/place-of-birth-form';
+import PlaceOfBirthForm from '@/components/place-of-birth';
 import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { StyledInput } from '@/components/forms/styled-input';
