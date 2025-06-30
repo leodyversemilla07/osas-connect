@@ -1,7 +1,7 @@
 import React, { memo } from "react";
-import { SelectorWithLabel } from "@/components/selector-with-label";
 import { InputWithLabel } from "@/components/input-with-label";
 import CourseSelector from "@/components/course-selector";
+import YearLevelSelector from "@/components/year-level-selector";
 import type { RegisterForm } from "@/hooks/use-registration-form";
 
 interface AcademicInformationStepProps {
@@ -48,20 +48,11 @@ const AcademicInformationStep = memo<AcademicInformationStepProps>(({
             </div>
 
             <div>
-                <SelectorWithLabel
-                    id="year_level"
-                    label="Year Level"
-                    required
+                <YearLevelSelector
                     value={data.year_level}
                     onChange={value => onFieldChange('year_level', value)}
-                    options={[
-                        { value: "1st Year", label: "1st Year" },
-                        { value: "2nd Year", label: "2nd Year" },
-                        { value: "3rd Year", label: "3rd Year" },
-                        { value: "4th Year", label: "4th Year" },
-                    ]}
-                    placeholder="Select your year level"
                     error={errors.year_level}
+                    required
                     className="w-full"
                 />
             </div>

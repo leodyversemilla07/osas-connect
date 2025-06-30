@@ -32,11 +32,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 /**
  * Enhanced Profile component with step-based navigation
- * Features:
- * - Step-based organization for better UX
- * - Save changes at any step
- * - No forced validation or review step
- * - Always accessible delete account section
  */
 export default function Profile({
     photoUrl,
@@ -59,8 +54,6 @@ export default function Profile({
         "Financial Information"
     ] : ["Basic Information"];
     const totalSections = sectionTitles.length;
-
-    const currentSectionTitle = sectionTitles[currentStep - 1];
 
     // Initialize form data and state management
     const initialData = useProfileInitialData(profile, auth.user, isStudent);
@@ -165,41 +158,7 @@ export default function Profile({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Profile settings" />
             <SettingsLayout>
-                {/* Current Section Title */}
-                <div className="mb-6">
-                    <h2 className="text-2xl font-semibold text-foreground">
-                        {currentSectionTitle}
-                    </h2>
-                    <p className="text-muted-foreground mt-1">
-                        Update your profile information
-                    </p>
-                </div>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6" role="form">
-                    {/* Error Summary - Show validation errors */}
-                    {Object.keys(errors).length > 0 && (
-                        <Card className="border-destructive/50 bg-destructive/5">
-                            <CardContent className="pt-6">
-                                <div className="flex items-start gap-3">
-                                    <div className="rounded-full bg-destructive/10 p-2">
-                                        <svg className="h-5 w-5 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-medium text-destructive mb-2">Please fix the following errors:</h3>
-                                        <ul className="text-sm space-y-1">
-                                            {Object.entries(errors).map(([field, message]) => (
-                                                <li key={field} className="text-muted-foreground">
-                                                    • <span className="font-medium">{field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span> {message}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
                     <div className="grid gap-6">{renderStepContent()}
 
                         {/* Save Button - Always present */}
@@ -235,6 +194,31 @@ export default function Profile({
                             )}
                         </div>
                     </div>
+
+                    {/* Error Summary - Show validation errors */}
+                    {Object.keys(errors).length > 0 && (
+                        <Card className="border-destructive/50 bg-destructive/5">
+                            <CardContent className="pt-6">
+                                <div className="flex items-start gap-3">
+                                    <div className="rounded-full bg-destructive/10 p-2">
+                                        <svg className="h-5 w-5 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="font-medium text-destructive mb-2">Please fix the following errors:</h3>
+                                        <ul className="text-sm space-y-1">
+                                            {Object.entries(errors).map(([field, message]) => (
+                                                <li key={field} className="text-muted-foreground">
+                                                    • <span className="font-medium">{field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span> {message}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
                 </form>
 
                 {/* Delete Account Section - Always visible */}

@@ -773,7 +773,7 @@ class OsasStaffController extends Controller
 
             DB::commit();
 
-            return redirect()->route('osas.students.details', $user->id)
+            return redirect()->route('osas.students.edit', $user->id)
                 ->with('success', 'Student profile updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();

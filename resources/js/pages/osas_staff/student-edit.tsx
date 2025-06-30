@@ -3,17 +3,27 @@ import { Save } from 'lucide-react';
 import { useMemo, useCallback } from 'react';
 import { type User as UserType, type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import ErrorBoundary from '@/components/error-boundary';
-import PlaceOfBirthForm from '@/components/place-of-birth';
-import { FormField } from '@/components/forms/form-field';
-import { FormSection } from '@/components/forms/form-section';
-import { StyledInput } from '@/components/forms/styled-input';
-import { ParentInformation } from '@/components/forms/parent-information';
+import PlaceOfBirth from '@/components/place-of-birth';
+import { InputWithLabel } from '@/components/input-with-label';
+import CourseSelector from '@/components/course-selector';
+import Address from '@/components/address';
+import ReligionSelector from '@/components/religion-selector';
+import { DatePicker } from '@/components/date-picker';
+import ResidenceTypeSelector from "@/components/residence-type-selector";
+import SexSelector from "@/components/sex-selector";
+import CivilStatusSelector from "@/components/civil-status-selector";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+} from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator';
+import YearLevelSelector from "@/components/year-level-selector";
+import PwdRadio from '@/components/pwd-radio';
 
 interface StudentWithProfile extends UserType {
     studentProfile: {
@@ -37,6 +47,7 @@ interface StudentWithProfile extends UserType {
         barangay?: string;
         city?: string;
         province?: string;
+        zip_code?: string;
         status_of_parents?: string;
         father_name?: string;
         father_age?: number;
@@ -69,10 +80,10 @@ interface EditStudentProfileProps {
 }
 
 export default function EditStudentProfile({ user }: EditStudentProfileProps) {
-    const { data, setData, put, processing, errors, wasSuccessful } = useForm({
+    const { data, setData, put, processing, errors } = useForm({
         first_name: user.first_name || '',
         middle_name: user.middle_name || '',
-        last_name: user.last_name || '',        
+        last_name: user.last_name || '',
         email: user.email || '',
         student_id: user.studentProfile.student_id || '',
         course: user.studentProfile.course || '',
@@ -98,8 +109,9 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
         barangay: user.studentProfile.barangay || '',
         city: user.studentProfile.city || '',
         province: user.studentProfile.province || '',
+        zip_code: user.studentProfile.zip_code || '',
         status_of_parents: user.studentProfile.status_of_parents || '',
-        father_name: user.studentProfile.father_name || '',        father_age: user.studentProfile.father_age || 0,
+        father_name: user.studentProfile.father_name || '', father_age: user.studentProfile.father_age || 0,
         father_address: user.studentProfile.father_address || '',
         father_telephone: user.studentProfile.father_telephone || '',
         father_mobile: user.studentProfile.father_mobile || '',
@@ -121,7 +133,9 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
         mother_education: user.studentProfile.mother_education || '',
         mother_school: user.studentProfile.mother_school || '',
         total_siblings: user.studentProfile.total_siblings || 0,
-    });    const breadcrumbs: BreadcrumbItem[] = useMemo(() => [
+    });
+
+    const breadcrumbs: BreadcrumbItem[] = useMemo(() => [
         {
             title: 'Dashboard',
             href: route('osas.dashboard'),
@@ -138,10 +152,9 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
             title: 'Edit Student Profile',
             href: route('osas.students.edit', user.id),
         },
-    ], [user.id]);    const handleSubmit = useCallback((e: React.FormEvent) => {
-        e.preventDefault();
-        put(route('osas.students.update', user.id));
-    }, [put, user.id]);// Memoize parent data to prevent infinite re-renders
+    ], [user.id]);
+
+    // Memoize parent data to prevent infinite re-renders
     const fatherData = useMemo(() => ({
         name: data.father_name,
         age: data.father_age,
@@ -166,7 +179,9 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
         data.father_monthly_income,
         data.father_education,
         data.father_school,
-    ]);    const motherData = useMemo(() => ({
+    ]);
+
+    const motherData = useMemo(() => ({
         name: data.mother_name,
         age: data.mother_age,
         address: data.mother_address,
@@ -190,379 +205,506 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
         data.mother_monthly_income,
         data.mother_education,
         data.mother_school,
-    ]);    // Memoize the data change handler to prevent re-creation on every render
+    ]);
+
+    // Memoize the data change handler to prevent re-creation on every render
     const handleDataChange = useCallback((field: string, value: string | number) => {
         setData(field as keyof typeof data, value);
-    }, [setData]);return (<AppLayout breadcrumbs={breadcrumbs}>
-        <Head title="Edit Student Profile" />
+    }, [setData]);
 
-        <ErrorBoundary>
-            <div className="flex h-full flex-1 flex-col space-y-6 p-6">
-            {/* Header */}
-            <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                <div className="flex items-center gap-4 mb-2">
-                    <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                        Edit Student
-                    </h1>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {user.first_name} {user.last_name}
-                </p>
-            </div>
+    const onSubmit = useCallback((e: React.FormEvent) => {
+        e.preventDefault();
+        put(route('osas.students.update', user.id), {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                toast.success('Profile updated successfully!');
+                // Optionally, you can refresh the page or re-fetch data here if needed
+            },
+            onError: () => {
+                toast.error('Failed to update profile. Please check the form for errors.');
+            },
+        });
+    }, [put, user.id]);
 
-            {/* Success Message */}
-            {wasSuccessful && (
-                <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-                    <AlertDescription className="text-green-800 dark:text-green-200 text-sm">
-                        Profile updated successfully!
-                    </AlertDescription>
-                </Alert>
-            )}            <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Basic Information */}
-                <FormSection title="Basic Information">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <FormField label="First Name" required error={errors.first_name}>
-                            <StyledInput
-                                id="first_name"
-                                value={data.first_name}
-                                onChange={(e) => setData('first_name', e.target.value)}
-                            />
-                        </FormField>
-
-                        <FormField label="Middle Name" error={errors.middle_name}>
-                            <StyledInput
-                                id="middle_name"
-                                value={data.middle_name}
-                                onChange={(e) => setData('middle_name', e.target.value)}
-                            />
-                        </FormField>
-
-                        <FormField label="Last Name" required error={errors.last_name}>
-                            <StyledInput
-                                id="last_name"
-                                value={data.last_name}
-                                onChange={(e) => setData('last_name', e.target.value)}
-                            />
-                        </FormField>
-                    </div>
-                </FormSection>                {/* Contact Information */}
-                <FormSection title="Contact Information">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField label="Email Address" required error={errors.email}>
-                            <StyledInput
-                                id="email"
-                                type="email"
-                                value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                            />
-                        </FormField>
-                    </div>
-                </FormSection>                {/* Academic Information */}
-                <FormSection title="Academic Information">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <FormField label="Student ID" required error={errors.student_id}>
-                            <StyledInput
-                                id="student_id"
-                                value={data.student_id}
-                                onChange={(e) => setData('student_id', e.target.value)}
-                                placeholder="e.g. MBC2023-1234"
-                            />
-                        </FormField>
-
-                        <FormField label="Course" required error={errors.course}>
-                            <StyledInput
-                                id="course"
-                                value={data.course}
-                                onChange={(e) => setData('course', e.target.value)}
-                                placeholder="e.g. BSIT"
-                            />
-                        </FormField>
-
-                        <FormField label="Year Level" required error={errors.year_level}>
-                            <Select value={data.year_level} onValueChange={(value) => setData('year_level', value)}>
-                                <SelectTrigger className="border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent">
-                                    <SelectValue placeholder="Select year level" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="1st Year">1st Year</SelectItem>
-                                    <SelectItem value="2nd Year">2nd Year</SelectItem>
-                                    <SelectItem value="3rd Year">3rd Year</SelectItem>
-                                    <SelectItem value="4th Year">4th Year</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </FormField>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField label="Major" error={errors.major}>
-                            <StyledInput
-                                id="major"
-                                value={data.major}
-                                onChange={(e) => setData('major', e.target.value)}
-                                placeholder="e.g. Web Development"
-                            />
-                        </FormField>
-
-                        <FormField label="Existing Scholarships" error={errors.existing_scholarships}>
-                            <StyledInput
-                                as="textarea"
-                                id="existing_scholarships"
-                                value={data.existing_scholarships}
-                                onChange={(e) => setData('existing_scholarships', e.target.value)}
-                                placeholder="List any current scholarships..."
-                            />
-                        </FormField>
-                    </div>
-                </FormSection>                {/* Personal Information */}
-                <FormSection title="Personal Information">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <FormField label="Civil Status" required error={errors.civil_status}>
-                            <Select value={data.civil_status} onValueChange={(value) => setData('civil_status', value)}>
-                                <SelectTrigger className="border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent">
-                                    <SelectValue placeholder="Select civil status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Single">Single</SelectItem>
-                                    <SelectItem value="Married">Married</SelectItem>
-                                    <SelectItem value="Widowed">Widowed</SelectItem>
-                                    <SelectItem value="Separated">Separated</SelectItem>
-                                    <SelectItem value="Annulled">Annulled</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </FormField>
-
-                        <FormField label="Sex" required error={errors.sex}>
-                            <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
-                                <SelectTrigger className="border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent">
-                                    <SelectValue placeholder="Select sex" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Male">Male</SelectItem>
-                                    <SelectItem value="Female">Female</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </FormField>
-
-                        <FormField label="Date of Birth" error={errors.date_of_birth}>
-                            <StyledInput
-                                id="date_of_birth"
-                                type="date"
-                                value={data.date_of_birth}
-                                onChange={(e) => setData('date_of_birth', e.target.value)}
-                            />
-                        </FormField>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="grid gap-2">
-                            <PlaceOfBirthForm
-                                data={{
-                                    place_of_birth: data.place_of_birth || '',
-                                }}
-                                setData={(field, value) => setData(field, value)}
-                                errors={errors}
-                                processing={processing}
-                            />
-                        </div>
-
-                        <FormField label="Religion" error={errors.religion}>
-                            <StyledInput
-                                id="religion"
-                                value={data.religion}
-                                onChange={(e) => setData('religion', e.target.value)}
-                                placeholder="Religion"
-                            />
-                        </FormField>
-
-                        <FormField label="Residence Type" error={errors.residence_type}>
-                            <Select value={data.residence_type} onValueChange={(value) => setData('residence_type', value)}>
-                                <SelectTrigger className="border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent">
-                                    <SelectValue placeholder="Select residence type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Parent's House">Parent's House</SelectItem>
-                                    <SelectItem value="Boarding House">Boarding House</SelectItem>
-                                    <SelectItem value="With Guardian">With Guardian</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </FormField>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <FormField label="Mobile Number" error={errors.mobile_number}>
-                            <StyledInput
-                                id="mobile_number"
-                                value={data.mobile_number}
-                                onChange={(e) => setData('mobile_number', e.target.value)}
-                                placeholder="+639123456789"
-                            />
-                        </FormField>
-
-                        <FormField label="Telephone Number" error={errors.telephone_number}>
-                            <StyledInput
-                                id="telephone_number"
-                                value={data.telephone_number}
-                                onChange={(e) => setData('telephone_number', e.target.value)}
-                                placeholder="Landline number"
-                            />
-                        </FormField>
-
-                        <FormField label="Guardian Name" error={errors.guardian_name}>
-                            <StyledInput
-                                id="guardian_name"
-                                value={data.guardian_name}
-                                onChange={(e) => setData('guardian_name', e.target.value)}
-                                placeholder="Full name of guardian"
-                            />
-                        </FormField>
-                    </div>
-
-                    <div className="mt-6">
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="is_pwd"
-                                checked={data.is_pwd}
-                                onCheckedChange={(checked) => setData('is_pwd', checked as boolean)}
-                            />
-                            <Label htmlFor="is_pwd" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Person with Disability (PWD)
-                            </Label>
-                        </div>
-
-                        {data.is_pwd && (
-                            <div className="mt-4 max-w-md">
-                                <FormField label="Disability Type" error={errors.disability_type}>
-                                    <StyledInput
-                                        id="disability_type"
-                                        value={data.disability_type}
-                                        onChange={(e) => setData('disability_type', e.target.value)}
-                                        placeholder="Specify disability type"
-                                    />
-                                </FormField>
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Edit Student Profile" />
+            <ErrorBoundary>
+                <div className="flex h-full flex-1 flex-col space-y-6 p-6">
+                    {/* Header */}
+                    <div className="mb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                                    Edit Student Profile
+                                </h1>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Update student information, address, academic, and family details.
+                                </p>
                             </div>
-                        )}
+                        </div>
+                        <div className="flex gap-2 self-start md:self-center">
+                            <Button
+                                variant="ghost"
+                                asChild
+                                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                            >
+                                <Link href={route('osas.students.details', user.id)}>
+                                    Cancel
+                                </Link>
+                            </Button>
+                            <Button
+                                type="submit"
+                                form="edit-student-profile-form"
+                                disabled={processing}
+                                className="flex items-center gap-2"
+                            >
+                                <Save className="h-4 w-4" />
+                                {processing ? 'Saving...' : 'Save Changes'}
+                            </Button>
+                        </div>
                     </div>
-                </FormSection>                {/* Address Information */}
-                <FormSection title="Address Information">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField label="Street" error={errors.street}>
-                            <StyledInput
-                                id="street"
-                                value={data.street}
-                                onChange={(e) => setData('street', e.target.value)}
-                                placeholder="Street address"
-                            />
-                        </FormField>
+                    <Separator className="my-2" />
 
-                        <FormField label="Barangay" error={errors.barangay}>
-                            <StyledInput
-                                id="barangay"
-                                value={data.barangay}
-                                onChange={(e) => setData('barangay', e.target.value)}
-                                placeholder="Barangay"
-                            />
-                        </FormField>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField label="City" error={errors.city}>
-                            <StyledInput
-                                id="city"
-                                value={data.city}
-                                onChange={(e) => setData('city', e.target.value)}
-                                placeholder="City"
-                            />
-                        </FormField>
-
-                        <FormField label="Province" error={errors.province}>
-                            <StyledInput
-                                id="province"
-                                value={data.province}
-                                onChange={(e) => setData('province', e.target.value)}
-                                placeholder="Province"
-                            />
-                        </FormField>
-                    </div>
-                </FormSection>
-
-                {/* Family Background */}
-                <FormSection title="Family Background">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField label="Status of Parents" error={errors.status_of_parents}>
-                            <Select value={data.status_of_parents} onValueChange={(value) => setData('status_of_parents', value)}>
-                                <SelectTrigger className="border-0 border-b border-gray-200 dark:border-gray-700 rounded-none bg-transparent">
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Living Together">Living Together</SelectItem>
-                                    <SelectItem value="Separated">Separated</SelectItem>
-                                    <SelectItem value="Father Deceased">Father Deceased</SelectItem>
-                                    <SelectItem value="Mother Deceased">Mother Deceased</SelectItem>
-                                    <SelectItem value="Both Deceased">Both Deceased</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </FormField>                        <FormField label="Total Number of Siblings" error={errors.total_siblings}>
-                            <StyledInput
-                                id="total_siblings"
-                                type="number"
-                                min="0"
-                                value={data.total_siblings?.toString() || ''}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (value === '') {
-                                        setData('total_siblings', 0);
-                                    } else {
-                                        const numValue = parseInt(value, 10);
-                                        if (!isNaN(numValue)) {
-                                            setData('total_siblings', numValue);
-                                        }
-                                    }
-                                }}
-                                placeholder="0"
-                            />
-                        </FormField>
-                    </div>
-                </FormSection>                
-                {/* Father's Information */}
-                <FormSection title="Father's Information">                    
-                    <ParentInformation
-                        parentType="father"
-                        data={fatherData}
-                        onDataChange={handleDataChange}
-                        errors={errors}
-                    />
-                </FormSection>                
-                {/* Mother's Information */}
-                <FormSection title="Mother's Information">                    
-                    <ParentInformation
-                        parentType="mother"
-                        data={motherData}
-                        onDataChange={handleDataChange}
-                        errors={errors}
-                    />
-                </FormSection>{/* Form Actions */}
-                <div className="flex items-center justify-end gap-6 pt-6 border-t border-gray-100 dark:border-gray-800">
-                    <Button
-                        variant="ghost"
-                        asChild
-                        className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    <form
+                        onSubmit={onSubmit}
+                        className="space-y-8"
+                        id="edit-student-profile-form"
                     >
-                        <Link href={route('osas.students.details', user.id)}>
-                            Cancel
-                        </Link>
-                    </Button>
-                    <Button
-                        type="submit"
-                        disabled={processing}
-                        className="flex items-center gap-2"
-                    >
-                        <Save className="h-4 w-4" />
-                        {processing ? 'Saving...' : 'Save Changes'}
-                    </Button>                
-                    </div>
-            </form>
-        </div>
-        </ErrorBoundary>
-    </AppLayout>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                            {/* Column 1 */}
+                            <div className="flex flex-col gap-8 h-full">
+                                {/* Student Information */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Student Information</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="space-y-8">
+                                            {/* Personal Details */}
+                                            <div>
+                                                <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                                                    Personal Details
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <InputWithLabel
+                                                        id="first_name"
+                                                        label="First Name"
+                                                        required
+                                                        value={data.first_name}
+                                                        onChange={value => handleDataChange('first_name', value)}
+                                                        error={errors['first_name']}
+                                                        placeholder="Enter first name"
+                                                    />
+                                                    <InputWithLabel
+                                                        id="middle_name"
+                                                        label="Middle Name"
+                                                        required
+                                                        value={data.middle_name}
+                                                        onChange={value => handleDataChange('middle_name', value)}
+                                                        error={errors['middle_name']}
+                                                        placeholder="Enter middle name"
+                                                    />
+                                                    <InputWithLabel
+                                                        id="last_name"
+                                                        label="Last Name"
+                                                        required
+                                                        value={data.last_name}
+                                                        onChange={value => handleDataChange('last_name', value)}
+                                                        error={errors['last_name']}
+                                                        placeholder="Enter last name"
+                                                    />
+                                                    <SexSelector
+                                                        value={data.sex}
+                                                        onChange={value => handleDataChange('sex', value)}
+                                                        error={errors['sex']}
+                                                        required
+                                                        className="w-full"
+                                                    />
+                                                    <CivilStatusSelector
+                                                        value={data.civil_status}
+                                                        onChange={value => handleDataChange('civil_status', value)}
+                                                        error={errors['civil_status']}
+                                                        required
+                                                        className="w-full"
+                                                    />
+                                                    <DatePicker
+                                                        id="date_of_birth"
+                                                        label="Date of Birth"
+                                                        required
+                                                        value={data.date_of_birth ? new Date(data.date_of_birth) : undefined}
+                                                        onChange={date => setData('date_of_birth', date ? date.toISOString().split('T')[0] : '')}
+                                                        error={errors['date_of_birth']}
+                                                        maxDate={new Date()}
+                                                        className="w-full"
+                                                    />
+                                                </div>
+                                                <div className="mt-6">
+                                                    <PlaceOfBirth
+                                                        data={{ place_of_birth: data.place_of_birth || '' }}
+                                                        setData={setData}
+                                                        errors={errors}
+                                                        processing={processing}
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                                    <ReligionSelector
+                                                        value={data.religion}
+                                                        onChange={value => setData('religion', value)}
+                                                        error={errors.religion}
+                                                        required={false}
+                                                    />
+                                                    <ResidenceTypeSelector
+                                                        value={data.residence_type}
+                                                        onChange={value => setData('residence_type', value)}
+                                                        error={errors.residence_type}
+                                                        required={false}
+                                                        className="w-full"
+                                                    />
+                                                    <div className="col-span-2">
+                                                        <PwdRadio
+                                                            value={data.is_pwd ? 'Yes' : 'No'}
+                                                            onChange={val => setData('is_pwd', val === 'Yes')}
+                                                            disabilityType={data.disability_type || ''}
+                                                            onDisabilityTypeChange={val => setData('disability_type', val)}
+                                                            error={errors.is_pwd}
+                                                            disabilityTypeError={errors.disability_type}
+                                                            required={false}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {/* Address */}
+                                            <div>
+                                                <Address
+                                                    data={{
+                                                        street: data.street,
+                                                        barangay: data.barangay,
+                                                        city: data.city,
+                                                        province: data.province,
+                                                        zip_code: data.zip_code || ''
+                                                    }}
+                                                    setData={(field, value) => setData(field, value)}
+                                                    errors={errors}
+                                                    processing={processing}
+                                                />
+                                            </div>
+                                            {/* Academic Details */}
+                                            <div>
+                                                <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                                                    Academic Details
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <InputWithLabel
+                                                        id="student_id"
+                                                        label="Student ID"
+                                                        value={data.student_id}
+                                                        onChange={value => setData('student_id', value)}
+                                                        error={errors.student_id}
+                                                        required
+                                                        placeholder="e.g. MBC2023-1234"
+                                                    />
+                                                    <CourseSelector
+                                                        value={data.course}
+                                                        onChange={value => setData('course', value)}
+                                                        error={errors.course}
+                                                        required
+                                                        majorValue={data.major}
+                                                        onMajorChange={value => setData('major', value)}
+                                                        majorError={errors.major}
+                                                    />
+                                                    <YearLevelSelector
+                                                        value={data.year_level}
+                                                        onChange={value => setData('year_level', value)}
+                                                        error={errors.year_level}
+                                                        required
+                                                        className="w-full"
+                                                    />
+                                                    <InputWithLabel
+                                                        id="existing_scholarships"
+                                                        label="Existing Scholarships"
+                                                        value={data.existing_scholarships}
+                                                        onChange={value => setData('existing_scholarships', value)}
+                                                        error={errors.existing_scholarships}
+                                                        placeholder="List any current scholarships..."
+                                                    />
+                                                </div>
+                                            </div>
+                                            {/* Contact Information */}
+                                            <div>
+                                                <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                                                    Contact Information
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <InputWithLabel
+                                                        id="email"
+                                                        label="Email Address"
+                                                        type="email"
+                                                        value={data.email}
+                                                        onChange={value => setData('email', value)}
+                                                        error={errors.email}
+                                                        required
+                                                    />
+                                                    <InputWithLabel
+                                                        id="mobile_number"
+                                                        label="Mobile Number"
+                                                        value={data.mobile_number}
+                                                        onChange={value => setData('mobile_number', value)}
+                                                        error={errors.mobile_number}
+                                                        placeholder="+639123456789"
+                                                    />
+                                                    <InputWithLabel
+                                                        id="telephone_number"
+                                                        label="Telephone Number"
+                                                        value={data.telephone_number}
+                                                        onChange={value => setData('telephone_number', value)}
+                                                        error={errors.telephone_number}
+                                                        placeholder="(02) 123-4567"
+                                                    />
+                                                </div>
+                                            </div>
+                                            {/* Guardian & Siblings */}
+                                            <div>
+                                                <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                                                    Guardian & Siblings
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <InputWithLabel
+                                                        id="guardian_name"
+                                                        label="Guardian Name"
+                                                        value={data.guardian_name}
+                                                        onChange={value => setData('guardian_name', value)}
+                                                        error={errors.guardian_name}
+                                                        placeholder="Guardian's full name"
+                                                    />
+                                                    <InputWithLabel
+                                                        id="total_siblings"
+                                                        label="Total Siblings"
+                                                        type="number"
+                                                        value={data.total_siblings?.toString() || ''}
+                                                        onChange={value => setData('total_siblings', value === '' ? 0 : parseInt(value))}
+                                                        error={errors.total_siblings}
+                                                        placeholder="0"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                            {/* Column 2 */}
+                            <div className="flex flex-col gap-8 h-full">
+                                {/* Father's Information */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Father's Information</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-1 gap-6">
+                                            <InputWithLabel
+                                                id="father_name"
+                                                label="Full Name"
+                                                value={fatherData.name}
+                                                onChange={value => handleDataChange('father_name', value)}
+                                                error={errors['father_name']}
+                                                placeholder="Father's full name"
+                                            />
+                                            <InputWithLabel
+                                                id="father_age"
+                                                label="Age"
+                                                type="number"
+                                                value={fatherData.age?.toString() || ''}
+                                                onChange={value => handleDataChange('father_age', value === '' ? 0 : parseInt(value))}
+                                                error={errors['father_age']}
+                                                placeholder="Age"
+                                            />
+                                            <InputWithLabel
+                                                id="father_address"
+                                                label="Address"
+                                                value={fatherData.address}
+                                                onChange={value => handleDataChange('father_address', value)}
+                                                error={errors['father_address']}
+                                                placeholder="Home address"
+                                            />
+                                            <InputWithLabel
+                                                id="father_telephone"
+                                                label="Telephone"
+                                                value={fatherData.telephone}
+                                                onChange={value => handleDataChange('father_telephone', value)}
+                                                error={errors['father_telephone']}
+                                                placeholder="(02) 123-4567"
+                                            />
+                                            <InputWithLabel
+                                                id="father_mobile"
+                                                label="Mobile Number"
+                                                value={fatherData.mobile}
+                                                onChange={value => handleDataChange('father_mobile', value)}
+                                                error={errors['father_mobile']}
+                                                placeholder="+639123456789"
+                                            />
+                                            <InputWithLabel
+                                                id="father_email"
+                                                label="Email Address"
+                                                type="email"
+                                                value={fatherData.email}
+                                                onChange={value => handleDataChange('father_email', value)}
+                                                error={errors['father_email']}
+                                                placeholder="father@email.com"
+                                            />
+                                            <InputWithLabel
+                                                id="father_occupation"
+                                                label="Occupation"
+                                                value={fatherData.occupation}
+                                                onChange={value => handleDataChange('father_occupation', value)}
+                                                error={errors['father_occupation']}
+                                                placeholder="Job title"
+                                            />
+                                            <InputWithLabel
+                                                id="father_company"
+                                                label="Company"
+                                                value={fatherData.company}
+                                                onChange={value => handleDataChange('father_company', value)}
+                                                error={errors['father_company']}
+                                                placeholder="Company name"
+                                            />
+                                            <InputWithLabel
+                                                id="father_monthly_income"
+                                                label="Monthly Income"
+                                                type="number"
+                                                value={fatherData.monthly_income?.toString() || ''}
+                                                onChange={value => handleDataChange('father_monthly_income', value === '' ? 0 : parseFloat(value))}
+                                                error={errors['father_monthly_income']}
+                                                placeholder="0.00"
+                                            />
+                                            <InputWithLabel
+                                                id="father_education"
+                                                label="Education"
+                                                value={fatherData.education}
+                                                onChange={value => handleDataChange('father_education', value)}
+                                                error={errors['father_education']}
+                                                placeholder="Educational attainment"
+                                            />
+                                            <InputWithLabel
+                                                id="father_school"
+                                                label="School"
+                                                value={fatherData.school}
+                                                onChange={value => handleDataChange('father_school', value)}
+                                                error={errors['father_school']}
+                                                placeholder="School attended"
+                                            />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                            {/* Column 3 */}
+                            <div className="flex flex-col gap-8 h-full">
+                                {/* Mother's Information */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Mother's Information</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-1 gap-6">
+                                            <InputWithLabel
+                                                id="mother_name"
+                                                label="Full Name"
+                                                value={motherData.name}
+                                                onChange={value => handleDataChange('mother_name', value)}
+                                                error={errors['mother_name']}
+                                                placeholder="Mother's full name"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_age"
+                                                label="Age"
+                                                type="number"
+                                                value={motherData.age?.toString() || ''}
+                                                onChange={value => handleDataChange('mother_age', value === '' ? 0 : parseInt(value))}
+                                                error={errors['mother_age']}
+                                                placeholder="Age"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_address"
+                                                label="Address"
+                                                value={motherData.address}
+                                                onChange={value => handleDataChange('mother_address', value)}
+                                                error={errors['mother_address']}
+                                                placeholder="Home address"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_telephone"
+                                                label="Telephone"
+                                                value={motherData.telephone}
+                                                onChange={value => handleDataChange('mother_telephone', value)}
+                                                error={errors['mother_telephone']}
+                                                placeholder="(02) 123-4567"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_mobile"
+                                                label="Mobile Number"
+                                                value={motherData.mobile}
+                                                onChange={value => handleDataChange('mother_mobile', value)}
+                                                error={errors['mother_mobile']}
+                                                placeholder="+639123456789"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_email"
+                                                label="Email Address"
+                                                type="email"
+                                                value={motherData.email}
+                                                onChange={value => handleDataChange('mother_email', value)}
+                                                error={errors['mother_email']}
+                                                placeholder="mother@email.com"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_occupation"
+                                                label="Occupation"
+                                                value={motherData.occupation}
+                                                onChange={value => handleDataChange('mother_occupation', value)}
+                                                error={errors['mother_occupation']}
+                                                placeholder="Job title"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_company"
+                                                label="Company"
+                                                value={motherData.company}
+                                                onChange={value => handleDataChange('mother_company', value)}
+                                                error={errors['mother_company']}
+                                                placeholder="Company name"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_monthly_income"
+                                                label="Monthly Income"
+                                                type="number"
+                                                value={motherData.monthly_income?.toString() || ''}
+                                                onChange={value => handleDataChange('mother_monthly_income', value === '' ? 0 : parseFloat(value))}
+                                                error={errors['mother_monthly_income']}
+                                                placeholder="0.00"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_education"
+                                                label="Education"
+                                                value={motherData.education}
+                                                onChange={value => handleDataChange('mother_education', value)}
+                                                error={errors['mother_education']}
+                                                placeholder="Educational attainment"
+                                            />
+                                            <InputWithLabel
+                                                id="mother_school"
+                                                label="School"
+                                                value={motherData.school}
+                                                onChange={value => handleDataChange('mother_school', value)}
+                                                error={errors['mother_school']}
+                                                placeholder="School attended"
+                                            />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </ErrorBoundary>
+        </AppLayout>
     );
 }

@@ -68,7 +68,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                         variant="outline"
                         disabled={disabled}
                         className={cn(
-                            "w-48 justify-between font-normal",
+                            "w-full justify-between font-normal",
                             !value && "text-muted-foreground"
                         )}
                         aria-describedby={cn(errorId, descriptionId)}

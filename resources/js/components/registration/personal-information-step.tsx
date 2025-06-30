@@ -4,9 +4,11 @@ import Address from "@/components/address";
 import PlaceOfBirth from "@/components/place-of-birth";
 import type { RegisterForm } from "@/hooks/use-registration-form";
 import { InputWithLabel } from "@/components/input-with-label";
-import { SelectorWithLabel } from "@/components/selector-with-label";
-import RadioWithLabel from "@/components/radio-with-label";
+import CivilStatusSelector from "@/components/civil-status-selector";
 import ReligionSelector from "@/components/religion-selector";
+import ResidenceTypeSelector from "@/components/residence-type-selector";
+import SexSelector from "@/components/sex-selector";
+import PwdRadio from "@/components/pwd-radio";
 
 interface PersonalInformationStepProps {
     data: RegisterForm;
@@ -18,29 +20,6 @@ interface PersonalInformationStepProps {
     onDateOfBirthSelect: (date: Date | undefined) => void;
     processing?: boolean;
 }
-
-const CIVIL_STATUS_OPTIONS = [
-    { value: "Single", label: "Single" },
-    { value: "Married", label: "Married" },
-    { value: "Divorced", label: "Divorced" },
-    { value: "Widowed", label: "Widowed" },
-];
-
-const SEX_OPTIONS = [
-    { value: "Male", label: "Male" },
-    { value: "Female", label: "Female" },
-];
-
-const RESIDENCE_TYPE_OPTIONS = [
-    { value: "Parent's House", label: "Parent's House" },
-    { value: "Boarding House", label: "Boarding House" },
-    { value: "With Guardian", label: "With Guardian" },
-];
-
-const PWD_OPTIONS = [
-    { value: "No", label: "No" },
-    { value: "Yes", label: "Yes" },
-];
 
 const PersonalInformationStep = memo<PersonalInformationStepProps>(
     ({
@@ -94,11 +73,6 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
             []
         );
 
-        const sexOptions = useMemo(() => SEX_OPTIONS, []);
-        const civilStatusOptions = useMemo(() => CIVIL_STATUS_OPTIONS, []);
-        const residenceTypeOptions = useMemo(() => RESIDENCE_TYPE_OPTIONS, []);
-        const pwdOptions = useMemo(() => PWD_OPTIONS, []);
-
         return (
             <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -137,27 +111,19 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <SelectorWithLabel
-                        id="sex"
-                        label="Sex"
-                        required
+                    <SexSelector
                         value={data.sex}
                         onChange={handleFieldChange("sex")}
-                        placeholder="Select sex"
-                        options={sexOptions}
                         error={errors.sex}
+                        required
                         className="w-full"
                     />
 
-                    <SelectorWithLabel
-                        id="civil_status"
-                        label="Civil Status"
-                        required
+                    <CivilStatusSelector
                         value={data.civil_status}
                         onChange={handleFieldChange("civil_status")}
-                        placeholder="Select civil status"
-                        options={civilStatusOptions}
                         error={errors.civil_status}
+                        required
                         className="w-full"
                     />
                 </div>
@@ -222,55 +188,27 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         className="w-full"
                     />
 
-                    <SelectorWithLabel
-                        id="residence_type"
-                        label="Residence Type"
-                        required
+                    <ResidenceTypeSelector
                         value={data.residence_type}
                         onChange={onResidenceTypeChange}
-                        placeholder="Select residence type"
-                        options={residenceTypeOptions}
                         error={errors.residence_type}
+                        required
                         className="w-full"
+                        guardianName={data.guardian_name}
+                        onGuardianNameChange={handleFieldChange("guardian_name")}
+                        guardianError={errors.guardian_name}
                     />
                 </div>
 
-                {data.residence_type === "With Guardian" && (
-                    <InputWithLabel
-                        id="guardian_name"
-                        label="Guardian Name"
-                        required
-                        value={data.guardian_name}
-                        onChange={handleFieldChange("guardian_name")}
-                        placeholder="Enter guardian's full name"
-                        error={errors.guardian_name}
-                        className="w-full"
-                    />
-                )}
-
-                <RadioWithLabel
-                    id="is_pwd"
-                    label="Person with Disability (PWD)"
-                    required
+                <PwdRadio
                     value={data.is_pwd}
                     onChange={onPwdChange}
-                    options={pwdOptions}
-                    orientation="horizontal"
+                    disabilityType={data.disability_type}
+                    onDisabilityTypeChange={handleFieldChange("disability_type")}
                     error={errors.is_pwd}
+                    disabilityTypeError={errors.disability_type}
+                    required
                 />
-
-                {data.is_pwd === "Yes" && (
-                    <InputWithLabel
-                        id="disability_type"
-                        label="Type of Disability"
-                        required
-                        value={data.disability_type}
-                        onChange={handleFieldChange("disability_type")}
-                        placeholder="Specify type of disability"
-                        error={errors.disability_type}
-                        className="w-full"
-                    />
-                )}
             </div>
         );
     }
