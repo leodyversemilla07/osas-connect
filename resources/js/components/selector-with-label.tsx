@@ -34,7 +34,7 @@ export function SelectorWithLabel({
 
     return (
         <div className={`grid gap-2 ${className}`}>
-            <Label htmlFor={id} className="text-sm font-medium">
+            <Label htmlFor={id}>
                 {label}{required && <span className="text-red-500">*</span>}
             </Label>
             {description && (
@@ -47,7 +47,7 @@ export function SelectorWithLabel({
                     id={id}
                     aria-describedby={[errorId, descriptionId].filter(Boolean).join(" ")}
                     aria-invalid={!!error}
-                    className="mt-1 truncate w-full max-w-full"
+                    className="mt-0 truncate w-full max-w-full"
                 >
                     <SelectValue placeholder={placeholder} className="truncate w-full max-w-full" />
                 </SelectTrigger>

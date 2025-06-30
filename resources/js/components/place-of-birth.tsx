@@ -52,12 +52,13 @@ export default function PlaceOfBirth({ data, setData, errors, processing }: Plac
     }, [birthData.province, provinces]);
 
     useEffect(() => {
-        if (birthData.province && birthData.city) {
-            setData('place_of_birth', `${birthData.city}, ${birthData.province}`);
-        } else {
-            setData('place_of_birth', '');
+        const newValue = birthData.province && birthData.city
+            ? `${birthData.city}, ${birthData.province}`
+            : '';
+        if (data.place_of_birth !== newValue) {
+            setData('place_of_birth', newValue);
         }
-    }, [birthData.province, birthData.city, setData]);
+    }, [birthData.province, birthData.city, setData, data.place_of_birth]);
 
     const handleProvinceChange = useCallback((value: string) => {
         const selectedProvince = provinces.find(p => p.code === value);

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Plus, Trash2 } from 'lucide-react';
-import { FormField, NumberField, TextField } from '@/components/profile/form-fields';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { InputWithLabel } from '@/components/input-with-label';
+import { SelectorWithLabel } from '@/components/selector-with-label';
 import type { SiblingInfo, ProfileSectionProps } from '@/types/profile';
 
 /**
@@ -54,30 +54,30 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                 <CardDescription>Information about your family members</CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
-                {/* Parents Status */}                <FormField label="Status of Parents" error={errors.status_of_parents}>
-                    <Select
-                        value={data.status_of_parents || ''}
-                        onValueChange={(value) => updateField('status_of_parents', value)}
-                    >
-                        <SelectTrigger data-testid="parents-status-select">
-                            <SelectValue placeholder="Select parents status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Living Together">Living Together</SelectItem>
-                            <SelectItem value="Separated">Separated</SelectItem>
-                            <SelectItem value="Single Parent">Single Parent</SelectItem>
-                            <SelectItem value="Mother Deceased">Mother Deceased</SelectItem>
-                            <SelectItem value="Father Deceased">Father Deceased</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </FormField>
+                {/* Parents Status */}
+                <SelectorWithLabel
+                    id="status_of_parents"
+                    label="Status of Parents"
+                    value={data.status_of_parents || ''}
+                    onChange={(value) => updateField('status_of_parents', value)}
+                    options={[
+                        { value: 'Living Together', label: 'Living Together' },
+                        { value: 'Separated', label: 'Separated' },
+                        { value: 'Single Parent', label: 'Single Parent' },
+                        { value: 'Mother Deceased', label: 'Mother Deceased' },
+                        { value: 'Father Deceased', label: 'Father Deceased' },
+                    ]}
+                    error={errors.status_of_parents}
+                    placeholder="Select parents status"
+                    data-testid="parents-status-select"
+                />
 
                 {/* Father's Information */}
                 <div className="space-y-4">
                     <h4 className="font-semibold text-sm text-foreground">Father's Information</h4>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
+                        <InputWithLabel
                             label="Father's Name"
                             id="father_name"
                             value={data.father_name || ''}
@@ -87,17 +87,19 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="father-name-input"
                         />
 
-                        <NumberField
+                        <InputWithLabel
                             label="Father's Age"
-                            id="father_age" value={data.father_age}
-                            onChange={(value) => updateField('father_age', value)}
+                            id="father_age"
+                            type="number"
+                            value={String(data.father_age ?? '')}
+                            onChange={value => updateField('father_age', value === '' ? 0 : Number(value))}
                             error={errors.father_age}
                             placeholder="Enter father's age"
                             data-testid="father-age-input"
                         />
                     </div>
 
-                    <TextField
+                    <InputWithLabel
                         label="Father's Address"
                         id="father_address"
                         value={data.father_address || ''}
@@ -108,7 +110,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <TextField
+                        <InputWithLabel
                             label="Father's Telephone"
                             id="father_telephone"
                             value={data.father_telephone || ''}
@@ -118,7 +120,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="father-telephone-input"
                         />
 
-                        <TextField
+                        <InputWithLabel
                             label="Father's Mobile"
                             id="father_mobile"
                             value={data.father_mobile || ''}
@@ -128,7 +130,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="father-mobile-input"
                         />
 
-                        <TextField
+                        <InputWithLabel
                             label="Father's Email"
                             id="father_email"
                             type="email"
@@ -141,7 +143,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
+                        <InputWithLabel
                             label="Father's Occupation"
                             id="father_occupation"
                             value={data.father_occupation || ''}
@@ -151,7 +153,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="father-occupation-input"
                         />
 
-                        <TextField
+                        <InputWithLabel
                             label="Father's Company"
                             id="father_company"
                             value={data.father_company || ''}
@@ -163,19 +165,23 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <NumberField
+                        <InputWithLabel
                             label="Father's Monthly Income"
-                            id="father_monthly_income" value={data.father_monthly_income}
-                            onChange={(value) => updateField('father_monthly_income', value)}
+                            id="father_monthly_income"
+                            type="number"
+                            value={String(data.father_monthly_income ?? '')}
+                            onChange={value => updateField('father_monthly_income', value === '' ? 0 : Number(value))}
                             error={errors.father_monthly_income}
                             placeholder="Enter monthly income"
                             data-testid="father-monthly-income-input"
                         />
 
-                        <NumberField
+                        <InputWithLabel
                             label="Years of Service"
-                            id="father_years_service" value={data.father_years_service}
-                            onChange={(value) => updateField('father_years_service', value)}
+                            id="father_years_service"
+                            type="number"
+                            value={String(data.father_years_service ?? '')}
+                            onChange={value => updateField('father_years_service', value === '' ? 0 : Number(value))}
                             error={errors.father_years_service}
                             placeholder="Enter years of service"
                             data-testid="father-years-service-input"
@@ -183,7 +189,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
+                        <InputWithLabel
                             label="Father's Education"
                             id="father_education"
                             value={data.father_education || ''}
@@ -193,7 +199,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="father-education-input"
                         />
 
-                        <TextField
+                        <InputWithLabel
                             label="Father's School"
                             id="father_school"
                             value={data.father_school || ''}
@@ -205,7 +211,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     </div>
 
                     {data.father_occupation?.toLowerCase().includes('unemployed') && (
-                        <TextField
+                        <InputWithLabel
                             label="Reason for Unemployment"
                             id="father_unemployment_reason"
                             value={data.father_unemployment_reason || ''}
@@ -222,7 +228,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     <h4 className="font-semibold text-sm text-foreground">Mother's Information</h4>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
+                        <InputWithLabel
                             label="Mother's Name"
                             id="mother_name"
                             value={data.mother_name || ''}
@@ -232,17 +238,19 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="mother-name-input"
                         />
 
-                        <NumberField
+                        <InputWithLabel
                             label="Mother's Age"
-                            id="mother_age" value={data.mother_age}
-                            onChange={(value) => updateField('mother_age', value)}
+                            id="mother_age"
+                            type="number"
+                            value={String(data.mother_age ?? '')}
+                            onChange={value => updateField('mother_age', value === '' ? 0 : Number(value))}
                             error={errors.mother_age}
                             placeholder="Enter mother's age"
                             data-testid="mother-age-input"
                         />
                     </div>
 
-                    <TextField
+                    <InputWithLabel
                         label="Mother's Address"
                         id="mother_address"
                         value={data.mother_address || ''}
@@ -253,7 +261,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <TextField
+                        <InputWithLabel
                             label="Mother's Telephone"
                             id="mother_telephone"
                             value={data.mother_telephone || ''}
@@ -263,7 +271,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="mother-telephone-input"
                         />
 
-                        <TextField
+                        <InputWithLabel
                             label="Mother's Mobile"
                             id="mother_mobile"
                             value={data.mother_mobile || ''}
@@ -273,7 +281,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="mother-mobile-input"
                         />
 
-                        <TextField
+                        <InputWithLabel
                             label="Mother's Email"
                             id="mother_email"
                             type="email"
@@ -286,7 +294,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
+                        <InputWithLabel
                             label="Mother's Occupation"
                             id="mother_occupation"
                             value={data.mother_occupation || ''}
@@ -296,7 +304,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="mother-occupation-input"
                         />
 
-                        <TextField
+                        <InputWithLabel
                             label="Mother's Company"
                             id="mother_company"
                             value={data.mother_company || ''}
@@ -308,19 +316,23 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <NumberField
+                        <InputWithLabel
                             label="Mother's Monthly Income"
-                            id="mother_monthly_income" value={data.mother_monthly_income}
-                            onChange={(value) => updateField('mother_monthly_income', value)}
+                            id="mother_monthly_income"
+                            type="number"
+                            value={String(data.mother_monthly_income ?? '')}
+                            onChange={value => updateField('mother_monthly_income', value === '' ? 0 : Number(value))}
                             error={errors.mother_monthly_income}
                             placeholder="Enter monthly income"
                             data-testid="mother-monthly-income-input"
                         />
 
-                        <NumberField
+                        <InputWithLabel
                             label="Years of Service"
-                            id="mother_years_service" value={data.mother_years_service}
-                            onChange={(value) => updateField('mother_years_service', value)}
+                            id="mother_years_service"
+                            type="number"
+                            value={String(data.mother_years_service ?? '')}
+                            onChange={value => updateField('mother_years_service', value === '' ? 0 : Number(value))}
                             error={errors.mother_years_service}
                             placeholder="Enter years of service"
                             data-testid="mother-years-service-input"
@@ -328,7 +340,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
+                        <InputWithLabel
                             label="Mother's Education"
                             id="mother_education"
                             value={data.mother_education || ''}
@@ -338,7 +350,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                             data-testid="mother-education-input"
                         />
 
-                        <TextField
+                        <InputWithLabel
                             label="Mother's School"
                             id="mother_school"
                             value={data.mother_school || ''}
@@ -350,7 +362,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                     </div>
 
                     {data.mother_occupation?.toLowerCase().includes('unemployed') && (
-                        <TextField
+                        <InputWithLabel
                             label="Reason for Unemployment"
                             id="mother_unemployment_reason"
                             value={data.mother_unemployment_reason || ''}
@@ -379,10 +391,12 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                         </Button>
                     </div>
 
-                    <NumberField
+                    <InputWithLabel
                         label="Total Number of Siblings"
-                        id="total_siblings" value={data.total_siblings}
-                        onChange={(value) => updateField('total_siblings', value)}
+                        id="total_siblings"
+                        type="number"
+                        value={String(data.total_siblings ?? '')}
+                        onChange={value => updateField('total_siblings', value === '' ? 0 : Number(value))}
                         error={errors.total_siblings}
                         placeholder="Enter total number of siblings"
                         data-testid="total-siblings-input"
@@ -408,7 +422,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <TextField
+                                            <InputWithLabel
                                                 label="Name"
                                                 id={`sibling_${index}_name`}
                                                 value={sibling.name}
@@ -417,17 +431,19 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                                                 data-testid={`sibling-${index}-name-input`}
                                             />
 
-                                            <NumberField
+                                            <InputWithLabel
                                                 label="Age"
-                                                id={`sibling_${index}_age`} value={sibling.age}
-                                                onChange={(value) => updateSibling(index, 'age', value)}
+                                                id={`sibling_${index}_age`}
+                                                type="number"
+                                                value={String(sibling.age)}
+                                                onChange={(value) => updateSibling(index, 'age', value === '' ? 0 : Number(value))}
                                                 placeholder="Enter age"
                                                 data-testid={`sibling-${index}-age-input`}
                                             />
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <TextField
+                                            <InputWithLabel
                                                 label="Civil Status"
                                                 id={`sibling_${index}_civil_status`}
                                                 value={sibling.civil_status}
@@ -436,7 +452,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                                                 data-testid={`sibling-${index}-civil-status-input`}
                                             />
 
-                                            <TextField
+                                            <InputWithLabel
                                                 label="Educational Attainment"
                                                 id={`sibling_${index}_education`}
                                                 value={sibling.educational_attainment}
@@ -447,7 +463,7 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <TextField
+                                            <InputWithLabel
                                                 label="Occupation"
                                                 id={`sibling_${index}_occupation`}
                                                 value={sibling.occupation}
@@ -456,10 +472,12 @@ export const FamilyBackgroundSection = React.memo<Pick<ProfileSectionProps, 'dat
                                                 data-testid={`sibling-${index}-occupation-input`}
                                             />
 
-                                            <NumberField
+                                            <InputWithLabel
                                                 label="Monthly Income"
-                                                id={`sibling_${index}_income`} value={sibling.monthly_income}
-                                                onChange={(value) => updateSibling(index, 'monthly_income', value)}
+                                                id={`sibling_${index}_income`}
+                                                type="number"
+                                                value={String(sibling.monthly_income)}
+                                                onChange={(value) => updateSibling(index, 'monthly_income', value === '' ? 0 : Number(value))}
                                                 placeholder="Enter monthly income"
                                                 data-testid={`sibling-${index}-income-input`}
                                             />

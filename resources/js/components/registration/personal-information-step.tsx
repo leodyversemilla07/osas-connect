@@ -6,6 +6,7 @@ import type { RegisterForm } from "@/hooks/use-registration-form";
 import { InputWithLabel } from "@/components/input-with-label";
 import { SelectorWithLabel } from "@/components/selector-with-label";
 import RadioWithLabel from "@/components/radio-with-label";
+import ReligionSelector from "@/components/religion-selector";
 
 interface PersonalInformationStepProps {
     data: RegisterForm;
@@ -23,80 +24,6 @@ const CIVIL_STATUS_OPTIONS = [
     { value: "Married", label: "Married" },
     { value: "Divorced", label: "Divorced" },
     { value: "Widowed", label: "Widowed" },
-];
-
-const RELIGION_OPTIONS = [
-    { value: "Roman Catholicism", label: "Roman Catholicism" },
-    { value: "Iglesia ni Cristo", label: "Iglesia ni Cristo" },
-    { value: "Philippine Independent Church (Aglipayan Church)", label: "Philippine Independent Church (Aglipayan Church)" },
-    { value: "Evangelical Christianity", label: "Evangelical Christianity" },
-    { value: "Baptist", label: "Baptist" },
-    { value: "Methodist", label: "Methodist" },
-    { value: "Presbyterian", label: "Presbyterian" },
-    { value: "Pentecostal", label: "Pentecostal" },
-    { value: "Lutheran", label: "Lutheran" },
-    { value: "Anglican / Episcopal", label: "Anglican / Episcopal" },
-    { value: "Seventh-day Adventist Church", label: "Seventh-day Adventist Church" },
-    { value: "Jehovah's Witnesses", label: "Jehovah's Witnesses" },
-    { value: "The Church of Jesus Christ of Latter-day Saints (Mormons)", label: "The Church of Jesus Christ of Latter-day Saints (Mormons)" },
-    { value: "Orthodox Christianity", label: "Orthodox Christianity" },
-    { value: "Quakers (Religious Society of Friends)", label: "Quakers (Religious Society of Friends)" },
-    { value: "United Church of Christ in the Philippines (UCCP)", label: "United Church of Christ in the Philippines (UCCP)" },
-    { value: "Bible Baptist Church", label: "Bible Baptist Church" },
-    { value: "Church of the Nazarene", label: "Church of the Nazarene" },
-    { value: "Foursquare Gospel Church", label: "Foursquare Gospel Church" },
-    { value: "Assemblies of God", label: "Assemblies of God" },
-    { value: "Victory Christian Fellowship", label: "Victory Christian Fellowship" },
-    { value: "Jesus Is Lord Church", label: "Jesus Is Lord Church" },
-    { value: "El Shaddai (Catholic Charismatic)", label: "El Shaddai (Catholic Charismatic)" },
-    { value: "The Kingdom of Jesus Christ", label: "The Kingdom of Jesus Christ" },
-    { value: "Church of God", label: "Church of God" },
-    { value: "Sunni Islam", label: "Sunni Islam" },
-    { value: "Shia Islam", label: "Shia Islam" },
-    { value: "Ahmadiyya Muslim Community", label: "Ahmadiyya Muslim Community" },
-    { value: "Anito (ancestral worship)", label: "Anito (ancestral worship)" },
-    { value: "Bathala belief system", label: "Bathala belief system" },
-    { value: "Katalonan traditions", label: "Katalonan traditions" },
-    { value: "Lumad traditional religion", label: "Lumad traditional religion" },
-    { value: "Ifugao traditional religion", label: "Ifugao traditional religion" },
-    { value: "Kalinga traditional religion", label: "Kalinga traditional religion" },
-    { value: "Bontoc traditional religion", label: "Bontoc traditional religion" },
-    { value: "Mangyan traditional religion", label: "Mangyan traditional religion" },
-    { value: "Palawan indigenous religion", label: "Palawan indigenous religion" },
-    { value: "Aeta indigenous beliefs", label: "Aeta indigenous beliefs" },
-    { value: "Visayan folk religion", label: "Visayan folk religion" },
-    { value: "Kulam (witchcraft)", label: "Kulam (witchcraft)" },
-    { value: "Shamanism", label: "Shamanism" },
-    { value: "Babaylan traditions", label: "Babaylan traditions" },
-    { value: "Animism", label: "Animism" },
-    { value: "Buddhism", label: "Buddhism" },
-    { value: "Theravāda Buddhism", label: "Theravāda Buddhism" },
-    { value: "Mahāyāna Buddhism", label: "Mahāyāna Buddhism" },
-    { value: "Tibetan Buddhism", label: "Tibetan Buddhism" },
-    { value: "Hinduism", label: "Hinduism" },
-    { value: "Sikhism", label: "Sikhism" },
-    { value: "Judaism", label: "Judaism" },
-    { value: "Bahá'í Faith", label: "Bahá'í Faith" },
-    { value: "Taoism", label: "Taoism" },
-    { value: "Confucianism", label: "Confucianism" },
-    { value: "Unitarian Universalism", label: "Unitarian Universalism" },
-    { value: "Zoroastrianism", label: "Zoroastrianism" },
-    { value: "Jainism", label: "Jainism" },
-    { value: "Atheism", label: "Atheism" },
-    { value: "Agnosticism", label: "Agnosticism" },
-    { value: "Humanism", label: "Humanism" },
-    { value: "Spiritualism", label: "Spiritualism" },
-    { value: "New Age", label: "New Age" },
-    { value: "Wicca", label: "Wicca" },
-    { value: "Neo-Paganism", label: "Neo-Paganism" },
-    { value: "Universal Life Church", label: "Universal Life Church" },
-    { value: "Eckankar", label: "Eckankar" },
-    { value: "Church of Scientology", label: "Church of Scientology" },
-    { value: "Raëlism", label: "Raëlism" },
-    { value: "Theosophy", label: "Theosophy" },
-    { value: "Falun Gong", label: "Falun Gong" },
-    { value: "New Thought", label: "New Thought" },
-    { value: "Prefer not to say", label: "Prefer not to say" },
 ];
 
 const SEX_OPTIONS = [
@@ -169,7 +96,6 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
 
         const sexOptions = useMemo(() => SEX_OPTIONS, []);
         const civilStatusOptions = useMemo(() => CIVIL_STATUS_OPTIONS, []);
-        const religionOptions = useMemo(() => RELIGION_OPTIONS, []);
         const residenceTypeOptions = useMemo(() => RESIDENCE_TYPE_OPTIONS, []);
         const pwdOptions = useMemo(() => PWD_OPTIONS, []);
 
@@ -288,15 +214,11 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <SelectorWithLabel
-                        id="religion"
-                        label="Religion"
-                        required
+                    <ReligionSelector
                         value={data.religion}
                         onChange={handleFieldChange("religion")}
-                        placeholder="Select religion"
-                        options={religionOptions}
                         error={errors.religion}
+                        required
                         className="w-full"
                     />
 

@@ -5,6 +5,63 @@ import { Eye } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Link } from "@inertiajs/react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
+import DeleteStudentDialog from '@/components/delete-student-dialog';
+import React from 'react';
+
+const ActionsCell: React.FC<{ user: User }> = ({ user }) => {
+    const [openDelete, setOpenDelete] = React.useState(false);
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                    onClick={() => navigator.clipboard.writeText(String(user.student_profile?.student_id || ''))}
+                >
+                    Copy Student ID
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                    <Link href={route('admin.students.show', { user: user.id })} className="flex items-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        <span>View Student</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href={route('admin.students.edit', { user: user.id })} className="flex items-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        <span>Edit Student</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    onClick={() => setOpenDelete(true)}
+                    className="text-red-600 focus:text-red-700"
+                >
+                    Delete Student
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+            <DeleteStudentDialog
+                open={openDelete}
+                onOpenChange={setOpenDelete}
+                user={{
+                    id: user.id,
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                    email: user.email,
+                }}
+            />
+        </DropdownMenu>
+    );
+};
 
 export const columns: ColumnDef<User>[] = [
     {
@@ -43,6 +100,17 @@ export const columns: ColumnDef<User>[] = [
         enableHiding: false,
     },
     {
+        accessorKey: "student_profile.student_id",
+        header: "Student ID",
+        cell: ({ row }) => (
+            <span className="font-mono text-base text-gray-900 dark:text-gray-100">
+                {row.original.student_profile?.student_id || "-"}
+            </span>
+        ),
+        enableSorting: true,
+        enableHiding: false,
+    },
+    {
         id: "fullName",
         accessorFn: (row) => `${row.first_name} ${row.middle_name ? `${row.middle_name} ` : ''}${row.last_name}`,
         header: "Name",
@@ -50,8 +118,6 @@ export const columns: ColumnDef<User>[] = [
             <div className="space-y-1">
                 <div className="font-medium text-base text-gray-900 dark:text-gray-100">
                     {row.original.first_name} {row.original.middle_name && `${row.original.middle_name} `}{row.original.last_name}
-                </div>                <div className="text-sm text-gray-500 dark:text-gray-400">
-                    ID: {row.original.student_profile?.student_id}
                 </div>
             </div>
         ),
@@ -59,35 +125,48 @@ export const columns: ColumnDef<User>[] = [
     },
     {
         accessorKey: "email",
-        header: "Contact",
+        header: "Email",
         cell: ({ row }) => (
             <div className="space-y-1">
                 <div className="text-base text-gray-900 dark:text-gray-100">{row.original.email}</div>
-                {row.original.student_profile?.mobile_number && (
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {row.original.student_profile.mobile_number}
-                    </div>
-                )}
             </div>
         ),
     },
     {
+        accessorKey: "student_profile.mobile_number",
+        header: "Mobile Number",
+        cell: ({ row }) => (
+            <span className="text-base text-gray-900 dark:text-gray-100">
+                {row.original.student_profile?.mobile_number || "-"}
+            </span>
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "student_profile.course",
+        header: "Course",
+        cell: ({ row }) => (
+            <span className="text-base text-gray-900 dark:text-gray-100">
+                {row.original.student_profile?.course || "-"}
+            </span>
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
         accessorKey: "student_profile.year_level",
-        header: "Year", cell: ({ row }) => {
+        header: "Year",
+        cell: ({ row }) => {
             const yearLevel = row.original.student_profile?.year_level;
-            const course = row.original.student_profile?.course;
-
             return (
-                <div className="space-y-1">
-                    <div className="text-base font-medium text-gray-900 dark:text-gray-100">{yearLevel}</div>
-                    {course && (
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {course}
-                        </div>
-                    )}
-                </div>
-            )
+                <span className="text-base text-gray-900 dark:text-gray-100">
+                    {yearLevel || "-"}
+                </span>
+            );
         },
+        enableSorting: false,
+        enableHiding: false,
     },
     {
         accessorKey: "created_at",
@@ -102,19 +181,7 @@ export const columns: ColumnDef<User>[] = [
         },
     }, {
         id: "actions",
-        header: "Actions",
-        cell: ({ row }) => {
-            return (
-                <div className="text-left">
-                    <Link
-                        href={route('admin.students.show', { user: row.original.id })}
-                        className="text-sm text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition-colors flex items-center gap-2 pb-1"
-                    >
-                        <Eye className="h-4 w-4" />
-                        View
-                    </Link>
-                </div>
-            );
-        },
+        enableHiding: false,
+        cell: ({ row }) => <ActionsCell user={row.original} />,
     },
 ];

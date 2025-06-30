@@ -1,9 +1,13 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
-import { FormField, TextField } from '@/components/profile/form-fields';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SelectorWithLabel } from '@/components/selector-with-label';
+import { InputWithLabel } from '@/components/input-with-label';
+import { DatePicker } from '@/components/date-picker';
+import Address from '@/components/address';
+import PlaceOfBirth from '@/components/place-of-birth';
+import ReligionSelector from '@/components/religion-selector';
 import type { ProfileSectionProps } from '@/types/profile';
 
 /**
@@ -34,143 +38,92 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
             <CardContent className="space-y-6">
                 {/* Civil Status and Gender */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField label="Civil Status" error={errors.civil_status}>
-                        <Select
-                            value={data.civil_status || ''}
-                            onValueChange={(value) => updateField('civil_status', value)}
-                        >
-                            <SelectTrigger data-testid="civil-status-select">
-                                <SelectValue placeholder="Select civil status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Single">Single</SelectItem>
-                                <SelectItem value="Married">Married</SelectItem>
-                                <SelectItem value="Widowed">Widowed</SelectItem>
-                                <SelectItem value="Separated">Separated</SelectItem>
-                                <SelectItem value="Divorced">Divorced</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </FormField>
-                    <FormField label="Sex" error={errors.sex}>
-                        <Select
-                            value={data.sex || ''}
-                            onValueChange={(value) => updateField('sex', value)}
-                        >
-                            <SelectTrigger data-testid="sex-select">
-                                <SelectValue placeholder="Select sex" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Male">Male</SelectItem>
-                                <SelectItem value="Female">Female</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </FormField>
+                    <SelectorWithLabel
+                        id="civil_status"
+                        label="Civil Status"
+                        value={data.civil_status || ''}
+                        onChange={(value) => updateField('civil_status', value)}
+                        options={[
+                            { value: 'Single', label: 'Single' },
+                            { value: 'Married', label: 'Married' },
+                            { value: 'Widowed', label: 'Widowed' },
+                            { value: 'Separated', label: 'Separated' },
+                            { value: 'Divorced', label: 'Divorced' },
+                        ]}
+                        placeholder="Select civil status"
+                        error={errors.civil_status}
+                    />
+                    <SelectorWithLabel
+                        id="sex"
+                        label="Sex"
+                        value={data.sex || ''}
+                        onChange={(value) => updateField('sex', value)}
+                        options={[
+                            { value: 'Male', label: 'Male' },
+                            { value: 'Female', label: 'Female' },
+                        ]}
+                        placeholder="Select sex"
+                        error={errors.sex}
+                    />
                 </div>
 
                 {/* Birth Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField label="Date of Birth" error={errors.date_of_birth}>
-                        <TextField
-                            id="date_of_birth"
-                            type="date"
-                            value={data.date_of_birth || ''}
-                            onChange={(value) => updateField('date_of_birth', value)}
-                            placeholder="Select date of birth"
-                            data-testid="date-of-birth-input"
-                        />
-                    </FormField>
+                <DatePicker
+                    id="date_of_birth"
+                    label="Date of Birth"
+                    value={data.date_of_birth ? new Date(data.date_of_birth) : undefined}
+                    onChange={(date) => updateField('date_of_birth', date ? date.toISOString().slice(0, 10) : '')}
+                    error={errors.date_of_birth}
+                    className="w-full"
+                />
 
-                    <TextField
-                        label="Place of Birth"
-                        id="place_of_birth"
-                        value={data.place_of_birth || ''}
-                        onChange={(value) => updateField('place_of_birth', value)}
-                        error={errors.place_of_birth}
-                        placeholder="Enter place of birth"
-                        data-testid="place-of-birth-input"
-                    />
-                </div>
+                <PlaceOfBirth
+                    data={{ place_of_birth: data.place_of_birth || '' }}
+                    setData={(field, value) => updateField(field, value)}
+                    errors={{ place_of_birth: errors.place_of_birth || '' }}
+                    processing={false}
+                />
+                <Address
+                    data={{
+                        street: data.street || '',
+                        barangay: data.barangay || '',
+                        city: data.city || '',
+                        province: data.province || '',
+                        zip_code: data.zip_code || '',
+                    }}
+                    setData={(field, value) => updateField(field, value)}
+                    errors={{
+                        street: errors.street || '',
+                        barangay: errors.barangay || '',
+                        city: errors.city || '',
+                        province: errors.province || '',
+                        zip_code: errors.zip_code || '',
+                    }}
+                    processing={false}
+                />
 
-                {/* Address Information */}
-                <div className="space-y-4">
-                    <h4 className="font-semibold text-sm text-foreground">Address Information</h4>
-
-                    <TextField
-                        label="Street Address"
-                        id="street"
-                        value={data.street || ''}
-                        onChange={(value) => updateField('street', value)}
-                        error={errors.street}
-                        placeholder="Enter street address"
-                        data-testid="street-input"
-                    />
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
-                            label="Barangay"
-                            id="barangay"
-                            value={data.barangay || ''}
-                            onChange={(value) => updateField('barangay', value)}
-                            error={errors.barangay}
-                            placeholder="Enter barangay"
-                            data-testid="barangay-input"
-                        />
-
-                        <TextField
-                            label="City"
-                            id="city"
-                            value={data.city || ''}
-                            onChange={(value) => updateField('city', value)}
-                            error={errors.city}
-                            placeholder="Enter city"
-                            data-testid="city-input"
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
-                            label="Province"
-                            id="province"
-                            value={data.province || ''}
-                            onChange={(value) => updateField('province', value)}
-                            error={errors.province}
-                            placeholder="Enter province"
-                            data-testid="province-input"
-                        />
-
-                        <TextField
-                            label="Zip Code"
-                            id="zip_code"
-                            value={String(data.zip_code || '')}
-                            onChange={(value) => updateField('zip_code', value)}
-                            error={errors.zip_code}
-                            placeholder="Enter zip code"
-                            data-testid="zip-code-input"
-                        />
-                    </div>
-                </div>
 
                 {/* Contact Information */}
                 <div className="space-y-4">
-                    <h4 className="font-semibold text-sm text-foreground">Contact Information</h4>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextField
-                            label="Mobile Number"
+                        <InputWithLabel
                             id="mobile_number"
+                            label="Mobile Number"
                             value={data.mobile_number || ''}
-                            onChange={(value) => updateField('mobile_number', value)}
+                            onChange={(value: string) => updateField('mobile_number', value)}
                             error={errors.mobile_number}
                             placeholder="Enter mobile number"
+                            className="w-full"
                             data-testid="mobile-number-input"
                         />
-
-                        <TextField
-                            label="Telephone Number"
+                        <InputWithLabel
                             id="telephone_number"
+                            label="Telephone Number"
                             value={data.telephone_number || ''}
-                            onChange={(value) => updateField('telephone_number', value)}
+                            onChange={(value: string) => updateField('telephone_number', value)}
                             error={errors.telephone_number}
                             placeholder="Enter telephone number (optional)"
+                            className="w-full"
                             data-testid="telephone-number-input"
                         />
                     </div>
@@ -194,13 +147,14 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                     </div>
 
                     {data.is_pwd && (
-                        <TextField
-                            label="Disability Type"
+                        <InputWithLabel
                             id="disability_type"
+                            label="Disability Type"
                             value={data.disability_type || ''}
-                            onChange={(value) => updateField('disability_type', value)}
+                            onChange={(value: string) => updateField('disability_type', value)}
                             error={errors.disability_type}
                             placeholder="Specify disability type"
+                            className="w-full"
                             data-testid="disability-type-input"
                         />
                     )}
@@ -208,40 +162,37 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
 
                 {/* Additional Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TextField
-                        label="Religion"
-                        id="religion"
+                    <ReligionSelector
                         value={data.religion || ''}
-                        onChange={(value) => updateField('religion', value)}
+                        onChange={(value: string) => updateField('religion', value)}
                         error={errors.religion}
-                        placeholder="Enter religion"
-                        data-testid="religion-input"
-                    />                    <FormField label="Residence Type" error={errors.residence_type}>
-                        <Select
-                            value={data.residence_type || ''}
-                            onValueChange={(value) => updateField('residence_type', value)}
-                        >
-                            <SelectTrigger data-testid="residence-type-select">
-                                <SelectValue placeholder="Select residence type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Parent's House">Parent's House</SelectItem>
-                                <SelectItem value="Boarding House">Boarding House</SelectItem>
-                                <SelectItem value="With Guardian">With Guardian</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </FormField>
+                        className="w-full"
+                    />
+                    <SelectorWithLabel
+                        id="residence_type"
+                        label="Residence Type"
+                        value={data.residence_type || ''}
+                        onChange={(value) => updateField('residence_type', value)}
+                        options={[
+                            { value: "Parent's House", label: "Parent's House" },
+                            { value: "Boarding House", label: "Boarding House" },
+                            { value: "With Guardian", label: "With Guardian" },
+                        ]}
+                        placeholder="Select residence type"
+                        error={errors.residence_type}
+                    />
                 </div>
 
                 {/* Guardian Name - Only show when residence type is "With Guardian" */}
                 {data.residence_type === 'With Guardian' && (
-                    <TextField
-                        label="Guardian Name"
+                    <InputWithLabel
                         id="guardian_name"
+                        label="Guardian Name"
                         value={data.guardian_name || ''}
-                        onChange={(value) => updateField('guardian_name', value)}
+                        onChange={(value: string) => updateField('guardian_name', value)}
                         error={errors.guardian_name}
                         placeholder="Enter guardian's full name"
+                        className="w-full"
                         data-testid="guardian-name-input"
                     />
                 )}

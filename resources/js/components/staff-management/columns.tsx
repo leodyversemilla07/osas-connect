@@ -7,11 +7,11 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Clock, UserCheck, Eye } from "lucide-react"
-import { Link, router } from "@inertiajs/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 // Extended type to handle both staff and invitations
@@ -50,7 +50,8 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
         enableHiding: false,
     }, {
         accessorKey: "avatar",
-        header: "Avatar", cell: ({ row }) => {
+        header: "Avatar",
+        cell: ({ row }) => {
             if (row.original.type === 'invitation') {
                 // Generate initials from email address
                 const email = row.original.email || ''
@@ -94,6 +95,23 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
         },
         enableSorting: false,
         enableHiding: false,
+    },
+    {
+        accessorKey: "osas_staff_profile.staff_id",
+        header: "Staff ID",
+        cell: ({ row }) => {
+            if (row.original.type === 'staff') {
+                return (
+                    <span className="font-mono text-sm text-gray-700 dark:text-gray-200">
+                        {row.original.osas_staff_profile?.staff_id || '—'}
+                    </span>
+                )
+            }
+            // For invitations, show a dash or blank
+            return <span className="text-gray-400">—</span>
+        },
+        enableSorting: true,
+        enableHiding: true,
     }, {
         id: "fullName",
         accessorFn: (row) => row.type === 'invitation' ? row.email : `${row.first_name} ${row.last_name}`,
@@ -116,16 +134,14 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
                     <div className="font-medium text-base text-gray-900 dark:text-gray-100">
                         {row.original.first_name} {row.original.last_name}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                        ID: {row.original.osas_staff_profile?.staff_id}
-                    </div>
                 </div>
             )
         },
         enableHiding: false,
     }, {
         accessorKey: "email",
-        header: "Contact", cell: ({ row }) => {
+        header: "Email",
+        cell: ({ row }) => {
             if (row.original.type === 'invitation') {
                 const getBadgeVariantAndText = (status: string) => {
                     switch (status) {
@@ -173,18 +189,32 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
             return (
                 <div className="space-y-1">
                     <div className="text-base text-gray-900 dark:text-gray-100">{row.original.email}</div>
-                    <div className="flex items-center gap-2">
-                        <Badge variant="default" className="bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-300">
-                            <UserCheck className="h-3 w-3 mr-1" />
-                            Active Staff
-                        </Badge>
-                    </div>
                 </div>
             )
         },
     }, {
+        id: "activeStatus",
+        header: "Status",
+        cell: ({ row }) => {
+            if (row.original.type === 'staff') {
+                return row.original.status === 'active' ? (
+                    <Badge variant="default" className="bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-300">
+                        Active
+                    </Badge>
+                ) : (
+                    <Badge variant="secondary" className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        Inactive
+                    </Badge>
+                )
+            }
+            // For invitations, show a dash
+            return <span className="text-gray-400">—</span>
+        },
+        enableSorting: true,
+        enableHiding: true,
+    }, {
         accessorKey: "created_at",
-        header: "Date",
+        header: "Joined",
         cell: ({ row }) => {
             const date = new Date(row.getValue("created_at"))
             if (row.original.type === 'invitation') {
@@ -204,60 +234,40 @@ export const columns: ColumnDef<StaffTableEntry>[] = [
                     <div className="text-base text-gray-900 dark:text-gray-100">
                         {date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                        Joined
-                    </div>
                 </div>
             )
         },
     }, {
         id: "actions",
-        header: "Actions",
+        enableHiding: false,
         cell: ({ row }) => {
-            if (row.original.type === 'invitation') {
-                return (
-                    <div className="text-left">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
-                                    <MoreHorizontal className="h-5 w-5" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-40">
-                                <DropdownMenuItem
-                                    onClick={() => {
-                                        router.post(route('admin.invitations.resend', { invitation: row.original.invitation_id }))
-                                    }}
-                                    className="text-base"
-                                >
-                                    Resend Invitation
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    onClick={() => {
-                                        router.delete(route('admin.invitations.revoke', { invitation: row.original.invitation_id }))
-                                    }}
-                                    className="text-base text-red-600 dark:text-red-400"
-                                >
-                                    Revoke Invitation
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                )
-            }
-
+            const user = row.original;
             return (
-                <div className="text-left">
-                    <Link
-                        href={route('admin.staff.show', { user: row.original.id })}
-                        className="text-sm text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition-colors flex items-center gap-2 pb-1"
-                    >
-                        <Eye className="h-4 w-4" />
-                        View
-                    </Link>
-                </div>
-            )
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem
+                            onClick={() => navigator.clipboard.writeText(String(user.osas_staff_profile?.staff_id || ''))}
+                        >
+                            Copy Staff ID
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                            <a href={route('admin.staff.show', { user: user.id })}>
+                                <Eye className="inline h-4 w-4 mr-2" />
+                                View Staff
+                            </a>
+                        </DropdownMenuItem>
+                        {/* Add more actions here as needed */}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            );
         },
     },
 ]

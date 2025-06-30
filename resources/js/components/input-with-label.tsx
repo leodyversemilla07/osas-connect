@@ -5,7 +5,7 @@ import InputError from "@/components/input-error";
 interface InputWithLabelProps {
     id: string;
     label: string;
-    type?: "text" | "email" | "tel" | "password";
+    type?: "text" | "email" | "tel" | "password" | "number" | "date";
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;

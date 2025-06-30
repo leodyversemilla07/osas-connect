@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import { SelectorWithLabel } from "@/components/selector-with-label";
 import { InputWithLabel } from "@/components/input-with-label";
+import CourseSelector from "@/components/course-selector";
 import type { RegisterForm } from "@/hooks/use-registration-form";
 
 interface AcademicInformationStepProps {
@@ -34,52 +35,17 @@ const AcademicInformationStep = memo<AcademicInformationStepProps>(({
             </div>
 
             <div>
-                <SelectorWithLabel
-                    id="course"
-                    label="Course"
-                    required
+                <CourseSelector
                     value={data.course}
                     onChange={onCourseChange}
-                    options={[
-                        { value: "Bachelor of Science in Information Technology", label: "BSIT - Bachelor of Science in Information Technology" },
-                        { value: "Bachelor of Science in Computer Engineering", label: "BSCpE - Bachelor of Science in Computer Engineering" },
-                        { value: "Bachelor of Science in Tourism Management", label: "BSTM - Bachelor of Science in Tourism Management" },
-                        { value: "Bachelor of Science in Hospitality Management", label: "BSHM - Bachelor of Science in Hospitality Management" },
-                        { value: "Bachelor of Science in Entrepreneurship", label: "BSENTREP - Bachelor of Science in Entrepreneurship" },
-                        { value: "Bachelor of Arts in Political Science", label: "ABPolSci - Bachelor of Arts in Political Science" },
-                        { value: "Bachelor of Science in Criminology", label: "BSCrim - Bachelor of Science in Criminology" },
-                        { value: "Bachelor of Science in Fisheries", label: "BSFI - Bachelor of Science in Fisheries" },
-                        { value: "Bachelor of Secondary Education", label: "BSEd - Bachelor of Secondary Education" },
-                        { value: "Bachelor of Elementary Education", label: "BEEd - Bachelor of Elementary Education" },
-                    ]}
-                    placeholder="Select your course"
                     error={errors.course}
+                    required
+                    majorValue={data.major}
+                    onMajorChange={value => onFieldChange('major', value)}
+                    majorError={errors.major}
                     className="w-full"
                 />
             </div>
-            {(data.course === "Bachelor of Secondary Education" || data.course === "Bachelor of Science in Entrepreneurship") && (
-                <div>
-                    <SelectorWithLabel
-                        id="major"
-                        label={data.course === "Bachelor of Secondary Education" ? "Major" : "Specialization"}
-                        required
-                        value={data.major}
-                        onChange={value => onFieldChange('major', value)}
-                        options={data.course === "Bachelor of Secondary Education"
-                            ? [
-                                { value: "Mathematics", label: "Mathematics" },
-                                { value: "English", label: "English" },
-                                { value: "Science", label: "Science" },
-                            ]
-                            : [
-                                { value: "Farm Business", label: "Farm Business" },
-                            ]}
-                        placeholder={data.course === "Bachelor of Secondary Education" ? "Select your major" : "Select your specialization"}
-                        error={errors.major}
-                        className="w-full"
-                    />
-                </div>
-            )}
 
             <div>
                 <SelectorWithLabel

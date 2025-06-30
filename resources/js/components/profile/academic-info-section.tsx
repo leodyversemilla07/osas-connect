@@ -1,8 +1,9 @@
 import React, { memo } from 'react';
 import { GraduationCap } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FormField, TextField } from '@/components/profile/form-fields';
+import { InputWithLabel } from "@/components/input-with-label";
+import CourseSelector from "@/components/course-selector";
+import { SelectorWithLabel } from "@/components/selector-with-label";
 import type { ProfileSectionProps } from '@/types/profile';
 
 // Academic level options
@@ -29,121 +30,40 @@ export const AcademicInfoSection = memo<ProfileSectionProps>(({
                 <CardDescription>Your educational background details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                        label="Course/Program"
-                        required
-                        error={errors.course}
-                    >
-                        <div className='truncate'>
-                            <Select
-                                value={data.course ?? ''}
-                                onValueChange={handleCourseChange || ((value) => updateField('course', value))}
-                            >
-                                <SelectTrigger data-testid="course-select">
-                                    <SelectValue placeholder="Select your course" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Bachelor of Science in Information Technology">
-                                        BSIT - Bachelor of Science in Information Technology
-                                    </SelectItem>
-                                    <SelectItem value="Bachelor of Science in Computer Engineering">
-                                        BSCpE - Bachelor of Science in Computer Engineering
-                                    </SelectItem>
-                                    <SelectItem value="Bachelor of Science in Tourism Management">
-                                        BSTM - Bachelor of Science in Tourism Management
-                                    </SelectItem>
-                                    <SelectItem value="Bachelor of Science in Hospitality Management">
-                                        BSHM - Bachelor of Science in Hospitality Management
-                                    </SelectItem>
-                                    <SelectItem value="Bachelor of Science in Entrepreneurship">
-                                        BSENTREP - Bachelor of Science in Entrepreneurship
-                                    </SelectItem>
-                                    <SelectItem value="Bachelor of Arts in Political Science">
-                                        ABPolSci - Bachelor of Arts in Political Science
-                                    </SelectItem>
-                                    <SelectItem value="Bachelor of Science in Criminology">
-                                        BSCrim - Bachelor of Science in Criminology
-                                    </SelectItem>
-                                    <SelectItem value="Bachelor of Science in Fisheries">
-                                        BSFI - Bachelor of Science in Fisheries
-                                    </SelectItem>
-                                    <SelectItem value="Bachelor of Secondary Education">
-                                        BSEd - Bachelor of Secondary Education
-                                    </SelectItem>
-                                    <SelectItem value="Bachelor of Elementary Education">
-                                        BEEd - Bachelor of Elementary Education
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </FormField>
-                    {(data.course === "Bachelor of Secondary Education" || data.course === "Bachelor of Science in Entrepreneurship") && (
-                        <FormField
-                            label={data.course === "Bachelor of Secondary Education" ? "Major" : "Specialization"}
-                            required
-                            error={errors.major}
-                        >
-                            <Select
-                                value={data.major ?? ''}
-                                onValueChange={(value) => updateField('major', value)}
-                            >
-                                <SelectTrigger data-testid="major-select">
-                                    <SelectValue placeholder={data.course === "Bachelor of Secondary Education" ? "Select your major" : "Select your specialization"} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {data.course === "Bachelor of Secondary Education" ? (
-                                        <>
-                                            <SelectItem value="Mathematics">Mathematics</SelectItem>
-                                            <SelectItem value="English">English</SelectItem>
-                                            <SelectItem value="Science">Science</SelectItem>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <SelectItem value="Farm Business">Farm Business</SelectItem>
-                                        </>
-                                    )}
-                                </SelectContent>
-                            </Select>
-                        </FormField>
-                    )}
-                </div>
+                <CourseSelector
+                    value={data.course ?? ''}
+                    onChange={handleCourseChange || ((value) => updateField('course', value))}
+                    error={errors.course}
+                    majorValue={data.major ?? ''}
+                    onMajorChange={(value) => updateField('major', value)}
+                    majorError={errors.major}
+                    className="truncate"
+                />
 
-                <FormField
+                <SelectorWithLabel
+                    id="year_level"
                     label="Year Level"
-                    required
+                    value={data.year_level ?? ''}
+                    onChange={(value) => updateField('year_level', value)}
+                    options={[...YEAR_LEVELS]}
                     error={errors.year_level}
-                >
-                    <Select
-                        value={data.year_level ?? ''}
-                        onValueChange={(value) => updateField('year_level', value)}
-                    >
-                        <SelectTrigger data-testid="year-level-select">
-                            <SelectValue placeholder="Select your current year level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {YEAR_LEVELS.map((level) => (
-                                <SelectItem key={level.value} value={level.value}>
-                                    {level.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </FormField>
+                    placeholder="Select your current year level"
+                    className="w-full"
+                />
 
-                <FormField
-                    label="Existing Scholarships"
-                    error={errors.existing_scholarships}
-                    description="List any current scholarships or financial aid you're receiving"
-                >
-                    <TextField
+                {/* Existing Scholarships Field */}
+                <div className="space-y-1">
+                    <InputWithLabel
                         id="existing_scholarships"
+                        label="Existing Scholarships"
                         value={data.existing_scholarships ?? ''}
                         onChange={(value) => updateField('existing_scholarships', value)}
                         placeholder="e.g., Academic Excellence Scholarship, DOST Scholarship"
-                        data-testid="existing-scholarships-input"
+                        error={errors.existing_scholarships}
+                        className="w-full"
                     />
-                </FormField>
+                    <p className="text-sm text-muted-foreground">List any current scholarships or financial aid you're receiving</p>
+                </div>
             </CardContent>
         </Card>
     );

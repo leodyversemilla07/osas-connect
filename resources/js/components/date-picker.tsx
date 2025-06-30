@@ -52,8 +52,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     };
 
     return (
-        <div className={cn("flex flex-col gap-3", className)}>
-            <Label htmlFor={id} className="px-1 text-sm font-medium">
+        <div className={cn("grid gap-2", className)}>
+            <Label htmlFor={id}>
                 {label} {required && <span className="text-red-500">*</span>}
             </Label>
             {description && (
@@ -95,7 +95,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                     />
                 </PopoverContent>
             </Popover>
-            {error && <InputError id={errorId} message={error} />}
+            <InputError id={errorId} message={error} />
         </div>
     );
 };
