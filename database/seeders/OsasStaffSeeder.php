@@ -124,7 +124,7 @@ class OsasStaffSeeder extends Seeder
             [
                 'last_name' => 'Lunar',
                 'first_name' => 'Spectre',
-                'middle_name' => 'Admin',
+                'middle_name' => 'Smith',
                 'password' => Hash::make('Staff@123'),
                 'role' => 'osas_staff',
                 'email_verified_at' => now(),

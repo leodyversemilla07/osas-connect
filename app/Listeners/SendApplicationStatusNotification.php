@@ -7,6 +7,7 @@ use App\Mail\ScholarshipApplicationStatusChanged as StatusChangedMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 
 class SendApplicationStatusNotification implements ShouldQueue
 {
@@ -39,7 +40,7 @@ class SendApplicationStatusNotification implements ShouldQueue
         // Optionally, also notify OSAS staff for certain status changes
         if (in_array($application->status, ['submitted', 'incomplete'])) {
             // Get OSAS staff emails (you might want to implement this differently)
-            $osasEmails = \App\Models\User::whereHas('roles', function ($query) {
+            $osasEmails = User::whereHas('roles', function ($query) {
                 $query->where('name', 'osas_staff');
             })
                 ->pluck('email')
