@@ -71,9 +71,7 @@ class RegisteredUserController extends Controller
                 'disability_type' => $request->disability_type,
                 'religion' => $request->religion,
                 'residence_type' => $request->residence_type,
-                'guardian_name' => $request->residence_type === 'With Guardian'
-                    ? $request->guardian_name
-                    : 'Not Applicable',
+                'guardian_name' => $request->residence_type === 'With Guardian' ? $request->guardian_name : 'Not Applicable',
                 'existing_scholarships' => $request->scholarships,
             ]);
 
@@ -99,22 +97,8 @@ class RegisteredUserController extends Controller
             'middle_name' => ['nullable', 'string', 'max:255'],
 
             // Email and Student ID
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                'unique:'.User::class,
-                'ends_with:@minsu.edu.ph',
-            ],
-            'student_id' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:'.StudentProfile::class,
-                'regex:/^MBC\d{4}-\d{4}$/',
-            ],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class, 'ends_with:@minsu.edu.ph'],
+            'student_id' => ['required', 'string', 'max:255', 'unique:'.StudentProfile::class, 'regex:/^MBC\d{4}-\d{4}$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
 
             // Academic information

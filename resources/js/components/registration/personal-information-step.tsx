@@ -75,7 +75,8 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
 
         return (
             <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Row 1: First Name | Middle Name */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InputWithLabel
                         id="first_name"
                         label="First Name"
@@ -86,7 +87,6 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         error={errors.first_name}
                         className="w-full"
                     />
-
                     <InputWithLabel
                         id="middle_name"
                         label="Middle Name"
@@ -97,7 +97,10 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         error={errors.middle_name}
                         className="w-full"
                     />
+                </div>
 
+                {/* Row 2: Last Name | Sex */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InputWithLabel
                         id="last_name"
                         label="Last Name"
@@ -108,9 +111,6 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         error={errors.last_name}
                         className="w-full"
                     />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <SexSelector
                         value={data.sex}
                         onChange={handleFieldChange("sex")}
@@ -118,7 +118,10 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         required
                         className="w-full"
                     />
+                </div>
 
+                {/* Row 3: Civil Status | Date of Birth */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <CivilStatusSelector
                         value={data.civil_status}
                         onChange={handleFieldChange("civil_status")}
@@ -126,20 +129,20 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         required
                         className="w-full"
                     />
+                    <DatePicker
+                        id="date_of_birth"
+                        label="Date of Birth"
+                        required
+                        value={data.date_of_birth ? new Date(new Date(data.date_of_birth).getTime()) : undefined}
+                        onChange={onDateOfBirthSelect}
+                        placeholder="Select date of birth"
+                        error={errors.date_of_birth}
+                        maxDate={new Date()}
+                        className="w-full"
+                    />
                 </div>
 
-                <DatePicker
-                    id="date_of_birth"
-                    label="Date of Birth"
-                    required
-                    value={data.date_of_birth ? new Date(new Date(data.date_of_birth).getTime()) : undefined}
-                    onChange={onDateOfBirthSelect}
-                    placeholder="Select date of birth"
-                    error={errors.date_of_birth}
-                    maxDate={new Date()}
-                    className="w-full md:w-1/2"
-                />
-
+                {/* Place of Birth */}
                 <PlaceOfBirth
                     data={placeOfBirthData}
                     setData={handlePlaceOfBirthChange}
@@ -147,6 +150,7 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                     processing={processing}
                 />
 
+                {/* Address */}
                 <Address
                     data={addressData}
                     setData={handleAddressChange}
@@ -154,6 +158,7 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                     processing={processing}
                 />
 
+                {/* Mobile and Telephone Number */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InputWithLabel
                         id="mobile_number"
@@ -167,7 +172,6 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         error={errors.mobile_number}
                         className="w-full"
                     />
-
                     <InputWithLabel
                         id="telephone_number"
                         label="Telephone Number"
@@ -179,6 +183,7 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                     />
                 </div>
 
+                {/* Religion and Residence Type */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <ReligionSelector
                         value={data.religion}
@@ -187,7 +192,6 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         required
                         className="w-full"
                     />
-
                     <ResidenceTypeSelector
                         value={data.residence_type}
                         onChange={onResidenceTypeChange}
@@ -200,6 +204,7 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                     />
                 </div>
 
+                {/* PWD Radio */}
                 <PwdRadio
                     value={data.is_pwd}
                     onChange={onPwdChange}

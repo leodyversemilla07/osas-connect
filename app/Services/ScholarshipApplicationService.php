@@ -15,19 +15,16 @@ class ScholarshipApplicationService
     /**
      * Submit a new scholarship application
      */
-    public function submit(
-        StudentProfile $student,
-        Scholarship $scholarship,
-        array $data,
-        array $documents
-    ): ScholarshipApplication {
+    public function submit(StudentProfile $student, Scholarship $scholarship, array $data, array $documents): ScholarshipApplication
+    {
         // Validate that scholarship is accepting applications
         if (! $scholarship->isAcceptingApplications()) {
             throw new InvalidArgumentException('This scholarship is not accepting applications at this time.');
         }
 
         // Check if student already has a pending or approved application
-        $existingApplication = $student->scholarshipApplications()
+        $existingApplication = $student
+            ->scholarshipApplications()
             ->where('scholarship_id', $scholarship->id)
             ->whereIn('status', [
                 ScholarshipApplication::STATUS_SUBMITTED,
@@ -87,7 +84,6 @@ class ScholarshipApplicationService
             DB::commit();
 
             return $application;
-
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -97,14 +93,13 @@ class ScholarshipApplicationService
     /**
      * Update document for an application
      */
-    public function updateDocument(
-        ScholarshipApplication $application,
-        string $documentType,
-        $file
-    ): bool {
-        if ($application->status === ScholarshipApplication::STATUS_APPROVED ||
+    public function updateDocument(ScholarshipApplication $application, string $documentType, $file): bool
+    {
+        if (
+            $application->status === ScholarshipApplication::STATUS_APPROVED ||
             $application->status === ScholarshipApplication::STATUS_REJECTED ||
-            $application->status === ScholarshipApplication::STATUS_END) {
+            $application->status === ScholarshipApplication::STATUS_END
+        ) {
             throw new InvalidArgumentException('Cannot update documents for a finalized application.');
         }
 
@@ -134,14 +129,9 @@ class ScholarshipApplicationService
     /**
      * Schedule an interview for an application
      */
-    public function scheduleInterview(
-        ScholarshipApplication $application,
-        \DateTime $scheduleDate
-    ): bool {
-        if (! in_array($application->status, [
-            ScholarshipApplication::STATUS_VERIFIED,
-            ScholarshipApplication::STATUS_UNDER_EVALUATION,
-        ])) {
+    public function scheduleInterview(ScholarshipApplication $application, \DateTime $scheduleDate): bool
+    {
+        if (! in_array($application->status, [ScholarshipApplication::STATUS_VERIFIED, ScholarshipApplication::STATUS_UNDER_EVALUATION])) {
             throw new InvalidArgumentException('Application is not ready for interview scheduling.');
         }
 
@@ -168,10 +158,8 @@ class ScholarshipApplicationService
     /**
      * Record stipend disbursement
      */
-    public function recordStipendDisbursement(
-        ScholarshipApplication $application,
-        float $amount
-    ): bool {
+    public function recordStipendDisbursement(ScholarshipApplication $application, float $amount): bool
+    {
         if ($application->status !== ScholarshipApplication::STATUS_APPROVED) {
             throw new InvalidArgumentException('Cannot disburse stipend for non-approved application.');
         }
@@ -261,7 +249,8 @@ class ScholarshipApplicationService
      */
     protected function hasActiveScholarship(StudentProfile $student): bool
     {
-        return $student->scholarshipApplications()
+        return $student
+            ->scholarshipApplications()
             ->whereIn('status', [
                 ScholarshipApplication::STATUS_APPROVED,
                 ScholarshipApplication::STATUS_UNDER_EVALUATION,

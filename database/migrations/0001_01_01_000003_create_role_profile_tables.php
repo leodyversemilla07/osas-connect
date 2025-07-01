@@ -20,8 +20,7 @@ return new class extends Migration
             $table->string('major')->default('None');
             $table->string('year_level');
             $table->decimal('current_gwa', 4, 3)->nullable();
-            $table->enum('enrollment_status', ['enrolled', 'not_enrolled', 'graduated', 'dropped_out'])
-                ->default('enrolled');
+            $table->enum('enrollment_status', ['enrolled', 'not_enrolled', 'graduated', 'dropped_out'])->default('enrolled');
             $table->integer('units')->default(18);
             $table->string('guardian_name')->default('Not Applicable');
             $table->string('existing_scholarships')->nullable();
@@ -44,13 +43,7 @@ return new class extends Migration
             $table->string('residence_type');
 
             // Family Background
-            $table->enum('status_of_parents', [
-                'Living Together',
-                'Separated',
-                'Single Parent',
-                'Mother Deceased',
-                'Father Deceased',
-            ])->nullable();
+            $table->enum('status_of_parents', ['Living Together', 'Separated', 'Single Parent', 'Mother Deceased', 'Father Deceased'])->nullable();
 
             // Father's Information
             $table->string('father_name')->nullable();

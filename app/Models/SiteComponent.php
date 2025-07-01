@@ -6,11 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SiteComponent extends Model
 {
-    protected $fillable = [
-        'component_type',
-        'content',
-        'is_active',
-    ];
+    protected $fillable = ['component_type', 'content', 'is_active'];
 
     protected $casts = [
         'content' => 'array',
@@ -38,10 +34,7 @@ class SiteComponent extends Model
      */
     public static function updateHeader(array $content)
     {
-        return static::updateOrCreate(
-            ['component_type' => 'header'],
-            ['content' => $content, 'is_active' => true]
-        );
+        return static::updateOrCreate(['component_type' => 'header'], ['content' => $content, 'is_active' => true]);
     }
 
     /**
@@ -49,9 +42,6 @@ class SiteComponent extends Model
      */
     public static function updateFooter(array $content)
     {
-        return static::updateOrCreate(
-            ['component_type' => 'footer'],
-            ['content' => $content, 'is_active' => true]
-        );
+        return static::updateOrCreate(['component_type' => 'footer'], ['content' => $content, 'is_active' => true]);
     }
 }

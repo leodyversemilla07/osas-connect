@@ -71,8 +71,12 @@ describe('ScholarshipNotification Model', function () {
     });
 
     test('unread scope works', function () {
-        ScholarshipNotification::factory()->count(3)->create(['read_at' => null]);
-        ScholarshipNotification::factory()->count(2)->create(['read_at' => now()]);
+        ScholarshipNotification::factory()
+            ->count(3)
+            ->create(['read_at' => null]);
+        ScholarshipNotification::factory()
+            ->count(2)
+            ->create(['read_at' => now()]);
 
         $unread = ScholarshipNotification::unread()->get();
 

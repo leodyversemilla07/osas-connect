@@ -68,14 +68,11 @@ class AdminSeeder extends Seeder
                     'role' => 'admin',
                     'email_verified_at' => now(),
                     'is_active' => true,
-                ]
+                ],
             );
 
             // Create the admin profile
-            AdminProfile::firstOrCreate(
-                ['user_id' => $admin->id],
-                ['admin_id' => $adminData['admin_id']]
-            );
+            AdminProfile::firstOrCreate(['user_id' => $admin->id], ['admin_id' => $adminData['admin_id']]);
         }
 
         $this->command->info('Created 5 admin users with profiles.');
@@ -97,14 +94,11 @@ class AdminSeeder extends Seeder
                 'role' => 'admin',
                 'email_verified_at' => now(),
                 'is_active' => true,
-            ]
+            ],
         );
 
         // Create admin profile
-        AdminProfile::firstOrCreate(
-            ['user_id' => $admin->id],
-            ['admin_id' => 'ADMIN_SPEC001']
-        );
+        AdminProfile::firstOrCreate(['user_id' => $admin->id], ['admin_id' => 'ADMIN_SPEC001']);
 
         $this->command->info('Created specific admin: Leif Sage Semilla');
     }

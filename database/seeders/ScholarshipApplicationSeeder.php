@@ -98,9 +98,7 @@ class ScholarshipApplicationSeeder extends Seeder
                 $scholarship = $scholarships->random();
 
                 // Skip if student already has application for this scholarship
-                $existingApplication = ScholarshipApplication::where('user_id', $student->id)
-                    ->where('scholarship_id', $scholarship->id)
-                    ->first();
+                $existingApplication = ScholarshipApplication::where('user_id', $student->id)->where('scholarship_id', $scholarship->id)->first();
 
                 if ($existingApplication) {
                     continue;
@@ -117,9 +115,7 @@ class ScholarshipApplicationSeeder extends Seeder
             $student = $students->random();
             $scholarship = $scholarships->random();
 
-            $existingApplication = ScholarshipApplication::where('user_id', $student->id)
-                ->where('scholarship_id', $scholarship->id)
-                ->first();
+            $existingApplication = ScholarshipApplication::where('user_id', $student->id)->where('scholarship_id', $scholarship->id)->first();
 
             if (! $existingApplication) {
                 $this->createApplication($student, $scholarship, 'draft', rand(1, 5));

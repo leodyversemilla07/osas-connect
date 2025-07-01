@@ -10,14 +10,7 @@ class ScholarshipVerification extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = [
-        'application_id',
-        'verifier_id',
-        'verification_type',
-        'status',
-        'comments',
-        'verification_data',
-    ];
+    protected $fillable = ['application_id', 'verifier_id', 'verification_type', 'status', 'comments', 'verification_data'];
 
     protected $casts = [
         'verification_data' => 'array',

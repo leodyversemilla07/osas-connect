@@ -12,19 +12,19 @@ class UserAgentParser
         if (empty($userAgent)) {
             return [
                 'browser' => 'Unknown',
-                'device' => 'Unknown'
+                'device' => 'Unknown',
             ];
         }
 
         // Extract browser information
         $browser = self::getBrowser($userAgent);
-        
+
         // Extract device/OS information
         $device = self::getDevice($userAgent);
 
         return [
             'browser' => $browser,
-            'device' => $device
+            'device' => $device,
         ];
     }
 
@@ -40,7 +40,7 @@ class UserAgentParser
             '/Edge\/([0-9.]+)/' => 'Edge',
             '/Opera\/([0-9.]+)/' => 'Opera',
             '/MSIE ([0-9.]+)/' => 'Internet Explorer',
-            '/Trident.*rv:([0-9.]+)/' => 'Internet Explorer'
+            '/Trident.*rv:([0-9.]+)/' => 'Internet Explorer',
         ];
 
         foreach ($browsers as $regex => $name) {
@@ -48,7 +48,8 @@ class UserAgentParser
                 $version = isset($matches[1]) ? $matches[1] : '';
                 // Truncate version to major.minor
                 $version = preg_replace('/^(\d+\.\d+).*/', '$1', $version);
-                return $name . ($version ? ' ' . $version : '');
+
+                return $name.($version ? ' '.$version : '');
             }
         }
 
@@ -64,25 +65,29 @@ class UserAgentParser
         if (preg_match('/iPhone/', $userAgent)) {
             if (preg_match('/OS ([0-9_]+)/', $userAgent, $matches)) {
                 $version = str_replace('_', '.', $matches[1]);
-                return 'iPhone (iOS ' . $version . ')';
+
+                return 'iPhone (iOS '.$version.')';
             }
+
             return 'iPhone';
         }
 
         if (preg_match('/iPad/', $userAgent)) {
             if (preg_match('/OS ([0-9_]+)/', $userAgent, $matches)) {
                 $version = str_replace('_', '.', $matches[1]);
-                return 'iPad (iOS ' . $version . ')';
+
+                return 'iPad (iOS '.$version.')';
             }
+
             return 'iPad';
         }
 
         if (preg_match('/Android ([0-9.]+)/', $userAgent, $matches)) {
             $version = $matches[1];
             if (preg_match('/Mobile/', $userAgent)) {
-                return 'Android Phone (' . $version . ')';
+                return 'Android Phone ('.$version.')';
             } else {
-                return 'Android Tablet (' . $version . ')';
+                return 'Android Tablet ('.$version.')';
             }
         }
 
@@ -95,21 +100,24 @@ class UserAgentParser
                 '6.1' => 'Windows 7',
                 '6.0' => 'Windows Vista',
                 '5.1' => 'Windows XP',
-                '5.0' => 'Windows 2000'
+                '5.0' => 'Windows 2000',
             ];
             $version = $matches[1];
-            return $versions[$version] ?? 'Windows NT ' . $version;
+
+            return $versions[$version] ?? 'Windows NT '.$version;
         }
 
         if (preg_match('/Mac OS X ([0-9_]+)/', $userAgent, $matches)) {
             $version = str_replace('_', '.', $matches[1]);
-            return 'macOS ' . $version;
+
+            return 'macOS '.$version;
         }
 
         if (preg_match('/Linux/', $userAgent)) {
             if (preg_match('/Ubuntu/', $userAgent)) {
                 return 'Ubuntu Linux';
             }
+
             return 'Linux';
         }
 

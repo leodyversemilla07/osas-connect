@@ -21,13 +21,16 @@ Artisan::command('test:cloudcube', function () {
 
     if ($disk === 'cloudcube') {
         $config = config('filesystems.disks.cloudcube');
-        $this->table(['Setting', 'Value'], [
-            ['Bucket', $config['bucket']],
-            ['Cube Root', $config['root']],
-            ['Base URL', $config['url']],
-            ['Region', $config['region']],
-            ['Visibility', $config['visibility']],
-        ]);
+        $this->table(
+            ['Setting', 'Value'],
+            [
+                ['Bucket', $config['bucket']],
+                ['Cube Root', $config['root']],
+                ['Base URL', $config['url']],
+                ['Region', $config['region']],
+                ['Visibility', $config['visibility']],
+            ],
+        );
     } else {
         $this->warn('Not using CloudCube disk. Currently using: '.$disk);
         $this->info('To test CloudCube, set APP_ENV=production or modify StorageService::getDisk()');
@@ -55,7 +58,6 @@ Artisan::command('test:cloudcube', function () {
         // Try to delete the test file
         $disk->delete($testPath);
         $this->info('✓ Delete test successful');
-
     } catch (\Exception $e) {
         $this->error('✗ Storage connection failed: '.$e->getMessage());
 
@@ -71,13 +73,7 @@ Artisan::command('test:cloudcube', function () {
         file_put_contents($tempPath, 'This is a test file for StorageService - '.now());
 
         // Create an UploadedFile instance for testing
-        $uploadedFile = new \Illuminate\Http\UploadedFile(
-            $tempPath,
-            'test_file.txt',
-            'text/plain',
-            null,
-            true
-        );
+        $uploadedFile = new \Illuminate\Http\UploadedFile($tempPath, 'test_file.txt', 'text/plain', null, true);
 
         // Test file storage
         $storedPath = StorageService::store($uploadedFile, 'tests');
@@ -115,7 +111,6 @@ Artisan::command('test:cloudcube', function () {
 
         // Clean up temp file
         fclose($tempFile);
-
     } catch (\Exception $e) {
         $this->error('✗ StorageService test failed: '.$e->getMessage());
 
@@ -134,7 +129,6 @@ Artisan::command('test:cloudcube', function () {
     }
 
     return 0;
-
 })->purpose('Test CloudCube S3 configuration and connectivity');
 
 // Photo upload test command for CloudCube
@@ -147,19 +141,18 @@ Artisan::command('test:photo-upload', function () {
 
     try {
         // Create a test image file (simulate uploaded photo)
-        $testImageContent = file_get_contents('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+        $testImageContent = file_get_contents(
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+        );
         $tempFile = tmpfile();
         $tempPath = stream_get_meta_data($tempFile)['uri'];
-        file_put_contents($tempPath, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='));
+        file_put_contents(
+            $tempPath,
+            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='),
+        );
 
         // Create an UploadedFile instance (simulating a photo upload)
-        $uploadedPhoto = new \Illuminate\Http\UploadedFile(
-            $tempPath,
-            'profile_photo.png',
-            'image/png',
-            null,
-            true
-        );
+        $uploadedPhoto = new \Illuminate\Http\UploadedFile($tempPath, 'profile_photo.png', 'image/png', null, true);
 
         $this->info('1. Testing profile photo upload...');
 
@@ -195,7 +188,6 @@ Artisan::command('test:photo-upload', function () {
             // Clean up test photo
             $deleted = StorageService::delete($photoPath);
             $this->info($deleted ? '✓ Test photo cleanup successful' : '✗ Test photo cleanup failed');
-
         } else {
             $this->error('✗ Photo upload failed');
 
@@ -204,7 +196,6 @@ Artisan::command('test:photo-upload', function () {
 
         // Clean up temp file
         fclose($tempFile);
-
     } catch (\Exception $e) {
         $this->error('✗ Photo upload test failed: '.$e->getMessage());
 
@@ -225,7 +216,6 @@ Artisan::command('test:photo-upload', function () {
     }
 
     return 0;
-
 })->purpose('Test photo upload functionality with CloudCube integration');
 
 // CloudCube diagnostic command
@@ -269,12 +259,10 @@ Artisan::command('debug:cloudcube', function () {
 
         $this->info("\n4. Configuration check:");
         $config = config('filesystems.disks.cloudcube');
-        $this->table(['Setting', 'Value'], [
-            ['Bucket', $config['bucket']],
-            ['Root', $config['root']],
-            ['Key', substr($config['key'], 0, 8).'...'],
-            ['URL', $config['url']],
-        ]);
+        $this->table(
+            ['Setting', 'Value'],
+            [['Bucket', $config['bucket']], ['Root', $config['root']], ['Key', substr($config['key'], 0, 8).'...'], ['URL', $config['url']]],
+        );
 
         $this->info("\n5. Upload a test file to verify:");
         $testContent = 'CloudCube test file - '.now();
@@ -302,7 +290,6 @@ Artisan::command('debug:cloudcube', function () {
         foreach ($files as $file) {
             $this->line("  - {$file}");
         }
-
     } catch (\Exception $e) {
         $this->error('Error: '.$e->getMessage());
         $this->error('Stack trace: '.$e->getTraceAsString());

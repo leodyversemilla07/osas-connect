@@ -14,10 +14,7 @@ class OsasStaffProfile extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'user_id',
-        'staff_id',
-    ];
+    protected $fillable = ['user_id', 'staff_id'];
 
     /**
      * Get the user that owns the OSAS staff profile.

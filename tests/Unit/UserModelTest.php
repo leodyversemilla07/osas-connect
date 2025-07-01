@@ -11,9 +11,11 @@ describe('User Model', function () {
         $user = User::factory()->create(['role' => 'student']);
 
         // Create some notifications for the user
-        $notifications = ScholarshipNotification::factory()->count(3)->create([
-            'user_id' => $user->id,
-        ]);
+        $notifications = ScholarshipNotification::factory()
+            ->count(3)
+            ->create([
+                'user_id' => $user->id,
+            ]);
 
         expect($user->scholarshipNotifications()->count())->toBe(3);
         expect($user->scholarshipNotifications->first())->toBeInstanceOf(ScholarshipNotification::class);

@@ -299,9 +299,7 @@ class StudentProfile extends Model
      */
     public function getActiveScholarshipsAttribute()
     {
-        return $this->scholarshipApplications()
-            ->where('status', 'approved')
-            ->count();
+        return $this->scholarshipApplications()->where('status', 'approved')->count();
     }
 
     /**
@@ -329,12 +327,7 @@ class StudentProfile extends Model
      */
     public function activeScholarshipApplications()
     {
-        return $this->scholarshipApplications()
-            ->whereIn('status', [
-                'approved',
-                'under_review',
-                'interview_scheduled',
-            ]);
+        return $this->scholarshipApplications()->whereIn('status', ['approved', 'under_review', 'interview_scheduled']);
     }
 
     /**
@@ -349,10 +342,10 @@ class StudentProfile extends Model
         }
 
         if ($type === 'full') {
-            return $this->current_gwa >= 1.000 && $this->current_gwa <= 1.450 && ! $this->hasGradeBelow(1.75);
+            return $this->current_gwa >= 1.0 && $this->current_gwa <= 1.45 && ! $this->hasGradeBelow(1.75);
         }
 
-        return $this->current_gwa >= 1.460 && $this->current_gwa <= 1.750 && ! $this->hasGradeBelow(2.00);
+        return $this->current_gwa >= 1.46 && $this->current_gwa <= 1.75 && ! $this->hasGradeBelow(2.0);
     }
 
     /**

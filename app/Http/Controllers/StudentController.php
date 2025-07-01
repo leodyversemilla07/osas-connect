@@ -31,9 +31,7 @@ class StudentController extends Controller
 
         // Count both existing scholarships and approved applications
         $existingScholarships = ! empty($student->existing_scholarships) ? 1 : 0;
-        $approvedApplications = $student->scholarshipApplications()
-            ->where('status', 'approved')
-            ->count();
+        $approvedApplications = $student->scholarshipApplications()->where('status', 'approved')->count();
 
         $studentData['scholarships'] = $existingScholarships + $approvedApplications;
 
@@ -54,7 +52,8 @@ class StudentController extends Controller
             });
 
         // Get recent applications
-        $recentApplications = $student->scholarshipApplications()
+        $recentApplications = $student
+            ->scholarshipApplications()
             ->with('scholarship')
             ->latest()
             ->take(3)
@@ -67,17 +66,19 @@ class StudentController extends Controller
                     'scholarship_name' => $application->scholarship->name,
                     'status' => $application->status,
                     'submitted_at' => $application->applied_at
-                        ? (is_string($application->applied_at) ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d') : $application->applied_at->format('Y-m-d'))
-                        : (is_string($application->created_at) ? \Carbon\Carbon::parse($application->created_at)->format('Y-m-d') : $application->created_at->format('Y-m-d')),
+                        ? (is_string($application->applied_at)
+                            ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d')
+                            : $application->applied_at->format('Y-m-d'))
+                        : (is_string($application->created_at)
+                            ? \Carbon\Carbon::parse($application->created_at)->format('Y-m-d')
+                            : $application->created_at->format('Y-m-d')),
                     'progress' => $progress,
                 ];
             });
 
         // Get statistics
         $totalApplications = $student->scholarshipApplications()->count();
-        $approvedScholarships = $student->scholarshipApplications()
-            ->where('status', 'approved')
-            ->count();
+        $approvedScholarships = $student->scholarshipApplications()->where('status', 'approved')->count();
 
         return Inertia::render('student/dashboard', [
             'student' => $studentData,
@@ -118,7 +119,8 @@ class StudentController extends Controller
         }
 
         // Get all applications with scholarship details
-        $applications = $student->scholarshipApplications()
+        $applications = $student
+            ->scholarshipApplications()
             ->with('scholarship')
             ->latest()
             ->get()
@@ -131,11 +133,19 @@ class StudentController extends Controller
                     'scholarship_type' => $application->scholarship->type,
                     'status' => $application->status,
                     'submitted_at' => $application->applied_at
-                        ? (is_string($application->applied_at) ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d') : $application->applied_at->format('Y-m-d'))
-                        : (is_string($application->created_at) ? \Carbon\Carbon::parse($application->created_at)->format('Y-m-d') : $application->created_at->format('Y-m-d')),
-                    'updated_at' => is_string($application->updated_at) ? \Carbon\Carbon::parse($application->updated_at)->format('Y-m-d') : $application->updated_at->format('Y-m-d'),
+                        ? (is_string($application->applied_at)
+                            ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d')
+                            : $application->applied_at->format('Y-m-d'))
+                        : (is_string($application->created_at)
+                            ? \Carbon\Carbon::parse($application->created_at)->format('Y-m-d')
+                            : $application->created_at->format('Y-m-d')),
+                    'updated_at' => is_string($application->updated_at)
+                        ? \Carbon\Carbon::parse($application->updated_at)->format('Y-m-d')
+                        : $application->updated_at->format('Y-m-d'),
                     'progress' => $progress,
-                    'amount' => $application->scholarship->getStipendAmount() ? '₱'.number_format($application->scholarship->getStipendAmount(), 0).'/month' : 'Amount TBD',
+                    'amount' => $application->scholarship->getStipendAmount()
+                        ? '₱'.number_format($application->scholarship->getStipendAmount(), 0).'/month'
+                        : 'Amount TBD',
                     'deadline' => $application->scholarship->deadline->format('Y-m-d'),
                     'can_edit' => in_array($application->status, ['draft', 'incomplete']),
                 ];
@@ -166,7 +176,8 @@ class StudentController extends Controller
         }
 
         // Get the specific application and authorize access
-        $application = $student->scholarshipApplications()
+        $application = $student
+            ->scholarshipApplications()
             ->with(['scholarship', 'documents'])
             ->findOrFail($applicationId);
 
@@ -191,7 +202,7 @@ class StudentController extends Controller
                 $requiredDocuments[$type] = [
                     'name' => $displayName,
                     'uploaded_at' => $document ? $document->created_at->format('Y-m-d H:i:s') : null,
-                    'verified' => $document ? ($document->status === 'approved') : false,
+                    'verified' => $document ? $document->status === 'approved' : false,
                 ];
             }
         }
@@ -202,17 +213,20 @@ class StudentController extends Controller
                 'id' => $application->scholarship->id,
                 'name' => $application->scholarship->name,
                 'type' => $application->scholarship->type,
-                'amount' => $application->scholarship->getStipendAmount() ? '₱'.number_format($application->scholarship->getStipendAmount(), 0).'/month' : 'Amount TBD',
+                'amount' => $application->scholarship->getStipendAmount()
+                    ? '₱'.number_format($application->scholarship->getStipendAmount(), 0).'/month'
+                    : 'Amount TBD',
                 'description' => $application->scholarship->description ?? '',
             ],
             'status' => $application->status,
-            'submitted_at' => $application->applied_at ?
-                (is_string($application->applied_at) ?
-                    \Carbon\Carbon::parse($application->applied_at)->format('F j, Y') :
-                    $application->applied_at->format('F j, Y')) : null,
-            'created_at' => is_string($application->created_at) ?
-                \Carbon\Carbon::parse($application->created_at)->format('F j, Y') :
-                $application->created_at->format('F j, Y'),
+            'submitted_at' => $application->applied_at
+                ? (is_string($application->applied_at)
+                    ? \Carbon\Carbon::parse($application->applied_at)->format('F j, Y')
+                    : $application->applied_at->format('F j, Y'))
+                : null,
+            'created_at' => is_string($application->created_at)
+                ? \Carbon\Carbon::parse($application->created_at)->format('F j, Y')
+                : $application->created_at->format('F j, Y'),
             'progress' => $this->getApplicationProgress($application->status),
             'purpose_letter' => $application->purpose_statement,
             'verifier_comments' => $application->feedback,
@@ -309,28 +323,11 @@ class StudentController extends Controller
     private function getNextSteps(string $status): array
     {
         $nextSteps = [
-            'draft' => [
-                'Complete your application form.',
-                'Upload all required documents.',
-                'Submit your application before the deadline.',
-            ],
-            'submitted' => [
-                'Wait for document verification.',
-                'Check your email for updates.',
-                'Be prepared for potential document requests.',
-            ],
-            'under_verification' => [
-                'Wait for document verification to complete.',
-                'Respond promptly to any additional document requests.',
-            ],
-            'verified' => [
-                'Wait for application evaluation.',
-                'Prepare for potential interview scheduling.',
-            ],
-            'under_evaluation' => [
-                'Wait for evaluation results.',
-                'Be available for interview if required.',
-            ],
+            'draft' => ['Complete your application form.', 'Upload all required documents.', 'Submit your application before the deadline.'],
+            'submitted' => ['Wait for document verification.', 'Check your email for updates.', 'Be prepared for potential document requests.'],
+            'under_verification' => ['Wait for document verification to complete.', 'Respond promptly to any additional document requests.'],
+            'verified' => ['Wait for application evaluation.', 'Prepare for potential interview scheduling.'],
+            'under_evaluation' => ['Wait for evaluation results.', 'Be available for interview if required.'],
             'approved' => [
                 'Congratulations! Check for scholarship guidelines.',
                 'Maintain required academic performance.',
@@ -365,14 +362,13 @@ class StudentController extends Controller
             'approved_applications' => $applications->where('status', 'approved')->count(),
             'draft_applications' => $applications->where('status', 'draft')->count(),
             'rejected_applications' => $applications->where('status', 'rejected')->count(),
-            'available_scholarships' => Scholarship::where('status', 'active')
-                ->where('deadline', '>=', now())
-                ->count(),
+            'available_scholarships' => Scholarship::where('status', 'active')->where('deadline', '>=', now())->count(),
             'upcoming_deadlines' => Scholarship::where('status', 'active')
                 ->where('deadline', '>=', now())
                 ->where('deadline', '<=', now()->addDays(30))
                 ->count(),
-            'recent_notifications_count' => Auth::user()->scholarshipNotifications()
+            'recent_notifications_count' => Auth::user()
+                ->scholarshipNotifications()
                 ->where('created_at', '>=', now()->subDays(7))
                 ->count(),
             'current_gwa' => $student->current_gwa,
@@ -394,7 +390,8 @@ class StudentController extends Controller
             return response()->json(['error' => 'Student profile not found'], 404);
         }
 
-        $recentApplications = $student->scholarshipApplications()
+        $recentApplications = $student
+            ->scholarshipApplications()
             ->with(['scholarship'])
             ->latest('updated_at')
             ->take(5)
@@ -410,7 +407,8 @@ class StudentController extends Controller
                 ];
             });
 
-        $statusUpdates = Auth::user()->scholarshipNotifications()
+        $statusUpdates = Auth::user()
+            ->scholarshipNotifications()
             ->where('type', 'application_status')
             ->latest()
             ->take(5)
@@ -439,7 +437,8 @@ class StudentController extends Controller
                 ];
             });
 
-        $notifications = Auth::user()->scholarshipNotifications()
+        $notifications = Auth::user()
+            ->scholarshipNotifications()
             ->latest()
             ->take(5)
             ->get()
@@ -484,15 +483,13 @@ class StudentController extends Controller
      */
     public function searchScholarships(Request $request)
     {
-        $query = Scholarship::where('status', 'active')
-            ->where('deadline', '>=', now());
+        $query = Scholarship::where('status', 'active')->where('deadline', '>=', now());
 
         // Search by name or description
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%{$searchTerm}%")
-                    ->orWhere('description', 'like', "%{$searchTerm}%");
+                $q->where('name', 'like', "%{$searchTerm}%")->orWhere('description', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -500,8 +497,7 @@ class StudentController extends Controller
         if ($request->has('q') && $request->q) {
             $searchTerm = $request->q;
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%{$searchTerm}%")
-                    ->orWhere('description', 'like', "%{$searchTerm}%");
+                $q->where('name', 'like', "%{$searchTerm}%")->orWhere('description', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -572,9 +568,7 @@ class StudentController extends Controller
         }
 
         // Check if already applied
-        $existingApplication = $student->scholarshipApplications()
-            ->where('scholarship_id', $scholarship->id)
-            ->exists();
+        $existingApplication = $student->scholarshipApplications()->where('scholarship_id', $scholarship->id)->exists();
 
         if ($existingApplication) {
             return false;
@@ -662,9 +656,7 @@ class StudentController extends Controller
         $canApply = $this->canStudentApply($scholarship) && $eligibilityCheck['met'];
 
         // Check for existing application
-        $existingApplication = $student->scholarshipApplications()
-            ->where('scholarship_id', $scholarship->id)
-            ->first();
+        $existingApplication = $student->scholarshipApplications()->where('scholarship_id', $scholarship->id)->first();
 
         // Build eligibility reasons array
         $reasons = [];
@@ -690,17 +682,20 @@ class StudentController extends Controller
                 'requirements' => $eligibilityCheck['requirements'],
                 'reasons' => $reasons,
             ],
-            'existing_application' => $existingApplication ? [
-                'id' => $existingApplication->id,
-                'status' => $existingApplication->status,
-                'submitted_at' => $existingApplication->applied_at ?
-                    (is_string($existingApplication->applied_at) ?
-                        \Carbon\Carbon::parse($existingApplication->applied_at)->format('Y-m-d') :
-                        $existingApplication->applied_at->format('Y-m-d')) : null,
-                'created_at' => is_string($existingApplication->created_at) ?
-                    \Carbon\Carbon::parse($existingApplication->created_at)->format('Y-m-d') :
-                    $existingApplication->created_at->format('Y-m-d'),
-            ] : null,
+            'existing_application' => $existingApplication
+                ? [
+                    'id' => $existingApplication->id,
+                    'status' => $existingApplication->status,
+                    'submitted_at' => $existingApplication->applied_at
+                        ? (is_string($existingApplication->applied_at)
+                            ? \Carbon\Carbon::parse($existingApplication->applied_at)->format('Y-m-d')
+                            : $existingApplication->applied_at->format('Y-m-d'))
+                        : null,
+                    'created_at' => is_string($existingApplication->created_at)
+                        ? \Carbon\Carbon::parse($existingApplication->created_at)->format('Y-m-d')
+                        : $existingApplication->created_at->format('Y-m-d'),
+                ]
+                : null,
         ];
 
         return response()->json($responseData);

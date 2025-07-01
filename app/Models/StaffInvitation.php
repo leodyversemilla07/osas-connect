@@ -16,14 +16,7 @@ class StaffInvitation extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'email',
-        'token',
-        'invited_by',
-        'role',
-        'expires_at',
-        'status',
-    ];
+    protected $fillable = ['email', 'token', 'invited_by', 'role', 'expires_at', 'status'];
 
     /**
      * The attributes that should be cast.

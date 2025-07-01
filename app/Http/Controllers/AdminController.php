@@ -40,11 +40,8 @@ class AdminController extends Controller
         $rejectedApplications = ScholarshipApplication::where('status', 'rejected')->count();
 
         // Calculate funding and success rate
-        $totalFundsAllocated = ScholarshipApplication::where('status', 'approved')
-            ->sum('amount_received') ?? 0;
-        $applicationSuccessRate = $totalApplications > 0
-            ? round(($approvedApplications / $totalApplications) * 100)
-            : 0;
+        $totalFundsAllocated = ScholarshipApplication::where('status', 'approved')->sum('amount_received') ?? 0;
+        $applicationSuccessRate = $totalApplications > 0 ? round(($approvedApplications / $totalApplications) * 100) : 0;
 
         // Documents needing verification (you may need to adjust this based on your actual document system)
         $documentsNeedingVerification = 0; // Placeholder - implement based on your document verification system
@@ -160,22 +157,21 @@ class AdminController extends Controller
 
         // Always eager‐load the student profile
         $query = User::with('studentProfile')
-            ->where('role', '=', 'student')  // Only show students
+            ->where('role', '=', 'student') // Only show students
             ->where('id', '!=', $currentUserId)
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
-                    $query->where('first_name', 'like', "%{$search}%")
+                    $query
+                        ->where('first_name', 'like', "%{$search}%")
                         ->orWhere('last_name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
                         ->orWhereHas('studentProfile', function ($query) use ($search) {
-                            $query->where('student_id', 'like', "%{$search}%")
-                                ->orWhere('course', 'like', "%{$search}%");
+                            $query->where('student_id', 'like', "%{$search}%")->orWhere('course', 'like', "%{$search}%");
                         });
                 });
             });
 
-        $users = $query->orderBy('last_name')
-            ->get(); // Get all students instead of paginating
+        $users = $query->orderBy('last_name')->get(); // Get all students instead of paginating
 
         // Create a manual pagination-like structure for frontend compatibility
         $paginatedUsers = new \Illuminate\Pagination\LengthAwarePaginator(
@@ -186,7 +182,7 @@ class AdminController extends Controller
             [
                 'path' => $request->url(),
                 'pageName' => 'page',
-            ]
+            ],
         );
         $paginatedUsers->appends($request->query());
 
@@ -200,14 +196,16 @@ class AdminController extends Controller
                 'email' => $user->email,
                 'avatar' => $user->avatar, // This will utilize the getAvatarAttribute accessor from the User model
                 'role' => 'Student', // Role is determined by the query context
-                'student_profile' => $user->studentProfile ? [
-                    'student_id' => $user->studentProfile->student_id,
-                    'course' => $user->studentProfile->course,
-                    'major' => $user->studentProfile->major,
-                    'year_level' => $user->studentProfile->year_level,
-                    'mobile_number' => $user->studentProfile->mobile_number,
-                    // Add any other student_profile fields needed by the frontend here
-                ] : null,
+                'student_profile' => $user->studentProfile
+                    ? [
+                        'student_id' => $user->studentProfile->student_id,
+                        'course' => $user->studentProfile->course,
+                        'major' => $user->studentProfile->major,
+                        'year_level' => $user->studentProfile->year_level,
+                        'mobile_number' => $user->studentProfile->mobile_number,
+                        // Add any other student_profile fields needed by the frontend here
+                    ]
+                    : null,
                 'created_at' => $user->created_at,
                 // Ensure all fields expected by student-management/columns.tsx are present
             ];
@@ -585,7 +583,9 @@ class AdminController extends Controller
     {
         // Redirect admin users back as they cannot be edited
         if ($user->isAdmin()) {
-            return redirect()->back()->withErrors(['error' => 'Admin profiles cannot be edited.']);
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Admin profiles cannot be edited.']);
         }
 
         // Load the appropriate profile based on user role
@@ -668,7 +668,9 @@ class AdminController extends Controller
             $userData['adminProfile'] = $user->adminProfile->toArray();
         } else {
             // Profile not found for the user role
-            return redirect()->back()->withErrors(['error' => 'User profile not found.']);
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'User profile not found.']);
         }
 
         return Inertia::render('admin/edit-user-profile', [
@@ -778,10 +780,7 @@ class AdminController extends Controller
             // Update profile record based on role
             if ($user->role === 'student' && $user->studentProfile) {
                 // Filter out user fields from student profile data
-                $profileFields = array_diff_key(
-                    $validatedData,
-                    array_flip(['first_name', 'middle_name', 'last_name', 'email'])
-                );
+                $profileFields = array_diff_key($validatedData, array_flip(['first_name', 'middle_name', 'last_name', 'email']));
 
                 // Ensure boolean fields are properly handled
                 $booleanFields = ['is_pwd'];
@@ -804,8 +803,7 @@ class AdminController extends Controller
             // Redirect to the appropriate show route
             $routeName = $user->role === 'student' ? 'admin.students.show' : 'admin.staff.show';
 
-            return redirect()->route($routeName, $user)
-                ->with('message', 'User profile updated successfully.');
+            return redirect()->route($routeName, $user)->with('message', 'User profile updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -825,8 +823,7 @@ class AdminController extends Controller
         // Redirect to the appropriate page based on user role
         $redirectRoute = $user->role === 'student' ? 'admin.students' : 'admin.staff';
 
-        return redirect()->route($redirectRoute)
-            ->with('message', 'User successfully deleted.');
+        return redirect()->route($redirectRoute)->with('message', 'User successfully deleted.');
     }
 
     /**
@@ -843,7 +840,8 @@ class AdminController extends Controller
             ->where('id', '!=', $currentUserId)
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
-                    $query->where('first_name', 'like', "%{$search}%")
+                    $query
+                        ->where('first_name', 'like', "%{$search}%")
                         ->orWhere('last_name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
                 });
@@ -852,10 +850,9 @@ class AdminController extends Controller
         $staffMembers = $staffQuery->orderBy('last_name')->get();
 
         // Query for all staff invitations (regardless of status)
-        $invitationsQuery = StaffInvitation::with('inviter')
-            ->when($search, function ($query) use ($search) {
-                $query->where('email', 'like', "%{$search}%");
-            });
+        $invitationsQuery = StaffInvitation::with('inviter')->when($search, function ($query) use ($search) {
+            $query->where('email', 'like', "%{$search}%");
+        });
 
         $allInvitations = $invitationsQuery->orderBy('created_at', 'desc')->get();
 
@@ -933,11 +930,14 @@ class AdminController extends Controller
      */
     public function sendInvitation(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|unique:users,email|unique:staff_invitations,email,NULL,id,accepted_at,NULL',
-        ], [
-            'email.unique' => 'This email is already associated with an existing user or has a pending invitation.',
-        ]);        // Generate invitation token with 48-hour expiry
+        $request->validate(
+            [
+                'email' => 'required|email|unique:users,email|unique:staff_invitations,email,NULL,id,accepted_at,NULL',
+            ],
+            [
+                'email.unique' => 'This email is already associated with an existing user or has a pending invitation.',
+            ],
+        ); // Generate invitation token with 48-hour expiry
         $invitation = StaffInvitation::create([
             'email' => $request->email,
             'token' => StaffInvitation::generateToken(),
@@ -999,12 +999,15 @@ class AdminController extends Controller
         $type = $request->query('type');
 
         $query = Scholarship::withCount(['applications'])
-            ->with(['applications' => function ($query) {
-                $query->where('status', 'approved');
-            }])
+            ->with([
+                'applications' => function ($query) {
+                    $query->where('status', 'approved');
+                },
+            ])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
+                    $query
+                        ->where('name', 'like', "%{$search}%")
                         ->orWhere('description', 'like', "%{$search}%")
                         ->orWhere('type', 'like', "%{$search}%");
                 });
@@ -1025,7 +1028,7 @@ class AdminController extends Controller
                 'inactive' => 'closed',
                 'draft' => 'closed',
                 'upcoming' => 'upcoming',
-                default => 'closed'
+                default => 'closed',
             };
 
             return [
@@ -1072,7 +1075,7 @@ class AdminController extends Controller
     public function scholarshipApplications(Request $request)
     {
         $query = ScholarshipApplication::with([
-            'user.studentProfile',  // Fix: Should be 'user.studentProfile' not 'user.user.studentProfile'
+            'user.studentProfile', // Fix: Should be 'user.studentProfile' not 'user.user.studentProfile'
             'scholarship',
             'documents',
             'reviewer',
@@ -1082,7 +1085,8 @@ class AdminController extends Controller
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->whereHas('user', function ($userQuery) use ($request) {
-                    $userQuery->where('first_name', 'like', '%'.$request->search.'%')
+                    $userQuery
+                        ->where('first_name', 'like', '%'.$request->search.'%')
                         ->orWhere('last_name', 'like', '%'.$request->search.'%')
                         ->orWhere('middle_name', 'like', '%'.$request->search.'%')
                         ->orWhere('email', 'like', '%'.$request->search.'%');
@@ -1120,7 +1124,7 @@ class AdminController extends Controller
                 'id' => $application->id,
                 'student' => [
                     'id' => $application->user->id,
-                    'name' => $application->user->full_name,  // Changed from name to full_name
+                    'name' => $application->user->full_name, // Changed from name to full_name
                     'email' => $application->user->email,
                     'student_id' => $application->user->studentProfile->student_id ?? 'N/A',
                     'course' => $application->user->studentProfile->course ?? 'N/A',
@@ -1137,10 +1141,12 @@ class AdminController extends Controller
                 'approved_at' => $application->approved_at,
                 'rejected_at' => $application->rejected_at,
                 'amount_received' => $application->amount_received,
-                'reviewer' => $application->reviewer ? [
-                    'name' => $application->reviewer->full_name,  // Changed from name to full_name
-                    'email' => $application->reviewer->email,
-                ] : null,
+                'reviewer' => $application->reviewer
+                    ? [
+                        'name' => $application->reviewer->full_name, // Changed from name to full_name
+                        'email' => $application->reviewer->email,
+                    ]
+                    : null,
                 'created_at' => $application->created_at->toISOString(),
                 'updated_at' => $application->updated_at->toISOString(),
             ];
@@ -1153,7 +1159,12 @@ class AdminController extends Controller
 
         $statistics = [
             'total_applications' => \App\Models\ScholarshipApplication::count(),
-            'pending_applications' => \App\Models\ScholarshipApplication::whereIn('status', ['submitted', 'under_verification', 'verified', 'under_evaluation'])->count(),
+            'pending_applications' => \App\Models\ScholarshipApplication::whereIn('status', [
+                'submitted',
+                'under_verification',
+                'verified',
+                'under_evaluation',
+            ])->count(),
             'approved_applications' => \App\Models\ScholarshipApplication::where('status', 'approved')->count(),
             'rejected_applications' => \App\Models\ScholarshipApplication::where('status', 'rejected')->count(),
             'this_month_count' => \App\Models\ScholarshipApplication::where('created_at', '>=', $thisMonth)->count(),
@@ -1162,9 +1173,7 @@ class AdminController extends Controller
 
         // Calculate completion rate
         $totalProcessed = $statistics['approved_applications'] + $statistics['rejected_applications'];
-        $statistics['completion_rate'] = $statistics['total_applications'] > 0 
-            ? ($totalProcessed / $statistics['total_applications']) * 100 
-            : 0;
+        $statistics['completion_rate'] = $statistics['total_applications'] > 0 ? ($totalProcessed / $statistics['total_applications']) * 100 : 0;
 
         return Inertia::render('admin/scholarship-applications/index', [
             'applications' => $applications,
@@ -1183,9 +1192,10 @@ class AdminController extends Controller
         // Get recent login activity by querying users with their most recent sessions
         // We need to get the most recent session for each user
         $recentLoginsQuery = User::with(['studentProfile', 'osasStaffProfile', 'adminProfile'])
-            ->leftJoin('sessions', function($join) {
-                $join->on('users.id', '=', 'sessions.user_id')
-                     ->whereRaw('sessions.last_activity = (SELECT MAX(s2.last_activity) FROM sessions s2 WHERE s2.user_id = users.id)');
+            ->leftJoin('sessions', function ($join) {
+                $join
+                    ->on('users.id', '=', 'sessions.user_id')
+                    ->whereRaw('sessions.last_activity = (SELECT MAX(s2.last_activity) FROM sessions s2 WHERE s2.user_id = users.id)');
             })
             ->whereNotNull('users.updated_at')
             ->where('users.id', '!=', $currentUserId)
@@ -1193,53 +1203,52 @@ class AdminController extends Controller
             ->orderBy('users.updated_at', 'desc');
 
         $paginatedUsers = $recentLoginsQuery->paginate($perPage);
-        
-        $recentLogins = $paginatedUsers->getCollection()
-            ->map(function ($user) {
-                $profileInfo = null;
 
-                if ($user->role === 'student' && $user->studentProfile) {
-                    $profileInfo = [
-                        'student_id' => $user->studentProfile->student_id,
-                        'course' => $user->studentProfile->course,
-                        'year_level' => $user->studentProfile->year_level,
-                    ];
-                } elseif ($user->role === 'osas_staff' && $user->osasStaffProfile) {
-                    $profileInfo = [
-                        'staff_id' => $user->osasStaffProfile->staff_id,
-                        'department' => 'Office of Student Affairs & Services',
-                    ];
-                } elseif ($user->role === 'admin' && $user->adminProfile) {
-                    $profileInfo = [
-                        'department' => 'Administration',
-                    ];
-                }
+        $recentLogins = $paginatedUsers->getCollection()->map(function ($user) {
+            $profileInfo = null;
 
-                // Parse user agent to extract browser and device info
-                $userAgentInfo = UserAgentParser::parse($user->user_agent);
-
-                // Format role display name properly
-                $roleDisplay = match($user->role) {
-                    'admin' => 'Administrator',
-                    'osas_staff' => 'OSAS Staff',
-                    'student' => 'Student',
-                    default => ucwords(str_replace('_', ' ', $user->role))
-                };
-
-                return [
-                    'id' => $user->id,
-                    'name' => $user->full_name,
-                    'email' => $user->email,
-                    'role' => $roleDisplay,
-                    'avatar' => $user->avatar,
-                    'last_activity' => $user->updated_at,
-                    'is_active' => $user->is_active,
-                    'profile_info' => $profileInfo,
-                    'ip_address' => $user->ip_address,
-                    'device' => $userAgentInfo['device'],
-                    'browser' => $userAgentInfo['browser'],
+            if ($user->role === 'student' && $user->studentProfile) {
+                $profileInfo = [
+                    'student_id' => $user->studentProfile->student_id,
+                    'course' => $user->studentProfile->course,
+                    'year_level' => $user->studentProfile->year_level,
                 ];
-            });
+            } elseif ($user->role === 'osas_staff' && $user->osasStaffProfile) {
+                $profileInfo = [
+                    'staff_id' => $user->osasStaffProfile->staff_id,
+                    'department' => 'Office of Student Affairs & Services',
+                ];
+            } elseif ($user->role === 'admin' && $user->adminProfile) {
+                $profileInfo = [
+                    'department' => 'Administration',
+                ];
+            }
+
+            // Parse user agent to extract browser and device info
+            $userAgentInfo = UserAgentParser::parse($user->user_agent);
+
+            // Format role display name properly
+            $roleDisplay = match ($user->role) {
+                'admin' => 'Administrator',
+                'osas_staff' => 'OSAS Staff',
+                'student' => 'Student',
+                default => ucwords(str_replace('_', ' ', $user->role)),
+            };
+
+            return [
+                'id' => $user->id,
+                'name' => $user->full_name,
+                'email' => $user->email,
+                'role' => $roleDisplay,
+                'avatar' => $user->avatar,
+                'last_activity' => $user->updated_at,
+                'is_active' => $user->is_active,
+                'profile_info' => $profileInfo,
+                'ip_address' => $user->ip_address,
+                'device' => $userAgentInfo['device'],
+                'browser' => $userAgentInfo['browser'],
+            ];
+        });
 
         return Inertia::render('admin/recent-logins', [
             'recentLogins' => [
@@ -1428,7 +1437,7 @@ class AdminController extends Controller
         $content['description'] = $request->description;
         $content['category'] = $request->category;
         $content['priority'] = $request->priority;
-        $content['date'] = $request->date ?? $content['date'] ?? now()->format('Y-m-d');
+        $content['date'] = $request->date ?? ($content['date'] ?? now()->format('Y-m-d'));
 
         $page->update([
             'title' => $request->title,
@@ -1597,7 +1606,7 @@ class AdminController extends Controller
     {
         // Fix: Load the correct relationships
         $application->load([
-            'user.studentProfile',  // Fix: Use 'user' instead of 'student.user'
+            'user.studentProfile', // Fix: Use 'user' instead of 'student.user'
             'scholarship',
             'reviewer',
             'documents',
@@ -1641,11 +1650,13 @@ class AdminController extends Controller
                     'eligibility_criteria' => $application->scholarship->eligibility_criteria,
                     'required_documents' => $application->scholarship->required_documents,
                 ],
-                'reviewer' => $application->reviewer ? [
-                    'id' => $application->reviewer->id,
-                    'name' => $application->reviewer->name, // Use 'name' instead of 'full_name'
-                    'email' => $application->reviewer->email,
-                ] : null,
+                'reviewer' => $application->reviewer
+                    ? [
+                        'id' => $application->reviewer->id,
+                        'name' => $application->reviewer->name, // Use 'name' instead of 'full_name'
+                        'email' => $application->reviewer->email,
+                    ]
+                    : null,
                 'created_at' => $application->created_at,
                 'updated_at' => $application->updated_at,
             ],
@@ -1660,9 +1671,8 @@ class AdminController extends Controller
         // Load the scholarship with related data
         $scholarship->load([
             'applications' => function ($query) {
-                $query->with(['user.studentProfile', 'reviewer'])
-                    ->latest();
-            }
+                $query->with(['user.studentProfile', 'reviewer'])->latest();
+            },
         ]);
 
         // Get application statistics for this scholarship
@@ -1672,9 +1682,7 @@ class AdminController extends Controller
         $rejectedApplications = $scholarship->applications()->where('status', 'rejected')->count();
 
         // Calculate total amount disbursed
-        $totalDisbursed = $scholarship->applications()
-            ->where('status', 'approved')
-            ->sum('amount_received') ?? 0;
+        $totalDisbursed = $scholarship->applications()->where('status', 'approved')->sum('amount_received') ?? 0;
 
         // Transform scholarship data for frontend
         $scholarshipData = [

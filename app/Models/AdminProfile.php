@@ -14,10 +14,7 @@ class AdminProfile extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'user_id',
-        'admin_id',
-    ];
+    protected $fillable = ['user_id', 'admin_id'];
 
     /**
      * Get the user that owns the admin profile.

@@ -42,14 +42,9 @@ class StudentProfileFactory extends Factory
             'course' => $course,
             'major' => $major,
             'year_level' => fake()->randomElement(['1st Year', '2nd Year', '3rd Year', '4th Year']),
-            'existing_scholarships' => fake()->optional(0.4)->randomElement([
-                'TES',
-                'ESGP-PA',
-                'Tulong Dunong',
-                'Municipal Scholarship',
-                'Provincial Scholarship',
-                'DOST Scholarship',
-            ]),
+            'existing_scholarships' => fake()
+                ->optional(0.4)
+                ->randomElement(['TES', 'ESGP-PA', 'Tulong Dunong', 'Municipal Scholarship', 'Provincial Scholarship', 'DOST Scholarship']),
 
             // Personal Information
             'civil_status' => fake()->randomElement(['Single', 'Married', 'Widowed', 'Separated', 'Annulled']),
@@ -76,27 +71,16 @@ class StudentProfileFactory extends Factory
 
             // PWD Information
             'is_pwd' => $isPwd,
-            'disability_type' => $isPwd ? fake()->randomElement([
-                'Visual Impairment',
-                'Hearing Impairment',
-                'Physical Disability',
-                'Learning Disability',
-            ]) : null,
+            'disability_type' => $isPwd
+                ? fake()->randomElement(['Visual Impairment', 'Hearing Impairment', 'Physical Disability', 'Learning Disability'])
+                : null,
 
             // Residence Information
             'residence_type' => $residenceType,
-            'guardian_name' => $residenceType === 'With Guardian'
-                ? fake()->name()
-                : 'Not Applicable',
+            'guardian_name' => $residenceType === 'With Guardian' ? fake()->name() : 'Not Applicable',
 
             // Family Background - Parents
-            'status_of_parents' => fake()->randomElement([
-                'Living Together',
-                'Separated',
-                'Single Parent',
-                'Mother Deceased',
-                'Father Deceased',
-            ]),
+            'status_of_parents' => fake()->randomElement(['Living Together', 'Separated', 'Single Parent', 'Mother Deceased', 'Father Deceased']),
 
             // Father's Information
             'father_name' => fake()->name('male'),
@@ -109,12 +93,7 @@ class StudentProfileFactory extends Factory
             'father_company' => fake()->optional(0.8)->company(),
             'father_monthly_income' => fake()->randomFloat(2, 10000, 100000),
             'father_years_service' => fake()->numberBetween(1, 30),
-            'father_education' => fake()->randomElement([
-                'High School',
-                'College',
-                'Vocational',
-                'Post Graduate',
-            ]),
+            'father_education' => fake()->randomElement(['High School', 'College', 'Vocational', 'Post Graduate']),
             'father_school' => fake()->company(),
             'father_unemployment_reason' => fake()->optional(0.2)->sentence(),
 
@@ -129,37 +108,29 @@ class StudentProfileFactory extends Factory
             'mother_company' => fake()->optional(0.8)->company(),
             'mother_monthly_income' => fake()->randomFloat(2, 10000, 100000),
             'mother_years_service' => fake()->numberBetween(1, 30),
-            'mother_education' => fake()->randomElement([
-                'High School',
-                'College',
-                'Vocational',
-                'Post Graduate',
-            ]),
+            'mother_education' => fake()->randomElement(['High School', 'College', 'Vocational', 'Post Graduate']),
             'mother_school' => fake()->company(),
             'mother_unemployment_reason' => fake()->optional(0.2)->sentence(),
 
             // Siblings Information
             'total_siblings' => fake()->numberBetween(0, 5),
-            'siblings' => fake()->optional(0.8)->randomElements(
-                array_map(function () {
-                    return [
-                        'name' => fake()->name(),
-                        'age_civil_status' => fake()->numberBetween(1, 40).' / '.fake()->randomElement(['Single', 'Married']),
-                        'permanent_home_address' => fake()->address(),
-                        'occupation' => fake()->jobTitle(),
-                        'average_monthly_income' => fake()->randomFloat(2, 0, 50000),
-                        'educational_attainment' => fake()->randomElement([
-                            'Elementary',
-                            'High School',
-                            'College',
-                            'Post Graduate',
-                        ]),
-                        'school_or_college' => fake()->company(),
-                        'still_with_you' => fake()->boolean(),
-                        'school_fees_per_year' => fake()->optional(0.6)->randomFloat(2, 10000, 100000),
-                    ];
-                }, range(1, fake()->numberBetween(1, 5)))
-            ),
+            'siblings' => fake()
+                ->optional(0.8)
+                ->randomElements(
+                    array_map(function () {
+                        return [
+                            'name' => fake()->name(),
+                            'age_civil_status' => fake()->numberBetween(1, 40).' / '.fake()->randomElement(['Single', 'Married']),
+                            'permanent_home_address' => fake()->address(),
+                            'occupation' => fake()->jobTitle(),
+                            'average_monthly_income' => fake()->randomFloat(2, 0, 50000),
+                            'educational_attainment' => fake()->randomElement(['Elementary', 'High School', 'College', 'Post Graduate']),
+                            'school_or_college' => fake()->company(),
+                            'still_with_you' => fake()->boolean(),
+                            'school_fees_per_year' => fake()->optional(0.6)->randomFloat(2, 10000, 100000),
+                        ];
+                    }, range(1, fake()->numberBetween(1, 5))),
+                ),
 
             // Income Information
             'combined_annual_pay_parents' => fake()->randomFloat(2, 120000, 1200000),

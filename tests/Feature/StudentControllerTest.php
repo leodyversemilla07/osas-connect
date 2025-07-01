@@ -27,20 +27,23 @@ describe('StudentController Dashboard Stats', function () {
         ]);
 
         // Create some scholarships
-        $this->scholarships = Scholarship::factory()->count(5)->create([
-            'status' => 'active',
-        ]);
+        $this->scholarships = Scholarship::factory()
+            ->count(5)
+            ->create([
+                'status' => 'active',
+            ]);
 
         // Create some applications for the student
-        $this->applications = ScholarshipApplication::factory()->count(3)->create([
-            'user_id' => $this->student->id,
-            'scholarship_id' => $this->scholarships->random()->id,
-        ]);
+        $this->applications = ScholarshipApplication::factory()
+            ->count(3)
+            ->create([
+                'user_id' => $this->student->id,
+                'scholarship_id' => $this->scholarships->random()->id,
+            ]);
     });
 
     test('dashboard stats endpoint returns correct data structure', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.dashboard.stats'));
+        $response = $this->actingAs($this->student)->get(route('student.dashboard.stats'));
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -73,8 +76,7 @@ describe('StudentController Dashboard Stats', function () {
             'status' => 'draft',
         ]);
 
-        $response = $this->actingAs($this->student)
-            ->get(route('student.dashboard.stats'));
+        $response = $this->actingAs($this->student)->get(route('student.dashboard.stats'));
 
         $data = $response->json();
 
@@ -85,8 +87,7 @@ describe('StudentController Dashboard Stats', function () {
     test('non-student users cannot access dashboard stats', function () {
         $admin = User::factory()->create(['role' => 'admin']);
 
-        $response = $this->actingAs($admin)
-            ->get(route('student.dashboard.stats'));
+        $response = $this->actingAs($admin)->get(route('student.dashboard.stats'));
 
         $response->assertStatus(302); // Redirected by middleware, not 403
     });
@@ -105,16 +106,10 @@ describe('StudentController Recent Activity', function () {
     });
 
     test('recent activity endpoint returns correct structure', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.dashboard.activity'));
+        $response = $this->actingAs($this->student)->get(route('student.dashboard.activity'));
 
         $response->assertStatus(200);
-        $response->assertJsonStructure([
-            'recent_applications',
-            'status_updates',
-            'upcoming_deadlines',
-            'notifications',
-        ]);
+        $response->assertJsonStructure(['recent_applications', 'status_updates', 'upcoming_deadlines', 'notifications']);
     });
 });
 
@@ -147,8 +142,7 @@ describe('StudentController Scholarship Search', function () {
     });
 
     test('search returns all active scholarships when no filters', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.scholarships.search'));
+        $response = $this->actingAs($this->student)->get(route('student.scholarships.search'));
 
         $response->assertStatus(200);
         $data = $response->json();
@@ -157,8 +151,7 @@ describe('StudentController Scholarship Search', function () {
     });
 
     test('search filters by scholarship type', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.scholarships.search', ['type' => 'academic_full']));
+        $response = $this->actingAs($this->student)->get(route('student.scholarships.search', ['type' => 'academic_full']));
 
         $response->assertStatus(200);
         $data = $response->json();
@@ -168,8 +161,7 @@ describe('StudentController Scholarship Search', function () {
     });
 
     test('search filters by query text', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.scholarships.search', ['q' => 'Academic Excellence']));
+        $response = $this->actingAs($this->student)->get(route('student.scholarships.search', ['q' => 'Academic Excellence']));
 
         $response->assertStatus(200);
         $data = $response->json();
@@ -180,10 +172,11 @@ describe('StudentController Scholarship Search', function () {
 
     test('search respects pagination', function () {
         // Create more scholarships
-        Scholarship::factory()->count(15)->create(['status' => 'active']);
+        Scholarship::factory()
+            ->count(15)
+            ->create(['status' => 'active']);
 
-        $response = $this->actingAs($this->student)
-            ->get(route('student.scholarships.search', ['per_page' => 5]));
+        $response = $this->actingAs($this->student)->get(route('student.scholarships.search', ['per_page' => 5]));
 
         $response->assertStatus(200);
         $data = $response->json();
@@ -210,35 +203,18 @@ describe('StudentController Scholarship Details', function () {
     });
 
     test('scholarship details endpoint returns complete information', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.scholarships.details', $this->scholarship));
+        $response = $this->actingAs($this->student)->get(route('student.scholarships.details', $this->scholarship));
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'scholarship' => [
-                'id',
-                'name',
-                'description',
-                'type',
-                'requirements',
-                'amount',
-                'application_start_date',
-                'deadline',
-                'status',
-            ],
-            'eligibility' => [
-                'can_apply',
-                'is_eligible',
-                'requirements',
-                'reasons',
-            ],
+            'scholarship' => ['id', 'name', 'description', 'type', 'requirements', 'amount', 'application_start_date', 'deadline', 'status'],
+            'eligibility' => ['can_apply', 'is_eligible', 'requirements', 'reasons'],
             'existing_application',
         ]);
     });
 
     test('eligibility check works correctly for qualified student', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.scholarships.details', $this->scholarship));
+        $response = $this->actingAs($this->student)->get(route('student.scholarships.details', $this->scholarship));
 
         $data = $response->json();
 
@@ -254,8 +230,7 @@ describe('StudentController Scholarship Details', function () {
         $updatedProfile = \App\Models\StudentProfile::where('user_id', $this->student->id)->first();
         expect((float) $updatedProfile->current_gwa)->toBe(2.0);
 
-        $response = $this->actingAs($this->student)
-            ->get(route('student.scholarships.details', $this->scholarship));
+        $response = $this->actingAs($this->student)->get(route('student.scholarships.details', $this->scholarship));
 
         $data = $response->json();
 
@@ -269,8 +244,7 @@ describe('StudentController Scholarship Details', function () {
             'scholarship_id' => $this->scholarship->id,
         ]);
 
-        $response = $this->actingAs($this->student)
-            ->get(route('student.scholarships.details', $this->scholarship));
+        $response = $this->actingAs($this->student)->get(route('student.scholarships.details', $this->scholarship));
 
         $data = $response->json();
 

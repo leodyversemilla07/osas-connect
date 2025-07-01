@@ -19,7 +19,11 @@ class DocumentController extends Controller
 
         $request->validate([
             'document' => ['required', 'file', 'max:10240'], // 10MB max
-            'type' => ['required', 'string', 'in:transcripts,recommendation_letter,financial_statement,grades,indigency,good_moral,parent_consent,recommendation'],
+            'type' => [
+                'required',
+                'string',
+                'in:transcripts,recommendation_letter,financial_statement,grades,indigency,good_moral,parent_consent,recommendation',
+            ],
         ]);
 
         $path = StorageService::store($request->file('document'), 'documents');

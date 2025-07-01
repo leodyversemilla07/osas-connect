@@ -10,8 +10,6 @@ interface ReligionSelectorProps {
 }
 
 const RELIGION_OPTIONS = [
-    { value: 'Prefer not to say', label: 'Prefer not to say' },
-    { value: 'Other', label: 'Other' },
     { value: 'Aeta indigenous beliefs', label: 'Aeta indigenous beliefs' },
     { value: 'Agnosticism', label: 'Agnosticism' },
     { value: 'Ahmadiyya Muslim Community', label: 'Ahmadiyya Muslim Community' },
@@ -84,6 +82,8 @@ const RELIGION_OPTIONS = [
     { value: 'Visayan folk religion', label: 'Visayan folk religion' },
     { value: 'Wicca', label: 'Wicca' },
     { value: 'Zoroastrianism', label: 'Zoroastrianism' },
+    { value: 'Prefer not to say', label: 'Prefer not to say' },
+    { value: 'Other', label: 'Other' },
 ];
 
 export default function ReligionSelector({

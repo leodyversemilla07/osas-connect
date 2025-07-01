@@ -10,25 +10,14 @@ class ScholarshipNotification extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'title',
-        'message',
-        'type',
-        'data',
-        'read_at',
-        'notifiable_type',
-        'notifiable_id',
-    ];
+    protected $fillable = ['user_id', 'title', 'message', 'type', 'data', 'read_at', 'notifiable_type', 'notifiable_id'];
 
     protected $casts = [
         'data' => 'array',
         'read_at' => 'datetime',
     ];
 
-    protected $appends = [
-        'is_read',
-    ];
+    protected $appends = ['is_read'];
 
     const TYPE_APPLICATION_STATUS = 'application_status';
 

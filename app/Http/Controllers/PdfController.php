@@ -413,22 +413,69 @@ class PdfController extends Controller
             $user->load([
                 'studentProfile' => function ($query) {
                     $query->select(
-                        'id', 'user_id', 'student_id', 'course', 'major', 'year_level',
-                        'guardian_name', 'existing_scholarships', 'civil_status', 'sex',
-                        'date_of_birth', 'place_of_birth', 'street', 'barangay', 'city',
-                        'province', 'mobile_number', 'telephone_number', 'is_pwd',
-                        'disability_type', 'religion', 'residence_type', 'status_of_parents',
-                        'father_name', 'father_age', 'father_occupation', 'father_monthly_income',
-                        'father_mobile', 'father_telephone', 'father_email', 'father_company',
-                        'father_years_service', 'father_education', 'father_school', 'father_unemployment_reason',
-                        'mother_name', 'mother_age', 'mother_occupation', 'mother_monthly_income',
-                        'mother_mobile', 'mother_telephone', 'mother_email', 'mother_company',
-                        'mother_years_service', 'mother_education', 'mother_school', 'mother_unemployment_reason',
-                        'total_siblings', 'siblings', 'combined_annual_pay_parents', 'combined_annual_pay_siblings',
-                        'income_from_business', 'income_from_land_rentals', 'income_from_building_rentals',
-                        'retirement_benefits_pension', 'commissions', 'support_from_relatives', 'bank_deposits',
-                        'other_income_description', 'other_income_amount', 'total_annual_income',
-                        'total_monthly_expenses', 'total_annual_expenses'
+                        'id',
+                        'user_id',
+                        'student_id',
+                        'course',
+                        'major',
+                        'year_level',
+                        'guardian_name',
+                        'existing_scholarships',
+                        'civil_status',
+                        'sex',
+                        'date_of_birth',
+                        'place_of_birth',
+                        'street',
+                        'barangay',
+                        'city',
+                        'province',
+                        'mobile_number',
+                        'telephone_number',
+                        'is_pwd',
+                        'disability_type',
+                        'religion',
+                        'residence_type',
+                        'status_of_parents',
+                        'father_name',
+                        'father_age',
+                        'father_occupation',
+                        'father_monthly_income',
+                        'father_mobile',
+                        'father_telephone',
+                        'father_email',
+                        'father_company',
+                        'father_years_service',
+                        'father_education',
+                        'father_school',
+                        'father_unemployment_reason',
+                        'mother_name',
+                        'mother_age',
+                        'mother_occupation',
+                        'mother_monthly_income',
+                        'mother_mobile',
+                        'mother_telephone',
+                        'mother_email',
+                        'mother_company',
+                        'mother_years_service',
+                        'mother_education',
+                        'mother_school',
+                        'mother_unemployment_reason',
+                        'total_siblings',
+                        'siblings',
+                        'combined_annual_pay_parents',
+                        'combined_annual_pay_siblings',
+                        'income_from_business',
+                        'income_from_land_rentals',
+                        'income_from_building_rentals',
+                        'retirement_benefits_pension',
+                        'commissions',
+                        'support_from_relatives',
+                        'bank_deposits',
+                        'other_income_description',
+                        'other_income_amount',
+                        'total_annual_income',
+                        'total_monthly_expenses',
+                        'total_annual_expenses',
                     );
                 },
             ]);
@@ -476,22 +523,69 @@ class PdfController extends Controller
             $user->load([
                 'studentProfile' => function ($query) {
                     $query->select(
-                        'id', 'user_id', 'student_id', 'course', 'major', 'year_level',
-                        'guardian_name', 'existing_scholarships', 'civil_status', 'sex',
-                        'date_of_birth', 'place_of_birth', 'street', 'barangay', 'city',
-                        'province', 'mobile_number', 'telephone_number', 'is_pwd',
-                        'disability_type', 'religion', 'residence_type', 'status_of_parents',
-                        'father_name', 'father_age', 'father_occupation', 'father_monthly_income',
-                        'father_mobile', 'father_telephone', 'father_email', 'father_company',
-                        'father_years_service', 'father_education', 'father_school', 'father_unemployment_reason',
-                        'mother_name', 'mother_age', 'mother_occupation', 'mother_monthly_income',
-                        'mother_mobile', 'mother_telephone', 'mother_email', 'mother_company',
-                        'mother_years_service', 'mother_education', 'mother_school', 'mother_unemployment_reason',
-                        'total_siblings', 'siblings', 'combined_annual_pay_parents', 'combined_annual_pay_siblings',
-                        'income_from_business', 'income_from_land_rentals', 'income_from_building_rentals',
-                        'retirement_benefits_pension', 'commissions', 'support_from_relatives', 'bank_deposits',
-                        'other_income_description', 'other_income_amount', 'total_annual_income',
-                        'total_monthly_expenses', 'total_annual_expenses'
+                        'id',
+                        'user_id',
+                        'student_id',
+                        'course',
+                        'major',
+                        'year_level',
+                        'guardian_name',
+                        'existing_scholarships',
+                        'civil_status',
+                        'sex',
+                        'date_of_birth',
+                        'place_of_birth',
+                        'street',
+                        'barangay',
+                        'city',
+                        'province',
+                        'mobile_number',
+                        'telephone_number',
+                        'is_pwd',
+                        'disability_type',
+                        'religion',
+                        'residence_type',
+                        'status_of_parents',
+                        'father_name',
+                        'father_age',
+                        'father_occupation',
+                        'father_monthly_income',
+                        'father_mobile',
+                        'father_telephone',
+                        'father_email',
+                        'father_company',
+                        'father_years_service',
+                        'father_education',
+                        'father_school',
+                        'father_unemployment_reason',
+                        'mother_name',
+                        'mother_age',
+                        'mother_occupation',
+                        'mother_monthly_income',
+                        'mother_mobile',
+                        'mother_telephone',
+                        'mother_email',
+                        'mother_company',
+                        'mother_years_service',
+                        'mother_education',
+                        'mother_school',
+                        'mother_unemployment_reason',
+                        'total_siblings',
+                        'siblings',
+                        'combined_annual_pay_parents',
+                        'combined_annual_pay_siblings',
+                        'income_from_business',
+                        'income_from_land_rentals',
+                        'income_from_building_rentals',
+                        'retirement_benefits_pension',
+                        'commissions',
+                        'support_from_relatives',
+                        'bank_deposits',
+                        'other_income_description',
+                        'other_income_amount',
+                        'total_annual_income',
+                        'total_monthly_expenses',
+                        'total_annual_expenses',
                     );
                 },
             ]);
@@ -539,22 +633,69 @@ class PdfController extends Controller
             $user->load([
                 'studentProfile' => function ($query) {
                     $query->select(
-                        'id', 'user_id', 'student_id', 'course', 'major', 'year_level',
-                        'guardian_name', 'existing_scholarships', 'civil_status', 'sex',
-                        'date_of_birth', 'place_of_birth', 'street', 'barangay', 'city',
-                        'province', 'mobile_number', 'telephone_number', 'is_pwd',
-                        'disability_type', 'religion', 'residence_type', 'status_of_parents',
-                        'father_name', 'father_age', 'father_occupation', 'father_monthly_income',
-                        'father_mobile', 'father_telephone', 'father_email', 'father_company',
-                        'father_years_service', 'father_education', 'father_school', 'father_unemployment_reason',
-                        'mother_name', 'mother_age', 'mother_occupation', 'mother_monthly_income',
-                        'mother_mobile', 'mother_telephone', 'mother_email', 'mother_company',
-                        'mother_years_service', 'mother_education', 'mother_school', 'mother_unemployment_reason',
-                        'total_siblings', 'siblings', 'combined_annual_pay_parents', 'combined_annual_pay_siblings',
-                        'income_from_business', 'income_from_land_rentals', 'income_from_building_rentals',
-                        'retirement_benefits_pension', 'commissions', 'support_from_relatives', 'bank_deposits',
-                        'other_income_description', 'other_income_amount', 'total_annual_income',
-                        'total_monthly_expenses', 'total_annual_expenses'
+                        'id',
+                        'user_id',
+                        'student_id',
+                        'course',
+                        'major',
+                        'year_level',
+                        'guardian_name',
+                        'existing_scholarships',
+                        'civil_status',
+                        'sex',
+                        'date_of_birth',
+                        'place_of_birth',
+                        'street',
+                        'barangay',
+                        'city',
+                        'province',
+                        'mobile_number',
+                        'telephone_number',
+                        'is_pwd',
+                        'disability_type',
+                        'religion',
+                        'residence_type',
+                        'status_of_parents',
+                        'father_name',
+                        'father_age',
+                        'father_occupation',
+                        'father_monthly_income',
+                        'father_mobile',
+                        'father_telephone',
+                        'father_email',
+                        'father_company',
+                        'father_years_service',
+                        'father_education',
+                        'father_school',
+                        'father_unemployment_reason',
+                        'mother_name',
+                        'mother_age',
+                        'mother_occupation',
+                        'mother_monthly_income',
+                        'mother_mobile',
+                        'mother_telephone',
+                        'mother_email',
+                        'mother_company',
+                        'mother_years_service',
+                        'mother_education',
+                        'mother_school',
+                        'mother_unemployment_reason',
+                        'total_siblings',
+                        'siblings',
+                        'combined_annual_pay_parents',
+                        'combined_annual_pay_siblings',
+                        'income_from_business',
+                        'income_from_land_rentals',
+                        'income_from_building_rentals',
+                        'retirement_benefits_pension',
+                        'commissions',
+                        'support_from_relatives',
+                        'bank_deposits',
+                        'other_income_description',
+                        'other_income_amount',
+                        'total_annual_income',
+                        'total_monthly_expenses',
+                        'total_annual_expenses',
                     );
                 },
             ]);
@@ -622,10 +763,7 @@ class PdfController extends Controller
 
             // Fill the form directly from the original template
             $pdf = new PdftkPdf($templatePath, ['command' => $pdftkCommand]);
-            $result = $pdf->fillForm($this->prepareFormData($user))
-                ->flatten()
-                ->compress()
-                ->saveAs($tempOutput);
+            $result = $pdf->fillForm($this->prepareFormData($user))->flatten()->compress()->saveAs($tempOutput);
 
             if (! $result) {
                 throw new Exception($pdf->getError() ?: 'Unknown error while generating PDF');
@@ -636,18 +774,16 @@ class PdfController extends Controller
             }
 
             // Generate filename
-            $safeName = preg_replace("/[^a-zA-Z0-9_\-\.]/", '_', $user->last_name.'_'.$user->first_name);
+            $safeName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $user->last_name.'_'.$user->first_name);
             $fileName = 'scholarship_application_'.$safeName.'_'.date('Y-m-d_His').'.pdf';
 
             // Return the PDF as a download response with automatic cleanup
-            return response()->file(
-                $tempOutput,
-                [
+            return response()
+                ->file($tempOutput, [
                     'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
-                ]
-            )->deleteFileAfterSend(true);
-
+                ])
+                ->deleteFileAfterSend(true);
         } catch (Exception $e) {
             $this->cleanup($tempOutput);
             throw $e;
@@ -665,10 +801,7 @@ class PdfController extends Controller
 
             // Fill the CHED form directly from the original template
             $pdf = new PdftkPdf($templatePath, ['command' => $pdftkCommand]);
-            $result = $pdf->fillForm($this->prepareChedFormData($user))
-                ->flatten()
-                ->compress()
-                ->saveAs($tempOutput);
+            $result = $pdf->fillForm($this->prepareChedFormData($user))->flatten()->compress()->saveAs($tempOutput);
 
             if (! $result) {
                 throw new Exception($pdf->getError() ?: 'Unknown error while generating CHED PDF');
@@ -679,18 +812,16 @@ class PdfController extends Controller
             }
 
             // Generate filename
-            $safeName = preg_replace("/[^a-zA-Z0-9_\-\.]/", '_', $user->last_name.'_'.$user->first_name);
+            $safeName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $user->last_name.'_'.$user->first_name);
             $fileName = 'ched_scholarship_application_'.$safeName.'_'.date('Y-m-d_His').'.pdf';
 
             // Return the PDF as a download response with automatic cleanup
-            return response()->file(
-                $tempOutput,
-                [
+            return response()
+                ->file($tempOutput, [
                     'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
-                ]
-            )->deleteFileAfterSend(true);
-
+                ])
+                ->deleteFileAfterSend(true);
         } catch (Exception $e) {
             $this->cleanup($tempOutput);
             throw $e;
@@ -708,10 +839,7 @@ class PdfController extends Controller
 
             // Fill the Annex 1 form directly from the original template
             $pdf = new PdftkPdf($templatePath, ['command' => $pdftkCommand]);
-            $result = $pdf->fillForm($this->prepareAnnex1FormData($user))
-                ->flatten()
-                ->compress()
-                ->saveAs($tempOutput);
+            $result = $pdf->fillForm($this->prepareAnnex1FormData($user))->flatten()->compress()->saveAs($tempOutput);
 
             if (! $result) {
                 throw new Exception($pdf->getError() ?: 'Unknown error while generating Annex 1 PDF');
@@ -722,18 +850,16 @@ class PdfController extends Controller
             }
 
             // Generate filename
-            $safeName = preg_replace("/[^a-zA-Z0-9_\-\.]/", '_', $user->last_name.'_'.$user->first_name);
+            $safeName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $user->last_name.'_'.$user->first_name);
             $fileName = 'annex1_tpdf_application_'.$safeName.'_'.date('Y-m-d_His').'.pdf';
 
             // Return the PDF as a download response with automatic cleanup
-            return response()->file(
-                $tempOutput,
-                [
+            return response()
+                ->file($tempOutput, [
                     'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
-                ]
-            )->deleteFileAfterSend(true);
-
+                ])
+                ->deleteFileAfterSend(true);
         } catch (Exception $e) {
             $this->cleanup($tempOutput);
             throw $e;
@@ -775,12 +901,10 @@ class PdfController extends Controller
         };
 
         // Build address string with proper validation
-        $addressParts = array_filter([
-            $profile->street ?? '',
-            $profile->barangay ?? '',
-            $profile->city ?? '',
-            $profile->province ?? '',
-        ], fn ($part) => ! empty(trim($part)));
+        $addressParts = array_filter(
+            [$profile->street ?? '', $profile->barangay ?? '', $profile->city ?? '', $profile->province ?? ''],
+            fn ($part) => ! empty(trim($part)),
+        );
 
         // Prepare course year string with validation
         $courseYearStr = '';
@@ -840,7 +964,10 @@ class PdfController extends Controller
         $formData[self::FORM_FIELDS['FATHER_PERMANENT_HOME_ADDRESS']] = $formData[self::FORM_FIELDS['ADDRESS']]; // Use same as student address
         $formData[self::FORM_FIELDS['FATHER_TEL_NO']] = $ensureValue($profile->father_telephone ?? null, self::DEFAULT_VALUES['DEFAULT_PHONE']);
         $formData[self::FORM_FIELDS['FATHER_MOBILE_NO']] = $ensureValue($profile->father_mobile ?? null, self::DEFAULT_VALUES['DEFAULT_PHONE']);
-        $formData[self::FORM_FIELDS['FATHER_EMAIL_ADDRESS']] = $ensureValue($profile->father_email ?? null, self::DEFAULT_VALUES['DEFAULT_PARENT_EMAIL']);
+        $formData[self::FORM_FIELDS['FATHER_EMAIL_ADDRESS']] = $ensureValue(
+            $profile->father_email ?? null,
+            self::DEFAULT_VALUES['DEFAULT_PARENT_EMAIL'],
+        );
         $formData[self::FORM_FIELDS['FATHER_OCCUPATION_POSITION']] = $ensureValue($profile->father_occupation);
         $formData[self::FORM_FIELDS['FATHER_COMPANY']] = $ensureValue($profile->father_company ?? null);
         $formData[self::FORM_FIELDS['FATHER_AVERAGE_INCOME']] = $formatMoney($profile->father_monthly_income);
@@ -855,7 +982,10 @@ class PdfController extends Controller
         $formData[self::FORM_FIELDS['MOTHER_PERMANENT_HOME_ADDRESS']] = $formData[self::FORM_FIELDS['ADDRESS']]; // Use same as student address
         $formData[self::FORM_FIELDS['MOTHER_TEL_NO']] = $ensureValue($profile->mother_telephone ?? null, self::DEFAULT_VALUES['DEFAULT_PHONE']);
         $formData[self::FORM_FIELDS['MOTHER_MOBILE_NO']] = $ensureValue($profile->mother_mobile ?? null, self::DEFAULT_VALUES['DEFAULT_PHONE']);
-        $formData[self::FORM_FIELDS['MOTHER_EMAIL_ADDRESS']] = $ensureValue($profile->mother_email ?? null, self::DEFAULT_VALUES['DEFAULT_PARENT_EMAIL']);
+        $formData[self::FORM_FIELDS['MOTHER_EMAIL_ADDRESS']] = $ensureValue(
+            $profile->mother_email ?? null,
+            self::DEFAULT_VALUES['DEFAULT_PARENT_EMAIL'],
+        );
         $formData[self::FORM_FIELDS['MOTHER_OCCUPATION_POSITION']] = $ensureValue($profile->mother_occupation);
         $formData[self::FORM_FIELDS['MOTHER_COMPANY']] = $ensureValue($profile->mother_company ?? null);
         $formData[self::FORM_FIELDS['MOTHER_AVERAGE_INCOME']] = $formatMoney($profile->mother_monthly_income);
@@ -885,7 +1015,9 @@ class PdfController extends Controller
 
         // Family Income - Map available fields and use defaults for missing ones
         $formData[self::FORM_FIELDS['COMBINED_ANNUAL_PAY']] = $ensureValue(null, 'Yes');
-        $formData[self::FORM_FIELDS['COMBINED_ANNUAL_PAY_PHP']] = $formatMoney($profile->combined_annual_pay_parents + $profile->combined_annual_pay_siblings);
+        $formData[self::FORM_FIELDS['COMBINED_ANNUAL_PAY_PHP']] = $formatMoney(
+            $profile->combined_annual_pay_parents + $profile->combined_annual_pay_siblings,
+        );
         $formData[self::FORM_FIELDS['INCOME_FROM_BUSINESS']] = $profile->income_from_business > 0 ? 'Yes' : 'No';
         $formData[self::FORM_FIELDS['INCOME_FROM_BUSINESS_PHP']] = $formatMoney($profile->income_from_business ?? 0);
         $formData[self::FORM_FIELDS['INCOME_FROM_LAND_RENTALS']] = $profile->income_from_land_rentals > 0 ? 'Yes' : 'No';
@@ -907,12 +1039,27 @@ class PdfController extends Controller
 
         // Family Expenses - Monthly (use defaults for now)
         $monthlyExpenseFields = [
-            'FOOD_GROCERY', 'CAR_LOAN_AMORTIZATION', 'OTHER_LOAN_AMORTIZATION', 'SCHOOL_BUS_PAYMENT',
-            'TRANSPO_GAS_SCHOOLBUS', 'EDUC_PLAN_PREMIUMS', 'INSURANCE_POLICY_PREMIUMS',
-            'HEALTH_INSURANCE_PREMIUM', 'SSS_GSIS_PAGIBIG_LOANS', 'SCHOOL_OFFICE_UNIF_CLOTHING',
-            'ELECTRICITY_WATER_CABLE_COOKING_GAS', 'TELEPHONE_CELLPHONE', 'HELPER_YAYA',
-            'DRIVER', 'MEDICINES', 'DOCTORS_FEE_CONSULTATION', 'HOSPITALIZATION', 'RECREATION',
-            'TOTAL', 'SUB_TOTAL', 'SUB_TOTAL_X_12_MOTHS',
+            'FOOD_GROCERY',
+            'CAR_LOAN_AMORTIZATION',
+            'OTHER_LOAN_AMORTIZATION',
+            'SCHOOL_BUS_PAYMENT',
+            'TRANSPO_GAS_SCHOOLBUS',
+            'EDUC_PLAN_PREMIUMS',
+            'INSURANCE_POLICY_PREMIUMS',
+            'HEALTH_INSURANCE_PREMIUM',
+            'SSS_GSIS_PAGIBIG_LOANS',
+            'SCHOOL_OFFICE_UNIF_CLOTHING',
+            'ELECTRICITY_WATER_CABLE_COOKING_GAS',
+            'TELEPHONE_CELLPHONE',
+            'HELPER_YAYA',
+            'DRIVER',
+            'MEDICINES',
+            'DOCTORS_FEE_CONSULTATION',
+            'HOSPITALIZATION',
+            'RECREATION',
+            'TOTAL',
+            'SUB_TOTAL',
+            'SUB_TOTAL_X_12_MOTHS',
         ];
 
         foreach ($monthlyExpenseFields as $field) {
@@ -920,9 +1067,7 @@ class PdfController extends Controller
         }
 
         // Family Expenses - Annual (use defaults for now)
-        $annualExpenseFields = [
-            'WITHHOLDING_TAX', 'SSS_GSIS_PAGIBIG_CONTRIBUTION', 'OTHERS', 'TOTAL_ANNUAL_EXPENSE',
-        ];
+        $annualExpenseFields = ['WITHHOLDING_TAX', 'SSS_GSIS_PAGIBIG_CONTRIBUTION', 'OTHERS', 'TOTAL_ANNUAL_EXPENSE'];
 
         foreach ($annualExpenseFields as $field) {
             $formData[self::FORM_FIELDS[$field]] = $formatMoney(0);
@@ -988,12 +1133,10 @@ class PdfController extends Controller
         };
 
         // Build address string with proper validation
-        $addressParts = array_filter([
-            $profile->street ?? '',
-            $profile->barangay ?? '',
-            $profile->city ?? '',
-            $profile->province ?? '',
-        ], fn ($part) => ! empty(trim($part)));
+        $addressParts = array_filter(
+            [$profile->street ?? '', $profile->barangay ?? '', $profile->city ?? '', $profile->province ?? ''],
+            fn ($part) => ! empty(trim($part)),
+        );
 
         // Personal Information
         $formData[self::CHED_FORM_FIELDS['FIRST_NAME']] = $ensureValue($user->first_name);
@@ -1007,7 +1150,9 @@ class PdfController extends Controller
         $formData[self::CHED_FORM_FIELDS['CITIZENSHIP']] = $ensureValue(null, 'Filipino'); // Default to Filipino
         $formData[self::CHED_FORM_FIELDS['MOBILE_NUMBER']] = $ensureValue($profile->mobile_number, self::DEFAULT_VALUES['DEFAULT_PHONE']);
         $formData[self::CHED_FORM_FIELDS['EMAIL_ADDRESS']] = $ensureValue($user->email, self::DEFAULT_VALUES['DEFAULT_EMAIL']);
-        $formData[self::CHED_FORM_FIELDS['PRESENT_ADDRESS']] = ! empty($addressParts) ? implode(', ', $addressParts) : self::DEFAULT_VALUES['DEFAULT_ADDRESS'];
+        $formData[self::CHED_FORM_FIELDS['PRESENT_ADDRESS']] = ! empty($addressParts)
+            ? implode(', ', $addressParts)
+            : self::DEFAULT_VALUES['DEFAULT_ADDRESS'];
         $formData[self::CHED_FORM_FIELDS['ZIP_CODE']] = $ensureValue(null, '0000'); // Default zip code
 
         // Student Photo - Handle photo from user record
@@ -1030,7 +1175,10 @@ class PdfController extends Controller
         // Father Information
         $formData[self::CHED_FORM_FIELDS['FATHER_NAME']] = $ensureValue($profile->father_name);
         $formData[self::CHED_FORM_FIELDS['FATHER_ADDRESS']] = $formData[self::CHED_FORM_FIELDS['PRESENT_ADDRESS']]; // Use same as student
-        $formData[self::CHED_FORM_FIELDS['FATHER_CONTACT_NUMBER']] = $ensureValue($profile->father_mobile ?? $profile->father_telephone ?? null, self::DEFAULT_VALUES['DEFAULT_PHONE']);
+        $formData[self::CHED_FORM_FIELDS['FATHER_CONTACT_NUMBER']] = $ensureValue(
+            $profile->father_mobile ?? ($profile->father_telephone ?? null),
+            self::DEFAULT_VALUES['DEFAULT_PHONE'],
+        );
         $formData[self::CHED_FORM_FIELDS['FATHER_OCCUPATION']] = $ensureValue($profile->father_occupation);
         $formData[self::CHED_FORM_FIELDS['FATHER_NAME_OF_EMPLOYER']] = $ensureValue($profile->father_company ?? null);
         $formData[self::CHED_FORM_FIELDS['FATHER_EMPLOYER_ADDRESS']] = $ensureValue(null);
@@ -1040,7 +1188,10 @@ class PdfController extends Controller
         // Mother Information
         $formData[self::CHED_FORM_FIELDS['MOTHER_NAME']] = $ensureValue($profile->mother_name);
         $formData[self::CHED_FORM_FIELDS['MOTHER_ADDRESS']] = $formData[self::CHED_FORM_FIELDS['PRESENT_ADDRESS']]; // Use same as student
-        $formData[self::CHED_FORM_FIELDS['MOTHER_CONTACT_NUMBER']] = $ensureValue($profile->mother_mobile ?? $profile->mother_telephone ?? null, self::DEFAULT_VALUES['DEFAULT_PHONE']);
+        $formData[self::CHED_FORM_FIELDS['MOTHER_CONTACT_NUMBER']] = $ensureValue(
+            $profile->mother_mobile ?? ($profile->mother_telephone ?? null),
+            self::DEFAULT_VALUES['DEFAULT_PHONE'],
+        );
         $formData[self::CHED_FORM_FIELDS['MOTHER_OCCUPATION']] = $ensureValue($profile->mother_occupation);
         $formData[self::CHED_FORM_FIELDS['MOTHER_NAME_OF_EMPLOYER']] = $ensureValue($profile->mother_company ?? null);
         $formData[self::CHED_FORM_FIELDS['MOTHER_EMPLOYER_ADDRESS']] = $ensureValue(null);
@@ -1117,7 +1268,9 @@ class PdfController extends Controller
         $formData[self::ANNEX1_FORM_FIELDS['EMAIL_ADDRESS']] = $ensureValue($user->email, self::DEFAULT_VALUES['DEFAULT_EMAIL']);
 
         // Address Information
-        $formData[self::ANNEX1_FORM_FIELDS['STREET_BARANGAY']] = $ensureValue($profile->street ? $profile->street.', '.$profile->barangay : $profile->barangay);
+        $formData[self::ANNEX1_FORM_FIELDS['STREET_BARANGAY']] = $ensureValue(
+            $profile->street ? $profile->street.', '.$profile->barangay : $profile->barangay,
+        );
         $formData[self::ANNEX1_FORM_FIELDS['TOWN_CITY_MUNICIPALITY']] = $ensureValue($profile->city);
         $formData[self::ANNEX1_FORM_FIELDS['PROVINCE']] = $ensureValue($profile->province);
         $formData[self::ANNEX1_FORM_FIELDS['ZIP_CODE']] = $ensureValue(null, '0000'); // Default zip code
@@ -1142,12 +1295,10 @@ class PdfController extends Controller
         if ($profile->father_address ?? null) {
             $parentAddress = $profile->father_address;
         } else {
-            $addressParts = array_filter([
-                $profile->street ?? '',
-                $profile->barangay ?? '',
-                $profile->city ?? '',
-                $profile->province ?? '',
-            ], fn ($part) => ! empty(trim($part)));
+            $addressParts = array_filter(
+                [$profile->street ?? '', $profile->barangay ?? '', $profile->city ?? '', $profile->province ?? ''],
+                fn ($part) => ! empty(trim($part)),
+            );
             $parentAddress = ! empty($addressParts) ? implode(', ', $addressParts) : self::DEFAULT_VALUES['DEFAULT_ADDRESS'];
         }
 
@@ -1174,7 +1325,7 @@ class PdfController extends Controller
         // Set checkboxes to 'Yes' or 'On' based on the data
 
         // Sex: male checkbox - check if sex is male
-        $formData[self::ANNEX1_FORM_FIELDS['SEX_MALE']] = (strtolower($profile->sex ?? '') === 'male') ? 'Yes' : 'Off';
+        $formData[self::ANNEX1_FORM_FIELDS['SEX_MALE']] = strtolower($profile->sex ?? '') === 'male' ? 'Yes' : 'Off';
 
         // School sector: public - default to checked since most users likely from public schools
         $formData[self::ANNEX1_FORM_FIELDS['SCHOOL_SECTOR_PUBLIC']] = 'Yes'; // Default to public
@@ -1323,7 +1474,13 @@ class PdfController extends Controller
                     self::DEFAULT_VALUES['DEFAULT_PHONE'],
                     self::DEFAULT_VALUES['DEFAULT_ADDRESS'],
                     self::DEFAULT_VALUES['DEFAULT_DATE'],
-                    'Filipino', 'Public', 'College/University', 'Living', 'No', 'None', '0000',
+                    'Filipino',
+                    'Public',
+                    'College/University',
+                    'Living',
+                    'No',
+                    'None',
+                    '0000',
                 ]);
 
                 if ($isDefault) {
@@ -1373,7 +1530,15 @@ class PdfController extends Controller
                     self::DEFAULT_VALUES['DEFAULT_PHONE'],
                     self::DEFAULT_VALUES['DEFAULT_ADDRESS'],
                     self::DEFAULT_VALUES['DEFAULT_DATE'],
-                    'Filipino', 'Public', 'College/University', 'Living', 'No', 'None', '0000', 'Yes', 'Off',
+                    'Filipino',
+                    'Public',
+                    'College/University',
+                    'Living',
+                    'No',
+                    'None',
+                    '0000',
+                    'Yes',
+                    'Off',
                 ]);
 
                 if ($isDefault) {
@@ -1549,19 +1714,19 @@ class PdfController extends Controller
         if ($isLocal) {
             // For local/dev environment: prioritize native pdftk first
             $commands = [
-                'pdftk',                                          // pdftk in PATH
-                'pdftk.exe',                                     // Windows pdftk binary in PATH
-                'C:\\Program Files (x86)\\PDFtk Server\\bin\\pdftk.exe',  // Windows pdftk installation path (unquoted)
-                '/usr/bin/pdftk',                                // Common Linux installation path
-                'pdftk-java',                                    // Java version as fallback
+                'pdftk', // pdftk in PATH
+                'pdftk.exe', // Windows pdftk binary in PATH
+                'C:\\Program Files (x86)\\PDFtk Server\\bin\\pdftk.exe', // Windows pdftk installation path (unquoted)
+                '/usr/bin/pdftk', // Common Linux installation path
+                'pdftk-java', // Java version as fallback
                 '/usr/bin/pdftk-java',
             ];
         } else {
             // For production/staging environment: prioritize pdftk-java for Heroku
             $commands = [
-                'pdftk-java',                                      // Java version for Heroku
-                '/app/.apt/usr/bin/pdftk-java',                   // Heroku apt buildpack path
-                '/app/.apt/usr/bin/pdftk.pdftk-java',             // Heroku apt buildpack installs it with this name
+                'pdftk-java', // Java version for Heroku
+                '/app/.apt/usr/bin/pdftk-java', // Heroku apt buildpack path
+                '/app/.apt/usr/bin/pdftk.pdftk-java', // Heroku apt buildpack installs it with this name
                 // Direct Java command with comprehensive security bypass (most reliable option for Heroku)
                 'java -Djava.awt.headless=true -Djava.security.manager= -Djava.security.properties= -Djava.security.policy= -Djava.security.auth.login.config= -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8 -Djava.net.useSystemProxies=false -Djava.util.prefs.systemRoot=/tmp -Djava.util.prefs.userRoot=/tmp -jar /app/.apt/usr/share/pdftk/pdftk.jar',
                 // Alternative with minimal security bypass
@@ -1577,7 +1742,15 @@ class PdfController extends Controller
             ];
         }
 
-        logger()->info('Environment: '.app()->environment().' (isLocal: '.($isLocal ? 'true' : 'false').', isProduction: '.($isProduction ? 'true' : 'false').')');
+        logger()->info(
+            'Environment: '.
+                app()->environment().
+                ' (isLocal: '.
+                ($isLocal ? 'true' : 'false').
+                ', isProduction: '.
+                ($isProduction ? 'true' : 'false').
+                ')',
+        );
         logger()->info('Trying PDFTK commands in order: '.implode(', ', array_slice($commands, 0, 5)).'...');
 
         foreach ($commands as $cmd) {
@@ -1626,16 +1799,19 @@ class PdfController extends Controller
             // Create empty security properties file to bypass security initialization
             $securityFile = sys_get_temp_dir().'/java.security.empty';
             file_put_contents($securityFile, '# Empty security properties');
-            $env['JAVA_OPTS'] = '-Djava.awt.headless=true '.
-                               '-Djava.security.manager= '.
-                               '-Djava.security.properties='.$securityFile.' '.
-                               '-Djava.security.policy= '.
-                               '-Djava.security.auth.login.config= '.
-                               '-Djava.security.egd=file:/dev/./urandom '.
-                               '-Dfile.encoding=UTF-8 '.
-                               '-Djava.net.useSystemProxies=false '.
-                               '-Djava.util.prefs.systemRoot=/tmp '.
-                               '-Djava.util.prefs.userRoot=/tmp';
+            $env['JAVA_OPTS'] =
+                '-Djava.awt.headless=true '.
+                '-Djava.security.manager= '.
+                '-Djava.security.properties='.
+                $securityFile.
+                ' '.
+                '-Djava.security.policy= '.
+                '-Djava.security.auth.login.config= '.
+                '-Djava.security.egd=file:/dev/./urandom '.
+                '-Dfile.encoding=UTF-8 '.
+                '-Djava.net.useSystemProxies=false '.
+                '-Djava.util.prefs.systemRoot=/tmp '.
+                '-Djava.util.prefs.userRoot=/tmp';
         }
 
         // Test the command with proper environment

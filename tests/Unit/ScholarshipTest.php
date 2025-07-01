@@ -17,7 +17,7 @@ describe('Scholarship Model', function () {
             'name' => 'Test Scholarship',
             'type' => 'academic_full',
             'description' => 'Description of the scholarship',
-            'amount' => 500.00,
+            'amount' => 500.0,
             'deadline' => now()->addDays(30)->toDateString(),
             'funding_source' => 'MinSU Institutional Fund',
             'status' => 'active',
@@ -37,10 +37,12 @@ describe('Scholarship Model', function () {
         $student = User::factory()->create(['role' => 'student']);
         $studentProfile = StudentProfile::factory()->create(['user_id' => $student->id]);
 
-        ScholarshipApplication::factory()->count(3)->create([
-            'scholarship_id' => $scholarship->id,
-            'user_id' => $student->id,
-        ]);
+        ScholarshipApplication::factory()
+            ->count(3)
+            ->create([
+                'scholarship_id' => $scholarship->id,
+                'user_id' => $student->id,
+            ]);
 
         expect($scholarship->applications()->count())->toBe(3);
         expect($scholarship->applications->first())->toBeInstanceOf(ScholarshipApplication::class);
@@ -64,12 +66,12 @@ describe('Scholarship Model', function () {
         $academicPartial = Scholarship::factory()->create(['type' => 'academic_partial']);
 
         // Academic full: 1.000 - 1.450 range
-        expect($academicFull->getMinimumGwa())->toBe(1.000);
-        expect($academicFull->getMaximumGwa())->toBe(1.450);
+        expect($academicFull->getMinimumGwa())->toBe(1.0);
+        expect($academicFull->getMaximumGwa())->toBe(1.45);
 
         // Academic partial: 1.460 - 1.750 range
-        expect($academicPartial->getMinimumGwa())->toBe(1.460);
-        expect($academicPartial->getMaximumGwa())->toBe(1.750);
+        expect($academicPartial->getMinimumGwa())->toBe(1.46);
+        expect($academicPartial->getMaximumGwa())->toBe(1.75);
     });
 
     test('scholarship can get stipend amount', function () {
@@ -88,7 +90,9 @@ describe('Scholarship Model', function () {
         $scholarship->delete();
 
         expect(Scholarship::find($id))->toBeNull();
-        expect(Scholarship::withTrashed()->find($id))->not()->toBeNull();
+        expect(Scholarship::withTrashed()->find($id))
+            ->not()
+            ->toBeNull();
     });
     test('active scholarships scope returns only active scholarships', function () {
         // Clear any existing scholarships first

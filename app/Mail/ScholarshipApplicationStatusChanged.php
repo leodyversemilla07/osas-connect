@@ -44,9 +44,7 @@ class ScholarshipApplicationStatusChanged extends Mailable implements ShouldQueu
 
         $subject = $statusMessages[$this->application->status] ?? 'Scholarship Application Status Changed';
 
-        return new Envelope(
-            subject: $subject,
-        );
+        return new Envelope(subject: $subject);
     }
 
     /**
@@ -66,7 +64,7 @@ class ScholarshipApplicationStatusChanged extends Mailable implements ShouldQueu
                 'nextSteps' => $this->getNextSteps(),
                 'dashboardUrl' => route('student.dashboard'),
                 'applicationUrl' => route('scholarships.applications.status', $this->application),
-            ]
+            ],
         );
     }
 
@@ -129,16 +127,8 @@ class ScholarshipApplicationStatusChanged extends Mailable implements ShouldQueu
                 'Complete any required scholarship agreements',
                 'Attend orientation sessions if applicable',
             ],
-            'rejected' => [
-                'Review feedback if provided',
-                'Consider applying for other available scholarships',
-                'Contact OSAS if you have questions',
-            ],
-            'incomplete' => [
-                'Review the feedback provided',
-                'Upload any missing or corrected documents',
-                'Resubmit your application',
-            ],
+            'rejected' => ['Review feedback if provided', 'Consider applying for other available scholarships', 'Contact OSAS if you have questions'],
+            'incomplete' => ['Review the feedback provided', 'Upload any missing or corrected documents', 'Resubmit your application'],
         ];
 
         return $nextSteps[$this->application->status] ?? [];

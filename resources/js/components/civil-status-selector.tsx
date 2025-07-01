@@ -14,6 +14,11 @@ const CIVIL_STATUS_OPTIONS = [
     { value: "Married", label: "Married" },
     { value: "Divorced", label: "Divorced" },
     { value: "Widowed", label: "Widowed" },
+    { value: "Separated", label: "Separated" },
+    { value: "Civil Union", label: "Civil Union" },
+    { value: "Domestic Partnership", label: "Domestic Partnership" },
+    { value: "Other", label: "Other" },
+    { value: "Prefer not to say", label: "Prefer not to say" },
 ];
 
 export default function CivilStatusSelector({

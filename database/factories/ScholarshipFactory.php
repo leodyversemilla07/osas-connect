@@ -32,11 +32,7 @@ class ScholarshipFactory extends Factory
                 'academic_standing' => 'good_standing',
                 'enrollment_status' => 'enrolled',
             ]),
-            'required_documents' => json_encode([
-                'application_form',
-                'academic_records',
-                'enrollment_certificate',
-            ]),
+            'required_documents' => json_encode(['application_form', 'academic_records', 'enrollment_certificate']),
             'stipend_schedule' => $this->faker->randomElement(['monthly', 'semestral']),
             'slots_available' => $this->faker->numberBetween(5, 50),
             'status' => $this->faker->randomElement(['draft', 'active', 'inactive', 'upcoming']),

@@ -40,6 +40,15 @@ export const BasicInfoSection = memo<BasicInfoSectionProps>(({
                         data-testid="first-name-input"
                     />
                     <InputWithLabel
+                        id="middle_name"
+                        label="Middle Name"
+                        value={data.middle_name ?? ''}
+                        onChange={(value) => updateField('middle_name', value)}
+                        placeholder="Enter your middle name (if any)"
+                        error={errors.middle_name}
+                        data-testid="middle-name-input"
+                    />
+                    <InputWithLabel
                         id="last_name"
                         label="Last Name"
                         value={data.last_name}
@@ -48,31 +57,22 @@ export const BasicInfoSection = memo<BasicInfoSectionProps>(({
                         error={errors.last_name}
                         data-testid="last-name-input"
                     />
+                    <InputWithLabel
+                        id="email"
+                        label="Email"
+                        type="email"
+                        value={data.email}
+                        onChange={(value) => updateField('email', value)}
+                        placeholder="Enter your email address"
+                        error={errors.email}
+                        data-testid="email-input"
+                    />
                 </div>
-                <InputWithLabel
-                    id="middle_name"
-                    label="Middle Name"
-                    value={data.middle_name ?? ''}
-                    onChange={(value) => updateField('middle_name', value)}
-                    placeholder="Enter your middle name (if any)"
-                    error={errors.middle_name}
-                    data-testid="middle-name-input"
-                />
-                <InputWithLabel
-                    id="email"
-                    label="Email"
-                    type="email"
-                    value={data.email}
-                    onChange={(value) => updateField('email', value)}
-                    placeholder="Enter your email address"
-                    error={errors.email}
-                    data-testid="email-input"
-                />
                 <InputWithLabel
                     id={roleIdField}
                     label={roleDisplayName}
                     value={data[roleIdField as keyof typeof data] as string}
-                    onChange={() => {}} // Read-only
+                    onChange={() => { }} // Read-only
                     error={errors[roleIdField]}
                     disabled
                     data-testid="role-id-input"

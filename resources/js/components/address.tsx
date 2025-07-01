@@ -48,6 +48,7 @@ export default function Address({ data, setData, errors, processing }: AddressPr
             <Card>
                 <CardContent>
                     <div className="space-y-4">
+                        {/* Row 1: Province | City/Municipality */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="province">
@@ -71,7 +72,6 @@ export default function Address({ data, setData, errors, processing }: AddressPr
                                 </Select>
                                 <InputError message={errors.province} />
                             </div>
-
                             <div className="grid gap-2">
                                 <Label htmlFor="city">
                                     City/Municipality<span className="text-red-500">*</span>
@@ -96,7 +96,8 @@ export default function Address({ data, setData, errors, processing }: AddressPr
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Row 2: Barangay | Street/Sitio */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="barangay">
                                     Barangay<span className="text-red-500">*</span>
@@ -134,6 +135,10 @@ export default function Address({ data, setData, errors, processing }: AddressPr
                                 />
                                 <InputError message={errors.street} />
                             </div>
+                        </div>
+
+                        {/* Row 3: Zip Code (single field, but keep grid for alignment) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="zip_code">
                                     Zip Code<span className="text-red-500">*</span>
@@ -151,6 +156,7 @@ export default function Address({ data, setData, errors, processing }: AddressPr
                                 />
                                 <InputError message={errors.zip_code} />
                             </div>
+                            <div />
                         </div>
                     </div>
                 </CardContent>

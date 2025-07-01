@@ -28,7 +28,7 @@ class SiteComponentSeeder extends Seeder
                     ],
                 ],
                 'is_active' => true,
-            ]
+            ],
         );
 
         // Create default footer content
@@ -40,9 +40,7 @@ class SiteComponentSeeder extends Seeder
                     'cta_description' => 'Create your account and begin exploring scholarship opportunities today.',
                     'cta_button_text' => 'Register Now',
                     'about_text' => 'Your complete scholarship management system designed to connect students with educational funding opportunities. We help streamline the application process and maximize your chances of success.',
-                    'social_links' => [
-                        ['platform' => 'Facebook', 'url' => 'https://www.facebook.com/mbc.scholarships'],
-                    ],
+                    'social_links' => [['platform' => 'Facebook', 'url' => 'https://www.facebook.com/mbc.scholarships']],
                     'quick_links' => [
                         ['label' => 'Home', 'url' => '/'],
                         ['label' => 'About', 'url' => '/about'],
@@ -65,7 +63,7 @@ class SiteComponentSeeder extends Seeder
                     ],
                 ],
                 'is_active' => true,
-            ]
+            ],
         );
     }
 }

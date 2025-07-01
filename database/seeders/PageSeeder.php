@@ -204,10 +204,7 @@ class PageSeeder extends Seeder
         ];
 
         foreach ($pages as $pageData) {
-            Page::updateOrCreate(
-                ['slug' => $pageData['slug']],
-                $pageData
-            );
+            Page::updateOrCreate(['slug' => $pageData['slug']], $pageData);
         }
     }
 }

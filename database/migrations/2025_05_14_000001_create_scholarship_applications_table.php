@@ -17,17 +17,19 @@ return new class extends Migration
             $table->foreignId('scholarship_id')->constrained('scholarships')->onDelete('cascade');
 
             // Application Status
-            $table->enum('status', [
-                'draft',
-                'submitted',
-                'under_verification',
-                'incomplete',
-                'verified',
-                'under_evaluation',
-                'approved',
-                'rejected',
-                'end',
-            ])->default('draft');
+            $table
+                ->enum('status', [
+                    'draft',
+                    'submitted',
+                    'under_verification',
+                    'incomplete',
+                    'verified',
+                    'under_evaluation',
+                    'approved',
+                    'rejected',
+                    'end',
+                ])
+                ->default('draft');
             $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
             $table->foreignId('reviewer_id')->nullable()->constrained('users')->onDelete('set null');
 

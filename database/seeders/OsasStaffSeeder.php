@@ -103,14 +103,11 @@ class OsasStaffSeeder extends Seeder
                     'role' => 'osas_staff',
                     'email_verified_at' => now(),
                     'is_active' => true,
-                ]
+                ],
             );
 
             // Create the OSAS staff profile
-            OsasStaffProfile::firstOrCreate(
-                ['user_id' => $staff->id],
-                ['staff_id' => $staffData['staff_id']]
-            );
+            OsasStaffProfile::firstOrCreate(['user_id' => $staff->id], ['staff_id' => $staffData['staff_id']]);
         }
 
         $this->command->info('Created 10 OSAS staff users with profiles.');
@@ -132,14 +129,11 @@ class OsasStaffSeeder extends Seeder
                 'role' => 'osas_staff',
                 'email_verified_at' => now(),
                 'is_active' => true,
-            ]
+            ],
         );
 
         // Create OSAS staff profile
-        OsasStaffProfile::firstOrCreate(
-            ['user_id' => $staff->id],
-            ['staff_id' => 'STAFF_SPEC001']
-        );
+        OsasStaffProfile::firstOrCreate(['user_id' => $staff->id], ['staff_id' => 'STAFF_SPEC001']);
 
         $this->command->info('Created specific OSAS staff: Spectre Lunar');
     }

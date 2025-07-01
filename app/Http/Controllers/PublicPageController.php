@@ -37,7 +37,7 @@ class PublicPageController extends Controller
                 'hero' => [
                     'badge' => 'Scholarship Management',
                     'title' => $cmsContent['heading'] ?? 'Your Gateway to Educational Excellence',
-                    'subtitle' => $cmsContent['subheading'] ?? $cmsContent['body'] ?? 'OSAS Connect streamlines the scholarship application process.',
+                    'subtitle' => $cmsContent['subheading'] ?? ($cmsContent['body'] ?? 'OSAS Connect streamlines the scholarship application process.'),
                     'primary_button' => 'Apply for Scholarships',
                     'secondary_button' => 'Learn More',
                 ],
@@ -63,22 +63,26 @@ class PublicPageController extends Controller
             // Convert features array to expected format
             if (isset($cmsContent['features']) && is_array($cmsContent['features'])) {
                 $icons = ['FileText', 'TrendingUp', 'Shield', 'UserCheck'];
-                $pageContent['features']['items'] = array_map(function ($feature, $index) use ($icons) {
-                    // Handle both string and array feature formats
-                    if (is_array($feature)) {
-                        $title = $feature['title'] ?? $feature['name'] ?? 'Feature';
-                        $description = $feature['description'] ?? ('Enhanced '.strtolower($title).' capabilities');
-                    } else {
-                        $title = $feature;
-                        $description = 'Enhanced '.strtolower($feature).' capabilities';
-                    }
+                $pageContent['features']['items'] = array_map(
+                    function ($feature, $index) use ($icons) {
+                        // Handle both string and array feature formats
+                        if (is_array($feature)) {
+                            $title = $feature['title'] ?? ($feature['name'] ?? 'Feature');
+                            $description = $feature['description'] ?? 'Enhanced '.strtolower($title).' capabilities';
+                        } else {
+                            $title = $feature;
+                            $description = 'Enhanced '.strtolower($feature).' capabilities';
+                        }
 
-                    return [
-                        'icon' => $icons[$index % count($icons)],
-                        'title' => $title,
-                        'description' => $description,
-                    ];
-                }, array_values($cmsContent['features']), array_keys(array_values($cmsContent['features'])));
+                        return [
+                            'icon' => $icons[$index % count($icons)],
+                            'title' => $title,
+                            'description' => $description,
+                        ];
+                    },
+                    array_values($cmsContent['features']),
+                    array_keys(array_values($cmsContent['features'])),
+                );
             }
 
             // Add default guide items

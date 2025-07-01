@@ -42,24 +42,19 @@ class ProfileUpdateRequest extends FormRequest
             ];
 
             return array_merge($baseRules, $adminRules);
-
         } elseif ($user->role === 'osas_staff') {
             $osasStaffRules = [
-                'staff_id' => [
-                    Rule::unique('osas_staff_profiles', 'staff_id')->ignore($user->osasStaffProfile->id ?? null),
-                ],
+                'staff_id' => [Rule::unique('osas_staff_profiles', 'staff_id')->ignore($user->osasStaffProfile->id ?? null)],
                 'email' => $emailValidationBase, // OSAS Staff use the base email validation (no @minsu.edu.ph restriction)
             ];
 
             return array_merge($baseRules, $osasStaffRules);
-
-        } else { // student
+        } else {
+            // student
             $studentEmailValidation = array_merge($emailValidationBase, ['ends_with:@minsu.edu.ph']); // Students have the additional @minsu.edu.ph restriction
 
             $studentRules = [
-                'student_id' => [
-                    Rule::unique('student_profiles', 'student_id')->ignore($user->studentProfile->id ?? null),
-                ],
+                'student_id' => [Rule::unique('student_profiles', 'student_id')->ignore($user->studentProfile->id ?? null)],
                 'course' => ['required', 'string', 'max:255'],
                 'major' => ['nullable', 'string', 'max:255'],
                 'year_level' => ['required', 'string', 'max:255'],

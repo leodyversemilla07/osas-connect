@@ -41,7 +41,9 @@ class UnifiedScholarshipController extends Controller
 
         // Check if user can apply
         if (! $this->scholarshipService->isUserEligible($scholarship, $user)) {
-            return redirect()->back()->withErrors(['You are not eligible for this scholarship.']);
+            return redirect()
+                ->back()
+                ->withErrors(['You are not eligible for this scholarship.']);
         }
 
         $scholarshipData = $this->scholarshipService->formatScholarshipData($scholarship);
@@ -56,7 +58,9 @@ class UnifiedScholarshipController extends Controller
     {
         // Check if user can apply
         if (! $this->scholarshipService->isUserEligible($scholarship, Auth::user())) {
-            return redirect()->back()->withErrors(['You are not eligible for this scholarship.']);
+            return redirect()
+                ->back()
+                ->withErrors(['You are not eligible for this scholarship.']);
         }
 
         // Updated validation rules to match your form fields
@@ -83,15 +87,9 @@ class UnifiedScholarshipController extends Controller
         $validated = $request->validate($rules);
 
         try {
-            $application = $this->scholarshipService->createApplication(
-                $scholarship->id,
-                Auth::id(),
-                $validated
-            );
+            $application = $this->scholarshipService->createApplication($scholarship->id, Auth::id(), $validated);
 
-            return redirect()
-                ->route('student.scholarships.index')
-                ->with('success', 'Application submitted successfully!');
+            return redirect()->route('student.scholarships.index')->with('success', 'Application submitted successfully!');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -107,8 +105,7 @@ class UnifiedScholarshipController extends Controller
             case 'performing_arts_partial':
                 return [
                     'application_data.membership_duration' => 'required|string|min:1',
-                    'application_data.major_activities_count' => 'required|integer|min:'.
-                        ($scholarshipType === 'performing_arts_full' ? '1' : '2'),
+                    'application_data.major_activities_count' => 'required|integer|min:'.($scholarshipType === 'performing_arts_full' ? '1' : '2'),
                     'application_data.major_performances' => $scholarshipType === 'performing_arts_full' ? 'required|boolean' : 'nullable|boolean',
                     'application_data.coach_recommendation_provided' => 'required|boolean',
                 ];
@@ -159,7 +156,8 @@ class UnifiedScholarshipController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return redirect()->route('student.applications')
+            return redirect()
+                ->route('student.applications')
                 ->withErrors(['error' => 'Unable to load application details. Please try again.']);
         }
     }
@@ -170,7 +168,9 @@ class UnifiedScholarshipController extends Controller
 
         // Only allow editing of incomplete or draft applications
         if (! in_array($application->status, ['draft', 'incomplete'])) {
-            return redirect()->back()->withErrors(['This application cannot be edited in its current status.']);
+            return redirect()
+                ->back()
+                ->withErrors(['This application cannot be edited in its current status.']);
         }
 
         $applicationData = $this->scholarshipService->formatApplicationData($application);
@@ -193,12 +193,7 @@ class UnifiedScholarshipController extends Controller
         ]);
 
         try {
-            $this->scholarshipService->updateApplicationStatus(
-                $application,
-                $validated['status'],
-                $validated['notes'],
-                Auth::id()
-            );
+            $this->scholarshipService->updateApplicationStatus($application, $validated['status'], $validated['notes'], Auth::id());
 
             return back()->with('success', 'Application status updated successfully!');
         } catch (\Exception $e) {

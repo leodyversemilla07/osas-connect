@@ -7,12 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ApplicationComment extends Model
 {
-    protected $fillable = [
-        'application_id',
-        'user_id',
-        'comment',
-        'type',
-    ];
+    protected $fillable = ['application_id', 'user_id', 'comment', 'type'];
 
     protected $casts = [
         'created_at' => 'datetime',

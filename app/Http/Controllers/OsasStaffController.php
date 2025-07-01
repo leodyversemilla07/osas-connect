@@ -106,10 +106,7 @@ class OsasStaffController extends Controller
     public function showAcceptInvitationForm(Request $request, $token)
     {
         // Find the invitation by token and validate it
-        $invitation = StaffInvitation::where('token', $token)
-            ->where('accepted_at', null)
-            ->where('status', 'pending')
-            ->first();
+        $invitation = StaffInvitation::where('token', $token)->where('accepted_at', null)->where('status', 'pending')->first();
 
         // Check if invitation exists and is valid
         if (! $invitation) {
@@ -193,8 +190,7 @@ class OsasStaffController extends Controller
      */
     public function studentRecords(Request $request): Response
     {
-        $query = User::with('studentProfile')
-            ->where('role', 'student');
+        $query = User::with('studentProfile')->where('role', 'student');
 
         // Apply filters if provided
         if ($request->search) {
@@ -220,9 +216,7 @@ class OsasStaffController extends Controller
             });
         }
 
-        $students = $query->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $students = $query->latest()->paginate(10)->withQueryString();
 
         // Transform each user to include avatar and student_profile details (similar to AdminController)
         $students->getCollection()->transform(function ($user) {
@@ -234,13 +228,15 @@ class OsasStaffController extends Controller
                 'email' => $user->email,
                 'avatar' => $user->avatar, // This will utilize the getAvatarAttribute accessor from the User model
                 'role' => 'Student',
-                'student_profile' => $user->studentProfile ? [
-                    'student_id' => $user->studentProfile->student_id,
-                    'course' => $user->studentProfile->course,
-                    'major' => $user->studentProfile->major,
-                    'year_level' => $user->studentProfile->year_level,
-                    'mobile_number' => $user->studentProfile->mobile_number,
-                ] : null,
+                'student_profile' => $user->studentProfile
+                    ? [
+                        'student_id' => $user->studentProfile->student_id,
+                        'course' => $user->studentProfile->course,
+                        'major' => $user->studentProfile->major,
+                        'year_level' => $user->studentProfile->year_level,
+                        'mobile_number' => $user->studentProfile->mobile_number,
+                    ]
+                    : null,
                 'created_at' => $user->created_at,
             ];
         });
@@ -257,12 +253,7 @@ class OsasStaffController extends Controller
             'Bachelor of Science in Fisheries',
         ];
 
-        $yearLevels = [
-            '1st Year',
-            '2nd Year',
-            '3rd Year',
-            '4th Year',
-        ];
+        $yearLevels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
         return Inertia::render('osas_staff/student-records', [
             'students' => $students,
@@ -601,7 +592,9 @@ class OsasStaffController extends Controller
     {
         // Ensure the user is a student
         if ($user->role !== 'student') {
-            return redirect()->back()->withErrors(['error' => 'Only student profiles can be edited.']);
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Only student profiles can be edited.']);
         }
 
         // Load the student profile
@@ -609,7 +602,9 @@ class OsasStaffController extends Controller
 
         // Check if student profile exists
         if (! $user->studentProfile) {
-            return redirect()->back()->withErrors(['error' => 'Student profile not found.']);
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Student profile not found.']);
         }
 
         // Get photo URL from user record since photo_id is stored in users table
@@ -686,7 +681,9 @@ class OsasStaffController extends Controller
     {
         // Ensure the user is a student
         if ($user->role !== 'student') {
-            return redirect()->back()->withErrors(['error' => 'Only student profiles can be edited.']);
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Only student profiles can be edited.']);
         }
 
         // Load the student profile
@@ -694,7 +691,9 @@ class OsasStaffController extends Controller
 
         // Check if student profile exists
         if (! $user->studentProfile) {
-            return redirect()->back()->withErrors(['error' => 'Student profile not found.']);
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Student profile not found.']);
         }
 
         // Validate the request
@@ -761,9 +760,13 @@ class OsasStaffController extends Controller
             ]);
 
             // Prepare student profile data
-            $studentProfileData = array_filter($validatedData, function ($key) {
-                return ! in_array($key, ['first_name', 'middle_name', 'last_name', 'email']);
-            }, ARRAY_FILTER_USE_KEY);
+            $studentProfileData = array_filter(
+                $validatedData,
+                function ($key) {
+                    return ! in_array($key, ['first_name', 'middle_name', 'last_name', 'email']);
+                },
+                ARRAY_FILTER_USE_KEY,
+            );
 
             // Handle boolean fields
             $studentProfileData['is_pwd'] = $request->boolean('is_pwd');
@@ -773,12 +776,12 @@ class OsasStaffController extends Controller
 
             DB::commit();
 
-            return redirect()->route('osas.students.edit', $user->id)
-                ->with('success', 'Student profile updated successfully.');
+            return redirect()->route('osas.students.edit', $user->id)->with('success', 'Student profile updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()
+            return redirect()
+                ->back()
                 ->withErrors(['error' => 'Failed to update student profile: '.$e->getMessage()])
                 ->withInput();
         }
@@ -789,10 +792,11 @@ class OsasStaffController extends Controller
      */
     public function scholarshipRecords(Request $request): Response
     {
-        $query = \App\Models\Scholarship::withCount(['applications as total_applications'])
-            ->withCount(['applications as approved_applications' => function ($query) {
+        $query = \App\Models\Scholarship::withCount(['applications as total_applications'])->withCount([
+            'applications as approved_applications' => function ($query) {
                 $query->where('status', 'approved');
-            }]);
+            },
+        ]);
 
         // Apply search filter
         if ($request->search) {
@@ -918,8 +922,7 @@ class OsasStaffController extends Controller
             'criteria' => $request->criteria, // Keep both for compatibility
         ]);
 
-        return redirect()->route('osas.manage.scholarships')
-            ->with('success', 'Scholarship created successfully!');
+        return redirect()->route('osas.manage.scholarships')->with('success', 'Scholarship created successfully!');
     }
 
     /**
@@ -957,8 +960,7 @@ class OsasStaffController extends Controller
             'required_documents' => $request->required_documents,
         ]);
 
-        return redirect()->route('osas.manage.scholarships')
-            ->with('success', 'Scholarship updated successfully!');
+        return redirect()->route('osas.manage.scholarships')->with('success', 'Scholarship updated successfully!');
     }
 
     /**
@@ -971,18 +973,19 @@ class OsasStaffController extends Controller
             $approvedApplicationsCount = $scholarship->applications()->where('status', 'approved')->count();
 
             if ($approvedApplicationsCount > 0) {
-                return redirect()->route('osas.manage.scholarships')
+                return redirect()
+                    ->route('osas.manage.scholarships')
                     ->with('error', 'Cannot delete scholarship with approved applications. Please contact the administrator.');
             }
 
             $scholarshipName = $scholarship->name;
             $scholarship->delete();
 
-            return redirect()->route('osas.manage.scholarships')
+            return redirect()
+                ->route('osas.manage.scholarships')
                 ->with('success', "Scholarship '{$scholarshipName}' has been deleted successfully.");
         } catch (\Exception $e) {
-            return redirect()->route('osas.manage.scholarships')
-                ->with('error', 'Failed to delete scholarship. Please try again.');
+            return redirect()->route('osas.manage.scholarships')->with('error', 'Failed to delete scholarship. Please try again.');
         }
     }
 
@@ -1014,8 +1017,7 @@ class OsasStaffController extends Controller
      */
     public function scholarshipApplications(Request $request): Response
     {
-        $query = \App\Models\ScholarshipApplication::with(['user.studentProfile', 'scholarship', 'documents'])
-            ->latest();
+        $query = \App\Models\ScholarshipApplication::with(['user.studentProfile', 'scholarship', 'documents'])->latest();
 
         // Apply filters
         if ($request->status) {
@@ -1034,15 +1036,18 @@ class OsasStaffController extends Controller
 
         if ($request->search) {
             $query->where(function ($query) use ($request) {
-                $query->whereHas('user', function ($q) use ($request) {
-                    $q->where('first_name', 'like', '%'.$request->search.'%')
-                        ->orWhere('last_name', 'like', '%'.$request->search.'%')
-                        ->orWhere('email', 'like', '%'.$request->search.'%');
-                })->orWhereHas('user.studentProfile', function ($q) use ($request) {
-                    $q->where('student_id', 'like', '%'.$request->search.'%');
-                })->orWhereHas('scholarship', function ($q) use ($request) {
-                    $q->where('name', 'like', '%'.$request->search.'%');
-                });
+                $query
+                    ->whereHas('user', function ($q) use ($request) {
+                        $q->where('first_name', 'like', '%'.$request->search.'%')
+                            ->orWhere('last_name', 'like', '%'.$request->search.'%')
+                            ->orWhere('email', 'like', '%'.$request->search.'%');
+                    })
+                    ->orWhereHas('user.studentProfile', function ($q) use ($request) {
+                        $q->where('student_id', 'like', '%'.$request->search.'%');
+                    })
+                    ->orWhereHas('scholarship', function ($q) use ($request) {
+                        $q->where('name', 'like', '%'.$request->search.'%');
+                    });
             });
         }
 
@@ -1056,12 +1061,12 @@ class OsasStaffController extends Controller
         // Transform applications data
         $applications = $applications->map(function ($application) {
             $studentProfile = $application->user->studentProfile;
-            
+
             return [
                 'id' => $application->id,
                 'student' => [
                     'id' => $application->user->id,
-                    'name' => $application->user->full_name ?? $application->user->first_name . ' ' . $application->user->last_name,
+                    'name' => $application->user->full_name ?? $application->user->first_name.' '.$application->user->last_name,
                     'student_id' => $studentProfile ? $studentProfile->student_id : 'N/A',
                     'email' => $application->user->email,
                     'course' => $studentProfile ? $studentProfile->course : 'N/A',
@@ -1074,26 +1079,32 @@ class OsasStaffController extends Controller
                     'amount' => $application->scholarship->amount,
                 ],
                 'status' => $application->status,
-                'submitted_at' => $application->applied_at ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d H:i:s') : $application->created_at->format('Y-m-d H:i:s'),
+                'submitted_at' => $application->applied_at
+                    ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d H:i:s')
+                    : $application->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $application->updated_at->format('Y-m-d H:i:s'),
                 'priority' => $application->priority ?? 'medium',
                 'documents_count' => $application->documents->count(),
                 'verified_documents_count' => $application->documents->where('status', 'verified')->count(),
                 'interview_scheduled' => $application->interview_schedule !== null,
-                'deadline' => ($application->scholarship && $application->scholarship->deadline instanceof \Carbon\Carbon) ? $application->scholarship->deadline->format('Y-m-d H:i:s') : null,
-                'reviewer' => $application->reviewer ? [
-                    'name' => $application->reviewer->name,
-                    'id' => $application->reviewer->id,
-                ] : null,
+                'deadline' => $application->scholarship && $application->scholarship->deadline instanceof \Carbon\Carbon
+                        ? $application->scholarship->deadline->format('Y-m-d H:i:s')
+                        : null,
+                'reviewer' => $application->reviewer
+                    ? [
+                        'name' => $application->reviewer->name,
+                        'id' => $application->reviewer->id,
+                    ]
+                    : null,
             ];
         });
 
         // Get statistics with additional metrics
         $totalApplications = \App\Models\ScholarshipApplication::count();
-        $thisMonthCount = \App\Models\ScholarshipApplication::whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)->count();
+        $thisMonthCount = \App\Models\ScholarshipApplication::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
         $lastMonthCount = \App\Models\ScholarshipApplication::whereMonth('created_at', now()->subMonth()->month)
-            ->whereYear('created_at', now()->subMonth()->year)->count();
+            ->whereYear('created_at', now()->subMonth()->year)
+            ->count();
 
         $completedApplications = \App\Models\ScholarshipApplication::whereIn('status', ['approved', 'rejected'])->count();
         $completionRate = $totalApplications > 0 ? ($completedApplications / $totalApplications) * 100 : 0;
@@ -1141,7 +1152,9 @@ class OsasStaffController extends Controller
                 'id' => $application->id,
                 'status' => $application->status,
                 'priority' => $application->priority ?? 'medium',
-                'submitted_at' => $application->applied_at ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d H:i:s') : $application->created_at->format('Y-m-d H:i:s'),
+                'submitted_at' => $application->applied_at
+                    ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d H:i:s')
+                    : $application->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $application->updated_at->format('Y-m-d H:i:s'),
                 'deadline' => optional($application->scholarship->deadline)->format('Y-m-d H:i:s'),
                 'purpose_letter' => $application->purpose_letter,
@@ -1149,7 +1162,9 @@ class OsasStaffController extends Controller
                 'semester' => $application->semester,
                 'verifier_comments' => $application->verifier_comments,
                 'interview_scheduled' => $application->interview_schedule !== null,
-                'interview_date' => $application->interview_schedule ? \Carbon\Carbon::parse($application->interview_schedule)->format('Y-m-d H:i:s') : null,
+                'interview_date' => $application->interview_schedule
+                    ? \Carbon\Carbon::parse($application->interview_schedule)->format('Y-m-d H:i:s')
+                    : null,
                 'interview_notes' => $application->interview_notes,
                 'student' => [
                     'id' => $application->user->id,
@@ -1161,12 +1176,15 @@ class OsasStaffController extends Controller
                     'year_level' => $application->user->studentProfile->year_level,
                     'major' => $application->user->studentProfile->major,
                     'gpa' => $application->user->studentProfile->current_gwa,
-                    'address' => implode(', ', array_filter([
-                        $application->user->studentProfile->street,
-                        $application->user->studentProfile->barangay,
-                        $application->user->studentProfile->city,
-                        $application->user->studentProfile->province,
-                    ])),
+                    'address' => implode(
+                        ', ',
+                        array_filter([
+                            $application->user->studentProfile->street,
+                            $application->user->studentProfile->barangay,
+                            $application->user->studentProfile->city,
+                            $application->user->studentProfile->province,
+                        ]),
+                    ),
                     'photo_url' => $application->user->avatar,
                 ],
                 'scholarship' => [
@@ -1190,10 +1208,12 @@ class OsasStaffController extends Controller
                         'mime_type' => $doc->mime_type ?? 'application/pdf',
                         'is_verified' => $doc->status === 'verified',
                         'verified_at' => $doc->verified_at?->format('Y-m-d H:i:s'),
-                        'verified_by' => $doc->verifiedBy ? [
-                            'name' => $doc->verifiedBy->first_name.' '.$doc->verifiedBy->last_name,
-                            'id' => $doc->verifiedBy->id,
-                        ] : null,
+                        'verified_by' => $doc->verifiedBy
+                            ? [
+                                'name' => $doc->verifiedBy->first_name.' '.$doc->verifiedBy->last_name,
+                                'id' => $doc->verifiedBy->id,
+                            ]
+                            : null,
                         'uploaded_at' => $doc->created_at->format('Y-m-d H:i:s'),
                         'status' => $doc->status ?? 'pending',
                         'comments' => $doc->verification_remarks,
@@ -1206,10 +1226,12 @@ class OsasStaffController extends Controller
                     'interview_completed' => $application->interview_schedule !== null && $application->interview_notes !== null,
                     'review_completed' => in_array($application->status, ['approved', 'rejected']),
                 ],
-                'reviewer' => Auth::user() ? [
-                    'name' => Auth::user()->name,
-                    'id' => Auth::user()->id,
-                ] : null,
+                'reviewer' => Auth::user()
+                    ? [
+                        'name' => Auth::user()->name,
+                        'id' => Auth::user()->id,
+                    ]
+                    : null,
                 'comments' => $application->comments->map(function ($comment) {
                     return [
                         'id' => $comment->id,
@@ -1302,8 +1324,7 @@ class OsasStaffController extends Controller
      */
     public function exportApplications(Request $request)
     {
-        $query = \App\Models\ScholarshipApplication::with(['student.user', 'scholarship', 'documents'])
-            ->latest();
+        $query = \App\Models\ScholarshipApplication::with(['student.user', 'scholarship', 'documents'])->latest();
 
         // Apply same filters as the main applications page
         if ($request->status) {
@@ -1321,14 +1342,16 @@ class OsasStaffController extends Controller
         }
 
         if ($request->search) {
-            $query->whereHas('student.user', function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%')
-                    ->orWhere('email', 'like', '%'.$request->search.'%');
-            })->orWhereHas('student', function ($q) use ($request) {
-                $q->where('student_id', 'like', '%'.$request->search.'%');
-            })->orWhereHas('scholarship', function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%');
-            });
+            $query
+                ->whereHas('student.user', function ($q) use ($request) {
+                    $q->where('name', 'like', '%'.$request->search.'%')->orWhere('email', 'like', '%'.$request->search.'%');
+                })
+                ->orWhereHas('student', function ($q) use ($request) {
+                    $q->where('student_id', 'like', '%'.$request->search.'%');
+                })
+                ->orWhereHas('scholarship', function ($q) use ($request) {
+                    $q->where('name', 'like', '%'.$request->search.'%');
+                });
         }
 
         $applications = $query->get();
@@ -1475,7 +1498,8 @@ class OsasStaffController extends Controller
         // Ensure the application is in a state where interviews can be scheduled
         $allowedStatuses = ['verified', 'under_evaluation', 'approved'];
         if (! in_array($application->status, $allowedStatuses)) {
-            return redirect()->route('osas.applications.review', $application->id)
+            return redirect()
+                ->route('osas.applications.review', $application->id)
                 ->with('error', 'Interview can only be scheduled for verified or approved applications.');
         }
 
@@ -1498,8 +1522,9 @@ class OsasStaffController extends Controller
                     'type' => $application->scholarship->type,
                 ],
                 'interview_scheduled' => $application->interview_schedule !== null,
-                'interview_date' => $application->interview_schedule ?
-                    \Carbon\Carbon::parse($application->interview_schedule)->format('Y-m-d H:i:s') : null,
+                'interview_date' => $application->interview_schedule
+                    ? \Carbon\Carbon::parse($application->interview_schedule)->format('Y-m-d H:i:s')
+                    : null,
             ],
         ]);
     }

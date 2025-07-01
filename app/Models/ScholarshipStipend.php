@@ -10,17 +10,7 @@ class ScholarshipStipend extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = [
-        'application_id',
-        'processed_by',
-        'amount',
-        'month',
-        'academic_year',
-        'semester',
-        'status',
-        'remarks',
-        'processed_at',
-    ];
+    protected $fillable = ['application_id', 'processed_by', 'amount', 'month', 'academic_year', 'semester', 'status', 'remarks', 'processed_at'];
 
     protected $casts = [
         'amount' => 'decimal:2',

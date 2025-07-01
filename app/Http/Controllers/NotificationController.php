@@ -13,8 +13,7 @@ class NotificationController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ScholarshipNotification::where('user_id', Auth::id())
-            ->latest();        // Filter by read status
+        $query = ScholarshipNotification::where('user_id', Auth::id())->latest(); // Filter by read status
         if ($request->has('unread_only') && $request->unread_only) {
             $query->whereNull('read_at');
         }
@@ -33,9 +32,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'notifications' => $notifications,
-            'unread_count' => ScholarshipNotification::where('user_id', Auth::id())
-                ->whereNull('read_at')
-                ->count(),
+            'unread_count' => ScholarshipNotification::where('user_id', Auth::id())->whereNull('read_at')->count(),
         ]);
     }
 
@@ -89,9 +86,7 @@ class NotificationController extends Controller
             'notification_ids.*' => 'exists:scholarship_notifications,id',
         ]);
 
-        ScholarshipNotification::whereIn('id', $validated['notification_ids'])
-            ->where('user_id', Auth::id())
-            ->delete();
+        ScholarshipNotification::whereIn('id', $validated['notification_ids'])->where('user_id', Auth::id())->delete();
 
         return response()->json(['message' => 'Notifications deleted']);
     }
@@ -101,9 +96,7 @@ class NotificationController extends Controller
      */
     public function getUnreadCount()
     {
-        $count = ScholarshipNotification::where('user_id', Auth::id())
-            ->whereNull('read_at')
-            ->count();
+        $count = ScholarshipNotification::where('user_id', Auth::id())->whereNull('read_at')->count();
 
         return response()->json(['unread_count' => $count]);
     }

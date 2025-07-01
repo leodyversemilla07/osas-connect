@@ -49,11 +49,9 @@ class ProfileController extends Controller
         }
 
         // Merge user data with profile data for the form
-        $profileData = array_merge(
-            $user->only(['first_name', 'middle_name', 'last_name', 'email']),
-            $profile ? $profile->toArray() : [],
-            ['photo_url' => $photoUrl]
-        );
+        $profileData = array_merge($user->only(['first_name', 'middle_name', 'last_name', 'email']), $profile ? $profile->toArray() : [], [
+            'photo_url' => $photoUrl,
+        ]);
 
         // ✅ FIXED: Don't convert boolean to Yes/No - keep as boolean
         if (isset($profileData['is_pwd'])) {
@@ -62,10 +60,20 @@ class ProfileController extends Controller
 
         // ✅ Ensure other boolean fields are properly typed
         $booleanFields = [
-            'has_tv', 'has_radio_speakers_karaoke', 'has_musical_instruments',
-            'has_computer', 'has_stove', 'has_laptop', 'has_refrigerator',
-            'has_microwave', 'has_air_conditioner', 'has_electric_fan',
-            'has_washing_machine', 'has_cellphone', 'has_gaming_box', 'has_dslr_camera',
+            'has_tv',
+            'has_radio_speakers_karaoke',
+            'has_musical_instruments',
+            'has_computer',
+            'has_stove',
+            'has_laptop',
+            'has_refrigerator',
+            'has_microwave',
+            'has_air_conditioner',
+            'has_electric_fan',
+            'has_washing_machine',
+            'has_cellphone',
+            'has_gaming_box',
+            'has_dslr_camera',
         ];
 
         foreach ($booleanFields as $field) {
@@ -145,14 +153,12 @@ class ProfileController extends Controller
                 $adminProfile->update(['admin_id' => $validatedData['admin_id']]);
                 Log::info('Updated admin profile with admin_id: '.$validatedData['admin_id']);
             }
-
         } elseif ($user->role === 'osas_staff') {
             $staffProfile = $user->osasStaffProfile()->firstOrCreate(['user_id' => $user->id]);
             if (isset($validatedData['staff_id'])) {
                 $staffProfile->update(['staff_id' => $validatedData['staff_id']]);
                 Log::info('Updated staff profile with staff_id: '.$validatedData['staff_id']);
             }
-
         } elseif ($user->role === 'student') {
             $studentProfile = $user->studentProfile()->firstOrCreate(['user_id' => $user->id]);
 
@@ -162,10 +168,21 @@ class ProfileController extends Controller
 
             // ✅ Ensure boolean fields are properly handled
             $booleanFields = [
-                'is_pwd', 'has_tv', 'has_radio_speakers_karaoke', 'has_musical_instruments',
-                'has_computer', 'has_stove', 'has_laptop', 'has_refrigerator',
-                'has_microwave', 'has_air_conditioner', 'has_electric_fan',
-                'has_washing_machine', 'has_cellphone', 'has_gaming_box', 'has_dslr_camera',
+                'is_pwd',
+                'has_tv',
+                'has_radio_speakers_karaoke',
+                'has_musical_instruments',
+                'has_computer',
+                'has_stove',
+                'has_laptop',
+                'has_refrigerator',
+                'has_microwave',
+                'has_air_conditioner',
+                'has_electric_fan',
+                'has_washing_machine',
+                'has_cellphone',
+                'has_gaming_box',
+                'has_dslr_camera',
             ];
 
             foreach ($booleanFields as $field) {
@@ -177,9 +194,13 @@ class ProfileController extends Controller
             // ✅ Log the date_of_birth specifically for debugging
             Log::info('Date of birth in profile fields: ', [
                 'date_of_birth' => $profileFields['date_of_birth'] ?? 'NOT SET',
-                'all_date_fields' => array_filter($profileFields, function ($key) {
-                    return strpos($key, 'date') !== false || strpos($key, 'birth') !== false;
-                }, ARRAY_FILTER_USE_KEY),
+                'all_date_fields' => array_filter(
+                    $profileFields,
+                    function ($key) {
+                        return strpos($key, 'date') !== false || strpos($key, 'birth') !== false;
+                    },
+                    ARRAY_FILTER_USE_KEY,
+                ),
             ]);
 
             $studentProfile->update($profileFields);

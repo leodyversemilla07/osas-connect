@@ -19,17 +19,7 @@ class ScholarshipApplicationFactory extends Factory
     public function definition(): array
     {
         // Valid statuses from migration
-        $statuses = [
-            'draft',
-            'submitted',
-            'under_verification',
-            'incomplete',
-            'verified',
-            'under_evaluation',
-            'approved',
-            'rejected',
-            'end',
-        ];
+        $statuses = ['draft', 'submitted', 'under_verification', 'incomplete', 'verified', 'under_evaluation', 'approved', 'rejected', 'end'];
 
         $status = $this->faker->randomElement($statuses);
 
@@ -93,16 +83,10 @@ class ScholarshipApplicationFactory extends Factory
                     'uploaded_at' => now()->toDateTimeString(),
                 ],
             ]),
-            'evaluation_score' => in_array($status, ['under_evaluation', 'approved', 'rejected'])
-                ? $this->faker->randomFloat(2, 70, 100)
-                : null,
+            'evaluation_score' => in_array($status, ['under_evaluation', 'approved', 'rejected']) ? $this->faker->randomFloat(2, 70, 100) : null,
             'verifier_comments' => $verifiedAt ? $this->faker->paragraph() : null,
-            'committee_recommendation' => in_array($status, ['approved', 'rejected'])
-                ? $this->faker->paragraph()
-                : null,
-            'admin_remarks' => in_array($status, ['approved', 'rejected'])
-                ? $this->faker->sentence()
-                : null,
+            'committee_recommendation' => in_array($status, ['approved', 'rejected']) ? $this->faker->paragraph() : null,
+            'admin_remarks' => in_array($status, ['approved', 'rejected']) ? $this->faker->sentence() : null,
 
             // Interview
             'interview_schedule' => $this->faker->boolean(30) ? now()->addDays($this->faker->numberBetween(1, 14)) : null,
@@ -110,9 +94,7 @@ class ScholarshipApplicationFactory extends Factory
 
             // Stipend Tracking
             'stipend_status' => $status === 'approved' ? $this->faker->randomElement(['pending', 'processing', 'released']) : null,
-            'last_stipend_date' => $status === 'approved' && $this->faker->boolean(60)
-                ? now()->subDays($this->faker->numberBetween(1, 30))
-                : null,
+            'last_stipend_date' => $status === 'approved' && $this->faker->boolean(60) ? now()->subDays($this->faker->numberBetween(1, 30)) : null,
             'amount_received' => $status === 'approved' ? $this->faker->randomFloat(2, 1000, 10000) : 0,
 
             // Renewal

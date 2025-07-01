@@ -120,16 +120,16 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
 
   const getScholarshipTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      'academic_full': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-      'academic_partial': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-      'student_assistantship': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-      'performing_arts_full': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
-      'performing_arts_partial': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
-      'economic_assistance': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300',
-      'others': 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
+      'academic_full': 'bg-primary/10 text-primary border-primary/20',
+      'academic_partial': 'bg-primary/10 text-primary border-primary/20',
+      'student_assistantship': 'bg-chart-2/10 text-chart-2 border-chart-2/20',
+      'performing_arts_full': 'bg-chart-4/10 text-chart-4 border-chart-4/20',
+      'performing_arts_partial': 'bg-chart-4/10 text-chart-4 border-chart-4/20',
+      'economic_assistance': 'bg-chart-1/10 text-chart-1 border-chart-1/20',
+      'others': 'bg-muted text-muted-foreground border-border',
     };
 
-    return colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
+    return colors[type] || 'bg-muted text-muted-foreground border-border';
   };
 
   const getScholarshipTypeLabel = (type: string) => {
@@ -152,22 +152,22 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
       const today = new Date();
 
       if (isNaN(deadlineDate.getTime())) {
-        return { status: 'unknown', color: 'text-gray-600', icon: Clock, message: 'TBD' };
+        return { status: 'unknown', color: 'text-muted-foreground', icon: Clock, message: 'TBD' };
       }
 
       const daysUntilDeadline = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
       if (daysUntilDeadline < 0) {
-        return { status: 'expired', color: 'text-red-600', icon: AlertTriangle, message: 'Expired' };
+        return { status: 'expired', color: 'text-destructive', icon: AlertTriangle, message: 'Expired' };
       } else if (daysUntilDeadline <= 7) {
-        return { status: 'urgent', color: 'text-orange-600', icon: Clock, message: `${daysUntilDeadline} day(s) left` };
+        return { status: 'urgent', color: 'text-chart-1', icon: Clock, message: `${daysUntilDeadline} day(s) left` };
       } else if (daysUntilDeadline <= 30) {
-        return { status: 'soon', color: 'text-yellow-600', icon: Clock, message: `${daysUntilDeadline} day(s) left` };
+        return { status: 'soon', color: 'text-chart-4', icon: Clock, message: `${daysUntilDeadline} day(s) left` };
       } else {
-        return { status: 'normal', color: 'text-green-600', icon: CheckCircle, message: `${daysUntilDeadline} day(s) left` };
+        return { status: 'normal', color: 'text-chart-2', icon: CheckCircle, message: `${daysUntilDeadline} day(s) left` };
       }
     } catch {
-      return { status: 'unknown', color: 'text-gray-600', icon: Clock, message: 'TBD' };
+      return { status: 'unknown', color: 'text-muted-foreground', icon: Clock, message: 'TBD' };
     }
   };
 
@@ -180,12 +180,12 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
 
       <div className="flex h-full flex-1 flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 lg:space-y-8 lg:p-8">
         {/* Header Section */}
-        <div className="border-b border-gray-100 dark:border-gray-800 pb-6 lg:pb-8">
+        <div className="border-b pb-6 lg:pb-8">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 sm:text-3xl lg:text-4xl">
+            <h1 className="text-2xl font-semibold text-foreground sm:text-3xl lg:text-4xl">
               Browse Scholarships
             </h1>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 sm:text-base lg:text-lg">
+            <p className="mt-2 text-sm text-muted-foreground sm:text-base lg:text-lg">
               Discover scholarship opportunities available to you
             </p>
           </div>
@@ -194,11 +194,11 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
         {/* Scholarships Grid */}
         {scholarships.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 lg:py-24">
-            <FileText className="h-12 w-12 text-gray-400 mb-4 lg:h-16 lg:w-16 lg:mb-6" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3 lg:text-xl lg:mb-4">
+            <FileText className="h-12 w-12 text-muted-foreground mb-4 lg:h-16 lg:w-16 lg:mb-6" />
+            <h3 className="text-lg font-medium text-foreground mb-3 lg:text-xl lg:mb-4">
               No scholarships available
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 text-center max-w-md lg:text-lg">
+            <p className="text-muted-foreground text-center max-w-md lg:text-lg">
               There are currently no active scholarships accepting applications. Check back later for new opportunities.
             </p>
           </div>
@@ -209,7 +209,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
               const DeadlineIcon = deadlineStatus.icon;
 
               return (
-                <Card key={scholarship.id} className="flex flex-col h-full border-gray-200 dark:border-gray-800">
+                <Card key={scholarship.id} className="flex flex-col h-full">
                   <CardHeader className="pb-4 lg:pb-6">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
@@ -241,7 +241,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
                     {/* Key Information */}
                     <div className="space-y-3 lg:space-y-4">
                       <div className="flex items-center gap-3 text-sm lg:text-base">
-                        <DollarSign className="h-4 w-4 text-green-600 flex-shrink-0 lg:h-5 lg:w-5" />
+                        <DollarSign className="h-4 w-4 text-chart-2 flex-shrink-0 lg:h-5 lg:w-5" />
                         <span className="font-medium">{formatAmount(scholarship)}</span>
                       </div>
 
@@ -257,7 +257,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
 
                       {(scholarship.slots_available || scholarship.availableSlots || scholarship.slots) && (
                         <div className="flex items-center gap-3 text-sm lg:text-base">
-                          <Users className="h-4 w-4 text-blue-600 flex-shrink-0 lg:h-5 lg:w-5" />
+                          <Users className="h-4 w-4 text-chart-3 flex-shrink-0 lg:h-5 lg:w-5" />
                           <span>
                             <span className="font-medium">Available Slots:</span> {formatSlotsInfo(scholarship)}
                           </span>
@@ -266,7 +266,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
 
                       {shouldShowBeneficiaries(scholarship) && (
                         <div className="flex items-center gap-3 text-sm lg:text-base">
-                          <Users className="h-4 w-4 text-purple-600 flex-shrink-0 lg:h-5 lg:w-5" />
+                          <Users className="h-4 w-4 text-chart-4 flex-shrink-0 lg:h-5 lg:w-5" />
                           <span>
                             <span className="font-medium">Current Beneficiaries:</span> {scholarship.beneficiaries}
                           </span>
@@ -275,7 +275,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
 
                       {scholarship.funding_source && (
                         <div className="flex items-center gap-3 text-sm lg:text-base">
-                          <DollarSign className="h-4 w-4 text-green-600 flex-shrink-0 lg:h-5 lg:w-5" />
+                          <DollarSign className="h-4 w-4 text-chart-2 flex-shrink-0 lg:h-5 lg:w-5" />
                           <span>
                             <span className="font-medium">Funding Source:</span> {scholarship.funding_source}
                           </span>
@@ -284,7 +284,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
 
                       {scholarship.gwaRequirement && (
                         <div className="flex items-center gap-3 text-sm lg:text-base">
-                          <BookOpen className="h-4 w-4 text-indigo-600 flex-shrink-0 lg:h-5 lg:w-5" />
+                          <BookOpen className="h-4 w-4 text-primary flex-shrink-0 lg:h-5 lg:w-5" />
                           <span>
                             <span className="font-medium">GWA Requirement:</span>
                             {scholarship.gwaRequirement.min && scholarship.gwaRequirement.max
@@ -301,7 +301,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
 
                       {scholarship.stipend_schedule && (
                         <div className="flex items-center gap-3 text-sm lg:text-base">
-                          <Clock className="h-4 w-4 text-yellow-600 flex-shrink-0 lg:h-5 lg:w-5" />
+                          <Clock className="h-4 w-4 text-chart-5 flex-shrink-0 lg:h-5 lg:w-5" />
                           <span>
                             <span className="font-medium">Payment Schedule:</span> {scholarship.stipend_schedule}
                           </span>
@@ -314,13 +314,13 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
                       (scholarship.criteria && scholarship.criteria.length > 0)) && (
                         <div className="space-y-3 lg:space-y-4">
                           <div className="flex items-center gap-3">
-                            <BookOpen className="h-4 w-4 text-blue-600 lg:h-5 lg:w-5" />
+                            <BookOpen className="h-4 w-4 text-primary lg:h-5 lg:w-5" />
                             <span className="text-sm font-medium lg:text-base">Requirements:</span>
                           </div>
                           <div className="ml-7 space-y-2 lg:ml-8">
                             {(scholarship.requirements || scholarship.criteria || []).map((requirement, index) => (
-                              <div key={index} className="text-xs text-gray-600 dark:text-gray-400 flex items-start gap-2 lg:text-sm">
-                                <span className="text-blue-600 font-bold mt-0.5 lg:mt-1">•</span>
+                              <div key={index} className="text-xs text-muted-foreground flex items-start gap-2 lg:text-sm">
+                                <span className="text-primary font-bold mt-0.5 lg:mt-1">•</span>
                                 <span className="flex-1 leading-relaxed">{requirement}</span>
                               </div>
                             ))}
@@ -333,13 +333,13 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
                       (scholarship.eligibility_criteria && scholarship.eligibility_criteria.length > 0)) && (
                         <div className="space-y-3 lg:space-y-4">
                           <div className="flex items-center gap-3">
-                            <Users className="h-4 w-4 text-purple-600 lg:h-5 lg:w-5" />
+                            <Users className="h-4 w-4 text-chart-4 lg:h-5 lg:w-5" />
                             <span className="text-sm font-medium lg:text-base">Eligibility:</span>
                           </div>
                           <div className="ml-7 space-y-2 lg:ml-8">
                             {(scholarship.eligibilityCriteria || scholarship.eligibility_criteria || []).map((criteria: string, index: number) => (
-                              <div key={index} className="text-xs text-gray-600 dark:text-gray-400 flex items-start gap-2 lg:text-sm">
-                                <span className="text-purple-600 font-bold mt-0.5 lg:mt-1">•</span>
+                              <div key={index} className="text-xs text-muted-foreground flex items-start gap-2 lg:text-sm">
+                                <span className="text-chart-4 font-bold mt-0.5 lg:mt-1">•</span>
                                 <span className="flex-1 leading-relaxed">{criteria}</span>
                               </div>
                             ))}
@@ -352,7 +352,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
                       (scholarship.required_documents && scholarship.required_documents.length > 0)) && (
                         <div className="space-y-3 lg:space-y-4">
                           <div className="flex items-center gap-3">
-                            <FileText className="h-4 w-4 text-orange-600 lg:h-5 lg:w-5" />
+                            <FileText className="h-4 w-4 text-chart-1 lg:h-5 lg:w-5" />
                             <span className="text-sm font-medium lg:text-base">Required Documents:</span>
                           </div>
                           <div className="ml-7 space-y-2 lg:ml-8">
@@ -364,8 +364,8 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
                                 : scholarship.required_documents || [];
 
                               return documents.map((document, index) => (
-                                <div key={index} className="text-xs text-gray-600 dark:text-gray-400 flex items-start gap-2 lg:text-sm">
-                                  <span className="text-orange-600 font-bold mt-0.5 lg:mt-1">•</span>
+                                <div key={index} className="text-xs text-muted-foreground flex items-start gap-2 lg:text-sm">
+                                  <span className="text-chart-1 font-bold mt-0.5 lg:mt-1">•</span>
                                   <span className="flex-1 leading-relaxed">{document}</span>
                                 </div>
                               ));
@@ -375,7 +375,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
                       )}
 
                     {/* Action Button */}
-                    <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800 lg:mt-8 lg:pt-6">
+                    <div className="mt-6 pt-4 border-t lg:mt-8 lg:pt-6">
                       {scholarship.has_applied ? (
                         <Button variant="outline" className="w-full min-h-[44px] px-4 lg:min-h-[48px] lg:px-6" disabled>
                           <CheckCircle className="h-4 w-4 mr-2 lg:h-5 lg:w-5" />

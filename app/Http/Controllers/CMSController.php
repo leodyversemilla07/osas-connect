@@ -52,8 +52,7 @@ class CMSController extends Controller
 
         $page = Page::create($validated);
 
-        return redirect()->route('admin.cms.index')
-            ->with('success', 'Page created successfully.');
+        return redirect()->route('admin.cms.index')->with('success', 'Page created successfully.');
     }
 
     /**
@@ -104,8 +103,7 @@ class CMSController extends Controller
         try {
             $page->update($validated);
 
-            return redirect()->route('admin.cms.edit', $page)
-                ->with('success', 'Page updated successfully');
+            return redirect()->route('admin.cms.edit', $page)->with('success', 'Page updated successfully');
         } catch (\Exception $e) {
             return back()->withErrors([
                 'error' => 'Failed to update page: '.$e->getMessage(),
@@ -120,8 +118,7 @@ class CMSController extends Controller
     {
         $page->delete();
 
-        return redirect()->route('admin.cms.index')
-            ->with('success', 'Page deleted successfully.');
+        return redirect()->route('admin.cms.index')->with('success', 'Page deleted successfully.');
     }
 
     /**
@@ -169,11 +166,13 @@ class CMSController extends Controller
         $header = SiteComponent::getHeader();
 
         return Inertia::render('admin/cms/header', [
-            'header' => $header ? [
-                'id' => $header->id,
-                'content' => $header->content,
-                'updated_at' => $header->updated_at,
-            ] : null,
+            'header' => $header
+                ? [
+                    'id' => $header->id,
+                    'content' => $header->content,
+                    'updated_at' => $header->updated_at,
+                ]
+                : null,
         ]);
     }
 
@@ -211,8 +210,7 @@ class CMSController extends Controller
 
         SiteComponent::updateHeader($decodedContent);
 
-        return redirect()->route('admin.cms.header')
-            ->with('success', 'Header updated successfully.');
+        return redirect()->route('admin.cms.header')->with('success', 'Header updated successfully.');
     }
 
     /**
@@ -223,11 +221,13 @@ class CMSController extends Controller
         $footer = SiteComponent::getFooter();
 
         return Inertia::render('admin/cms/footer', [
-            'footer' => $footer ? [
-                'id' => $footer->id,
-                'content' => $footer->content,
-                'updated_at' => $footer->updated_at,
-            ] : null,
+            'footer' => $footer
+                ? [
+                    'id' => $footer->id,
+                    'content' => $footer->content,
+                    'updated_at' => $footer->updated_at,
+                ]
+                : null,
         ]);
     }
 
@@ -276,7 +276,6 @@ class CMSController extends Controller
 
         SiteComponent::updateFooter($decodedContent);
 
-        return redirect()->route('admin.cms.footer')
-            ->with('success', 'Footer updated successfully.');
+        return redirect()->route('admin.cms.footer')->with('success', 'Footer updated successfully.');
     }
 }

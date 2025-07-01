@@ -16,18 +16,14 @@ class StaffInvitation extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(
-        public StaffInvitationModel $invitation
-    ) {}
+    public function __construct(public StaffInvitationModel $invitation) {}
 
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: 'Invitation to Join OSAS Connect as Staff',
-        );
+        return new Envelope(subject: 'Invitation to Join OSAS Connect as Staff');
     }
 
     /**

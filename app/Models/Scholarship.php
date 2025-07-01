@@ -61,24 +61,24 @@ class Scholarship extends Model
     // MinSU-specific GWA requirements
     protected $gwa_requirements = [
         'academic_full' => [
-            'min' => 1.000,
-            'max' => 1.450,
+            'min' => 1.0,
+            'max' => 1.45,
         ],
         'academic_partial' => [
-            'min' => 1.460,
-            'max' => 1.750,
+            'min' => 1.46,
+            'max' => 1.75,
         ],
         'student_assistantship' => [
-            'max' => 2.250, // No failing grades requirement
+            'max' => 2.25, // No failing grades requirement
         ],
         'performing_arts_full' => [
-            'max' => 2.250, // No specific GWA but reasonable academic standing
+            'max' => 2.25, // No specific GWA but reasonable academic standing
         ],
         'performing_arts_partial' => [
-            'max' => 2.250, // No specific GWA but reasonable academic standing
+            'max' => 2.25, // No specific GWA but reasonable academic standing
         ],
         'economic_assistance' => [
-            'max' => 2.250,
+            'max' => 2.25,
         ],
     ];
 
@@ -293,9 +293,9 @@ class Scholarship extends Model
     public function isAcceptingApplications(): bool
     {
         return $this->status === 'active' &&
-               $this->deadline &&
-               now()->lte($this->deadline) &&
-               $this->applications()->where('status', 'approved')->count() < $this->slots_available;
+            $this->deadline &&
+            now()->lte($this->deadline) &&
+            $this->applications()->where('status', 'approved')->count() < $this->slots_available;
     }
 
     /**

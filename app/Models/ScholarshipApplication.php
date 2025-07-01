@@ -300,10 +300,7 @@ class ScholarshipApplication extends Model
      */
     protected function hasOtherScholarship(): bool
     {
-        return ScholarshipApplication::where('user_id', $this->user_id)
-            ->where('id', '!=', $this->id)
-            ->where('status', 'approved')
-            ->exists();
+        return ScholarshipApplication::where('user_id', $this->user_id)->where('id', '!=', $this->id)->where('status', 'approved')->exists();
     }
 
     /**

@@ -54,35 +54,37 @@ class ContentController extends Controller
      */
     public function scholarships(): Response
     {
-        $scholarships = Scholarship::active()->get()->map(function ($scholarship) {
-            // Calculate days remaining for deadline
-            $daysRemaining = 0;
-            if ($scholarship->deadline) {
-                $daysRemaining = max(0, Carbon::now()->diffInDays($scholarship->deadline, false));
-            }
+        $scholarships = Scholarship::active()
+            ->get()
+            ->map(function ($scholarship) {
+                // Calculate days remaining for deadline
+                $daysRemaining = 0;
+                if ($scholarship->deadline) {
+                    $daysRemaining = max(0, Carbon::now()->diffInDays($scholarship->deadline, false));
+                }
 
-            // Map scholarship type to expected format
-            $typeMapping = [
-                'academic_full' => 'Academic Scholarship',
-                'academic_partial' => 'Academic Scholarship',
-                'student_assistantship' => 'Student Assistantship Program',
-                'performing_arts_full' => 'Performing Arts Scholarship',
-                'performing_arts_partial' => 'Performing Arts Scholarship',
-                'economic_assistance' => 'Economic Assistance',
-                'others' => 'Academic Scholarship', // Default fallback
-            ];
+                // Map scholarship type to expected format
+                $typeMapping = [
+                    'academic_full' => 'Academic Scholarship',
+                    'academic_partial' => 'Academic Scholarship',
+                    'student_assistantship' => 'Student Assistantship Program',
+                    'performing_arts_full' => 'Performing Arts Scholarship',
+                    'performing_arts_partial' => 'Performing Arts Scholarship',
+                    'economic_assistance' => 'Economic Assistance',
+                    'others' => 'Academic Scholarship', // Default fallback
+                ];
 
-            return [
-                'id' => $scholarship->id,
-                'name' => $scholarship->name,
-                'amount' => $scholarship->amount ? '₱'.number_format($scholarship->amount, 2) : 'TBD',
-                'deadline' => $scholarship->deadline ? $scholarship->deadline->format('M d, Y') : 'No deadline',
-                'daysRemaining' => $daysRemaining,
-                'type' => $typeMapping[$scholarship->type] ?? 'Academic Scholarship',
-                'description' => $scholarship->description ?? 'No description available',
-                'requirements' => $scholarship->getEligibilityCriteria(),
-            ];
-        });
+                return [
+                    'id' => $scholarship->id,
+                    'name' => $scholarship->name,
+                    'amount' => $scholarship->amount ? '₱'.number_format($scholarship->amount, 2) : 'TBD',
+                    'deadline' => $scholarship->deadline ? $scholarship->deadline->format('M d, Y') : 'No deadline',
+                    'daysRemaining' => $daysRemaining,
+                    'type' => $typeMapping[$scholarship->type] ?? 'Academic Scholarship',
+                    'description' => $scholarship->description ?? 'No description available',
+                    'requirements' => $scholarship->getEligibilityCriteria(),
+                ];
+            });
 
         return Inertia::render('scholarships', [
             'auth' => [

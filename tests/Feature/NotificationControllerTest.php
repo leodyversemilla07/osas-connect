@@ -16,35 +16,30 @@ describe('NotificationController', function () {
 
         $this->studentProfile = StudentProfile::factory()->create([
             'user_id' => $this->student->id,
-        ]);        // Create some notifications for the student
-        $this->notifications = ScholarshipNotification::factory()->count(5)->create([
-            'user_id' => $this->student->id,
-            'read_at' => null,
-        ]);
+        ]); // Create some notifications for the student
+        $this->notifications = ScholarshipNotification::factory()
+            ->count(5)
+            ->create([
+                'user_id' => $this->student->id,
+                'read_at' => null,
+            ]);
 
         // Create some read notifications
-        $this->readNotifications = ScholarshipNotification::factory()->count(3)->create([
-            'user_id' => $this->student->id,
-            'read_at' => now(),
-        ]);
+        $this->readNotifications = ScholarshipNotification::factory()
+            ->count(3)
+            ->create([
+                'user_id' => $this->student->id,
+                'read_at' => now(),
+            ]);
     });
 
     test('index returns paginated notifications for authenticated user', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.notifications.index'));
+        $response = $this->actingAs($this->student)->get(route('student.notifications.index'));
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'notifications' => [
-                'data' => ['*' => [
-                    'id',
-                    'title',
-                    'message',
-                    'type',
-                    'is_read',
-                    'created_at',
-                ],
-                ],
+                'data' => ['*' => ['id', 'title', 'message', 'type', 'is_read', 'created_at']],
                 'current_page',
                 'per_page',
                 'total',
@@ -56,8 +51,7 @@ describe('NotificationController', function () {
     });
 
     test('unread count returns correct number', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.notifications.unread-count'));
+        $response = $this->actingAs($this->student)->get(route('student.notifications.unread-count'));
 
         $response->assertStatus(200);
         $data = $response->json();
@@ -68,8 +62,7 @@ describe('NotificationController', function () {
     test('mark as read updates notification status', function () {
         $notification = $this->notifications->first();
 
-        $response = $this->actingAs($this->student)
-            ->post(route('student.notifications.read', $notification));
+        $response = $this->actingAs($this->student)->post(route('student.notifications.read', $notification));
 
         $response->assertStatus(200);
 
@@ -79,13 +72,10 @@ describe('NotificationController', function () {
     });
 
     test('mark all as read updates all unread notifications', function () {
-        $response = $this->actingAs($this->student)
-            ->post(route('student.notifications.read-all'));
+        $response = $this->actingAs($this->student)->post(route('student.notifications.read-all'));
 
         $response->assertStatus(200);
-        $unreadCount = ScholarshipNotification::where('user_id', $this->student->id)
-            ->whereNull('read_at')
-            ->count();
+        $unreadCount = ScholarshipNotification::where('user_id', $this->student->id)->whereNull('read_at')->count();
 
         expect($unreadCount)->toBe(0);
     });
@@ -94,8 +84,7 @@ describe('NotificationController', function () {
         $notification = $this->notifications->first();
         $notificationId = $notification->id;
 
-        $response = $this->actingAs($this->student)
-            ->delete(route('student.notifications.destroy', $notification));
+        $response = $this->actingAs($this->student)->delete(route('student.notifications.destroy', $notification));
 
         $response->assertStatus(200);
 
@@ -106,10 +95,9 @@ describe('NotificationController', function () {
     test('bulk delete removes multiple notifications', function () {
         $notificationIds = $this->notifications->take(3)->pluck('id')->toArray();
 
-        $response = $this->actingAs($this->student)
-            ->post(route('student.notifications.bulk-delete'), [
-                'notification_ids' => $notificationIds,
-            ]);
+        $response = $this->actingAs($this->student)->post(route('student.notifications.bulk-delete'), [
+            'notification_ids' => $notificationIds,
+        ]);
 
         $response->assertStatus(200);
 
@@ -122,16 +110,14 @@ describe('NotificationController', function () {
         $otherNotification = ScholarshipNotification::factory()->create([
             'user_id' => $otherStudent->id,
         ]);
-        $response = $this->actingAs($this->student)
-            ->post(route('student.notifications.read', $otherNotification));
+        $response = $this->actingAs($this->student)->post(route('student.notifications.read', $otherNotification));
 
         $response->assertStatus(403);
     });
 
     test('non-student users cannot access notification endpoints', function () {
         $admin = User::factory()->create(['role' => 'admin']);
-        $response = $this->actingAs($admin)
-            ->get(route('student.notifications.index'));
+        $response = $this->actingAs($admin)->get(route('student.notifications.index'));
 
         $response->assertStatus(302); // Redirected due to role middleware
     });
@@ -143,8 +129,7 @@ describe('NotificationController', function () {
     });
 
     test('notifications are ordered by creation date desc', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.notifications.index'));
+        $response = $this->actingAs($this->student)->get(route('student.notifications.index'));
 
         $data = $response->json();
         $notifications = $data['notifications']['data'];
@@ -159,8 +144,7 @@ describe('NotificationController', function () {
     });
 
     test('filter by unread works correctly', function () {
-        $response = $this->actingAs($this->student)
-            ->get(route('student.notifications.index', ['filter' => 'unread']));
+        $response = $this->actingAs($this->student)->get(route('student.notifications.index', ['filter' => 'unread']));
 
         $data = $response->json();
         $notifications = $data['notifications']['data'];

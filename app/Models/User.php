@@ -17,37 +17,21 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'last_name',
-        'first_name',
-        'middle_name',
-        'email',
-        'password',
-        'role',
-        'is_active',
-        'last_login_at',
-        'photo_id',
-    ];
+    protected $fillable = ['last_name', 'first_name', 'middle_name', 'email', 'password', 'role', 'is_active', 'last_login_at', 'photo_id'];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * The accessors to append to the model's array form.
      *
      * @var list<string>
      */
-    protected $appends = [
-        'avatar',
-        'full_name',
-    ];
+    protected $appends = ['avatar', 'full_name'];
 
     /**
      * Get the attributes that should be cast.

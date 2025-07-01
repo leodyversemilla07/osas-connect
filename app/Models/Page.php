@@ -16,11 +16,7 @@ class Page extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'slug',
-        'title',
-        'content',
-    ];
+    protected $fillable = ['slug', 'title', 'content'];
 
     /**
      * The attributes that should be cast.
@@ -161,9 +157,7 @@ class Page extends Model
      */
     public static function getAnnouncements()
     {
-        return static::whereJsonContains('content->type', 'announcement')
-            ->orderBy('updated_at', 'desc')
-            ->get();
+        return static::whereJsonContains('content->type', 'announcement')->orderBy('updated_at', 'desc')->get();
     }
 
     /**
@@ -173,9 +167,7 @@ class Page extends Model
      */
     public static function getScholarships()
     {
-        return static::whereJsonContains('content->type', 'scholarship')
-            ->orderBy('updated_at', 'desc')
-            ->get();
+        return static::whereJsonContains('content->type', 'scholarship')->orderBy('updated_at', 'desc')->get();
     }
 
     /**

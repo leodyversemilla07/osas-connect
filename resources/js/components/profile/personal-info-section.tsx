@@ -1,13 +1,15 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { SelectorWithLabel } from '@/components/selector-with-label';
 import { InputWithLabel } from '@/components/input-with-label';
 import { DatePicker } from '@/components/date-picker';
 import Address from '@/components/address';
 import PlaceOfBirth from '@/components/place-of-birth';
 import ReligionSelector from '@/components/religion-selector';
+import CivilStatusSelector from '@/components/civil-status-selector';
+import SexSelector from '@/components/sex-selector';
+import PwdRadio from '@/components/pwd-radio';
+import ResidenceTypeSelector from '@/components/residence-type-selector';
 import type { ProfileSectionProps } from '@/types/profile';
 
 /**
@@ -19,13 +21,6 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
     errors,
     updateField
 }) => {
-    const handlePWDChange = React.useCallback((checked: boolean) => {
-        updateField('is_pwd', checked);
-        if (!checked) {
-            updateField('disability_type', null);
-        }
-    }, [updateField]);
-
     return (
         <Card data-testid="personal-info-section">
             <CardHeader>
@@ -38,31 +33,14 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
             <CardContent className="space-y-6">
                 {/* Civil Status and Gender */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <SelectorWithLabel
-                        id="civil_status"
-                        label="Civil Status"
+                    <CivilStatusSelector
                         value={data.civil_status || ''}
                         onChange={(value) => updateField('civil_status', value)}
-                        options={[
-                            { value: 'Single', label: 'Single' },
-                            { value: 'Married', label: 'Married' },
-                            { value: 'Widowed', label: 'Widowed' },
-                            { value: 'Separated', label: 'Separated' },
-                            { value: 'Divorced', label: 'Divorced' },
-                        ]}
-                        placeholder="Select civil status"
                         error={errors.civil_status}
                     />
-                    <SelectorWithLabel
-                        id="sex"
-                        label="Sex"
+                    <SexSelector
                         value={data.sex || ''}
                         onChange={(value) => updateField('sex', value)}
-                        options={[
-                            { value: 'Male', label: 'Male' },
-                            { value: 'Female', label: 'Female' },
-                        ]}
-                        placeholder="Select sex"
                         error={errors.sex}
                     />
                 </div>
@@ -130,35 +108,14 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                 </div>
 
                 {/* PWD Information */}
-                <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                        <Checkbox
-                            id="is_pwd"
-                            checked={data.is_pwd || false}
-                            onCheckedChange={handlePWDChange}
-                            data-testid="is-pwd-checkbox"
-                        />
-                        <label
-                            htmlFor="is_pwd"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                            Person with Disability (PWD)
-                        </label>
-                    </div>
-
-                    {data.is_pwd && (
-                        <InputWithLabel
-                            id="disability_type"
-                            label="Disability Type"
-                            value={data.disability_type || ''}
-                            onChange={(value: string) => updateField('disability_type', value)}
-                            error={errors.disability_type}
-                            placeholder="Specify disability type"
-                            className="w-full"
-                            data-testid="disability-type-input"
-                        />
-                    )}
-                </div>
+                <PwdRadio
+                    value={data.is_pwd ? "Yes" : "No"}
+                    onChange={(value) => updateField('is_pwd', value === "Yes")}
+                    disabilityType={data.disability_type || ''}
+                    onDisabilityTypeChange={(value) => updateField('disability_type', value)}
+                    error={errors.is_pwd}
+                    disabilityTypeError={errors.disability_type}
+                />
 
                 {/* Additional Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -168,34 +125,15 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                         error={errors.religion}
                         className="w-full"
                     />
-                    <SelectorWithLabel
-                        id="residence_type"
-                        label="Residence Type"
+                    <ResidenceTypeSelector
                         value={data.residence_type || ''}
                         onChange={(value) => updateField('residence_type', value)}
-                        options={[
-                            { value: "Parent's House", label: "Parent's House" },
-                            { value: "Boarding House", label: "Boarding House" },
-                            { value: "With Guardian", label: "With Guardian" },
-                        ]}
-                        placeholder="Select residence type"
                         error={errors.residence_type}
+                        guardianName={data.guardian_name || ''}
+                        onGuardianNameChange={(value) => updateField('guardian_name', value)}
+                        guardianError={errors.guardian_name}
                     />
                 </div>
-
-                {/* Guardian Name - Only show when residence type is "With Guardian" */}
-                {data.residence_type === 'With Guardian' && (
-                    <InputWithLabel
-                        id="guardian_name"
-                        label="Guardian Name"
-                        value={data.guardian_name || ''}
-                        onChange={(value: string) => updateField('guardian_name', value)}
-                        error={errors.guardian_name}
-                        placeholder="Enter guardian's full name"
-                        className="w-full"
-                        data-testid="guardian-name-input"
-                    />
-                )}
             </CardContent>
         </Card>
     );

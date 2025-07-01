@@ -10,12 +10,7 @@ class Interview extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'application_id',
-        'schedule',
-        'status',
-        'remarks',
-    ];
+    protected $fillable = ['application_id', 'schedule', 'status', 'remarks'];
 
     protected $casts = [
         'schedule' => 'datetime',
