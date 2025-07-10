@@ -44,7 +44,7 @@ class StudentController extends Controller
                     'id' => $scholarship->id,
                     'name' => $scholarship->name,
                     'type' => $scholarship->type,
-                    'amount' => $scholarship->getStipendAmount() ? '₱'.number_format($scholarship->getStipendAmount(), 0).'/month' : 'Amount TBD',
+                    'amount' => $scholarship->getStipendAmount() ? '₱' . number_format($scholarship->getStipendAmount(), 0) . '/month' : 'Amount TBD',
                     'deadline' => $scholarship->deadline->format('Y-m-d'),
                     'status' => $scholarship->status,
                     'description' => $scholarship->description,
@@ -144,24 +144,15 @@ class StudentController extends Controller
                         : $application->updated_at->format('Y-m-d'),
                     'progress' => $progress,
                     'amount' => $application->scholarship->getStipendAmount()
-                        ? '₱'.number_format($application->scholarship->getStipendAmount(), 0).'/month'
+                        ? '₱' . number_format($application->scholarship->getStipendAmount(), 0) . '/month'
                         : 'Amount TBD',
                     'deadline' => $application->scholarship->deadline->format('Y-m-d'),
                     'can_edit' => in_array($application->status, ['draft', 'incomplete']),
                 ];
             });
 
-        // Get statistics
-        $stats = [
-            'total' => $applications->count(),
-            'pending' => $applications->where('status', 'submitted')->count(),
-            'approved' => $applications->where('status', 'approved')->count(),
-            'draft' => $applications->where('status', 'draft')->count(),
-        ];
-
         return Inertia::render('student/applications', [
             'applications' => $applications,
-            'stats' => $stats,
         ]);
     }
 
@@ -214,7 +205,7 @@ class StudentController extends Controller
                 'name' => $application->scholarship->name,
                 'type' => $application->scholarship->type,
                 'amount' => $application->scholarship->getStipendAmount()
-                    ? '₱'.number_format($application->scholarship->getStipendAmount(), 0).'/month'
+                    ? '₱' . number_format($application->scholarship->getStipendAmount(), 0) . '/month'
                     : 'Amount TBD',
                 'description' => $application->scholarship->description ?? '',
             ],

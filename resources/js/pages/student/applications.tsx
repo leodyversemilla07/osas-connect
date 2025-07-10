@@ -1,11 +1,18 @@
 import { Head, Link } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
-import { DataTable } from '@/components/student-application-management/data-table';
-import { columns } from '@/components/student-application-management/columns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Plus } from 'lucide-react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -27,20 +34,15 @@ interface Application {
     interview_schedule?: string;
 }
 
+
 interface MyApplicationsProps {
     applications: Application[];
-    stats: {
-        total: number;
-        pending: number;
-        approved: number;
-        draft: number;
-    };
     filters?: {
         search?: string;
     };
 }
 
-export default function MyApplications({ applications, stats }: MyApplicationsProps) {
+export default function MyApplications({ applications }: MyApplicationsProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head>
@@ -49,14 +51,14 @@ export default function MyApplications({ applications, stats }: MyApplicationsPr
             </Head>
             <div className="flex h-full flex-1 flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 lg:space-y-8 lg:p-8">
                 {/* Header Section */}
-                <div className="border-b border-gray-100 dark:border-gray-800 pb-6 lg:pb-8">
+                <div className="border-b border-border pb-6 lg:pb-8">
                     <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                         <div className="min-w-0 flex-1">
-                            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 sm:text-3xl lg:text-4xl">Applications</h1>
-                            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 sm:text-base lg:text-lg">Track and manage your scholarship applications</p>
+                            <h1 className="text-2xl font-semibold text-foreground sm:text-3xl lg:text-4xl">Applications</h1>
+                            <p className="mt-2 text-sm text-muted-foreground sm:text-base lg:text-lg">Track and manage your scholarship applications</p>
                         </div>
                         <div className="flex-shrink-0">
-                            <Button asChild className="min-h-[44px] px-4 lg:px-6">
+                            <Button asChild>
                                 <Link href={route('student.scholarships.index')}>
                                     <Plus className="h-4 w-4 mr-2 lg:h-5 lg:w-5" />
                                     Apply for Scholarship
@@ -66,57 +68,80 @@ export default function MyApplications({ applications, stats }: MyApplicationsPr
                     </div>
                 </div>
 
-                {/* Statistics Cards */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-6 xl:gap-8">
-                    <Card className="border-gray-200 dark:border-gray-800">
-                        <CardHeader className="pb-3 lg:pb-4">
-                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider lg:text-base">
-                                Total Applications
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 lg:text-3xl">{stats?.total || 0}</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-gray-200 dark:border-gray-800">
-                        <CardHeader className="pb-3 lg:pb-4">
-                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider lg:text-base">
-                                Pending
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                            <p className="text-2xl font-semibold text-yellow-600 dark:text-yellow-400 lg:text-3xl">{stats?.pending || 0}</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-gray-200 dark:border-gray-800">
-                        <CardHeader className="pb-3 lg:pb-4">
-                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider lg:text-base">
-                                Approved
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                            <p className="text-2xl font-semibold text-green-600 dark:text-green-400 lg:text-3xl">{stats?.approved || 0}</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-gray-200 dark:border-gray-800">
-                        <CardHeader className="pb-3 lg:pb-4">
-                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider lg:text-base">
-                                Draft
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                            <p className="text-2xl font-semibold text-gray-600 dark:text-gray-400 lg:text-3xl">{stats?.draft || 0}</p>
-                        </CardContent>
-                    </Card>
-                </div>
-
                 {/* Applications Table */}
-                <div className="space-y-4 lg:space-y-6">
-                    <DataTable columns={columns} data={applications || []} />
-                </div>
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground">
+                                    My Applications
+                                </CardTitle>
+                                <div className="text-sm mt-1 text-muted-foreground">
+                                    Complete list of your scholarship applications
+                                </div>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>ID</TableHead>
+                                        <TableHead>Scholarship</TableHead>
+                                        <TableHead>Type</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead>Progress</TableHead>
+                                        <TableHead>Submitted</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {applications && applications.length > 0 ? (
+                                        applications.map((app) => (
+                                            <TableRow key={app.id}>
+                                                <TableCell>
+                                                    <div className="font-medium text-foreground">#{app.id}</div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="font-medium text-foreground">{app.scholarship_name}</div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="text-sm text-muted-foreground">{app.scholarship_type}</div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant={app.status === 'approved' ? 'default' : app.status === 'rejected' ? 'destructive' : 'secondary'}>
+                                                        {app.status.charAt(0).toUpperCase() + app.status.slice(1).replace(/_/g, ' ')}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {app.amount}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col gap-1">
+                                                        <span>{app.progress}%</span>
+                                                        <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                                                            <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${app.progress}%` }}></div>
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {new Date(app.submitted_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="h-24 text-center text-base text-muted-foreground">
+                                                No applications found
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </AppLayout>
     );
