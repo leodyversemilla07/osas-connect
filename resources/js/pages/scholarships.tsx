@@ -148,7 +148,7 @@ function ScholarshipCard({ scholarship, isAuthenticated }: { scholarship: Schola
     );
 }
 
-export default function Scholarships({ auth, scholarships, headerContent, footerContent }: ScholarshipsProps) {
+export default function Scholarships({ auth, scholarships }: ScholarshipsProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedType, setSelectedType] = useState<string>('all');
     const isAuthenticated = !!auth?.user;
@@ -169,7 +169,7 @@ export default function Scholarships({ auth, scholarships, headerContent, footer
             </Head>
 
             <div className="flex min-h-screen flex-col items-center bg-[#f3f2f2] text-[#010002] dark:bg-[#121212] dark:text-[#f3f2f2]">
-                <SiteHeader content={headerContent} />
+                <SiteHeader />
 
                 <main className="mt-16 w-full flex-1 p-6 lg:p-8">
                     <div className="mx-auto max-w-7xl">
@@ -278,7 +278,7 @@ export default function Scholarships({ auth, scholarships, headerContent, footer
                     </div>
                 </main>
 
-                <SiteFooter content={footerContent} />
+                <SiteFooter />
             </div>
         </>
     );

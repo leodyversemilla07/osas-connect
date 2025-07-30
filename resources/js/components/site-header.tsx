@@ -1,25 +1,16 @@
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
+import {
+    NavigationMenu,
+    NavigationMenuList,
+    NavigationMenuItem,
+    NavigationMenuLink,
+} from './ui/navigation-menu';
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
+import { Button } from './ui/button';
 
-interface NavigationItem {
-    label: string;
-    url: string;
-    active: boolean;
-}
-
-interface HeaderContent {
-    logo_text?: string;
-    tagline?: string;
-    navigation?: NavigationItem[];
-}
-
-interface Props {
-    content?: HeaderContent;
-}
-
-export default function SiteHeader({ content }: Props) {
+export default function SiteHeader() {
     const { auth } = usePage<SharedData>().props;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
@@ -28,8 +19,7 @@ export default function SiteHeader({ content }: Props) {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-    // Default navigation if no CMS content provided
-    const defaultNavigation = [
+    const navItems = [
         { label: 'Home', url: '/', active: true },
         { label: 'About', url: '/about', active: true },
         { label: 'Scholarships', url: '/scholarships', active: true },
@@ -139,12 +129,13 @@ export default function SiteHeader({ content }: Props) {
             className={`fixed top-0 z-50 w-full transform bg-[#005a2d] shadow-md backdrop-blur transition-transform duration-300 dark:bg-[#004020] ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}
             role="navigation"
         >
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <header className="relative flex h-16 items-center justify-between">                    {/* Logo Section */}
+            <div className="w-full px-4 sm:px-6 lg:px-8">
+                <header className="relative flex h-16 items-center justify-between w-full">
+                    {/* Logo Section */}
                     <div className="flex flex-shrink-0 items-center">
                         <Link href="/" className="flex items-center">
                             <img
-                                src={route('home') + '/images/logo.png'}
+                                src="/images/logo.png"
                                 alt="OSAS Connect Logo"
                                 className="mr-2 h-8 w-8 rounded-full object-cover"
                                 onError={(e) => {
@@ -152,60 +143,71 @@ export default function SiteHeader({ content }: Props) {
                                 }}
                             />
                             <span className="text-xl font-semibold text-white">
-                                {content?.logo_text || 'OSAS Connect'}
+                                OSAS Connect
                             </span>
                             <span className="ml-2 hidden text-xs text-[#febd12] sm:block">
-                                {content?.tagline || 'Scholarship Management'}
+                                Scholarship Management
                             </span>
                         </Link>
                     </div>
 
                     {/* Desktop Navigation - Center */}
-                    <nav
-                        className="hidden md:block"
-                        aria-label="Primary navigation"
-                    >                        <ul className="flex space-x-8" role="menubar">
-                            {(content?.navigation || defaultNavigation).map((item, index) => (
-                                <li key={index} role="none">
-                                    <Link
-                                        href={item.url}
+                    <NavigationMenu className="hidden md:flex w-full justify-center" aria-label="Primary navigation">
+                        <NavigationMenuList>
+                            {(navItems).map((item, index) => (
+                                <NavigationMenuItem key={index}>
+                                    <NavigationMenuLink
+                                        asChild
+                                        active={route().current() === item.url.replace('/', '') || (item.url === '/' && route().current('home'))}
                                         className={`rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#007a3d] hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2 ${route().current() === item.url.replace('/', '') || (item.url === '/' && route().current('home')) ? 'bg-[#007a3d] text-[#febd12]' : ''}`}
                                         aria-current={route().current() === item.url.replace('/', '') || (item.url === '/' && route().current('home')) ? 'page' : undefined}
                                         role="menuitem"
                                     >
-                                        {item.label}
-                                    </Link>
-                                </li>
+                                        <Link href={item.url}>{item.label}</Link>
+                                    </NavigationMenuLink>
+                                </NavigationMenuItem>
                             ))}
-                        </ul>
-                    </nav>
+                        </NavigationMenuList>
+                    </NavigationMenu>
 
                     {/* Auth Section - Right */}
                     <div className="hidden md:flex md:items-center md:space-x-4">
                         {auth.user ? (
-                            <Link
-                                href={route('dashboard')}
-                                className="inline-block rounded-md bg-[#febd12] px-5 py-1.5 text-sm font-medium text-[#010002] shadow-md transition-all hover:bg-[#f5b400] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
+                            <Button
+                                asChild
+                                variant="secondary"
+                                size="sm"
+                                className="bg-[#febd12] text-[#010002] hover:bg-[#f5b400] focus:ring-[#febd12]"
                             >
-                                Dashboard
-                            </Link>
+                                <Link href={route('dashboard')}>
+                                    Dashboard
+                                </Link>
+                            </Button>
                         ) : (
                             <>
-                                <Link
-                                    href={route('login')}
-                                    className="inline-block rounded-md px-5 py-1.5 text-sm font-medium text-white transition-all duration-200 hover:bg-white/10 hover:text-[#febd12] focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
+                                <Button
+                                    asChild
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-white hover:text-[#febd12] focus:ring-[#febd12]"
                                 >
-                                    Log in
-                                </Link>
-                                <Link
-                                    href={route('register')}
-                                    className="inline-block rounded-md bg-[#febd12] px-5 py-1.5 text-sm font-medium text-[#010002] shadow-md transition-all hover:bg-[#f5b400] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#febd12] focus:ring-offset-2"
+                                    <Link href={route('login')}>
+                                        Log in
+                                    </Link>
+                                </Button>
+                                <Button
+                                    asChild
+                                    variant="secondary"
+                                    size="sm"
+                                    className="bg-[#febd12] text-[#010002] hover:bg-[#f5b400] focus:ring-[#febd12]"
                                 >
-
-                                    Register
-                                </Link>
+                                    <Link href={route('register')}>
+                                        Register
+                                    </Link>
+                                </Button>
                             </>
-                        )}
+                        )
+                        }
                     </div>
 
                     {/* Mobile menu button */}
@@ -238,10 +240,10 @@ export default function SiteHeader({ content }: Props) {
                 ref={mobileMenuRef}
                 aria-expanded={isMenuOpen}
             >                <nav
-                    className="space-y-1 bg-[#004020] px-4 pb-3 pt-2 sm:px-6"
-                    aria-label="Mobile navigation"
-                >
-                    {(content?.navigation || defaultNavigation).map((item, index) => (
+                className="space-y-1 bg-[#004020] px-4 pb-3 pt-2 sm:px-6"
+                aria-label="Mobile navigation"
+            >
+                    {navItems.map((item, index) => (
                         <Link
                             key={index}
                             href={item.url}
@@ -266,7 +268,7 @@ export default function SiteHeader({ content }: Props) {
                             <div className="flex flex-col space-y-2">
                                 <Link
                                     href={route('login')}
-                                    className="flex items-center justify-center w-full rounded-md px-5 py-2 text-center text-base font-medium text-white transition-all duration-200 hover:text-[#febd12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2"
+                                    className="flex items-center justify-center w-full rounded-md px-5 py-2 text-center text-base font-medium text-white bg-[#005a2d] transition-all duration-200 hover:text-[#febd12] hover:bg-[#007a3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#febd12] focus-visible:ring-offset-2"
                                     role="menuitem"
                                 >
                                     Log in

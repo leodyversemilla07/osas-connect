@@ -18,21 +18,29 @@ class ScholarshipService
             $scholarship = Scholarship::findOrFail($scholarshipId);
             $user = User::with('studentProfile')->findOrFail($userId);
 
-            // Validate eligibility
-            $this->validateEligibility($scholarship, $user);
-
             // Process documents
             $documents = $this->processDocuments($data['documents'] ?? []);
 
-            // Create application
-            $application = ScholarshipApplication::create([
+            // Create application (not yet final, for eligibility check)
+            $application = new ScholarshipApplication([
                 'scholarship_id' => $scholarshipId,
                 'user_id' => $userId,
                 'application_data' => $this->sanitizeApplicationData($data),
                 'status' => 'submitted',
-                'submitted_at' => now(),
+                'applied_at' => now(),
                 'uploaded_documents' => $documents,
             ]);
+            $application->setRelation('studentProfile', $user->studentProfile);
+            $application->setRelation('scholarship', $scholarship);
+
+            // Validate eligibility using model logic
+            $issues = $application->getEligibilityIssues();
+            if (count($issues) > 0) {
+                throw new InvalidArgumentException(implode("\n", $issues));
+            }
+
+            // Save application
+            $application->save();
 
             // Trigger notifications
             $this->notifyApplicationSubmitted($application);
@@ -86,42 +94,16 @@ class ScholarshipService
     public function isUserEligible(Scholarship $scholarship, User $user): bool
     {
         $student = $user->studentProfile;
-
-        if (! $student) {
-            return false;
-        }
-
-        // Check enrollment status
-        if ($student->enrollment_status !== 'enrolled') {
-            return false;
-        }
-
-        // Check if student has active scholarship (except for Student Assistantship)
-        if ($scholarship->type !== 'student_assistantship' && $this->hasActiveScholarship($user)) {
-            return false;
-        }
-
-        // Check MinSU-specific eligibility by scholarship type
-        switch ($scholarship->type) {
-            case 'academic_full':
-                return $this->checkAcademicFullEligibility($student);
-
-            case 'academic_partial':
-                return $this->checkAcademicPartialEligibility($student);
-
-            case 'student_assistantship':
-                return $this->checkStudentAssistantshipEligibility($student);
-
-            case 'performing_arts_full':
-            case 'performing_arts_partial':
-                return $this->checkPerformingArtsEligibility($student);
-
-            case 'economic_assistance':
-                return $this->checkEconomicAssistanceEligibility($student);
-
-            default:
-                return false;
-        }
+        if (! $student) return false;
+        $application = new ScholarshipApplication([
+            'scholarship_id' => $scholarship->id,
+            'user_id' => $user->id,
+            'application_data' => [],
+            'status' => 'submitted',
+        ]);
+        $application->setRelation('studentProfile', $student);
+        $application->setRelation('scholarship', $scholarship);
+        return $application->meetsEligibilityCriteria();
     }
 
     /**
@@ -181,17 +163,13 @@ class ScholarshipService
         if (! $this->isUserEligible($scholarship, $user)) {
             throw new InvalidArgumentException('User is not eligible for this scholarship');
         }
-
         if (! $scholarship->isAcceptingApplications()) {
             throw new InvalidArgumentException('Scholarship is not accepting applications');
         }
-
-        // Check for existing application
         $existingApplication = ScholarshipApplication::where('scholarship_id', $scholarship->id)
             ->where('user_id', $user->id)
             ->whereNotIn('status', ['rejected', 'cancelled'])
             ->exists();
-
         if ($existingApplication) {
             throw new InvalidArgumentException('User already has an application for this scholarship');
         }

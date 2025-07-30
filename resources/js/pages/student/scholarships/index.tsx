@@ -2,9 +2,9 @@ import { Head, Link } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter, CardAction } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, FileText, Clock, CheckCircle, AlertTriangle, Users, BookOpen } from 'lucide-react';
+import { DollarSign, FileText, Clock, CheckCircle, AlertTriangle, Users, BookOpen, Eye } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -203,40 +203,44 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
             </p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:gap-6 lg:grid-cols-1 lg:gap-6 xl:grid-cols-2 xl:gap-8 2xl:grid-cols-3">
+          <div className="grid gap-6 sm:gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {scholarships.map((scholarship) => {
               const deadlineStatus = getDeadlineStatus(scholarship.deadline);
               const DeadlineIcon = deadlineStatus.icon;
 
               return (
                 <Card key={scholarship.id} className="flex flex-col h-full">
-                  <CardHeader className="pb-4 lg:pb-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-lg leading-tight mb-3 lg:text-xl lg:mb-4">
-                          {scholarship.name}
-                        </CardTitle>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge className={getScholarshipTypeColor(scholarship.type)}>
-                            {getScholarshipTypeLabel(scholarship.type)}
+                  <CardHeader>
+                    <CardTitle className="text-lg leading-tight lg:text-xl">
+                      {scholarship.name}
+                    </CardTitle>
+                    <CardDescription>
+                      <span className="flex flex-wrap gap-2 mt-2">
+                        <Badge className={getScholarshipTypeColor(scholarship.type)}>
+                          {getScholarshipTypeLabel(scholarship.type)}
+                        </Badge>
+                        {deadlineStatus.status === 'urgent' && (
+                          <Badge variant="destructive" className="text-xs lg:text-sm">
+                            Urgent
                           </Badge>
-                          {deadlineStatus.status === 'urgent' && (
-                            <Badge variant="destructive" className="text-xs lg:text-sm">
-                              Urgent
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                        )}
+                      </span>
+                    </CardDescription>
+                    <CardAction>
+                      <Link href={`/student/scholarships/${scholarship.id}`}
+                        className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        aria-label="View Details"
+                      >
+                        <Eye className="w-5 h-5" />
+                      </Link>
+                    </CardAction>
                   </CardHeader>
 
                   <CardContent className="flex-1 flex flex-col justify-between space-y-4 pt-0 lg:space-y-6">
                     {/* Description */}
-                    <div>
-                      <CardDescription className="text-sm leading-relaxed lg:text-base">
-                        {scholarship.description}
-                      </CardDescription>
-                    </div>
+                    <CardDescription className="text-sm leading-relaxed lg:text-base mb-2">
+                      {scholarship.description}
+                    </CardDescription>
 
                     {/* Key Information */}
                     <div className="space-y-3 lg:space-y-4">
@@ -374,8 +378,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
                         </div>
                       )}
 
-                    {/* Action Button */}
-                    <div className="mt-6 pt-4 border-t lg:mt-8 lg:pt-6">
+                    <CardFooter>
                       {scholarship.has_applied ? (
                         <Button variant="outline" className="w-full min-h-[44px] px-4 lg:min-h-[48px] lg:px-6" disabled>
                           <CheckCircle className="h-4 w-4 mr-2 lg:h-5 lg:w-5" />
@@ -393,7 +396,7 @@ export default function ScholarshipsIndex({ scholarships }: ScholarshipsIndexPro
                           </Link>
                         </Button>
                       )}
-                    </div>
+                    </CardFooter>
                   </CardContent>
                 </Card>
               );

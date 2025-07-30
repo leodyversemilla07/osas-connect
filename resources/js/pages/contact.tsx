@@ -2,71 +2,55 @@ import { Head } from '@inertiajs/react';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
 import { Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
-import { useCMSColors, ColorScheme } from '@/hooks/use-cms-colors';
 
-interface Contact {
-    type: string;
-    icon: string;
-    title: string;
-    description: string;
-    value: string;
-    link?: string;
-}
-
-interface PageContent {
+const pageContent = {
     hero: {
-        badge: string;
-        title: string;
-        subtitle: string;
-    };
+        badge: 'Contact Us',
+        title: 'Get in Touch',
+        subtitle: 'Have questions about scholarships or the application process? Our team is here to help you succeed.',
+    },
     info: {
-        badge: string;
-        title: string;
-        subtitle: string;
-    };
-    contacts: Contact[];
+        badge: 'How to Reach Us',
+        title: "We're Here to Help",
+        subtitle: 'Choose the best way to contact us based on your needs and preferences.',
+    },
+    contacts: [
+        {
+            type: 'email',
+            icon: 'Mail',
+            title: 'Email Us',
+            description: 'For general inquiries and scholarship questions',
+            value: 'minsubcscholarship.edu.ph@gmail.com',
+            link: 'mailto:minsubcscholarship.edu.ph@gmail.com',
+        },
+        {
+            type: 'address',
+            icon: 'MapPin',
+            title: 'Visit Us',
+            description: 'Office of Student Affairs and Services',
+            value: 'Mindoro State University - Bongabong Campus\nBongabong, Oriental Mindoro',
+        },
+        {
+            type: 'hours',
+            icon: 'Clock',
+            title: 'Office Hours',
+            description:
+                "We're available during regular business hours",
+            value: 'Monday - Friday\n8:00 AM - 5:00 PM\n(Lunch break: 12:00 PM - 1:00 PM)',
+        },
+        {
+            type: 'support',
+            icon: 'MessageCircle',
+            title: 'Quick Support',
+            description: 'Need immediate help?',
+            value: 'Use our live chat or submit a support ticket through your dashboard.',
+        },
+    ],
     cta: {
-        title: string;
-        description: string;
-    };
-}
-
-interface ContactProps {
-    pageContent: PageContent;
-    cmsTheme?: string | null;
-    cmsColorScheme?: ColorScheme | null;    headerContent?: {
-        logo_text?: string;
-        tagline?: string;
-        navigation?: Array<{
-            label: string;
-            url: string;
-            active: boolean;
-            children?: Array<{ label: string; url: string }>;
-        }>;
-    };
-    footerContent?: {
-        cta?: {
-            title?: string;
-            description?: string;
-            button_text?: string;
-            button_url?: string;
-        };
-        about?: {
-            title?: string;
-            description?: string;
-        };
-        contact?: {
-            address?: string;
-            email?: string;
-            viber?: string;
-            hours?: string;
-        };
-        social_links?: Array<{
-            platform: string;
-            url: string;
-        }>;
-    };
-}
+        title: 'Ready to Get Started?',
+        description: 'Join thousands of students who have found their path to academic success through OSAS Connect.',
+    },
+};
 
 const getIcon = (iconName: string) => {
     const icons = {
@@ -78,10 +62,7 @@ const getIcon = (iconName: string) => {
     return icons[iconName as keyof typeof icons] || Mail;
 };
 
-export default function Contact({ pageContent, cmsTheme, cmsColorScheme, headerContent, footerContent }: ContactProps) {
-    // Initialize CMS-aware theme and color management
-    useCMSColors({ cmsTheme, cmsColorScheme });
-
+export default function Contact() {
     return (
         <>
             <Head title="Contact Us">
@@ -89,7 +70,7 @@ export default function Contact({ pageContent, cmsTheme, cmsColorScheme, headerC
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
             <div className="flex min-h-screen flex-col items-center bg-[#f3f2f2] text-[#010002] dark:bg-[#121212] dark:text-[#f3f2f2]">                {/* Header Component */}
-                <SiteHeader content={headerContent} />
+                <SiteHeader />
 
                 {/* Main content with padding for the fixed header */}
                 <main className="mt-16 w-full flex-1 p-6 lg:p-8">
@@ -139,10 +120,10 @@ export default function Contact({ pageContent, cmsTheme, cmsColorScheme, headerC
                             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
                                 {pageContent.contacts.map((contact, index) => {
                                     const IconComponent = getIcon(contact.icon);
-                                    const ContactValue = ({ contact }: { contact: Contact }) => {
+                                    const ContactValue = ({ contact }: { contact: typeof pageContent.contacts[0] }) => {
                                         if (contact.link) {
                                             return (
-                                                <a 
+                                                <a
                                                     href={contact.link}
                                                     className="inline-flex items-center text-base text-[#23b14d] hover:text-[#1a8f3c] hover:underline transition-colors duration-200 break-all"
                                                 >
@@ -150,11 +131,11 @@ export default function Contact({ pageContent, cmsTheme, cmsColorScheme, headerC
                                                 </a>
                                             );
                                         }
-                                        
+
                                         if (contact.type === 'hours' || contact.type === 'address') {
                                             return (
                                                 <div className="text-base text-[#010002]/80 dark:text-[#f3f2f2]/80">
-                                                    {contact.value.split('\n').map((line, i) => (
+                                                    {contact.value.split('\n').map((line: string, i: number) => (
                                                         <div key={i}>{line}</div>
                                                     ))}
                                                 </div>
@@ -206,8 +187,10 @@ export default function Contact({ pageContent, cmsTheme, cmsColorScheme, headerC
                             </div>
                         </section>
                     </div>
-                </main>                {/* Footer Component */}
-                <SiteFooter content={footerContent} />
+                </main>
+
+                {/* Footer Component */}
+                <SiteFooter />
             </div>
         </>
     );

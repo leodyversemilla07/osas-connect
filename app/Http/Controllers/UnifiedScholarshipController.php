@@ -17,6 +17,27 @@ class UnifiedScholarshipController extends Controller
 
     public function __construct(private ScholarshipService $scholarshipService) {}
 
+    /**
+     * API endpoint: Preview eligibility for a scholarship (returns reasons for ineligibility).
+     * Usage: POST with application data, returns array of issues (empty if eligible).
+     */
+    public function previewEligibility(Request $request, Scholarship $scholarship)
+    {
+        $user = Auth::user()->load('studentProfile');
+        $application = new ScholarshipApplication([
+            'scholarship_id' => $scholarship->id,
+            'user_id' => $user->id,
+            'application_data' => $request->input('application_data', []),
+            'uploaded_documents' => $request->input('uploaded_documents', []),
+            'status' => 'submitted',
+        ]);
+        $application->setRelation('studentProfile', $user->studentProfile);
+        $application->setRelation('scholarship', $scholarship);
+        $application->setRelation('interview', null); // Optionally set interview if available
+        $issues = $application->getEligibilityIssues();
+        return response()->json(['eligible' => count($issues) === 0, 'issues' => $issues]);
+    }
+
     public function index()
     {
         $scholarships = $this->scholarshipService->getAvailableScholarships(Auth::id());
@@ -187,47 +208,9 @@ class UnifiedScholarshipController extends Controller
     {
         $this->authorize('update', $application);
 
+
         $validated = $request->validate([
             'status' => 'required|string',
-            'notes' => 'nullable|string|max:1000',
-        ]);
-
-        try {
-            $this->scholarshipService->updateApplicationStatus($application, $validated['status'], $validated['notes'], Auth::id());
-
-            return back()->with('success', 'Application status updated successfully!');
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
-        }
-    }
-
-    public function scheduleInterview(Request $request, ScholarshipApplication $application)
-    {
-        $this->authorize('update', $application);
-
-        $validated = $request->validate([
-            'interview_date' => 'required|date|after:now',
-            'interview_time' => 'required|date_format:H:i',
-            'location' => 'required|string|max:255',
-            'notes' => 'nullable|string|max:1000',
-        ]);
-
-        try {
-            $this->scholarshipService->scheduleInterview($application, $validated);
-
-            return back()->with('success', 'Interview scheduled successfully!');
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
-        }
-    }
-
-    public function recordStipend(Request $request, ScholarshipApplication $application)
-    {
-        $this->authorize('update', $application);
-
-        $validated = $request->validate([
-            'amount' => 'required|numeric|min:0',
-            'disbursement_date' => 'required|date',
             'notes' => 'nullable|string|max:1000',
         ]);
 

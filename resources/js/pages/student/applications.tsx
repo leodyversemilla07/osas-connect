@@ -1,7 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/app-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus } from 'lucide-react';
@@ -33,7 +32,6 @@ interface Application {
     verifier_comments?: string;
     interview_schedule?: string;
 }
-
 
 interface MyApplicationsProps {
     applications: Application[];
@@ -69,79 +67,65 @@ export default function MyApplications({ applications }: MyApplicationsProps) {
                 </div>
 
                 {/* Applications Table */}
-                <Card>
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground">
-                                    My Applications
-                                </CardTitle>
-                                <div className="text-sm mt-1 text-muted-foreground">
-                                    Complete list of your scholarship applications
-                                </div>
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="rounded-md border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>ID</TableHead>
-                                        <TableHead>Scholarship</TableHead>
-                                        <TableHead>Type</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Amount</TableHead>
-                                        <TableHead>Progress</TableHead>
-                                        <TableHead>Submitted</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {applications && applications.length > 0 ? (
-                                        applications.map((app) => (
-                                            <TableRow key={app.id}>
-                                                <TableCell>
-                                                    <div className="font-medium text-foreground">#{app.id}</div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="font-medium text-foreground">{app.scholarship_name}</div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="text-sm text-muted-foreground">{app.scholarship_type}</div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant={app.status === 'approved' ? 'default' : app.status === 'rejected' ? 'destructive' : 'secondary'}>
-                                                        {app.status.charAt(0).toUpperCase() + app.status.slice(1).replace(/_/g, ' ')}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {app.amount}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex flex-col gap-1">
-                                                        <span>{app.progress}%</span>
-                                                        <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                                                            <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${app.progress}%` }}></div>
-                                                        </div>
+                <div className="mb-4">
+                    <div className="rounded-md border mt-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>ID</TableHead>
+                                    <TableHead>Scholarship</TableHead>
+                                    <TableHead>Type</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Progress</TableHead>
+                                    <TableHead>Submitted</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {applications && applications.length > 0 ? (
+                                    applications.map((app) => (
+                                        <TableRow key={app.id}>
+                                            <TableCell>
+                                                <div className="font-medium text-foreground">#{app.id}</div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="font-medium text-foreground">{app.scholarship_name}</div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="text-sm text-muted-foreground">{app.scholarship_type}</div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={app.status === 'approved' ? 'default' : app.status === 'rejected' ? 'destructive' : 'secondary'}>
+                                                    {app.status.charAt(0).toUpperCase() + app.status.slice(1).replace(/_/g, ' ')}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {app.amount}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-col gap-1">
+                                                    <span>{app.progress}%</span>
+                                                    <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                                                        <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${app.progress}%` }}></div>
                                                     </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {new Date(app.submitted_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={7} className="h-24 text-center text-base text-muted-foreground">
-                                                No applications found
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {new Date(app.submitted_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                                             </TableCell>
                                         </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </CardContent>
-                </Card>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="h-24 text-center text-base text-muted-foreground">
+                                            No applications found
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
             </div>
         </AppLayout>
     );

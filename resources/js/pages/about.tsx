@@ -1,90 +1,80 @@
+
 import { Head } from '@inertiajs/react';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
 import { Users, Shield, Heart, CheckCircle } from 'lucide-react';
-import { useCMSColors, ColorScheme } from '@/hooks/use-cms-colors';
 
-interface Value {
-    icon: string;
-    title: string;
-    description: string;
-}
-
-interface TeamMember {
-    name: string;
-    position: string;
-    image: string;
-}
-
-interface PageContent {
+// Hardcoded content from PageSeeder.php for the 'about' page
+const pageContent = {
     hero: {
-        badge: string;
-        title: string;
-        subtitle: string;
-    };
+        badge: 'About Us',
+        title: 'Empowering Students Through Education',
+        subtitle: 'Learn about our mission to make quality education accessible to all students.',
+    },
     mission: {
-        badge: string;
-        title: string;
-        description: string;
-        features: string[];
-        image: string;
-    };
+        badge: 'Our Mission',
+        title: 'Our Mission',
+        description: 'To provide a streamlined, efficient, and transparent scholarship management system that connects deserving students with educational opportunities.',
+        features: [
+            'Streamlined application process',
+            'Transparent selection criteria',
+            'Real-time status tracking',
+            'Comprehensive document management',
+            'Equal opportunity access',
+        ],
+        image: 'https://img.freepik.com/free-photo/portrait-female-teacher-holding-notepad-green-wall_651396-1833.jpg',
+    },
     vision: {
-        badge: string;
-        title: string;
-        subtitle: string;
-        values: Value[];
-    };
+        badge: 'Our Vision',
+        title: 'Our Vision',
+        subtitle: 'Building a future where every student can achieve their educational dreams.',
+        values: [
+            {
+                icon: 'Users',
+                title: 'Community',
+                description: 'Building strong connections between students, educators, and scholarship providers.',
+            },
+            {
+                icon: 'Shield',
+                title: 'Trust',
+                description: 'Maintaining transparency and reliability in all scholarship processes.',
+            },
+            {
+                icon: 'Heart',
+                title: 'Care',
+                description: 'Putting student success and wellbeing at the center of everything we do.',
+            },
+        ],
+    },
     team: {
-        badge: string;
-        title: string;
-        subtitle: string;
-        members: TeamMember[];
-    };
+        badge: 'Our Team',
+        title: 'Meet Our Team',
+        subtitle: 'Dedicated professionals working to make education accessible for all.',
+        members: [
+            {
+                name: 'Dr. Maria Santos',
+                position: 'Director, Office of Student Affairs',
+                image: 'https://via.placeholder.com/150x150/005a2d/ffffff?text=MS',
+            },
+            {
+                name: 'Prof. Juan dela Cruz',
+                position: 'Scholarship Coordinator',
+                image: 'https://via.placeholder.com/150x150/005a2d/ffffff?text=JC',
+            },
+            {
+                name: 'Ms. Ana Rodriguez',
+                position: 'Student Support Services',
+                image: 'https://via.placeholder.com/150x150/005a2d/ffffff?text=AR',
+            },
+        ],
+    },
     cta: {
-        title: string;
-        description: string;
-        button_text: string;
-        button_link: string;
-    };
-}
-
-interface AboutProps {
-    pageContent: PageContent;
-    cmsTheme?: string | null;
-    cmsColorScheme?: ColorScheme | null;    headerContent?: {
-        logo_text?: string;
-        tagline?: string;
-        navigation?: Array<{
-            label: string;
-            url: string;
-            active: boolean;
-            children?: Array<{ label: string; url: string }>;
-        }>;
-    };
-    footerContent?: {
-        cta?: {
-            title?: string;
-            description?: string;
-            button_text?: string;
-            button_url?: string;
-        };
-        about?: {
-            title?: string;
-            description?: string;
-        };
-        contact?: {
-            address?: string;
-            email?: string;
-            viber?: string;
-            hours?: string;
-        };
-        social_links?: Array<{
-            platform: string;
-            url: string;
-        }>;
-    };
-}
+        title: 'Ready to Start Your Journey?',
+        description: 'Join thousands of students who have successfully received scholarships through OSAS Connect.',
+        button_text: 'Apply Now',
+        button_link: '/login',
+    },
+};
 
 const getIcon = (iconName: string) => {
     const icons = {
@@ -96,10 +86,8 @@ const getIcon = (iconName: string) => {
     return icons[iconName as keyof typeof icons] || Users;
 };
 
-export default function About({ pageContent, cmsTheme, cmsColorScheme, headerContent, footerContent }: AboutProps) {
-    // Initialize CMS-aware theme and color management
-    useCMSColors({ cmsTheme, cmsColorScheme });
-
+export default function About() {
+    // All content is now hardcoded in pageContent above
     return (
         <>
             <Head title="About - OSAS Connect">
@@ -108,7 +96,7 @@ export default function About({ pageContent, cmsTheme, cmsColorScheme, headerCon
             </Head>
             <div className="flex min-h-screen flex-col items-center bg-[#f3f2f2] text-[#010002] dark:bg-[#121212] dark:text-[#f3f2f2]">
                 {/* Header Component */}
-                <SiteHeader content={headerContent} />
+                <SiteHeader />
 
                 {/* Main content with padding for the fixed header */}
                 <main className="mt-16 w-full flex-1 p-6 lg:p-8">
@@ -270,7 +258,7 @@ export default function About({ pageContent, cmsTheme, cmsColorScheme, headerCon
                 </main>
 
                 {/* Footer Component */}
-                <SiteFooter content={footerContent} />
+                <SiteFooter />
             </div>
         </>
     );

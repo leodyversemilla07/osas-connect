@@ -269,6 +269,11 @@ class StudentProfile extends Model
         'father_years_service' => 'integer',
         'mother_years_service' => 'integer',
     ];
+    
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
 
     /**
      * Get the user that owns the student profile.

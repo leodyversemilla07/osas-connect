@@ -2,81 +2,66 @@ import { Head } from '@inertiajs/react';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
 import { ChevronDown, FileText, TrendingUp, Shield, UserCheck, Send } from 'lucide-react';
-import { useCMSColors, ColorScheme } from '@/hooks/use-cms-colors';
 
-interface PageContent {
+const pageContent = {
     hero: {
-        badge: string;
-        title: string;
-        subtitle: string;
-        primary_button: string;
-        secondary_button: string;
-    };
+        badge: 'Scholarship Management',
+        title: 'Your Gateway to Educational Excellence',
+        subtitle: 'OSAS Connect streamlines the scholarship application process, making educational opportunities accessible to all students.',
+        primary_button: 'Apply for Scholarships',
+        secondary_button: 'Learn More',
+    },
     features: {
-        badge: string;
-        title: string;
-        subtitle: string;
-        items: Array<{
-            icon: string;
-            title: string;
-            description: string;
-        }>;
-    };
+        badge: 'Why Choose OSAS Connect',
+        title: 'Everything You Need',
+        subtitle: 'Comprehensive tools for scholarship management',
+        items: [
+            {
+                icon: 'FileText',
+                title: 'Easy Applications',
+                description: 'Streamlined application process with digital document submission.',
+            },
+            {
+                icon: 'TrendingUp',
+                title: 'Track Progress',
+                description: 'Real-time updates on your application status and progress.',
+            },
+            {
+                icon: 'Shield',
+                title: 'Secure & Reliable',
+                description: 'Your data is protected with enterprise-grade security.',
+            },
+        ],
+    },
     guide: {
-        badge: string;
-        title: string;
-        subtitle: string;
-        items: Array<{
-            icon: string;
-            title: string;
-            description: string;
-        }>;
-    };
+        badge: 'How It Works',
+        title: 'Simple Steps to Success',
+        subtitle: 'Get started with your scholarship journey',
+        items: [
+            {
+                icon: 'UserCheck',
+                title: 'Create Account',
+                description: 'Register with your student credentials',
+            },
+            {
+                icon: 'FileText',
+                title: 'Browse Scholarships',
+                description: 'Explore available opportunities',
+            },
+            {
+                icon: 'Send',
+                title: 'Apply & Track',
+                description: 'Submit applications and monitor progress',
+            },
+        ],
+    },
     cta: {
-        title: string;
-        description: string;
-        button_text: string;
-        button_link: string;
-    };
-}
-
-interface HomeProps {
-    pageContent: PageContent;
-    cmsTheme?: string | null;
-    cmsColorScheme?: ColorScheme | null;
-    headerContent?: {
-        logo_text?: string;
-        tagline?: string;
-        navigation?: Array<{
-            label: string;
-            url: string;
-            active: boolean;
-            children?: Array<{ label: string; url: string }>;
-        }>;
-    };
-    footerContent?: {
-        cta?: {
-            title?: string;
-            description?: string;
-            button_text?: string;
-            button_url?: string;
-        };
-        about?: {
-            title?: string;
-            description?: string;
-        };
-        contact?: {
-            address?: string;
-            email?: string;
-            viber?: string;
-            hours?: string;
-        };
-        social_links?: Array<{
-            platform: string;
-            url: string;
-        }>;
-    };
-}
+        title: 'Ready to Apply?',
+        description: 'Start your scholarship journey today and unlock opportunities for your academic future.',
+        button_text: 'Get Started Now',
+        button_link: '/login',
+    },
+};
 
 const getIcon = (iconName: string) => {
     const icons = {
@@ -89,10 +74,8 @@ const getIcon = (iconName: string) => {
     return icons[iconName as keyof typeof icons] || FileText;
 };
 
-export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerContent, footerContent }: HomeProps) {
-    // Initialize CMS-aware theme and color management
-    useCMSColors({ cmsTheme, cmsColorScheme });
-
+export default function Home() {
+    // All content is now hardcoded in pageContent above
     return (
         <>
             <Head title="OSAS Connect - Scholarship Management System">
@@ -101,7 +84,7 @@ export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerCont
             </Head>
             <div className="flex min-h-screen flex-col items-center bg-[#f3f2f2] text-[#010002] dark:bg-[#121212] dark:text-[#f3f2f2]">
                 {/* Header Component */}
-                <SiteHeader content={headerContent} />
+                <SiteHeader />
 
                 {/* Main content with padding for the fixed header */}
                 <main className="mt-16 w-full flex-1 p-6 lg:p-8">
@@ -117,7 +100,7 @@ export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerCont
                                     <pattern id="pattern-circles" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
                                         <circle id="pattern-circle" cx="10" cy="10" r="1.6257413380501518" fill="#fff" />
                                     </pattern>
-                                    <rect id="rect" x="0" y="0" width="100%" height="100%" fill="url(#pattern-circles)"></rect>
+                                    <rect id="rect" x="0" y="0" width="100%" height="100%" fill="url(#pattern-circles)" />
                                 </svg>
                             </div>
 
@@ -125,26 +108,26 @@ export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerCont
                                 {/* Left column - Text content */}
                                 <div className="mb-8 w-full text-center md:mb-0 md:w-1/2 md:pr-8 md:text-left">
                                     <div className="inline-block rounded-full bg-[#febd12]/20 px-4 py-1 text-sm font-medium text-[#febd12]">
-                                        {pageContent?.hero?.badge || 'Welcome'}
+                                        {pageContent.hero.badge}
                                     </div>
                                     <h1 className="mt-4 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
-                                        {pageContent?.hero?.title || 'OSAS Connect'}
+                                        {pageContent.hero.title}
                                     </h1>
                                     <p className="mt-6 text-xl text-white/90">
-                                        {pageContent?.hero?.subtitle || 'Scholarship Management System'}
+                                        {pageContent.hero.subtitle}
                                     </p>
                                     <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                                         <a
                                             href="/login"
                                             className="inline-flex items-center justify-center rounded-lg bg-[#febd12] px-8 py-3 text-lg font-semibold text-[#005a2d] transition-all duration-200 hover:bg-[#febd12]/90 hover:shadow-lg"
                                         >
-                                            {pageContent?.hero?.primary_button || 'Get Started'}
+                                            {pageContent.hero.primary_button}
                                         </a>
                                         <a
                                             href="/about"
                                             className="inline-flex items-center justify-center rounded-lg border-2 border-white/30 bg-white/10 px-8 py-3 text-lg font-semibold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
                                         >
-                                            {pageContent?.hero?.secondary_button || 'Learn More'}
+                                            {pageContent.hero.secondary_button}
                                         </a>
                                     </div>
                                 </div>
@@ -177,16 +160,16 @@ export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerCont
                         <section className="mt-16 py-8 sm:mt-24 sm:py-16">
                             <div className="text-center mb-8 sm:mb-12">
                                 <span className="inline-block px-4 py-1 rounded-full bg-[#23b14d]/10 text-sm font-medium text-[#23b14d] mb-3">
-                                    {pageContent?.features?.badge || 'Features'}
+                                    {pageContent.features.badge}
                                 </span>
-                                <h2 className="text-2xl sm:text-3xl font-bold text-[#005a2d]">{pageContent?.features?.title || 'Platform Features'}</h2>
+                                <h2 className="text-2xl sm:text-3xl font-bold text-[#005a2d]">{pageContent.features.title}</h2>
                                 <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-base sm:text-lg text-[#010002]/70 dark:text-[#f3f2f2]/70 px-4">
-                                    {pageContent?.features?.subtitle || 'Discover our comprehensive scholarship management platform.'}
+                                    {pageContent.features.subtitle}
                                 </p>
                             </div>
 
                             <div className="mt-8 grid gap-6 px-4 sm:mt-10 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3 sm:px-0">
-                                {pageContent?.features?.items?.map((feature, index) => {
+                                {pageContent.features.items.map((feature, index) => {
                                     const IconComponent = getIcon(feature.icon);
                                     return (
                                         <div key={index} className="rounded-lg bg-white p-8 shadow-md transition-all hover:shadow-lg hover:translate-y-[-5px] dark:bg-[#1a1a1a] border-b-4 border-[#23b14d]">
@@ -199,7 +182,7 @@ export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerCont
                                             </p>
                                         </div>
                                     );
-                                }) || []}
+                                })}
                             </div>
                         </section>
 
@@ -207,16 +190,16 @@ export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerCont
                         <section className="py-8 sm:py-16">
                             <div className="text-center mb-8 sm:mb-12">
                                 <span className="inline-block px-4 py-1 rounded-full bg-[#005a2d]/10 text-sm font-medium text-[#005a2d] mb-3">
-                                    {pageContent?.guide?.badge || 'Guide'}
+                                    {pageContent.guide.badge}
                                 </span>
-                                <h2 className="text-2xl sm:text-3xl font-bold text-[#005a2d] px-4">{pageContent?.guide?.title || 'How It Works'}</h2>
+                                <h2 className="text-2xl sm:text-3xl font-bold text-[#005a2d] px-4">{pageContent.guide.title}</h2>
                                 <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-base sm:text-lg text-[#010002]/70 dark:text-[#f3f2f2]/70 px-4">
-                                    {pageContent?.guide?.subtitle || 'Follow these simple steps to get started.'}
+                                    {pageContent.guide.subtitle}
                                 </p>
                             </div>
 
                             <div className="grid gap-6 px-4 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3 sm:px-0">
-                                {pageContent?.guide?.items?.map((item, index) => {
+                                {pageContent.guide.items.map((item, index) => {
                                     const IconComponent = getIcon(item.icon);
                                     return (
                                         <div key={index} className="rounded-lg bg-white p-8 shadow-md transition-all hover:shadow-lg hover:translate-y-[-5px] dark:bg-[#1a1a1a] border-l-4 border-[#febd12]">
@@ -229,7 +212,7 @@ export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerCont
                                             </p>
                                         </div>
                                     );
-                                }) || []}
+                                })}
                             </div>
                         </section>
 
@@ -248,17 +231,17 @@ export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerCont
 
                                 <div className="flex flex-col md:flex-row items-center relative z-10">
                                     <div className="flex-1 text-center md:text-left mb-6 md:mb-0">
-                                        <h2 className="text-3xl sm:text-4xl font-bold text-white">{pageContent?.cta?.title || 'Ready to Get Started?'}</h2>
+                                        <h2 className="text-3xl sm:text-4xl font-bold text-white">{pageContent.cta.title}</h2>
                                         <p className="mt-4 text-lg text-white/90">
-                                            {pageContent?.cta?.description || 'Join thousands of students managing their scholarships with ease.'}
+                                            {pageContent.cta.description}
                                         </p>
                                     </div>
                                     <div className="flex-shrink-0">
                                         <a
-                                            href={pageContent?.cta?.button_link || '/login'}
+                                            href={pageContent.cta.button_link}
                                             className="inline-flex items-center justify-center rounded-lg bg-[#febd12] px-8 py-3 text-lg font-semibold text-[#005a2d] transition-all duration-200 hover:bg-[#febd12]/90 hover:shadow-lg"
                                         >
-                                            {pageContent?.cta?.button_text || 'Start Now'}
+                                            {pageContent.cta.button_text}
                                         </a>
                                     </div>
                                 </div>
@@ -268,7 +251,7 @@ export default function Home({ pageContent, cmsTheme, cmsColorScheme, headerCont
                 </main>
 
                 {/* Footer Component */}
-                <SiteFooter content={footerContent} />
+                <SiteFooter />
             </div>
         </>
     );

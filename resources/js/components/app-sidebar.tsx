@@ -42,7 +42,7 @@ const adminNavItems: NavItem[] = [
     },
     {
         title: 'Manage Students',
-        href: route('admin.students'),
+        href: route('admin.students.index'),
         icon: GraduationCap,
         roles: ['admin'],
     },
@@ -56,12 +56,6 @@ const adminNavItems: NavItem[] = [
         title: 'Recent Activity',
         href: route('admin.recent-logins'),
         icon: Activity,
-        roles: ['admin'],
-    },
-    {
-        title: 'CMS Pages',
-        href: route('admin.cms.index'),
-        icon: FileText,
         roles: ['admin'],
     }
 ];

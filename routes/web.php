@@ -1,34 +1,37 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\CMSController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OsasStaffController;
 use App\Http\Controllers\PdfController;
-use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UnifiedScholarshipController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StudentManagementController;
+use Inertia\Inertia;
 
-Route::get('/', [PublicPageController::class, 'home'])->name('home');
+Route::get('/', function () {
+    return Inertia::render('home');
+})->name('home');
 
-// Content routes using CMS
-Route::get('announcements', [\App\Http\Controllers\ContentController::class, 'announcements'])->name('announcements');
-Route::get('scholarships', [\App\Http\Controllers\ContentController::class, 'scholarships'])->name('scholarships');
+Route::get('/about', function () {
+    return Inertia::render('about');
+})->name('about');
 
-// API routes for content
-Route::get('api/announcements/{id}', [\App\Http\Controllers\ContentController::class, 'getAnnouncement'])->name('api.announcements.show');
-Route::get('api/scholarships/{id}', [\App\Http\Controllers\ContentController::class, 'getScholarship'])->name('api.scholarships.show');
+Route::get('/contact', function () {
+    return Inertia::render('contact');
+})->name('contact');
 
-// Dynamic page routes
-Route::get('contact', [PublicPageController::class, 'contact'])->name('contact');
-Route::get('about', [PublicPageController::class, 'about'])->name('about');
+Route::get('/scholarships', function () {
+    return Inertia::render('scholarships');
+})->name('scholarships');
 
-// CMS public page routes
-Route::get('pages/{slug}', [CMSController::class, 'showPublic'])->name('pages.show');
+Route::get('/announcements', function () {
+    return Inertia::render('announcements');
+})->name('announcements');
 
 Route::inertia('privacy', 'privacy')->name('privacy');
 Route::inertia('terms', 'terms')->name('terms');
@@ -57,12 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
-        // Students management
-        Route::get('/admin/students', [AdminController::class, 'students'])->name('admin.students');
-        Route::get('/admin/students/{user}', [AdminController::class, 'showUser'])->name('admin.students.show');
-        Route::get('/admin/students/{user}/edit', [AdminController::class, 'editUser'])->name('admin.students.edit');
-        Route::put('/admin/students/{user}', [AdminController::class, 'updateUser'])->name('admin.students.update');
-        Route::delete('/admin/students/{user}', [AdminController::class, 'destroyUser'])->name('admin.students.destroy');
+        // Students management (resourceful)
+        Route::resource('/admin/students', StudentManagementController::class, [
+            'as' => 'admin'
+        ]);
 
         // Staff management
         Route::get('/admin/staff', [AdminController::class, 'staff'])->name('admin.staff');
@@ -87,22 +88,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Additional admin routes
         Route::get('/admin/recent-logins', [AdminController::class, 'recentLogins'])->name('admin.recent-logins');
-
-        // Page management routes (CMS)
-        Route::get('/admin/cms', [CMSController::class, 'index'])->name('admin.cms.index');
-        Route::get('/admin/cms/create', [CMSController::class, 'create'])->name('admin.cms.create');
-        Route::get('/admin/cms/preview', [CMSController::class, 'preview'])->name('admin.cms.preview');
-        Route::post('/admin/cms', [CMSController::class, 'store'])->name('admin.cms.store');
-        Route::get('/admin/cms/{page}', [CMSController::class, 'show'])->name('admin.cms.show');
-        Route::get('/admin/cms/{page}/edit', [CMSController::class, 'edit'])->name('admin.cms.edit');
-        Route::put('/admin/cms/{page}', [CMSController::class, 'update'])->name('admin.cms.update');
-        Route::delete('/admin/cms/{page}', [CMSController::class, 'destroy'])->name('admin.cms.destroy');
-
-        // Site component management routes (Header & Footer)
-        Route::get('/admin/cms/components/header', [CMSController::class, 'editHeader'])->name('admin.cms.header');
-        Route::put('/admin/cms/components/header', [CMSController::class, 'updateHeader'])->name('admin.cms.header.update');
-        Route::get('/admin/cms/components/footer', [CMSController::class, 'editFooter'])->name('admin.cms.footer');
-        Route::put('/admin/cms/components/footer', [CMSController::class, 'updateFooter'])->name('admin.cms.footer.update');
 
         // Announcements management routes
         Route::get('/admin/announcements', [AdminController::class, 'announcements'])->name('admin.announcements');
@@ -246,11 +231,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/generate-annex1-tpdf-pdf/{user}', [PdfController::class, 'generateAnnex1Pdf'])->name('generate.annex1.tpdf.pdf');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
-
-// Dynamic page route (catch-all for pages managed through CMS)
-// This must be the last route to avoid conflicts with other routes
-Route::get('{slug}', [PublicPageController::class, 'show'])
-    ->where('slug', '[a-zA-Z0-9\-_/]+')
-    ->name('page.show');
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
