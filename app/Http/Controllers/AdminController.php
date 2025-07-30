@@ -2,20 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Page;
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
 use App\Models\StaffInvitation;
 use App\Models\User;
-use App\Services\StorageService;
 use App\Services\UserAgentParser;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,125 +21,7 @@ class AdminController extends Controller
      */
     public function index(): Response
     {
-        // Get counts for dashboard stats
-        $totalStudents = User::where('role', 'student')->count();
-        $totalStaff = User::where('role', 'osas_staff')->count();
-        $totalAdmins = User::where('role', 'admin')->count();
-        $pendingInvitations = StaffInvitation::where('status', 'pending')->count();
-
-        // Get scholarship and application stats
-        $totalScholarships = Scholarship::count();
-        $totalApplications = ScholarshipApplication::count();
-        $pendingApplications = ScholarshipApplication::where('status', 'submitted')->count();
-        $approvedApplications = ScholarshipApplication::where('status', 'approved')->count();
-        $rejectedApplications = ScholarshipApplication::where('status', 'rejected')->count();
-
-        // Calculate funding and success rate
-        $totalFundsAllocated = ScholarshipApplication::where('status', 'approved')->sum('amount_received') ?? 0;
-        $applicationSuccessRate = $totalApplications > 0 ? round(($approvedApplications / $totalApplications) * 100) : 0;
-
-        // Documents needing verification (you may need to adjust this based on your actual document system)
-        $documentsNeedingVerification = 0; // Placeholder - implement based on your document verification system
-
-        // Get recent logins (last 10)
-        $recentLogins = User::whereNotNull('updated_at')
-            ->orderBy('updated_at', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => (string) $user->id,
-                    'name' => $user->full_name,
-                    'email' => $user->email,
-                    'role' => ucfirst(str_replace('_', ' ', $user->role)),
-                    'timestamp' => $user->updated_at->toISOString(),
-                ];
-            });
-
-        // Get pending invitations (last 10)
-        $pendingInvitationsList = StaffInvitation::where('status', 'pending')
-            ->with('inviter')
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(function ($invitation) {
-                return [
-                    'id' => (string) $invitation->id,
-                    'email' => $invitation->email,
-                    'role' => ucfirst(str_replace('_', ' ', $invitation->role)),
-                    'sentDate' => $invitation->created_at->toISOString(),
-                    'status' => $invitation->status,
-                ];
-            });
-
-        // Get recent applications (last 10)
-        $recentApplications = ScholarshipApplication::with(['user', 'scholarship'])
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(function ($application) {
-                return [
-                    'id' => (string) $application->id,
-                    'student' => $application->user->full_name,
-                    'scholarshipName' => $application->scholarship->name,
-                    'status' => ucfirst($application->status),
-                    'submittedDate' => $application->created_at->toISOString(),
-                ];
-            });
-
-        // Generate pending tasks based on actual system data
-        $pendingTasks = collect();
-
-        if ($pendingApplications > 0) {
-            $pendingTasks->push([
-                'id' => 'task_applications',
-                'type' => 'Application Review',
-                'description' => "Review {$pendingApplications} pending scholarship applications",
-                'deadline' => null,
-                'priority' => 'high',
-            ]);
-        }
-
-        if ($documentsNeedingVerification > 0) {
-            $pendingTasks->push([
-                'id' => 'task_documents',
-                'type' => 'Document Verification',
-                'description' => "Verify {$documentsNeedingVerification} submitted documents",
-                'deadline' => null,
-                'priority' => 'medium',
-            ]);
-        }
-
-        if ($pendingInvitations > 0) {
-            $pendingTasks->push([
-                'id' => 'task_invitations',
-                'type' => 'Staff Invitations',
-                'description' => "Follow up on {$pendingInvitations} pending staff invitations",
-                'deadline' => null,
-                'priority' => 'low',
-            ]);
-        }
-
-        return Inertia::render('admin/dashboard', [
-            'stats' => [
-                'totalStudents' => $totalStudents,
-                'totalStaff' => $totalStaff,
-                'totalAdmins' => $totalAdmins,
-                'pendingInvitations' => $pendingInvitations,
-                'totalScholarships' => $totalScholarships,
-                'totalApplications' => $totalApplications,
-                'pendingApplications' => $pendingApplications,
-                'approvedApplications' => $approvedApplications,
-                'rejectedApplications' => $rejectedApplications,
-                'totalFundsAllocated' => $totalFundsAllocated,
-                'applicationSuccessRate' => $applicationSuccessRate,
-                'documentsNeedingVerification' => $documentsNeedingVerification,
-            ],
-            'recentLogins' => $recentLogins->toArray(),
-            'pendingInvitations' => $pendingInvitationsList->toArray(),
-            'recentApplications' => $recentApplications->toArray(),
-            'pendingTasks' => $pendingTasks->toArray(),
-        ]);
+        return Inertia::render('admin/dashboard');
     }
 
     /**
@@ -200,7 +77,7 @@ class AdminController extends Controller
         // Add all invitations (regardless of status)
         foreach ($allInvitations as $invitation) {
             $combinedData->push([
-                'id' => 'invitation_'.$invitation->id,
+                'id' => 'invitation_' . $invitation->id,
                 'type' => 'invitation',
                 'first_name' => null,
                 'last_name' => null,
@@ -407,16 +284,16 @@ class AdminController extends Controller
             $query->where(function ($q) use ($request) {
                 $q->whereHas('user', function ($userQuery) use ($request) {
                     $userQuery
-                        ->where('first_name', 'like', '%'.$request->search.'%')
-                        ->orWhere('last_name', 'like', '%'.$request->search.'%')
-                        ->orWhere('middle_name', 'like', '%'.$request->search.'%')
-                        ->orWhere('email', 'like', '%'.$request->search.'%');
+                        ->where('first_name', 'like', '%' . $request->search . '%')
+                        ->orWhere('last_name', 'like', '%' . $request->search . '%')
+                        ->orWhere('middle_name', 'like', '%' . $request->search . '%')
+                        ->orWhere('email', 'like', '%' . $request->search . '%');
                 })
                     ->orWhereHas('user.studentProfile', function ($profileQuery) use ($request) {
-                        $profileQuery->where('student_id', 'like', '%'.$request->search.'%');
+                        $profileQuery->where('student_id', 'like', '%' . $request->search . '%');
                     })
                     ->orWhereHas('scholarship', function ($scholarshipQuery) use ($request) {
-                        $scholarshipQuery->where('name', 'like', '%'.$request->search.'%');
+                        $scholarshipQuery->where('name', 'like', '%' . $request->search . '%');
                     });
             });
         }
@@ -583,341 +460,6 @@ class AdminController extends Controller
                 'links' => $paginatedUsers->linkCollection()->toArray(),
             ],
         ]);
-    }
-
-    /**
-     * Display pages management
-     */
-    public function pages(): Response
-    {
-        $pages = Page::orderBy('title')->get();
-
-        return Inertia::render('admin/pages/Index', [
-            'pages' => $pages,
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new page
-     */
-    public function createPage(): Response
-    {
-        return Inertia::render('admin/pages/Create');
-    }
-
-    /**
-     * Store a newly created page
-     */
-    public function storePage(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:pages,slug',
-            'content' => 'required|string',
-        ]);
-
-        Page::create([
-            'title' => $request->title,
-            'slug' => $request->slug,
-            'content' => $request->content,
-        ]);
-
-        return redirect()->route('admin.pages')->with('success', 'Page created successfully.');
-    }
-
-    /**
-     * Show the form for editing a page
-     */
-    public function editPage(Page $page): Response
-    {
-        return Inertia::render('admin/pages/Edit', [
-            'page' => $page,
-        ]);
-    }
-
-    /**
-     * Update the specified page
-     */
-    public function updatePage(Request $request, Page $page): RedirectResponse
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:pages,slug,'.$page->id,
-            'content' => 'required|string',
-        ]);
-
-        $page->update([
-            'title' => $request->title,
-            'slug' => $request->slug,
-            'content' => $request->content,
-        ]);
-
-        return redirect()->route('admin.pages')->with('success', 'Page updated successfully.');
-    }
-
-    /**
-     * Remove the specified page
-     */
-    public function destroyPage(Page $page): RedirectResponse
-    {
-        $page->delete();
-
-        return redirect()->route('admin.pages')->with('success', 'Page deleted successfully.');
-    }
-
-    /**
-     * Display announcements management
-     */
-    public function announcements(): Response
-    {
-        $announcements = Page::getAnnouncements();
-
-        return Inertia::render('admin/announcements/Index', [
-            'announcements' => $announcements->map(function ($page) {
-                return array_merge($page->getAnnouncementData(), [
-                    'slug' => $page->slug,
-                    'created_at' => $page->created_at,
-                    'updated_at' => $page->updated_at,
-                ]);
-            }),
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new announcement
-     */
-    public function createAnnouncement(): Response
-    {
-        return Inertia::render('admin/announcements/Create');
-    }
-
-    /**
-     * Store a newly created announcement
-     */
-    public function storeAnnouncement(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category' => 'required|string|in:Scholarship,Deadlines,Events,Requirements',
-            'priority' => 'required|string|in:high,medium,low',
-            'date' => 'nullable|date',
-        ]);
-
-        $slug = \Illuminate\Support\Str::slug($request->title.'-'.now()->format('Y-m-d-H-i-s'));
-
-        Page::create([
-            'title' => $request->title,
-            'slug' => $slug,
-            'content' => [
-                'type' => 'announcement',
-                'description' => $request->description,
-                'category' => $request->category,
-                'priority' => $request->priority,
-                'date' => $request->date ?? now()->format('Y-m-d'),
-            ],
-        ]);
-
-        return redirect()->route('admin.announcements')->with('success', 'Announcement created successfully.');
-    }
-
-    /**
-     * Show the form for editing an announcement
-     */
-    public function editAnnouncement(Page $page): Response
-    {
-        if (! $page->isAnnouncement()) {
-            abort(404, 'Page is not an announcement');
-        }
-
-        return Inertia::render('admin/announcements/Edit', [
-            'announcement' => array_merge($page->getAnnouncementData(), [
-                'slug' => $page->slug,
-            ]),
-        ]);
-    }
-
-    /**
-     * Update the specified announcement
-     */
-    public function updateAnnouncement(Request $request, Page $page): RedirectResponse
-    {
-        if (! $page->isAnnouncement()) {
-            abort(404, 'Page is not an announcement');
-        }
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category' => 'required|string|in:Scholarship,Deadlines,Events,Requirements',
-            'priority' => 'required|string|in:high,medium,low',
-            'date' => 'nullable|date',
-        ]);
-
-        $content = $page->content;
-        $content['description'] = $request->description;
-        $content['category'] = $request->category;
-        $content['priority'] = $request->priority;
-        $content['date'] = $request->date ?? ($content['date'] ?? now()->format('Y-m-d'));
-
-        $page->update([
-            'title' => $request->title,
-            'content' => $content,
-        ]);
-
-        return redirect()->route('admin.announcements')->with('success', 'Announcement updated successfully.');
-    }
-
-    /**
-     * Remove the specified announcement
-     */
-    public function destroyAnnouncement(Page $page): RedirectResponse
-    {
-        if (! $page->isAnnouncement()) {
-            abort(404, 'Page is not an announcement');
-        }
-
-        $page->delete();
-
-        return redirect()->route('admin.announcements')->with('success', 'Announcement deleted successfully.');
-    }
-
-    /**
-     * Display CMS scholarships management
-     */
-    public function cmsScholarships(): Response
-    {
-        $scholarships = Page::getScholarships();
-
-        return Inertia::render('admin/cms-scholarships/Index', [
-            'scholarships' => $scholarships->map(function ($page) {
-                return array_merge($page->getScholarshipData(), [
-                    'slug' => $page->slug,
-                    'created_at' => $page->created_at,
-                    'updated_at' => $page->updated_at,
-                ]);
-            }),
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new CMS scholarship
-     */
-    public function createCmsScholarship(): Response
-    {
-        return Inertia::render('admin/cms-scholarships/Create');
-    }
-
-    /**
-     * Store a newly created CMS scholarship
-     */
-    public function storeCmsScholarship(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'amount' => 'required|string|max:255',
-            'deadline' => 'required|date',
-            'type' => 'required|string|in:Academic Scholarship,Student Assistantship Program,Performing Arts Scholarship,Economic Assistance',
-            'requirements' => 'required|array',
-            'requirements.*' => 'required|string',
-        ]);
-
-        $slug = Str::slug($request->name.'-'.now()->format('Y-m-d-H-i-s'));
-
-        // Calculate days remaining
-        $deadline = Carbon::parse($request->deadline);
-        $daysRemaining = max(0, Carbon::now()->diffInDays($deadline, false));
-
-        Page::create([
-            'title' => $request->name,
-            'slug' => $slug,
-            'content' => [
-                'type' => 'scholarship',
-                'description' => $request->description,
-                'amount' => $request->amount,
-                'deadline' => $request->deadline,
-                'daysRemaining' => $daysRemaining,
-                'scholarshipType' => $request->type,
-                'requirements' => $request->requirements,
-            ],
-        ]);
-
-        return redirect()->route('admin.cms-scholarships')->with('success', 'Scholarship created successfully.');
-    }
-
-    /**
-     * Show the form for editing a CMS scholarship
-     */
-    public function editCmsScholarship(Page $page): Response
-    {
-        if (! $page->isScholarship()) {
-            abort(404, 'Page is not a scholarship');
-        }
-
-        return Inertia::render('admin/cms-scholarships/Edit', [
-            'scholarship' => array_merge($page->getScholarshipData(), [
-                'slug' => $page->slug,
-            ]),
-        ]);
-    }
-
-    /**
-     * Update the specified CMS scholarship
-     */
-    public function updateCmsScholarship(Request $request, Page $page): RedirectResponse
-    {
-        if (! $page->isScholarship()) {
-            abort(404, 'Page is not a scholarship');
-        }
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'amount' => 'required|string|max:255',
-            'deadline' => 'required|date',
-            'type' => 'required|string|in:Academic Scholarship,Student Assistantship Program,Performing Arts Scholarship,Economic Assistance',
-            'requirements' => 'required|array',
-            'requirements.*' => 'required|string',
-        ]);
-
-        // Calculate days remaining
-        $deadline = Carbon::parse($request->deadline);
-        $daysRemaining = max(0, Carbon::now()->diffInDays($deadline, false));
-
-        // Preserve existing content structure while updating fields
-        $content = $page->content;
-        $content['description'] = $request->description;
-        $content['amount'] = $request->amount;
-        $content['deadline'] = $request->deadline;
-        $content['daysRemaining'] = $daysRemaining;
-        $content['scholarshipType'] = $request->type;
-        $content['requirements'] = $request->requirements;
-
-        $page->update([
-            'title' => $request->name,
-            'slug' => Str::slug($request->name.'-'.now()->format('Y-m-d-H-i-s')),
-            'content' => array_merge($content, [
-                'type' => 'scholarship',
-                'updated_at' => now()->toDateTimeString(),
-            ]),
-        ]);
-
-        return redirect()->route('admin.cms-scholarships')->with('success', 'Scholarship updated successfully.');
-    }
-
-    /**
-     * Remove the specified CMS scholarship
-     */
-    public function destroyCmsScholarship(Page $page): RedirectResponse
-    {
-        if (! $page->isScholarship()) {
-            abort(404, 'Page is not a scholarship');
-        }
-
-        $page->delete();
-
-        return redirect()->route('admin.cms-scholarships')->with('success', 'Scholarship deleted successfully.');
     }
 
     /**
