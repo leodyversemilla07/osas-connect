@@ -25,7 +25,7 @@ interface Student {
     student_id: string;
     email: string;
     phone: string;
-    profile: {
+    student_profile: {
         first_name: string;
         last_name: string;
         course: string;
@@ -168,7 +168,7 @@ export default function InterviewDetails({ interview }: Props) {
 
     return (
         <>
-            <Head title={`Interview - ${interview.application.student.profile.first_name} ${interview.application.student.profile.last_name}`} />
+            <Head title={`Interview - ${interview.application.student.student_profile.first_name} ${interview.application.student.student_profile.last_name}`} />
             
             <div className="py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -221,7 +221,7 @@ export default function InterviewDetails({ interview }: Props) {
                         </div>
                         <div className="mt-4">
                             <h1 className="text-2xl font-bold text-gray-900">
-                                Interview with {interview.application.student.profile.first_name} {interview.application.student.profile.last_name}
+                                Interview with {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
                             </h1>
                             <p className="mt-1 text-sm text-gray-500">
                                 {interview.application.scholarship.name} • {interview.application.student.student_id}
@@ -364,7 +364,7 @@ export default function InterviewDetails({ interview }: Props) {
                                 <CardContent className="space-y-3">
                                     <div>
                                         <p className="text-sm font-medium text-gray-900">
-                                            {interview.application.student.profile.first_name} {interview.application.student.profile.last_name}
+                                            {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
                                         </p>
                                         <p className="text-sm text-gray-500">
                                             {interview.application.student.student_id}
@@ -372,19 +372,19 @@ export default function InterviewDetails({ interview }: Props) {
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-600">
-                                            <span className="font-medium">Course:</span> {interview.application.student.profile.course}
+                                            <span className="font-medium">Course:</span> {interview.application.student.student_profile.course}
                                         </p>
                                         <p className="text-sm text-gray-600">
-                                            <span className="font-medium">Year:</span> {interview.application.student.profile.year_level}
+                                            <span className="font-medium">Year:</span> {interview.application.student.student_profile.year_level}
                                         </p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-600">
                                             <span className="font-medium">Email:</span> {interview.application.student.email}
                                         </p>
-                                        {interview.application.student.profile.contact_number && (
+                                        {interview.application.student.student_profile.contact_number && (
                                             <p className="text-sm text-gray-600">
-                                                <span className="font-medium">Phone:</span> {interview.application.student.profile.contact_number}
+                                                <span className="font-medium">Phone:</span> {interview.application.student.student_profile.contact_number}
                                             </p>
                                         )}
                                     </div>

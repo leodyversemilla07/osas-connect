@@ -163,6 +163,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/statistics/overview', [InterviewController::class, 'statisticsOverview'])->name('statistics');
         });
 
+        // Analytics and Reporting Routes
+        Route::prefix('osas-staff/analytics')->name('osas.analytics.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\ReportingController::class, 'index'])->name('index');
+            Route::get('/reports', [\App\Http\Controllers\ReportingController::class, 'reports'])->name('reports');
+            
+            // Export endpoints
+            Route::get('/export/applications', [\App\Http\Controllers\ReportingController::class, 'exportApplications'])->name('export.applications');
+        });
+
         // Stipend recording
         Route::post('/osas-staff/scholarships/applications/{application}/stipend', [UnifiedScholarshipController::class, 'recordStipend'])->name(
             'osas.scholarships.stipend.record',

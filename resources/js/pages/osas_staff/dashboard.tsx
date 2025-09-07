@@ -1,12 +1,28 @@
 import { Head, usePage } from '@inertiajs/react';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import AppLayout from '@/layouts/app-layout';
-import { ClipboardList, FileCheck, BookOpen, FileText } from 'lucide-react';
+import { ClipboardList, FileCheck, BookOpen, FileText, MoreHorizontal, Eye } from 'lucide-react';
 
 // Import Shadcn UI components
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,7 +41,7 @@ const getStatusVariant = (status: string): "default" | "secondary" | "destructiv
 };
 
 export default function StaffDashboard() {
-    const { auth: pageAuth, pendingApplications = [], recentDocuments = [] } = usePage<SharedData & {
+    const { pendingApplications = [], recentDocuments = [] } = usePage<SharedData & {
         pendingApplications: Array<{
             id: number;
             studentName: string;
@@ -42,148 +58,170 @@ export default function StaffDashboard() {
             status: string;
         }>;
     }>().props;
-    const user = pageAuth.user;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="OSAS Staff Dashboard" />
 
-            <div className="flex h-full flex-1 flex-col space-y-8 p-6 lg:p-8">
-                {/* Header Section */}
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <h1 className="text-2xl font-medium text-foreground">
-                                Welcome, {user.first_name}
-                            </h1>
-                            <p className="text-sm text-muted-foreground">
-                                OSAS Staff Dashboard
+            <div className="p-6">
+                <h1 className="text-2xl font-bold mb-4">OSAS Staff Dashboard</h1>
+
+                {/* Stats Cards */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Pending Applications
+                            </CardTitle>
+                            <ClipboardList className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{pendingApplications?.length || 0}</div>
+                            <p className="text-xs text-muted-foreground">
+                                +20.1% from last month
                             </p>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Active Scholarships
+                            </CardTitle>
+                            <BookOpen className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">24</div>
+                            <p className="text-xs text-muted-foreground">
+                                +180.1% from last month
+                            </p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Recent Documents
+                            </CardTitle>
+                            <FileCheck className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{recentDocuments?.length || 0}</div>
+                            <p className="text-xs text-muted-foreground">
+                                +19% from last month
+                            </p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">
+                                Total Reports
+                            </CardTitle>
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">12</div>
+                            <p className="text-xs text-muted-foreground">
+                                +201 since last hour
+                            </p>
+                        </CardContent>
+                    </Card>
                 </div>
 
-                {/* Main Stats */}
-                <div className="grid gap-6 md:grid-cols-3">
-                    <Card className="border-none shadow-none">
-                        <CardContent className="p-6">
-                            <div className="space-y-2">
-                                <p className="text-sm text-muted-foreground">Pending Applications</p>
-                                <p className="text-3xl font-light text-foreground">
-                                    {pendingApplications?.length || 0}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-none shadow-none">
-                        <CardContent className="p-6">
-                            <div className="space-y-2">
-                                <p className="text-sm text-muted-foreground">Active Scholarships</p>
-                                <p className="text-3xl font-light text-foreground">24</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-none shadow-none">
-                        <CardContent className="p-6">
-                            <div className="space-y-2">
-                                <p className="text-sm text-muted-foreground">Recent Documents</p>
-                                <p className="text-3xl font-light text-foreground">
-                                    {recentDocuments?.length || 0}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Recent Activity */}
-                <Card className="border-border/50">
-                    <CardHeader className="pb-4">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg font-medium text-foreground">Recent Activity</CardTitle>
-                            <Button variant="ghost" size="sm">View All</Button>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                        <div className="space-y-4">
-                            {pendingApplications?.map((app) => (
-                                <div key={app.id} className="flex items-center justify-between py-3 border-b border-border/50 last:border-0">
-                                    <div className="space-y-1">
-                                        <p className="text-sm font-medium text-foreground">{app.studentName}</p>
-                                        <p className="text-xs text-muted-foreground">{app.scholarshipName}</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <Badge variant={getStatusVariant(app.status)} className="text-xs">
-                                            {app.status}
-                                        </Badge>
-                                        <Button variant="ghost" size="sm">Review</Button>
-                                    </div>
-                                </div>
-                            ))}
-
+                {/* Content Grid */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mb-6">
+                    {/* Recent Applications */}
+                    <Card className="col-span-4">
+                        <CardHeader>
+                            <CardTitle>Recent Applications</CardTitle>
+                        </CardHeader>
+                        <CardContent className="pl-2">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Student</TableHead>
+                                        <TableHead>Scholarship</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Date</TableHead>
+                                        <TableHead></TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {pendingApplications?.slice(0, 5).map((app) => (
+                                        <TableRow key={app.id}>
+                                            <TableCell className="font-medium">{app.studentName}</TableCell>
+                                            <TableCell>{app.scholarshipName}</TableCell>
+                                            <TableCell>
+                                                <Badge variant={getStatusVariant(app.status)}>
+                                                    {app.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-right">{app.dateSubmitted}</TableCell>
+                                            <TableCell>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <span className="sr-only">Open menu</span>
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                        <DropdownMenuItem>
+                                                            <Eye className="mr-2 h-4 w-4" />
+                                                            View Details
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem>Approve</DropdownMenuItem>
+                                                        <DropdownMenuItem>Reject</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
                             {pendingApplications?.length === 0 && (
-                                <div className="text-center py-8 text-muted-foreground">
-                                    <p className="text-sm">No recent activity</p>
+                                <div className="flex items-center justify-center h-24">
+                                    <p className="text-muted-foreground">No pending applications</p>
                                 </div>
                             )}
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
 
-                {/* Quick Actions */}
-                <Card className="border-border/50">
-                    <CardHeader className="pb-4">
-                        <CardTitle className="text-lg font-medium text-foreground">Quick Actions</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                            <Card className="border-border/50 hover:border-border transition-colors">
-                                <CardContent className="p-4">
-                                    <Button variant="ghost" className="w-full h-auto p-0 min-h-[60px]" asChild>
-                                        <a href="/applications" className="flex items-center gap-3">
-                                            <ClipboardList className="h-5 w-5 text-muted-foreground" />
-                                            <span className="text-sm">Review Applications</span>
-                                        </a>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-border/50 hover:border-border transition-colors">
-                                <CardContent className="p-4">
-                                    <Button variant="ghost" className="w-full h-auto p-0 min-h-[60px]" asChild>
-                                        <a href="/documents" className="flex items-center gap-3">
-                                            <FileCheck className="h-5 w-5 text-muted-foreground" />
-                                            <span className="text-sm">Manage Documents</span>
-                                        </a>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-border/50 hover:border-border transition-colors">
-                                <CardContent className="p-4">
-                                    <Button variant="ghost" className="w-full h-auto p-0 min-h-[60px]" asChild>
-                                        <a href="/scholarships" className="flex items-center gap-3">
-                                            <BookOpen className="h-5 w-5 text-muted-foreground" />
-                                            <span className="text-sm">Manage Scholarships</span>
-                                        </a>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="border-border/50 hover:border-border transition-colors">
-                                <CardContent className="p-4">
-                                    <Button variant="ghost" className="w-full h-auto p-0 min-h-[60px]" asChild>
-                                        <a href="/reports" className="flex items-center gap-3">
-                                            <FileText className="h-5 w-5 text-muted-foreground" />
-                                            <span className="text-sm">Generate Reports</span>
-                                        </a>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </CardContent>
-                </Card>
+                    {/* Quick Actions */}
+                    <Card className="col-span-3">
+                        <CardHeader>
+                            <CardTitle>Quick Actions</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid gap-3">
+                                <Button variant="outline" className="justify-start" asChild>
+                                    <a href="/applications">
+                                        <ClipboardList className="mr-2 h-4 w-4" />
+                                        Review Applications
+                                    </a>
+                                </Button>
+                                <Button variant="outline" className="justify-start" asChild>
+                                    <a href="/documents">
+                                        <FileCheck className="mr-2 h-4 w-4" />
+                                        Manage Documents
+                                    </a>
+                                </Button>
+                                <Button variant="outline" className="justify-start" asChild>
+                                    <a href="/scholarships">
+                                        <BookOpen className="mr-2 h-4 w-4" />
+                                        Manage Scholarships
+                                    </a>
+                                </Button>
+                                <Button variant="outline" className="justify-start" asChild>
+                                    <a href="/reports">
+                                        <FileText className="mr-2 h-4 w-4" />
+                                        Generate Reports
+                                    </a>
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </AppLayout>
     );

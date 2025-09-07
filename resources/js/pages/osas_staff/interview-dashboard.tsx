@@ -1,22 +1,36 @@
 import { Head, Link } from '@inertiajs/react';
+import { type BreadcrumbItem } from '@/types';
+import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-    Calendar, 
-    Clock, 
-    TrendingUp, 
-    CheckCircle, 
-    XCircle, 
+import { Button } from '@/components/ui/button';
+import {
+    Calendar,
+    Clock,
+    TrendingUp,
+    CheckCircle,
+    XCircle,
     UserX,
     AlertCircle,
     ArrowRight
 } from 'lucide-react';
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: route('osas.dashboard'),
+    },
+    {
+        title: 'Interview Dashboard',
+        href: route('osas.interviews.dashboard'),
+    },
+];
+
 interface Student {
     id: number;
     name: string;
     student_id: string;
-    profile: {
+    student_profile: {
         first_name: string;
         last_name: string;
         course: string;
@@ -87,8 +101,8 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
             rescheduled: { label: 'Rescheduled', variant: 'outline' as const },
         };
 
-        const config = statusConfig[status as keyof typeof statusConfig] || 
-                      { label: status, variant: 'outline' as const };
+        const config = statusConfig[status as keyof typeof statusConfig] ||
+            { label: status, variant: 'outline' as const };
 
         return (
             <Badge variant={config.variant}>
@@ -127,250 +141,249 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Interview Dashboard" />
-            
-            <div className="py-6">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Header */}
-                    <div className="md:flex md:items-center md:justify-between mb-6">
-                        <div className="min-w-0 flex-1">
-                            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+
+            <div className="flex h-full flex-1 flex-col space-y-8 p-6 lg:p-8">
+                {/* Header */}
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h1 className="text-3xl font-bold tracking-tight">
                                 Interview Dashboard
-                            </h2>
-                            <p className="mt-1 text-sm text-gray-500">
-                                Overview of interview activities and statistics
+                            </h1>
+                            <p className="text-muted-foreground">
+                                Manage and track interview activities and statistics
                             </p>
                         </div>
-                        <div className="mt-4 flex md:ml-4 md:mt-0">
-                            <Link
-                                href={route('osas.interviews.index')}
-                                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >
+                        <Button asChild>
+                            <Link href={route('osas.interviews.index')}>
                                 View All Interviews
                                 <ArrowRight className="h-4 w-4 ml-2" />
                             </Link>
-                        </div>
-                    </div>
-
-                    {/* Statistics Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <Card>
-                            <CardContent className="p-6">
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0">
-                                        <Calendar className="h-8 w-8 text-blue-600" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-sm font-medium text-gray-500 truncate">
-                                            Total Interviews
-                                        </p>
-                                        <p className="text-2xl font-semibold text-gray-900">
-                                            {statistics.total_interviews}
-                                        </p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent className="p-6">
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0">
-                                        <Clock className="h-8 w-8 text-yellow-600" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-sm font-medium text-gray-500 truncate">
-                                            Scheduled
-                                        </p>
-                                        <p className="text-2xl font-semibold text-gray-900">
-                                            {statistics.scheduled}
-                                        </p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent className="p-6">
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0">
-                                        <CheckCircle className="h-8 w-8 text-green-600" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-sm font-medium text-gray-500 truncate">
-                                            Completed
-                                        </p>
-                                        <p className="text-2xl font-semibold text-gray-900">
-                                            {statistics.completed}
-                                        </p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent className="p-6">
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0">
-                                        <TrendingUp className="h-8 w-8 text-indigo-600" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <p className="text-sm font-medium text-gray-500 truncate">
-                                            Completion Rate
-                                        </p>
-                                        <p className="text-2xl font-semibold text-gray-900">
-                                            {statistics.completion_rate}%
-                                        </p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Today's Interviews */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center">
-                                    <AlertCircle className="h-5 w-5 mr-2 text-orange-600" />
-                                    Today's Interviews ({todayInterviews.length})
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {todayInterviews.length === 0 ? (
-                                    <p className="text-gray-500 text-center py-4">
-                                        No interviews scheduled for today
-                                    </p>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {todayInterviews.slice(0, 5).map((interview) => (
-                                            <div key={interview.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                <div className="flex items-center space-x-3">
-                                                    {getStatusIcon(interview.status)}
-                                                    <div>
-                                                        <p className="font-medium text-gray-900">
-                                                            {interview.application.student.profile.first_name} {interview.application.student.profile.last_name}
-                                                        </p>
-                                                        <p className="text-sm text-gray-500">
-                                                            {formatTime(interview.schedule)} • {interview.location}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                    {getStatusBadge(interview.status)}
-                                                    <Link
-                                                        href={route('osas.interviews.show', interview.id)}
-                                                        className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
-                                                    >
-                                                        View
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {todayInterviews.length > 5 && (
-                                            <Link
-                                                href={route('osas.interviews.index')}
-                                                className="block text-center text-indigo-600 hover:text-indigo-900 text-sm font-medium mt-4"
-                                            >
-                                                View all {todayInterviews.length} interviews
-                                            </Link>
-                                        )}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        {/* Upcoming Interviews */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center">
-                                    <Calendar className="h-5 w-5 mr-2 text-blue-600" />
-                                    Upcoming Interviews ({upcomingInterviews.length})
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {upcomingInterviews.length === 0 ? (
-                                    <p className="text-gray-500 text-center py-4">
-                                        No upcoming interviews scheduled
-                                    </p>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {upcomingInterviews.slice(0, 5).map((interview) => (
-                                            <div key={interview.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                <div className="flex items-center space-x-3">
-                                                    {getStatusIcon(interview.status)}
-                                                    <div>
-                                                        <p className="font-medium text-gray-900">
-                                                            {interview.application.student.profile.first_name} {interview.application.student.profile.last_name}
-                                                        </p>
-                                                        <p className="text-sm text-gray-500">
-                                                            {formatDate(interview.schedule)} • {interview.location}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                    {getStatusBadge(interview.status)}
-                                                    <Link
-                                                        href={route('osas.interviews.show', interview.id)}
-                                                        className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
-                                                    >
-                                                        View
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {upcomingInterviews.length > 5 && (
-                                            <Link
-                                                href={route('osas.interviews.index')}
-                                                className="block text-center text-indigo-600 hover:text-indigo-900 text-sm font-medium mt-4"
-                                            >
-                                                View all {upcomingInterviews.length} interviews
-                                            </Link>
-                                        )}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card>
-                            <CardContent className="p-6 text-center">
-                                <div className="text-2xl font-bold text-gray-900 mb-2">
-                                    {statistics.this_week_count}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                    Interviews This Week
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent className="p-6 text-center">
-                                <div className="text-2xl font-bold text-gray-900 mb-2">
-                                    {statistics.average_score || 'N/A'}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                    Average Interview Score
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent className="p-6 text-center">
-                                <div className="text-2xl font-bold text-red-600 mb-2">
-                                    {statistics.no_show}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                    No-Show Count
-                                </div>
-                            </CardContent>
-                        </Card>
+                        </Button>
                     </div>
                 </div>
+
+                {/* Statistics Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <Calendar className="h-8 w-8 text-blue-600" />
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-muted-foreground truncate">
+                                        Total Interviews
+                                    </p>
+                                    <p className="text-2xl font-semibold">
+                                        {statistics.total_interviews}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <Clock className="h-8 w-8 text-yellow-600" />
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-muted-foreground truncate">
+                                        Scheduled
+                                    </p>
+                                    <p className="text-2xl font-semibold">
+                                        {statistics.scheduled}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <CheckCircle className="h-8 w-8 text-green-600" />
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-muted-foreground truncate">
+                                        Completed
+                                    </p>
+                                    <p className="text-2xl font-semibold">
+                                        {statistics.completed}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <TrendingUp className="h-8 w-8 text-indigo-600" />
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-muted-foreground truncate">
+                                        Completion Rate
+                                    </p>
+                                    <p className="text-2xl font-semibold">
+                                        {statistics.completion_rate}%
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Today's Interviews */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center text-lg font-semibold">
+                                <AlertCircle className="h-5 w-5 mr-2 text-orange-600" />
+                                Today's Interviews ({todayInterviews.length})
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {todayInterviews.length === 0 ? (
+                                <p className="text-muted-foreground text-center py-8">
+                                    No interviews scheduled for today
+                                </p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {todayInterviews.slice(0, 5).map((interview) => (
+                                        <div key={interview.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+                                            <div className="flex items-center space-x-3">
+                                                {getStatusIcon(interview.status)}
+                                                <div>
+                                                    <p className="font-medium">
+                                                        {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {formatTime(interview.schedule)} • {interview.location}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                {getStatusBadge(interview.status)}
+                                                <Button variant="outline" size="sm" asChild>
+                                                    <Link href={route('osas.interviews.show', interview.id)}>
+                                                        View
+                                                    </Link>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {todayInterviews.length > 5 && (
+                                        <Button variant="outline" size="sm" className="w-full mt-4" asChild>
+                                            <Link href={route('osas.interviews.index')}>
+                                                View all {todayInterviews.length} interviews
+                                            </Link>
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Upcoming Interviews */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center text-lg font-semibold">
+                                <Calendar className="h-5 w-5 mr-2 text-blue-600" />
+                                Upcoming Interviews ({upcomingInterviews.length})
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {upcomingInterviews.length === 0 ? (
+                                <p className="text-muted-foreground text-center py-8">
+                                    No upcoming interviews scheduled
+                                </p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {upcomingInterviews.slice(0, 5).map((interview) => (
+                                        <div key={interview.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+                                            <div className="flex items-center space-x-3">
+                                                {getStatusIcon(interview.status)}
+                                                <div>
+                                                    <p className="font-medium">
+                                                        {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {formatDate(interview.schedule)} • {interview.location}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                {getStatusBadge(interview.status)}
+                                                <Button variant="outline" size="sm" asChild>
+                                                    <Link href={route('osas.interviews.show', interview.id)}>
+                                                        View
+                                                    </Link>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {upcomingInterviews.length > 5 && (
+                                        <Button variant="outline" size="sm" className="w-full mt-4" asChild>
+                                            <Link href={route('osas.interviews.index')}>
+                                                View all {upcomingInterviews.length} interviews
+                                            </Link>
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="space-y-2">
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    Interviews This Week
+                                </p>
+                                <p className="text-2xl font-semibold">
+                                    {statistics.this_week_count}
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="space-y-2">
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    Average Interview Score
+                                </p>
+                                <p className="text-2xl font-semibold">
+                                    {statistics.average_score || 'N/A'}
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="space-y-2">
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    No-Show Count
+                                </p>
+                                <p className="text-2xl font-semibold text-destructive">
+                                    {statistics.no_show}
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
-        </>
+        </AppLayout>
     );
 }

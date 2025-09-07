@@ -787,6 +787,14 @@ class ScholarshipApplication extends Model
     }
 
     /**
+     * Get the stipends for this application.
+     */
+    public function stipends(): HasMany
+    {
+        return $this->hasMany(ScholarshipStipend::class, 'application_id');
+    }
+
+    /**
      * Get the reviewer for this application.
      */
     public function reviewer(): BelongsTo

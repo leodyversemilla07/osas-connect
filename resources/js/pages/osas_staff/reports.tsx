@@ -1,299 +1,372 @@
-import React from "react";
-import { Head } from "@inertiajs/react";
-import AppLayout from "@/layouts/app-layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-    FileText, 
-    Download, 
-    BarChart3, 
-    PieChart, 
-    TrendingUp, 
-    Users, 
-    DollarSign,
-    Calendar,
-    Filter
-} from "lucide-react";
+import React, { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DownloadIcon, FilterIcon, FileTextIcon, BarChart3Icon } from 'lucide-react';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-interface ReportData {
-    applications: {
-        total: number;
-        approved: number;
-        pending: number;
-        rejected: number;
-    };
-    scholarships: {
-        total_amount: number;
-        active_recipients: number;
-        completion_rate: number;
-    };
-    monthly_trends: Array<{
-        month: string;
-        applications: number;
-        approvals: number;
-    }>;
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+
+interface ScholarshipDistribution {
+    total_recipients: number;
+    by_scholarship_type: Record<string, number>;
+    by_course: Record<string, number>;
+    by_year_level: Record<string, number>;
+    gender_distribution: Record<string, number>;
+    total_amount_distributed: number;
 }
 
-interface ReportsPageProps {
-    reports: ReportData;
+interface FundUtilization {
+    scholarship_name: string;
+    scholarship_type: string;
+    total_budget: number;
+    total_disbursed: number;
+    utilization_rate: number;
+    recipients_count: number;
+    average_per_recipient: number;
 }
 
-export default function Reports({ reports }: ReportsPageProps) {
-    const defaultReports: ReportData = {
-        applications: {
-            total: 0,
-            approved: 0,
-            pending: 0,
-            rejected: 0
-        },
-        scholarships: {
-            total_amount: 0,
-            active_recipients: 0,
-            completion_rate: 0
-        },
-        monthly_trends: []
+interface Props {
+    scholarship_distribution: ScholarshipDistribution;
+    fund_utilization: FundUtilization[];
+    available_years: number[];
+    scholarship_types: string[];
+    current_filters: {
+        year?: string;
+        scholarship_type?: string;
+    };
+}
+
+export default function Reports({ 
+    scholarship_distribution, 
+    fund_utilization, 
+    available_years, 
+    scholarship_types, 
+    current_filters 
+}: Props) {
+    const [filters, setFilters] = useState(current_filters);
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(amount);
     };
 
-    const reportData = reports || defaultReports;
+    const formatNumber = (num: number) => {
+        return new Intl.NumberFormat().format(num);
+    };
 
-    const statisticsCards = [
-        {
-            title: "Total Applications",
-            value: reportData.applications.total.toLocaleString(),
-            icon: FileText,
-            color: "text-blue-600",
-            bgColor: "bg-blue-50"
-        },
-        {
-            title: "Active Recipients",
-            value: reportData.scholarships.active_recipients.toLocaleString(),
-            icon: Users,
-            color: "text-green-600",
-            bgColor: "bg-green-50"
-        },
-        {
-            title: "Total Amount Disbursed",
-            value: `₱${reportData.scholarships.total_amount.toLocaleString()}`,
-            icon: DollarSign,
-            color: "text-purple-600",
-            bgColor: "bg-purple-50"
-        },
-        {
-            title: "Completion Rate",
-            value: `${reportData.scholarships.completion_rate}%`,
-            icon: TrendingUp,
-            color: "text-orange-600",
-            bgColor: "bg-orange-50"
-        }
-    ];
+    const handleFilterChange = (key: string, value: string) => {
+        const newFilters = { ...filters, [key]: value };
+        setFilters(newFilters);
+        router.get('/osas-staff/analytics/reports', newFilters, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
 
-    const reportCategories = [
-        {
-            title: "Application Summary",
-            description: "Overview of scholarship applications by status",
-            icon: FileText,
-            actions: ["Export PDF", "Export Excel"]
-        },
-        {
-            title: "Financial Report",
-            description: "Scholarship disbursements and budget analysis",
-            icon: DollarSign,
-            actions: ["Generate Report", "Export Data"]
-        },
-        {
-            title: "Student Performance",
-            description: "Academic performance of scholarship recipients",
-            icon: BarChart3,
-            actions: ["View Report", "Download"]
-        },
-        {
-            title: "Monthly Analytics",
-            description: "Monthly trends and application patterns",
-            icon: TrendingUp,
-            actions: ["View Trends", "Export Chart"]
-        }
-    ];
+    const clearFilters = () => {
+        setFilters({});
+        router.get('/osas-staff/analytics/reports', {}, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
+    const exportApplications = () => {
+        const params = new URLSearchParams(filters);
+        window.open(`/osas-staff/analytics/export/applications?${params.toString()}`);
+    };
+
+    // Prepare chart data
+    const scholarshipTypeData = Object.entries(scholarship_distribution.by_scholarship_type).map(([type, count]) => ({
+        name: type,
+        value: count,
+    }));
+
+    const courseData = Object.entries(scholarship_distribution.by_course).map(([course, count]) => ({
+        name: course,
+        value: count,
+    }));
+
+    const genderData = Object.entries(scholarship_distribution.gender_distribution).map(([gender, count]) => ({
+        name: gender,
+        value: count,
+    }));
+
+    const utilizationData = fund_utilization.map(item => ({
+        name: item.scholarship_name,
+        budget: item.total_budget,
+        disbursed: item.total_disbursed,
+        utilization: item.utilization_rate,
+    }));
 
     return (
-        <AppLayout>
+        <>
             <Head title="Reports & Analytics" />
             
-            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                {/* Header */}
-                <div className="md:flex md:items-center md:justify-between mb-8">
-                    <div className="min-w-0 flex-1">
-                        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                            Reports & Analytics
-                        </h2>
-                        <p className="mt-1 text-sm text-gray-500">
-                            Comprehensive reports and insights on scholarship programs
+            <div className="container mx-auto p-6 space-y-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Reports & Analytics</h1>
+                        <p className="text-muted-foreground">
+                            Detailed reports and data analysis for scholarship programs
                         </p>
                     </div>
-                    <div className="mt-4 flex md:mt-0 md:ml-4 space-x-3">
-                        <Button variant="outline" size="sm">
-                            <Filter className="mr-2 h-4 w-4" />
-                            Filter Period
-                        </Button>
-                        <Button variant="outline" size="sm">
-                            <Calendar className="mr-2 h-4 w-4" />
-                            Date Range
-                        </Button>
-                    </div>
+                    
+                    <Button onClick={exportApplications} className="flex items-center gap-2">
+                        <DownloadIcon className="h-4 w-4" />
+                        Export Data
+                    </Button>
                 </div>
 
-                {/* Statistics Overview */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {statisticsCards.map((stat, index) => {
-                        const Icon = stat.icon;
-                        return (
-                            <Card key={index}>
-                                <CardContent className="p-6">
-                                    <div className="flex items-center">
-                                        <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                                            <Icon className={`h-6 w-6 ${stat.color}`} />
-                                        </div>
-                                        <div className="ml-4">
-                                            <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                                            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
-                </div>
-
-                {/* Reports Tabs */}
-                <Tabs defaultValue="overview" className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-4">
-                        <TabsTrigger value="overview">Overview</TabsTrigger>
-                        <TabsTrigger value="applications">Applications</TabsTrigger>
-                        <TabsTrigger value="financial">Financial</TabsTrigger>
-                        <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="overview" className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {reportCategories.map((category, index) => {
-                                const Icon = category.icon;
-                                return (
-                                    <Card key={index}>
-                                        <CardHeader>
-                                            <div className="flex items-center">
-                                                <Icon className="h-5 w-5 text-gray-600 mr-2" />
-                                                <CardTitle className="text-lg">{category.title}</CardTitle>
-                                            </div>
-                                            <CardDescription>{category.description}</CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="flex space-x-2">
-                                                {category.actions.map((action, actionIndex) => (
-                                                    <Button 
-                                                        key={actionIndex}
-                                                        variant={actionIndex === 0 ? "default" : "outline"}
-                                                        size="sm"
-                                                    >
-                                                        <Download className="mr-2 h-4 w-4" />
-                                                        {action}
-                                                    </Button>
-                                                ))}
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                );
-                            })}
+                {/* Filters */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <FilterIcon className="h-5 w-5" />
+                            Filters
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm font-medium">Year:</label>
+                                <Select 
+                                    value={filters.year || ''} 
+                                    onValueChange={(value) => handleFilterChange('year', value)}
+                                >
+                                    <SelectTrigger className="w-32">
+                                        <SelectValue placeholder="All years" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">All years</SelectItem>
+                                        {available_years.map(year => (
+                                            <SelectItem key={year} value={year.toString()}>
+                                                {year}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm font-medium">Scholarship Type:</label>
+                                <Select 
+                                    value={filters.scholarship_type || ''} 
+                                    onValueChange={(value) => handleFilterChange('scholarship_type', value)}
+                                >
+                                    <SelectTrigger className="w-40">
+                                        <SelectValue placeholder="All types" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">All types</SelectItem>
+                                        {scholarship_types.map(type => (
+                                            <SelectItem key={type} value={type}>
+                                                {type}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            
+                            {(filters.year || filters.scholarship_type) && (
+                                <Button variant="outline" onClick={clearFilters}>
+                                    Clear Filters
+                                </Button>
+                            )}
                         </div>
-                    </TabsContent>
+                    </CardContent>
+                </Card>
 
-                    <TabsContent value="applications" className="space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Application Status Distribution</CardTitle>
-                                <CardDescription>
-                                    Breakdown of scholarship applications by current status
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-green-600">
-                                            {reportData.applications.approved}
-                                        </div>
-                                        <div className="text-sm text-gray-600">Approved</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-yellow-600">
-                                            {reportData.applications.pending}
-                                        </div>
-                                        <div className="text-sm text-gray-600">Pending</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-red-600">
-                                            {reportData.applications.rejected}
-                                        </div>
-                                        <div className="text-sm text-gray-600">Rejected</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-blue-600">
-                                            {reportData.applications.total}
-                                        </div>
-                                        <div className="text-sm text-gray-600">Total</div>
-                                    </div>
-                                </div>
-                                <div className="mt-6">
-                                    <Button>
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Export Application Report
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Recipients</CardTitle>
+                            <FileTextIcon className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{formatNumber(scholarship_distribution.total_recipients)}</div>
+                            <p className="text-xs text-muted-foreground">Scholarship recipients</p>
+                        </CardContent>
+                    </Card>
 
-                    <TabsContent value="financial" className="space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Financial Summary</CardTitle>
-                                <CardDescription>
-                                    Scholarship disbursements and budget allocation
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-center py-8">
-                                    <PieChart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500">Financial charts and reports will be displayed here</p>
-                                    <Button className="mt-4">
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Generate Financial Report
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Distributed</CardTitle>
+                            <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{formatCurrency(scholarship_distribution.total_amount_distributed)}</div>
+                            <p className="text-xs text-muted-foreground">In scholarship funds</p>
+                        </CardContent>
+                    </Card>
 
-                    <TabsContent value="analytics" className="space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Trends & Analytics</CardTitle>
-                                <CardDescription>
-                                    Application trends and performance metrics over time
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-center py-8">
-                                    <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500">Analytics charts and trends will be displayed here</p>
-                                    <Button className="mt-4">
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Export Analytics Report
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                </Tabs>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Avg Utilization</CardTitle>
+                            <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {fund_utilization.length > 0 
+                                    ? (fund_utilization.reduce((sum, item) => sum + item.utilization_rate, 0) / fund_utilization.length).toFixed(1) 
+                                    : 0}%
+                            </div>
+                            <p className="text-xs text-muted-foreground">Fund utilization rate</p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Distribution Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Recipients by Scholarship Type</CardTitle>
+                            <CardDescription>Distribution of recipients across scholarship programs</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <PieChart>
+                                    <Pie
+                                        data={scholarshipTypeData}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                    >
+                                        {scholarshipTypeData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Recipients by Course</CardTitle>
+                            <CardDescription>Distribution across academic programs</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={courseData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Bar dataKey="value" fill="#8884d8" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Gender Distribution</CardTitle>
+                            <CardDescription>Recipients by gender</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <PieChart>
+                                    <Pie
+                                        data={genderData}
+                                        cx="50%"
+                                        cy="50%"
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                        label={({ name, value }) => `${name}: ${value}`}
+                                    >
+                                        {genderData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Fund Utilization</CardTitle>
+                            <CardDescription>Budget vs disbursed amounts by scholarship</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={utilizationData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                                    <YAxis />
+                                    <Tooltip formatter={(value) => [formatCurrency(Number(value)), '']} />
+                                    <Legend />
+                                    <Bar dataKey="budget" fill="#8884d8" name="Budget" />
+                                    <Bar dataKey="disbursed" fill="#82ca9d" name="Disbursed" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Fund Utilization Table */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Detailed Fund Utilization</CardTitle>
+                        <CardDescription>Complete breakdown of scholarship fund usage</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b">
+                                        <th className="text-left p-3">Scholarship</th>
+                                        <th className="text-left p-3">Type</th>
+                                        <th className="text-right p-3">Budget</th>
+                                        <th className="text-right p-3">Disbursed</th>
+                                        <th className="text-center p-3">Utilization</th>
+                                        <th className="text-center p-3">Recipients</th>
+                                        <th className="text-right p-3">Avg per Recipient</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {fund_utilization.map((item, index) => (
+                                        <tr key={index} className="border-b hover:bg-muted/50">
+                                            <td className="p-3 font-medium">{item.scholarship_name}</td>
+                                            <td className="p-3">
+                                                <Badge variant="outline">{item.scholarship_type}</Badge>
+                                            </td>
+                                            <td className="text-right p-3">{formatCurrency(item.total_budget)}</td>
+                                            <td className="text-right p-3">{formatCurrency(item.total_disbursed)}</td>
+                                            <td className="text-center p-3">
+                                                <Badge 
+                                                    variant={item.utilization_rate >= 80 ? "default" : 
+                                                            item.utilization_rate >= 50 ? "secondary" : "destructive"}
+                                                >
+                                                    {item.utilization_rate}%
+                                                </Badge>
+                                            </td>
+                                            <td className="text-center p-3">{item.recipients_count}</td>
+                                            <td className="text-right p-3">{formatCurrency(item.average_per_recipient)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
-        </AppLayout>
+        </>
     );
 }

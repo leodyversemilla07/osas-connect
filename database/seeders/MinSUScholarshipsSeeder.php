@@ -245,30 +245,12 @@ class MinSUScholarshipsSeeder extends Seeder
             ],
         ];
 
-        // Insert or update scholarships without criteria/renewal fields
-        DB::table('scholarships')->upsert(
-            $scholarships,
-            ['name'], // unique key
-            [
-                'type',
-                'type_specification',
-                'description',
-                'amount',
-                'stipend_amount',
-                'deadline',
-                'slots',
-                'beneficiaries',
-                'slots_available',
-                'funding_source',
-                'eligibility_criteria',
-                'required_documents',
-                'stipend_schedule',
-                'criteria',
-                'renewal_criteria',
-                'status',
-                'admin_remarks',
-                'updated_at',
-            ],
-        );
+        // Use individual insert/update for SQLite compatibility
+        foreach ($scholarships as $scholarship) {
+            DB::table('scholarships')->updateOrInsert(
+                ['name' => $scholarship['name']], // where condition
+                $scholarship // data to insert/update
+            );
+        }
     }
 }

@@ -331,7 +331,7 @@ class InterviewManagementService
      */
     public function getTodayInterviews(): Collection
     {
-        return Interview::with(['application.student.profile', 'application.scholarship', 'interviewer'])
+        return Interview::with(['application.student.studentProfile', 'application.scholarship', 'interviewer'])
             ->whereDate('schedule', today())
             ->whereIn('status', ['scheduled', 'rescheduled'])
             ->orderBy('schedule')

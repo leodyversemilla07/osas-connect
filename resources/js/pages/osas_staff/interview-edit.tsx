@@ -19,7 +19,7 @@ interface Student {
     id: number;
     name: string;
     student_id: string;
-    profile: {
+    student_profile: {
         first_name: string;
         last_name: string;
         course: string;
@@ -102,7 +102,7 @@ export default function InterviewEdit({ interview }: Props) {
 
     return (
         <>
-            <Head title={`Edit Interview - ${interview.application.student.profile.first_name} ${interview.application.student.profile.last_name}`} />
+            <Head title={`Edit Interview - ${interview.application.student.student_profile.first_name} ${interview.application.student.student_profile.last_name}`} />
             
             <div className="py-6">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -121,7 +121,7 @@ export default function InterviewEdit({ interview }: Props) {
                             Edit Interview
                         </h1>
                         <p className="mt-1 text-sm text-gray-500">
-                            Update interview details for {interview.application.student.profile.first_name} {interview.application.student.profile.last_name}
+                            Update interview details for {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
                         </p>
                     </div>
 
@@ -263,7 +263,7 @@ export default function InterviewEdit({ interview }: Props) {
                                     <div>
                                         <h4 className="font-medium text-gray-900">Student Information</h4>
                                         <p className="text-sm text-gray-600">
-                                            {interview.application.student.profile.first_name} {interview.application.student.profile.last_name}
+                                            {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
                                         </p>
                                         <p className="text-sm text-gray-500">
                                             {interview.application.student.student_id}
@@ -274,10 +274,10 @@ export default function InterviewEdit({ interview }: Props) {
                                         <h4 className="font-medium text-gray-900">Academic Information</h4>
                                         <div className="flex items-center text-sm text-gray-600 mt-1">
                                             <GraduationCap className="h-4 w-4 mr-1" />
-                                            {interview.application.student.profile.course}
+                                            {interview.application.student.student_profile.course}
                                         </div>
                                         <p className="text-sm text-gray-500">
-                                            Year {interview.application.student.profile.year_level}
+                                            Year {interview.application.student.student_profile.year_level}
                                         </p>
                                     </div>
 

@@ -42,7 +42,7 @@ class InterviewController extends Controller
      */
     public function staffIndex()
     {
-        $interviews = Interview::with(['application.student.profile', 'application.scholarship', 'interviewer'])
+        $interviews = Interview::with(['application.student.studentProfile', 'application.scholarship', 'interviewer'])
             ->orderBy('schedule', 'desc')
             ->paginate(15);
 
@@ -72,7 +72,7 @@ class InterviewController extends Controller
      */
     public function create()
     {
-        $applications = ScholarshipApplication::with(['student.profile', 'scholarship'])
+        $applications = ScholarshipApplication::with(['student.studentProfile', 'scholarship'])
             ->where('status', 'verified')
             ->whereDoesntHave('interview')
             ->get();
@@ -106,7 +106,7 @@ class InterviewController extends Controller
      */
     public function show(Interview $interview)
     {
-        $interview->load(['application.student.profile', 'application.scholarship', 'interviewer']);
+        $interview->load(['application.student.studentProfile', 'application.scholarship', 'interviewer']);
 
         if (Auth::user()->role === 'student') {
             return Inertia::render('student/interviews/show', [
@@ -124,7 +124,7 @@ class InterviewController extends Controller
      */
     public function edit(Interview $interview)
     {
-        $interview->load(['application.student.profile', 'application.scholarship', 'interviewer']);
+        $interview->load(['application.student.studentProfile', 'application.scholarship', 'interviewer']);
 
         return Inertia::render('osas_staff/interview-edit', [
             'interview' => $interview,
