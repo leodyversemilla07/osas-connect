@@ -8,8 +8,22 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { format } from "date-fns";
-import { getScholarshipTypeDisplay } from './columns';
 import { CalendarDays, Users, GraduationCap, DollarSign, FileText, CheckCircle } from 'lucide-react';
+
+// Shorter mappings for badges and table display
+const SCHOLARSHIP_TYPES = {
+    'academic_full': 'Academic (Full)',
+    'academic_partial': 'Academic (Partial)',
+    'student_assistantship': 'Student Assistantship',
+    'performing_arts_full': 'Performing Arts (Full)',
+    'performing_arts_partial': 'Performing Arts (Partial)',
+    'economic_assistance': 'Economic Assistance',
+    'others': 'Custom Type',
+} as const;
+
+const getScholarshipTypeDisplay = (type: string): string => {
+    return SCHOLARSHIP_TYPES[type as keyof typeof SCHOLARSHIP_TYPES] || type;
+};
 
 interface Scholarship {
     id: number;
