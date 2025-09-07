@@ -137,4 +137,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(ScholarshipNotification::class);
     }
+
+    /**
+     * Get the grades associated with the user through their student profile.
+     */
+    public function grades()
+    {
+        return $this->hasManyThrough(Grade::class, StudentProfile::class);
+    }
 }

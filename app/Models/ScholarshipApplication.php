@@ -117,6 +117,8 @@ class ScholarshipApplication extends Model
 
     const STATUS_APPROVED = 'approved';
 
+    const STATUS_ACTIVE = 'active';
+
     const STATUS_REJECTED = 'rejected';
 
     const STATUS_END = 'end';
@@ -130,6 +132,7 @@ class ScholarshipApplication extends Model
         self::STATUS_VERIFIED => 'Verified',
         self::STATUS_UNDER_EVALUATION => 'Under Evaluation',
         self::STATUS_APPROVED => 'Approved',
+        self::STATUS_ACTIVE => 'Active',
         self::STATUS_REJECTED => 'Rejected',
         self::STATUS_END => 'End',
     ];
@@ -222,35 +225,37 @@ class ScholarshipApplication extends Model
         $issues = [];
         $student = $this->studentProfile;
         $scholarship = $this->scholarship;
-        if (!$student) {
+        if (! $student) {
             $issues[] = 'Student profile not found.';
+
             return $issues;
         }
-        if (!$scholarship) {
+        if (! $scholarship) {
             $issues[] = 'Scholarship not found.';
+
             return $issues;
         }
 
         // General requirements (Section 16.4)
-        if (!$student->is_bona_fide) {
+        if (! $student->is_bona_fide) {
             $issues[] = 'Applicant is not a bona fide MinSU student.';
         }
-        if (!$student->has_regular_load) {
+        if (! $student->has_regular_load) {
             $issues[] = 'Applicant does not have a regular load as certified by the Registrar.';
         }
-        if (!$student->has_good_moral) {
+        if (! $student->has_good_moral) {
             $issues[] = 'Applicant does not have good moral character as certified by the Guidance Counselor.';
         }
         if ($this->hasFailedSubjects($student)) {
             $issues[] = 'Applicant has failed, dropped, deferred, or incomplete grades.';
         }
-        if (!$this->hasUploadedDocument('certification_of_grades')) {
+        if (! $this->hasUploadedDocument('certification_of_grades')) {
             $issues[] = 'Certification of Grades (signed by Registrar) is missing.';
         }
         if ($this->hasOtherScholarship()) {
             $issues[] = 'Applicant is already receiving another scholarship.';
         }
-        if (!$this->hasPassedInterview()) {
+        if (! $this->hasPassedInterview()) {
             $issues[] = 'Applicant has not passed the required interview.';
         }
 
@@ -277,15 +282,15 @@ class ScholarshipApplication extends Model
         }
 
         // Document completeness
-        if (!$this->areDocumentsComplete()) {
+        if (! $this->areDocumentsComplete()) {
             $issues[] = 'Not all required documents have been uploaded.';
         }
 
         // Renewal logic (stub for fund check)
-        if ($this->isRenewal() && !$this->isRenewalEligible()) {
+        if ($this->isRenewal() && ! $this->isRenewalEligible()) {
             $issues[] = 'Application is not eligible for renewal.';
         }
-        if ($this->isRenewal() && !$this->isFundsAvailable()) {
+        if ($this->isRenewal() && ! $this->isFundsAvailable()) {
             $issues[] = 'Renewal not possible: funds unavailable.';
         }
 
@@ -298,6 +303,7 @@ class ScholarshipApplication extends Model
     protected function hasUploadedDocument(string $docKey): bool
     {
         $uploadedDocs = $this->uploaded_documents ?? [];
+
         return isset($uploadedDocs[$docKey]);
     }
 
@@ -309,6 +315,7 @@ class ScholarshipApplication extends Model
         if ($this->interview && ($this->interview->status ?? null) === 'passed') {
             return true;
         }
+
         return ($this->application_data['interview_passed'] ?? false) === true;
     }
 
@@ -317,7 +324,7 @@ class ScholarshipApplication extends Model
      */
     public function isRenewal(): bool
     {
-        return ($this->renewal_status === self::RENEWAL_PENDING || $this->renewal_status === self::RENEWAL_ELIGIBLE);
+        return $this->renewal_status === self::RENEWAL_PENDING || $this->renewal_status === self::RENEWAL_ELIGIBLE;
     }
 
     /**
@@ -359,6 +366,7 @@ class ScholarshipApplication extends Model
         if ($this->hasOtherScholarship()) {
             $issues[] = 'Cannot receive other scholarship grants.';
         }
+
         return $issues;
     }
 
@@ -383,6 +391,7 @@ class ScholarshipApplication extends Model
         if ($this->hasOtherScholarship()) {
             $issues[] = 'Cannot receive other scholarship grants.';
         }
+
         return $issues;
     }
 
@@ -392,10 +401,10 @@ class ScholarshipApplication extends Model
     protected function getStudentAssistantshipEligibilityIssues($student): array
     {
         $issues = [];
-        if (!$this->hasUploadedDocument('letter_of_intent')) {
+        if (! $this->hasUploadedDocument('letter_of_intent')) {
             $issues[] = 'Letter of intent is required for Student Assistantship.';
         }
-        if (!$this->hasParentConsent()) {
+        if (! $this->hasParentConsent()) {
             $issues[] = 'Parent consent is required for Student Assistantship.';
         }
         if ($student->units > 21) {
@@ -404,12 +413,13 @@ class ScholarshipApplication extends Model
         if ($this->hasFailingGradesInPreviousSemester($student)) {
             $issues[] = 'No failing or incomplete grades in previous semester allowed for Student Assistantship.';
         }
-        if (!$this->hasCompletedPreHiringScreening()) {
+        if (! $this->hasCompletedPreHiringScreening()) {
             $issues[] = 'Pre-hiring screening by OSAS is required for Student Assistantship.';
         }
-        if (!$this->hasUploadedDocument('certification_of_grades')) {
+        if (! $this->hasUploadedDocument('certification_of_grades')) {
             $issues[] = 'Certification of Grades (signed by Registrar) is required for Student Assistantship.';
         }
+
         return $issues;
     }
 
@@ -422,12 +432,13 @@ class ScholarshipApplication extends Model
         if ($this->getPerformingArtsMembershipDuration() < 12) {
             $issues[] = 'Must be an active member for at least one year for Full Performing Arts Scholarship.';
         }
-        if (!$this->hasParticipatedInMajorPerformances()) {
+        if (! $this->hasParticipatedInMajorPerformances()) {
             $issues[] = 'Must have participated in major local, regional, or national performances for Full Performing Arts Scholarship.';
         }
-        if (!$this->hasCoachRecommendation()) {
+        if (! $this->hasCoachRecommendation()) {
             $issues[] = 'Coach/adviser recommendation is required for Full Performing Arts Scholarship.';
         }
+
         return $issues;
     }
 
@@ -440,12 +451,13 @@ class ScholarshipApplication extends Model
         if ($this->getPerformingArtsMembershipDuration() < 4) {
             $issues[] = 'Must be a member for at least one semester for Partial Performing Arts Scholarship.';
         }
-        if (!$this->hasPerformedInMajorActivities(2)) {
+        if (! $this->hasPerformedInMajorActivities(2)) {
             $issues[] = 'Must have performed in at least two major University activities for Partial Performing Arts Scholarship.';
         }
-        if (!$this->hasCoachRecommendation()) {
+        if (! $this->hasCoachRecommendation()) {
             $issues[] = 'Coach/adviser recommendation is required for Partial Performing Arts Scholarship.';
         }
+
         return $issues;
     }
 
@@ -458,12 +470,13 @@ class ScholarshipApplication extends Model
         if ($student->current_gwa === null || $student->current_gwa > 2.25) {
             $issues[] = 'GWA must not exceed 2.25 for Economic Assistance.';
         }
-        if (!$this->hasUploadedDocument('indigency_certificate')) {
+        if (! $this->hasUploadedDocument('indigency_certificate')) {
             $issues[] = 'Certification of Indigency from MSWDO is required for Economic Assistance.';
         }
-        if (!$this->hasValidIndigencyCertificate()) {
+        if (! $this->hasValidIndigencyCertificate()) {
             $issues[] = 'Indigency certificate is missing or expired (must be issued within last 6 months).';
         }
+
         return $issues;
     }
 
@@ -474,11 +487,22 @@ class ScholarshipApplication extends Model
     protected function checkAcademicFullEligibility($student): bool
     {
         // GWA: 1.000–1.450, no grade below 1.75, no failed/dropped/deferred, at least 18 units, no other scholarship
-        if ($student->current_gwa === null || $student->current_gwa < 1.000 || $student->current_gwa > 1.450) return false;
-        if ($this->hasGradeBelow($student, 1.75)) return false;
-        if ($this->hasFailedSubjects($student)) return false;
-        if ($student->units < 18) return false;
-        if ($this->hasOtherScholarship()) return false;
+        if ($student->current_gwa === null || $student->current_gwa < 1.000 || $student->current_gwa > 1.450) {
+            return false;
+        }
+        if ($this->hasGradeBelow($student, 1.75)) {
+            return false;
+        }
+        if ($this->hasFailedSubjects($student)) {
+            return false;
+        }
+        if ($student->units < 18) {
+            return false;
+        }
+        if ($this->hasOtherScholarship()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -489,11 +513,22 @@ class ScholarshipApplication extends Model
     protected function checkAcademicPartialEligibility($student): bool
     {
         // GWA: 1.460–1.750, no grade below 1.75, no failed/dropped/deferred, at least 18 units, no other scholarship
-        if ($student->current_gwa === null || $student->current_gwa < 1.460 || $student->current_gwa > 1.750) return false;
-        if ($this->hasGradeBelow($student, 1.75)) return false;
-        if ($this->hasFailedSubjects($student)) return false;
-        if ($student->units < 18) return false;
-        if ($this->hasOtherScholarship()) return false;
+        if ($student->current_gwa === null || $student->current_gwa < 1.460 || $student->current_gwa > 1.750) {
+            return false;
+        }
+        if ($this->hasGradeBelow($student, 1.75)) {
+            return false;
+        }
+        if ($this->hasFailedSubjects($student)) {
+            return false;
+        }
+        if ($student->units < 18) {
+            return false;
+        }
+        if ($this->hasOtherScholarship()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -504,10 +539,19 @@ class ScholarshipApplication extends Model
     protected function checkStudentAssistantshipEligibility($student): bool
     {
         // ≤21 units, no failing/incomplete grades in previous semester, parent consent, pre-hiring screening
-        if ($student->units > 21) return false;
-        if ($this->hasFailingGradesInPreviousSemester($student)) return false;
-        if (! $this->hasParentConsent()) return false;
-        if (! $this->hasCompletedPreHiringScreening()) return false;
+        if ($student->units > 21) {
+            return false;
+        }
+        if ($this->hasFailingGradesInPreviousSemester($student)) {
+            return false;
+        }
+        if (! $this->hasParentConsent()) {
+            return false;
+        }
+        if (! $this->hasCompletedPreHiringScreening()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -518,9 +562,16 @@ class ScholarshipApplication extends Model
     protected function checkPerformingArtsFullEligibility($student): bool
     {
         // 1+ year membership, major performances, coach recommendation
-        if ($this->getPerformingArtsMembershipDuration() < 12) return false;
-        if (! $this->hasParticipatedInMajorPerformances()) return false;
-        if (! $this->hasCoachRecommendation()) return false;
+        if ($this->getPerformingArtsMembershipDuration() < 12) {
+            return false;
+        }
+        if (! $this->hasParticipatedInMajorPerformances()) {
+            return false;
+        }
+        if (! $this->hasCoachRecommendation()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -531,9 +582,16 @@ class ScholarshipApplication extends Model
     protected function checkPerformingArtsPartialEligibility($student): bool
     {
         // 1+ semester membership, at least 2 major activities, coach recommendation
-        if ($this->getPerformingArtsMembershipDuration() < 4) return false;
-        if (! $this->hasPerformedInMajorActivities(2)) return false;
-        if (! $this->hasCoachRecommendation()) return false;
+        if ($this->getPerformingArtsMembershipDuration() < 4) {
+            return false;
+        }
+        if (! $this->hasPerformedInMajorActivities(2)) {
+            return false;
+        }
+        if (! $this->hasCoachRecommendation()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -544,8 +602,13 @@ class ScholarshipApplication extends Model
     protected function checkEconomicAssistanceEligibility($student): bool
     {
         // GWA ≤ 2.25, valid indigency certificate
-        if ($student->current_gwa === null || $student->current_gwa > 2.25) return false;
-        if (! $this->hasValidIndigencyCertificate()) return false;
+        if ($student->current_gwa === null || $student->current_gwa > 2.25) {
+            return false;
+        }
+        if (! $this->hasValidIndigencyCertificate()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -582,7 +645,10 @@ class ScholarshipApplication extends Model
     {
         // Check for failed or incomplete grades in the previous semester
         $latestSemester = $student->grades()->max('semester');
-        if (!$latestSemester) return false;
+        if (! $latestSemester) {
+            return false;
+        }
+
         return $student->grades()->where('semester', $latestSemester)
             ->whereIn('status', ['failed', 'incomplete', 'dropped', 'deferred'])->exists();
     }

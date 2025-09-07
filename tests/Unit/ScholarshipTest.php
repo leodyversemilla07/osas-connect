@@ -75,8 +75,14 @@ describe('Scholarship Model', function () {
     });
 
     test('scholarship can get stipend amount', function () {
-        $academicFull = Scholarship::factory()->create(['type' => 'academic_full']);
-        $academicPartial = Scholarship::factory()->create(['type' => 'academic_partial']);
+        $academicFull = Scholarship::factory()->create([
+            'type' => 'academic_full',
+            'amount' => 50000.00, // Set specific amount
+        ]);
+        $academicPartial = Scholarship::factory()->create([
+            'type' => 'academic_partial',
+            'amount' => 25000.00, // Set specific amount
+        ]);
 
         expect($academicFull->getStipendAmount())->toBeNumeric();
         expect($academicPartial->getStipendAmount())->toBeNumeric();

@@ -10,6 +10,32 @@ class Document extends Model
 {
     use HasFactory;
 
+    // Document status constants
+    const STATUS_PENDING = 'pending';
+
+    const STATUS_VERIFIED = 'verified';
+
+    const STATUS_REJECTED = 'rejected';
+
+    const STATUS_EXPIRED = 'expired';
+
+    // Document type constants (matching database enum)
+    const TYPE_GRADES = 'grades';
+
+    const TYPE_INDIGENCY = 'indigency';
+
+    const TYPE_GOOD_MORAL = 'good_moral';
+
+    const TYPE_PARENT_CONSENT = 'parent_consent';
+
+    const TYPE_RECOMMENDATION = 'recommendation';
+
+    const TYPE_TRANSCRIPTS = 'transcripts';
+
+    const TYPE_RECOMMENDATION_LETTER = 'recommendation_letter';
+
+    const TYPE_FINANCIAL_STATEMENT = 'financial_statement';
+
     protected $fillable = [
         'application_id',
         'type',

@@ -61,6 +61,39 @@ function actingAsUser(array $attributes = []): \App\Models\User
 }
 
 /**
+ * Create a student user with profile
+ */
+function createStudent(array $userAttributes = [], array $profileAttributes = []): \App\Models\User
+{
+    $user = \App\Models\User::factory()->create(array_merge(['role' => 'student'], $userAttributes));
+    \App\Models\StudentProfile::factory()->create(array_merge(['user_id' => $user->id], $profileAttributes));
+
+    return $user;
+}
+
+/**
+ * Create an admin user with profile
+ */
+function createAdmin(array $userAttributes = [], array $profileAttributes = []): \App\Models\User
+{
+    $user = \App\Models\User::factory()->create(array_merge(['role' => 'admin'], $userAttributes));
+    \App\Models\AdminProfile::factory()->create(array_merge(['user_id' => $user->id], $profileAttributes));
+
+    return $user;
+}
+
+/**
+ * Create an OSAS staff user with profile
+ */
+function createOsasStaff(array $userAttributes = [], array $profileAttributes = []): \App\Models\User
+{
+    $user = \App\Models\User::factory()->create(array_merge(['role' => 'osas_staff'], $userAttributes));
+    \App\Models\OsasStaffProfile::factory()->create(array_merge(['user_id' => $user->id], $profileAttributes));
+
+    return $user;
+}
+
+/**
  * Create a scholarship for testing
  */
 function createScholarship(array $attributes = []): \App\Models\Scholarship

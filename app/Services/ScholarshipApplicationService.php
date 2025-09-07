@@ -12,14 +12,29 @@ use InvalidArgumentException;
 
 class ScholarshipApplicationService
 {
+    protected ScholarshipEligibilityService $eligibilityService;
+
+    public function __construct(ScholarshipEligibilityService $eligibilityService)
+    {
+        $this->eligibilityService = $eligibilityService;
+    }
+
     /**
-     * Submit a new scholarship application
+     * Submit a new scholarship application with enhanced eligibility checking
      */
     public function submit(StudentProfile $student, Scholarship $scholarship, array $data, array $documents): ScholarshipApplication
     {
         // Validate that scholarship is accepting applications
         if (! $scholarship->isAcceptingApplications()) {
             throw new InvalidArgumentException('This scholarship is not accepting applications at this time.');
+        }
+
+        // Enhanced eligibility checking using the eligibility service
+        $eligibilityResult = $this->eligibilityService->checkEligibility($student, $scholarship);
+
+        if (! $eligibilityResult['eligible']) {
+            $failureReasons = implode('; ', $eligibilityResult['messages']);
+            throw new InvalidArgumentException("You are not eligible for this scholarship: {$failureReasons}");
         }
 
         // Check if student already has a pending or approved application
@@ -32,6 +47,7 @@ class ScholarshipApplicationService
                 ScholarshipApplication::STATUS_VERIFIED,
                 ScholarshipApplication::STATUS_UNDER_EVALUATION,
                 ScholarshipApplication::STATUS_APPROVED,
+                ScholarshipApplication::STATUS_ACTIVE,
             ])
             ->first();
 
@@ -41,9 +57,9 @@ class ScholarshipApplicationService
 
         DB::beginTransaction();
         try {
-            // Create the application
+            // Create the application with eligibility data
             $application = ScholarshipApplication::create([
-                'user_id' => $student->user_id, // Fixed: use user_id from student profile
+                'user_id' => $student->user_id,
                 'scholarship_id' => $scholarship->id,
                 'status' => ScholarshipApplication::STATUS_SUBMITTED,
                 'purpose_letter' => $data['purpose_letter'],
@@ -51,6 +67,12 @@ class ScholarshipApplicationService
                 'academic_year' => $data['academic_year'],
                 'semester' => $data['semester'],
                 'applied_at' => now(),
+                'application_data' => [
+                    'eligibility_check' => $eligibilityResult,
+                    'student_gwa' => $student->current_gwa,
+                    'student_units' => $student->units,
+                    'submission_data' => $data,
+                ],
             ]);
 
             // Handle document uploads

@@ -36,7 +36,7 @@ describe('NotificationController', function () {
     test('index returns paginated notifications for authenticated user', function () {
         $response = $this->actingAs($this->student)->get(route('student.notifications.index'));
 
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $response->assertJsonStructure([
             'notifications' => [
                 'data' => ['*' => ['id', 'title', 'message', 'type', 'is_read', 'created_at']],
@@ -53,7 +53,7 @@ describe('NotificationController', function () {
     test('unread count returns correct number', function () {
         $response = $this->actingAs($this->student)->get(route('student.notifications.unread-count'));
 
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $data = $response->json();
 
         expect($data['unread_count'])->toBe(5);

@@ -57,13 +57,13 @@ class ScholarshipApplicationStatusChanged extends Mailable implements ShouldQueu
             with: [
                 'application' => $this->application,
                 'previousStatus' => $this->previousStatus,
-                'studentName' => $this->application->student->user->name,
+                'studentName' => $this->application->student->name ?? 'Student',
                 'scholarshipName' => $this->application->scholarship->name,
                 'currentStatus' => $this->application->status,
                 'statusMessage' => $this->getStatusMessage(),
                 'nextSteps' => $this->getNextSteps(),
-                'dashboardUrl' => route('student.dashboard'),
-                'applicationUrl' => route('scholarships.applications.status', $this->application),
+                'dashboardUrl' => url('/dashboard'),
+                'applicationUrl' => url('/applications/'.$this->application->id),
             ],
         );
     }

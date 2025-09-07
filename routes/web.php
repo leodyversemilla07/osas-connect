@@ -7,10 +7,10 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OsasStaffController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentManagementController;
 use App\Http\Controllers\UnifiedScholarshipController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StudentManagementController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -62,7 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Students management (resourceful)
         Route::resource('/admin/students', StudentManagementController::class, [
-            'as' => 'admin'
+            'as' => 'admin',
         ]);
 
         // Staff management
@@ -146,6 +146,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/osas-staff/applications/{application}/interview', [UnifiedScholarshipController::class, 'scheduleInterview'])->name(
             'osas.scholarships.interview.store',
         );
+
+        // Comprehensive Interview Management Routes
+        Route::prefix('osas-staff/interviews')->name('osas.interviews.')->group(function () {
+            Route::get('/', [InterviewController::class, 'staffIndex'])->name('index');
+            Route::get('/dashboard', [InterviewController::class, 'dashboard'])->name('dashboard');
+            Route::get('/create', [InterviewController::class, 'create'])->name('create');
+            Route::post('/', [InterviewController::class, 'store'])->name('store');
+            Route::get('/{interview}', [InterviewController::class, 'show'])->name('show');
+            Route::get('/{interview}/edit', [InterviewController::class, 'edit'])->name('edit');
+            Route::patch('/{interview}', [InterviewController::class, 'update'])->name('update');
+            Route::post('/{interview}/reschedule', [InterviewController::class, 'reschedule'])->name('reschedule');
+            Route::post('/{interview}/complete', [InterviewController::class, 'complete'])->name('complete');
+            Route::post('/{interview}/cancel', [InterviewController::class, 'cancel'])->name('cancel');
+            Route::post('/{interview}/no-show', [InterviewController::class, 'markAsNoShow'])->name('no-show');
+            Route::get('/statistics/overview', [InterviewController::class, 'statisticsOverview'])->name('statistics');
+        });
 
         // Stipend recording
         Route::post('/osas-staff/scholarships/applications/{application}/stipend', [UnifiedScholarshipController::class, 'recordStipend'])->name(
@@ -231,5 +247,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/generate-annex1-tpdf-pdf/{user}', [PdfController::class, 'generateAnnex1Pdf'])->name('generate.annex1.tpdf.pdf');
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

@@ -40,15 +40,30 @@ class Scholarship extends Model
         'amount' => 'decimal:2',
     ];
 
+    // MinSU Institutional Scholarship Type Constants
+    const TYPE_ACADEMIC_FULL = 'academic_full';
+
+    const TYPE_ACADEMIC_PARTIAL = 'academic_partial';
+
+    const TYPE_STUDENT_ASSISTANTSHIP = 'student_assistantship';
+
+    const TYPE_PERFORMING_ARTS_FULL = 'performing_arts_full';
+
+    const TYPE_PERFORMING_ARTS_PARTIAL = 'performing_arts_partial';
+
+    const TYPE_ECONOMIC_ASSISTANCE = 'economic_assistance';
+
+    const TYPE_OTHERS = 'others';
+
     // MinSU Institutional Scholarship Types
     const TYPES = [
-        'academic_full' => 'Academic Scholarship (Full) - President\'s Lister',
-        'academic_partial' => 'Academic Scholarship (Partial) - Dean\'s Lister',
-        'student_assistantship' => 'Student Assistantship Program',
-        'performing_arts_full' => 'MinSU Accredited Performing Arts Group (Full Scholar)',
-        'performing_arts_partial' => 'MinSU Accredited Performing Arts Group (Partial Scholar)',
-        'economic_assistance' => 'Economically Deprived/Marginalized Student',
-        'others' => 'Others (Custom Type)',
+        self::TYPE_ACADEMIC_FULL => 'Academic Scholarship (Full) - President\'s Lister',
+        self::TYPE_ACADEMIC_PARTIAL => 'Academic Scholarship (Partial) - Dean\'s Lister',
+        self::TYPE_STUDENT_ASSISTANTSHIP => 'Student Assistantship Program',
+        self::TYPE_PERFORMING_ARTS_FULL => 'MinSU Accredited Performing Arts Group (Full Scholar)',
+        self::TYPE_PERFORMING_ARTS_PARTIAL => 'MinSU Accredited Performing Arts Group (Partial Scholar)',
+        self::TYPE_ECONOMIC_ASSISTANCE => 'Economically Deprived/Marginalized Student',
+        self::TYPE_OTHERS => 'Others (Custom Type)',
     ];
 
     const STATUSES = [

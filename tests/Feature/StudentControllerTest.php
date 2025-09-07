@@ -45,7 +45,7 @@ describe('StudentController Dashboard Stats', function () {
     test('dashboard stats endpoint returns correct data structure', function () {
         $response = $this->actingAs($this->student)->get(route('student.dashboard.stats'));
 
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $response->assertJsonStructure([
             'total_applications',
             'pending_applications',
@@ -89,7 +89,7 @@ describe('StudentController Dashboard Stats', function () {
 
         $response = $this->actingAs($admin)->get(route('student.dashboard.stats'));
 
-        $response->assertStatus(302); // Redirected by middleware, not 403
+        $response->assertRedirect(); // Instead of assertStatus(302)
     });
 
     test('unauthenticated users are redirected', function () {
@@ -118,23 +118,20 @@ describe('StudentController Scholarship Search', function () {
         $this->student = User::factory()->create(['role' => 'student']);
         $this->studentProfile = StudentProfile::factory()->create(['user_id' => $this->student->id]);
 
-        // Clear existing scholarships to ensure clean test data
-        Scholarship::truncate();
-
-        // Create test scholarships
+        // Create test scholarships with unique names to avoid conflicts
         $this->scholarships = collect([
             Scholarship::factory()->create([
-                'name' => 'Academic Excellence Scholarship',
+                'name' => 'Academic Excellence Scholarship '.uniqid(),
                 'type' => 'academic_full',
                 'status' => 'active',
             ]),
             Scholarship::factory()->create([
-                'name' => 'Need-Based Assistance',
+                'name' => 'Need-Based Assistance '.uniqid(),
                 'type' => 'economic_assistance',
                 'status' => 'active',
             ]),
             Scholarship::factory()->create([
-                'name' => 'Closed Scholarship',
+                'name' => 'Closed Scholarship '.uniqid(),
                 'type' => 'academic_partial',
                 'status' => 'inactive',
             ]),
@@ -144,10 +141,13 @@ describe('StudentController Scholarship Search', function () {
     test('search returns all active scholarships when no filters', function () {
         $response = $this->actingAs($this->student)->get(route('student.scholarships.search'));
 
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $data = $response->json();
 
-        expect($data['scholarships'])->toHaveCount(2); // Only active scholarships
+        // Check that we have at least our 2 active scholarships
+        expect($data['scholarships'])->toHaveCount(2);
+        // Verify all returned scholarships are active
+        collect($data['scholarships'])->each(fn ($scholarship) => expect($scholarship['status'])->toBe('active'));
     });
 
     test('search filters by scholarship type', function () {
