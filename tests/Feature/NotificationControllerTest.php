@@ -3,9 +3,6 @@
 use App\Models\ScholarshipNotification;
 use App\Models\StudentProfile;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 describe('NotificationController', function () {
     beforeEach(function () {
@@ -33,7 +30,7 @@ describe('NotificationController', function () {
             ]);
     });
 
-    test('index returns paginated notifications for authenticated user', function () {
+    it('returns paginated notifications for authenticated user', function () {
         $response = $this->actingAs($this->student)->get(route('student.notifications.index'));
 
         $response->assertSuccessful();
@@ -50,7 +47,7 @@ describe('NotificationController', function () {
         expect($data['notifications']['total'])->toBe(8); // 5 unread + 3 read
     });
 
-    test('unread count returns correct number', function () {
+    it('returns correct unread count', function () {
         $response = $this->actingAs($this->student)->get(route('student.notifications.unread-count'));
 
         $response->assertSuccessful();
@@ -59,53 +56,53 @@ describe('NotificationController', function () {
         expect($data['unread_count'])->toBe(5);
     });
 
-    test('mark as read updates notification status', function () {
+    it('marks notification as read', function () {
         $notification = $this->notifications->first();
 
         $response = $this->actingAs($this->student)->post(route('student.notifications.read', $notification));
 
-        $response->assertStatus(200);
+        $response->assertOk();
 
         $notification->refresh();
         expect($notification->is_read)->toBe(true);
         expect($notification->read_at)->not()->toBeNull();
     });
 
-    test('mark all as read updates all unread notifications', function () {
+    it('marks all notifications as read', function () {
         $response = $this->actingAs($this->student)->post(route('student.notifications.read-all'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $unreadCount = ScholarshipNotification::where('user_id', $this->student->id)->whereNull('read_at')->count();
 
         expect($unreadCount)->toBe(0);
     });
 
-    test('delete notification removes it from database', function () {
+    it('deletes notification', function () {
         $notification = $this->notifications->first();
         $notificationId = $notification->id;
 
         $response = $this->actingAs($this->student)->delete(route('student.notifications.destroy', $notification));
 
-        $response->assertStatus(200);
+        $response->assertOk();
 
         $exists = ScholarshipNotification::where('id', $notificationId)->exists();
         expect($exists)->toBe(false);
     });
 
-    test('bulk delete removes multiple notifications', function () {
+    it('bulk deletes multiple notifications', function () {
         $notificationIds = $this->notifications->take(3)->pluck('id')->toArray();
 
         $response = $this->actingAs($this->student)->post(route('student.notifications.bulk-delete'), [
             'notification_ids' => $notificationIds,
         ]);
 
-        $response->assertStatus(200);
+        $response->assertOk();
 
         $remainingCount = ScholarshipNotification::whereIn('id', $notificationIds)->count();
         expect($remainingCount)->toBe(0);
     });
 
-    test('users can only access their own notifications', function () {
+    it('prevents users from accessing other users notifications', function () {
         $otherStudent = User::factory()->create(['role' => 'student']);
         $otherNotification = ScholarshipNotification::factory()->create([
             'user_id' => $otherStudent->id,
@@ -115,20 +112,20 @@ describe('NotificationController', function () {
         $response->assertStatus(403);
     });
 
-    test('non-student users cannot access notification endpoints', function () {
+    it('prevents non-student users from accessing notification endpoints', function () {
         $admin = User::factory()->create(['role' => 'admin']);
         $response = $this->actingAs($admin)->get(route('student.notifications.index'));
 
         $response->assertStatus(302); // Redirected due to role middleware
     });
 
-    test('unauthenticated users are redirected', function () {
+    it('redirects unauthenticated users', function () {
         $response = $this->get(route('student.notifications.index'));
 
         $response->assertRedirect();
     });
 
-    test('notifications are ordered by creation date desc', function () {
+    it('orders notifications by creation date descending', function () {
         $response = $this->actingAs($this->student)->get(route('student.notifications.index'));
 
         $data = $response->json();
@@ -143,7 +140,7 @@ describe('NotificationController', function () {
         }
     });
 
-    test('filter by unread works correctly', function () {
+    it('filters notifications by unread status', function () {
         $response = $this->actingAs($this->student)->get(route('student.notifications.index', ['filter' => 'unread']));
 
         $data = $response->json();

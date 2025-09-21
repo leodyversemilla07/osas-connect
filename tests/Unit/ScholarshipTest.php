@@ -6,13 +6,13 @@ use App\Models\StudentProfile;
 use App\Models\User;
 
 describe('Scholarship Model', function () {
-    test('it has factory', function () {
+    it('has factory', function () {
         $scholarship = Scholarship::factory()->create();
 
         expect($scholarship)->toBeInstanceOf(Scholarship::class);
         expect($scholarship->id)->not()->toBeNull();
     });
-    test('fillable attributes work correctly', function () {
+    it('has working fillable attributes', function () {
         $data = [
             'name' => 'Test Scholarship',
             'type' => 'academic_full',
@@ -32,7 +32,7 @@ describe('Scholarship Model', function () {
         expect($scholarship->required_documents)->toBe(['transcript', 'id']);
         expect($scholarship->eligibility_criteria)->toBe(['criteria1' => 'value1']);
     });
-    test('applications relationship works', function () {
+    it('has working applications relationship', function () {
         $scholarship = Scholarship::factory()->create();
         $student = User::factory()->create(['role' => 'student']);
         $studentProfile = StudentProfile::factory()->create(['user_id' => $student->id]);
@@ -47,7 +47,7 @@ describe('Scholarship Model', function () {
         expect($scholarship->applications()->count())->toBe(3);
         expect($scholarship->applications->first())->toBeInstanceOf(ScholarshipApplication::class);
     });
-    test('scholarship status constants work', function () {
+    it('has working status constants', function () {
         expect(Scholarship::STATUSES)->toBeArray();
         expect(Scholarship::STATUSES)->toHaveKey('active');
         expect(Scholarship::STATUSES)->toHaveKey('draft');
@@ -55,13 +55,13 @@ describe('Scholarship Model', function () {
         expect(Scholarship::STATUSES)->toHaveKey('upcoming');
     });
 
-    test('scholarship types constants work', function () {
+    it('has working type constants', function () {
         expect(Scholarship::TYPES)->toBeArray();
         expect(Scholarship::TYPES)->toHaveKey('academic_full');
         expect(Scholarship::TYPES)->toHaveKey('academic_partial');
         expect(Scholarship::TYPES)->toHaveKey('student_assistantship');
     });
-    test('scholarship can determine gwa requirements', function () {
+    it('can determine GWA requirements', function () {
         $academicFull = Scholarship::factory()->create(['type' => 'academic_full']);
         $academicPartial = Scholarship::factory()->create(['type' => 'academic_partial']);
 
@@ -74,7 +74,7 @@ describe('Scholarship Model', function () {
         expect($academicPartial->getMaximumGwa())->toBe(1.75);
     });
 
-    test('scholarship can get stipend amount', function () {
+    it('can get stipend amount', function () {
         $academicFull = Scholarship::factory()->create([
             'type' => 'academic_full',
             'amount' => 50000.00, // Set specific amount
@@ -89,7 +89,7 @@ describe('Scholarship Model', function () {
         expect($academicFull->getStipendAmount())->toBeGreaterThan($academicPartial->getStipendAmount());
     });
 
-    test('scholarship soft deletes work', function () {
+    it('supports soft deletes', function () {
         $scholarship = Scholarship::factory()->create();
         $id = $scholarship->id;
 
@@ -100,7 +100,7 @@ describe('Scholarship Model', function () {
             ->not()
             ->toBeNull();
     });
-    test('active scholarships scope returns only active scholarships', function () {
+    it('returns only active scholarships in scope', function () {
         // Clear any existing scholarships first
         Scholarship::query()->delete();
 

@@ -4,14 +4,14 @@ use App\Models\ScholarshipNotification;
 use App\Models\User;
 
 describe('ScholarshipNotification Model', function () {
-    test('it has factory', function () {
+    it('has factory', function () {
         $notification = ScholarshipNotification::factory()->create();
 
         expect($notification)->toBeInstanceOf(ScholarshipNotification::class);
         expect($notification->id)->not()->toBeNull();
     });
 
-    test('fillable attributes work correctly', function () {
+    it('has working fillable attributes', function () {
         $user = User::factory()->create();
 
         $data = [
@@ -33,7 +33,7 @@ describe('ScholarshipNotification Model', function () {
         expect($notification->data)->toBe(['key' => 'value']);
     });
 
-    test('notification types constants exist', function () {
+    it('has notification type constants', function () {
         expect(ScholarshipNotification::TYPE_APPLICATION_STATUS)->toBe('application_status');
         expect(ScholarshipNotification::TYPE_DOCUMENT_REQUEST)->toBe('document_request');
         expect(ScholarshipNotification::TYPE_INTERVIEW_SCHEDULE)->toBe('interview_schedule');
@@ -41,7 +41,7 @@ describe('ScholarshipNotification Model', function () {
         expect(ScholarshipNotification::TYPE_RENEWAL_REMINDER)->toBe('renewal_reminder');
     });
 
-    test('user relationship works', function () {
+    it('has working user relationship', function () {
         $user = User::factory()->create();
         $notification = ScholarshipNotification::factory()->create(['user_id' => $user->id]);
 
@@ -49,7 +49,7 @@ describe('ScholarshipNotification Model', function () {
         expect($notification->user->id)->toBe($user->id);
     });
 
-    test('mark as read works', function () {
+    it('can be marked as read', function () {
         $notification = ScholarshipNotification::factory()->create([
             'read_at' => null,
         ]);
@@ -59,7 +59,7 @@ describe('ScholarshipNotification Model', function () {
         expect($notification->read_at)->not()->toBeNull();
     });
 
-    test('mark as read does nothing if already read', function () {
+    it('ignores mark as read if already read', function () {
         $readAt = now()->subDay();
         $notification = ScholarshipNotification::factory()->create([
             'read_at' => $readAt,
@@ -70,7 +70,7 @@ describe('ScholarshipNotification Model', function () {
         expect($notification->read_at->timestamp)->toBe($readAt->timestamp);
     });
 
-    test('unread scope works', function () {
+    it('has working unread scope', function () {
         ScholarshipNotification::factory()
             ->count(3)
             ->create(['read_at' => null]);
@@ -83,7 +83,7 @@ describe('ScholarshipNotification Model', function () {
         expect($unread)->toHaveCount(3);
     });
 
-    test('cast attributes work correctly', function () {
+    it('has working attribute casts', function () {
         $data = ['key' => 'value'];
         $notification = ScholarshipNotification::factory()->create([
             'data' => $data,

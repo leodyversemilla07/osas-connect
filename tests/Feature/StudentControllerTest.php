@@ -4,9 +4,6 @@ use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
 use App\Models\StudentProfile;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 describe('StudentController Dashboard Stats', function () {
     beforeEach(function () {
@@ -42,7 +39,7 @@ describe('StudentController Dashboard Stats', function () {
             ]);
     });
 
-    test('dashboard stats endpoint returns correct data structure', function () {
+    it('returns correct data structure for dashboard stats', function () {
         $response = $this->actingAs($this->student)->get(route('student.dashboard.stats'));
 
         $response->assertSuccessful();
@@ -59,7 +56,8 @@ describe('StudentController Dashboard Stats', function () {
             'eligible_scholarships_count',
         ]);
     });
-    test('dashboard stats calculates application counts correctly', function () {
+
+    it('calculates application counts correctly in dashboard stats', function () {
         // Clear any existing applications for this student to ensure clean test data
         ScholarshipApplication::where('user_id', $this->student->id)->delete();
 
@@ -84,7 +82,8 @@ describe('StudentController Dashboard Stats', function () {
         expect($data['approved_applications'])->toBe(1);
         expect($data['draft_applications'])->toBe(1);
     });
-    test('non-student users cannot access dashboard stats', function () {
+
+    it('prevents non-student users from accessing dashboard stats', function () {
         $admin = User::factory()->create(['role' => 'admin']);
 
         $response = $this->actingAs($admin)->get(route('student.dashboard.stats'));
@@ -92,7 +91,7 @@ describe('StudentController Dashboard Stats', function () {
         $response->assertRedirect(); // Instead of assertStatus(302)
     });
 
-    test('unauthenticated users are redirected', function () {
+    it('redirects unauthenticated users from dashboard stats', function () {
         $response = $this->get(route('student.dashboard.stats'));
 
         $response->assertRedirect();
@@ -105,10 +104,10 @@ describe('StudentController Recent Activity', function () {
         $this->studentProfile = StudentProfile::factory()->create(['user_id' => $this->student->id]);
     });
 
-    test('recent activity endpoint returns correct structure', function () {
+    it('returns correct structure for recent activity', function () {
         $response = $this->actingAs($this->student)->get(route('student.dashboard.activity'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonStructure(['recent_applications', 'status_updates', 'upcoming_deadlines', 'notifications']);
     });
 });
@@ -138,7 +137,7 @@ describe('StudentController Scholarship Search', function () {
         ]);
     });
 
-    test('search returns all active scholarships when no filters', function () {
+    it('returns all active scholarships when no filters applied', function () {
         $response = $this->actingAs($this->student)->get(route('student.scholarships.search'));
 
         $response->assertSuccessful();
@@ -150,27 +149,27 @@ describe('StudentController Scholarship Search', function () {
         collect($data['scholarships'])->each(fn ($scholarship) => expect($scholarship['status'])->toBe('active'));
     });
 
-    test('search filters by scholarship type', function () {
+    it('filters scholarships by type', function () {
         $response = $this->actingAs($this->student)->get(route('student.scholarships.search', ['type' => 'academic_full']));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $data = $response->json();
 
         expect($data['scholarships'])->toHaveCount(1);
         expect($data['scholarships'][0]['type'])->toBe('academic_full');
     });
 
-    test('search filters by query text', function () {
+    it('filters scholarships by query text', function () {
         $response = $this->actingAs($this->student)->get(route('student.scholarships.search', ['q' => 'Academic Excellence']));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $data = $response->json();
 
         expect($data['scholarships'])->toHaveCount(1);
         expect($data['scholarships'][0]['name'])->toContain('Academic Excellence');
     });
 
-    test('search respects pagination', function () {
+    it('respects pagination in scholarship search', function () {
         // Create more scholarships
         Scholarship::factory()
             ->count(15)
@@ -178,7 +177,7 @@ describe('StudentController Scholarship Search', function () {
 
         $response = $this->actingAs($this->student)->get(route('student.scholarships.search', ['per_page' => 5]));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $data = $response->json();
 
         expect($data['scholarships'])->toHaveCount(5);
@@ -202,10 +201,10 @@ describe('StudentController Scholarship Details', function () {
         ]);
     });
 
-    test('scholarship details endpoint returns complete information', function () {
+    it('returns complete information for scholarship details', function () {
         $response = $this->actingAs($this->student)->get(route('student.scholarships.details', $this->scholarship));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonStructure([
             'scholarship' => ['id', 'name', 'description', 'type', 'requirements', 'amount', 'application_start_date', 'deadline', 'status'],
             'eligibility' => ['can_apply', 'is_eligible', 'requirements', 'reasons'],
@@ -213,7 +212,7 @@ describe('StudentController Scholarship Details', function () {
         ]);
     });
 
-    test('eligibility check works correctly for qualified student', function () {
+    it('validates eligibility correctly for qualified students', function () {
         $response = $this->actingAs($this->student)->get(route('student.scholarships.details', $this->scholarship));
 
         $data = $response->json();
@@ -222,7 +221,7 @@ describe('StudentController Scholarship Details', function () {
         expect($data['eligibility']['can_apply'])->toBe(true);
     });
 
-    test('eligibility check fails for unqualified student', function () {
+    it('fails eligibility check for unqualified students', function () {
         // Update student to have lower GWA using a direct database query
         \App\Models\StudentProfile::where('user_id', $this->student->id)->update(['current_gwa' => 2.0]);
 
@@ -238,7 +237,7 @@ describe('StudentController Scholarship Details', function () {
         expect($data['eligibility']['reasons'])->toContain('GWA requirement not met');
     });
 
-    test('shows existing application if student already applied', function () {
+    it('shows existing application when student has already applied', function () {
         $application = ScholarshipApplication::factory()->create([
             'user_id' => $this->student->id,
             'scholarship_id' => $this->scholarship->id,

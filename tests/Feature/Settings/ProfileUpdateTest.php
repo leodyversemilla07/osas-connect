@@ -2,9 +2,7 @@
 
 use App\Models\User;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
-
-test('profile page is displayed', function () {
+it('displays the profile page', function () {
     $user = User::factory()->student()->create();
 
     $response = $this->actingAs($user)->get('/settings/profile');
@@ -12,7 +10,7 @@ test('profile page is displayed', function () {
     $response->assertOk();
 });
 
-test('profile information can be updated', function () {
+it('allows profile information updates', function () {
     $user = User::factory()->student()->unverified()->create();
 
     $response = $this->actingAs($user)->patch('/settings/profile', [
@@ -52,7 +50,7 @@ test('profile information can be updated', function () {
     expect($user->email_verified_at)->toBeNull();
 });
 
-test('email verification status is unchanged when the email address is unchanged', function () {
+it('preserves email verification status when email unchanged', function () {
     $user = User::factory()
         ->student()
         ->create([
@@ -93,7 +91,7 @@ test('email verification status is unchanged when the email address is unchanged
     expect($user->refresh()->email_verified_at)->not->toBeNull();
 });
 
-test('user can delete their account', function () {
+it('allows users to delete their account', function () {
     $user = User::factory()->student()->create();
 
     $response = $this->actingAs($user)->delete('/settings/profile', [
@@ -106,7 +104,7 @@ test('user can delete their account', function () {
     expect($user->fresh())->toBeNull();
 });
 
-test('correct password must be provided to delete account', function () {
+it('requires correct password to delete account', function () {
     $user = User::factory()->student()->create();
 
     $response = $this->actingAs($user)

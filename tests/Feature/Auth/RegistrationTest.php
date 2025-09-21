@@ -1,14 +1,12 @@
 <?php
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
-
-test('registration screen can be rendered', function () {
+it('renders the registration screen', function () {
     $response = $this->get('/register');
 
-    $response->assertStatus(200);
+    $response->assertOk();
 });
 
-test('new users can register', function () {
+it('allows new users to register', function () {
     $response = $this->post('/register', [
         'last_name' => 'Doe',
         'first_name' => 'John',
@@ -43,7 +41,7 @@ test('new users can register', function () {
     $response->assertRedirect(route('dashboard', absolute: false));
 });
 
-test('registration validation errors are shown', function () {
+it('shows validation errors for invalid registration data', function () {
     $response = $this->post('/register', []);
 
     $response->assertSessionHasErrors([
@@ -72,7 +70,7 @@ test('registration validation errors are shown', function () {
     ]);
 });
 
-test('email must be unique', function () {
+it('requires unique email addresses', function () {
     // First create a user
     $user = \App\Models\User::factory()->create([
         'email' => 'duplicate@minsu.edu.ph',

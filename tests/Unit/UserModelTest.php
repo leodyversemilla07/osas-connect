@@ -7,7 +7,7 @@ use App\Models\StudentProfile;
 use App\Models\User;
 
 describe('User Model', function () {
-    test('user has scholarship notifications relationship', function () {
+    it('has scholarship notifications relationship', function () {
         $user = User::factory()->create(['role' => 'student']);
 
         // Create some notifications for the user
@@ -21,7 +21,7 @@ describe('User Model', function () {
         expect($user->scholarshipNotifications->first())->toBeInstanceOf(ScholarshipNotification::class);
     });
 
-    test('user role checking methods work correctly', function () {
+    it('has working role checking methods', function () {
         $student = User::factory()->create(['role' => 'student']);
         $osasStaff = User::factory()->create(['role' => 'osas_staff']);
         $admin = User::factory()->create(['role' => 'admin']);
@@ -41,7 +41,8 @@ describe('User Model', function () {
         expect($admin->isOsasStaff())->toBe(false);
         expect($admin->isAdmin())->toBe(true);
     });
-    test('user has correct profile relationships', function () {
+    
+    it('has correct profile relationships', function () {
         $student = User::factory()->create(['role' => 'student']);
         $osasStaff = User::factory()->create(['role' => 'osas_staff']);
         $admin = User::factory()->create(['role' => 'admin']);
@@ -56,7 +57,7 @@ describe('User Model', function () {
         expect($admin->adminProfile)->toBeInstanceOf(AdminProfile::class);
         expect($admin->adminProfile->user_id)->toBe($admin->id);
     });
-    test('user profile method returns correct profile based on role', function () {
+    it('returns correct profile based on role', function () {
         $student = User::factory()->create(['role' => 'student']);
 
         // UserFactory automatically creates the profile
@@ -74,7 +75,7 @@ describe('User Model', function () {
         expect($admin->profile()->user_id)->toBe($admin->id);
     });
 
-    test('user full name attribute works correctly', function () {
+    it('has working full name attribute', function () {
         $user = User::factory()->create([
             'first_name' => 'John',
             'middle_name' => 'Middle',
@@ -92,13 +93,13 @@ describe('User Model', function () {
         expect($userNoMiddle->full_name)->toBe('Jane Smith');
     });
 
-    test('user avatar attribute returns null when no photo_id', function () {
+    it('returns null avatar when no photo_id', function () {
         $user = User::factory()->create(['photo_id' => null]);
 
         expect($user->avatar)->toBeNull();
     });
 
-    test('user mass assignment works correctly', function () {
+    it('supports mass assignment correctly', function () {
         $userData = [
             'first_name' => 'Test',
             'last_name' => 'User',
@@ -119,14 +120,14 @@ describe('User Model', function () {
         expect($user->is_active)->toBe(true);
     });
 
-    test('user hidden attributes are not visible in array', function () {
+    it('hides sensitive attributes in array', function () {
         $user = User::factory()->create();
         $userArray = $user->toArray();
 
         expect($userArray)->not()->toHaveKey('password');
         expect($userArray)->not()->toHaveKey('remember_token');
     });
-    test('user appended attributes are included in array', function () {
+    it('includes appended attributes in array', function () {
         $user = User::factory()->create([
             'first_name' => 'John',
             'middle_name' => null, // Explicitly set to null to avoid faker middle names
@@ -140,7 +141,7 @@ describe('User Model', function () {
         expect($userArray['full_name'])->toBe('John Doe');
     });
 
-    test('user casts work correctly', function () {
+    it('has working attribute casts', function () {
         $user = User::factory()->create([
             'is_active' => '1',
             'last_login_at' => '2024-01-01 12:00:00',

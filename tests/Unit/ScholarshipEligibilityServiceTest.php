@@ -10,7 +10,7 @@ beforeEach(function () {
 });
 
 describe('ScholarshipEligibilityService', function () {
-    test('checks basic requirements correctly', function () {
+    it('checks basic requirements correctly', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,
@@ -34,7 +34,7 @@ describe('ScholarshipEligibilityService', function () {
         expect($eligibility['requirements_met'])->toContain('no_existing_scholarship');
     });
 
-    test('fails eligibility for insufficient GWA for full scholarship', function () {
+    it('fails eligibility for insufficient GWA for full scholarship', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,
@@ -55,7 +55,7 @@ describe('ScholarshipEligibilityService', function () {
         expect($eligibility['requirements_failed'])->toContain('gwa_full_scholar');
     });
 
-    test('passes eligibility for correct GWA range for full scholarship', function () {
+    it('passes eligibility for correct GWA range for full scholarship', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,
@@ -76,7 +76,7 @@ describe('ScholarshipEligibilityService', function () {
         expect($eligibility['requirements_met'])->toContain('gwa_full_scholar');
     });
 
-    test('fails eligibility for assistantship with too many units', function () {
+    it('fails eligibility for assistantship with too many units', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,
@@ -96,7 +96,7 @@ describe('ScholarshipEligibilityService', function () {
         expect($eligibility['requirements_failed'])->toContain('max_units');
     });
 
-    test('passes eligibility for assistantship with acceptable units', function () {
+    it('passes eligibility for assistantship with acceptable units', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,
@@ -116,7 +116,7 @@ describe('ScholarshipEligibilityService', function () {
         expect($eligibility['requirements_met'])->toContain('max_units');
     });
 
-    test('fails eligibility for economic assistance with high GWA', function () {
+    it('fails eligibility for economic assistance with high GWA', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,
@@ -137,7 +137,7 @@ describe('ScholarshipEligibilityService', function () {
         expect($eligibility['requirements_failed'])->toContain('gwa_requirement');
     });
 
-    test('detects conflicting scholarships', function () {
+    it('detects conflicting scholarships', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,
@@ -157,7 +157,7 @@ describe('ScholarshipEligibilityService', function () {
         expect($eligibility['requirements_failed'])->toContain('no_existing_scholarship');
     });
 
-    test('gets recommended scholarships based on student profile', function () {
+    it('gets recommended scholarships based on student profile', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,
@@ -189,7 +189,7 @@ describe('ScholarshipEligibilityService', function () {
         expect($firstRecommendation['scholarship']->type)->toBe(Scholarship::TYPE_ACADEMIC_FULL);
     });
 
-    test('fails eligibility for insufficient units', function () {
+    it('fails eligibility for insufficient units', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,
@@ -209,7 +209,7 @@ describe('ScholarshipEligibilityService', function () {
         expect($eligibility['requirements_failed'])->toContain('regular_load');
     });
 
-    test('calculates eligibility score correctly', function () {
+    it('calculates eligibility score correctly', function () {
         $user = User::factory()->create(['role' => 'student']);
         $student = StudentProfile::factory()->create([
             'user_id' => $user->id,

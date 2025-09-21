@@ -1,43 +1,43 @@
 <?php
 
 describe('Architectural Testing', function () {
-    test('controllers should have correct naming')
+    it('ensures all controllers have proper naming')
         ->expect('App\Http\Controllers')
         ->toHaveSuffix('Controller');
 
-    test('requests should extend FormRequest')
+    it('ensures all requests extend FormRequest')
         ->expect('App\Http\Requests')
         ->toExtend('Illuminate\Foundation\Http\FormRequest');
 
-    test('models should extend Model')
+    it('ensures all models extend the base Model')
         ->expect('App\Models')
         ->toExtend('Illuminate\Database\Eloquent\Model');
 
-    test('policies should have correct naming')
+    it('ensures all policies have proper naming')
         ->expect('App\Policies')
         ->toHaveSuffix('Policy');
 
-    test('services should be in the correct namespace')
+    it('ensures all services are in the App\Services namespace')
         ->expect('App\Services')
         ->toBeClasses();
 
-    test('observers should have correct naming')
+    it('ensures all observers have proper naming')
         ->expect('App\Observers')
         ->toHaveSuffix('Observer');
 
-    test('events should be in the correct namespace')
+    it('ensures all events are in the App\Events namespace')
         ->expect('App\Events')
         ->toBeClasses();
 
-    test('listeners should be in the correct namespace')
+    it('ensures all listeners are in the App\Listeners namespace')
         ->expect('App\Listeners')
         ->toBeClasses();
 
-    test('mail classes should be in the correct namespace')
+    it('ensures all mail classes are in the App\Mail namespace')
         ->expect('App\Mail')
         ->toBeClasses();
 
-    test('models should use consistent fillable patterns')
+    it('ensures all models use consistent fillable patterns')
         ->expect('App\Models')
         ->toBeClasses();
 });

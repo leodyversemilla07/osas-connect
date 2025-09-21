@@ -5,9 +5,6 @@ use App\Models\ScholarshipApplication;
 use App\Models\User;
 use App\Services\InterviewManagementService;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->service = app(InterviewManagementService::class);

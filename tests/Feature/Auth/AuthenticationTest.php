@@ -6,15 +6,14 @@ use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 use function Pest\Laravel\post;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
-
-test('login screen can be rendered', function () {
+it('renders the login screen', function () {
     $response = get('/login');
 
     $response->assertSuccessful();
 });
 
-test('users can authenticate using the login screen', function () {
+it('authenticates users with valid credentials', function () {
+    /** @var User $user */
     $user = User::factory()->create();
 
     $response = post('/login', [
@@ -26,7 +25,8 @@ test('users can authenticate using the login screen', function () {
     $response->assertRedirect(route('dashboard', absolute: false));
 });
 
-test('users can not authenticate with invalid password', function () {
+it('does not authenticate users with invalid password', function () {
+    /** @var User $user */
     $user = User::factory()->create();
 
     post('/login', [
@@ -37,7 +37,8 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
-test('users can logout', function () {
+it('logs out authenticated users', function () {
+    /** @var User $user */
     $user = User::factory()->create();
 
     $response = actingAs($user)->post('/logout');

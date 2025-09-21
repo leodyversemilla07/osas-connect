@@ -3,7 +3,7 @@
 use function Pest\Laravel\post;
 
 describe('Basic Validation Testing', function () {
-    test('registration requires basic fields', function () {
+    it('requires basic fields for registration', function () {
         $response = post('/register', []);
 
         $response->assertSessionHasErrors([
@@ -14,7 +14,7 @@ describe('Basic Validation Testing', function () {
         ]);
     });
 
-    test('email must be properly formatted', function () {
+    it('validates email format', function () {
         $response = post('/register', [
             'first_name' => 'John',
             'last_name' => 'Doe',
@@ -26,7 +26,7 @@ describe('Basic Validation Testing', function () {
         $response->assertSessionHasErrors('email');
     });
 
-    test('password confirmation must match', function () {
+    it('requires password confirmation to match', function () {
         $response = post('/register', [
             'first_name' => 'John',
             'last_name' => 'Doe',
