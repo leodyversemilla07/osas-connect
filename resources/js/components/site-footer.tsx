@@ -1,135 +1,43 @@
 import { Link } from '@inertiajs/react';
-import { Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
-import FacebookIcon from '../icons/facebook-icon';
 
 export default function SiteFooter() {
-    const quickLinks = [
-        { label: 'Home', url: route('home') },
+    const footerLinks = [
         { label: 'About', url: route('about') },
-        { label: 'Scholarships', url: route('scholarships') },
-        { label: 'Announcements', url: route('announcements') },
         { label: 'Contact', url: route('contact') },
-    ];
-
-    const supportLinks = [
-        { label: 'Privacy Policy', url: route('privacy') },
-        { label: 'Terms of Service', url: route('terms') },
-        { label: 'Cookie Policy', url: route('cookies') },
-        { label: 'Accessibility', url: route('accessibility') },
-        { label: 'Sitemap', url: route('sitemap') },
+        { label: 'Privacy', url: route('privacy') },
+        { label: 'Terms', url: route('terms') },
     ];
 
     return (
-        <footer className="w-full bg-[#003a1d] text-white">
+        <footer className="w-full border-t border-[#005a2d]/10 dark:border-[#f3f2f2]/10 bg-white/30 dark:bg-[#121212]/30">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                {/* Main Footer Content */}
-                <div className="grid gap-8 py-12 sm:gap-12 md:grid-cols-2 lg:grid-cols-4">
-                    <div className="mb-6 sm:mb-0">
-                        <div className="mb-4 flex items-center">
-                            <img
-                                src='/images/logo.png'
-                                alt="OSAS Connect Logo"
-                                className="h-10 w-10 mr-3 rounded-full bg-white object-contain border border-[#febd12]"
-                            />
-                            <span className="text-2xl font-semibold text-white">
+                <div className="py-8">
+                    <div className="flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
+                        {/* Logo */}
+                        <div className="flex items-center">
+                            <Link href="/" className="text-lg font-semibold text-[#005a2d] dark:text-[#23b14d]">
                                 OSAS Connect
-                            </span>
-                            <span className="ml-2 text-xs text-[#febd12]">Scholarship Management</span>
+                            </Link>
                         </div>
-                        <p className="mb-4 text-sm text-white/80">
-                            Your complete scholarship management system designed to connect students with educational funding opportunities. We help streamline the application process and maximize your chances of success.
-                        </p>
-                        <div className="mt-6 flex items-center space-x-4">
-                            {([{ platform: 'Facebook', url: 'https://www.facebook.com/mbc.scholarships' }]).map((social, index) => (
-                                <a
+
+                        {/* Links */}
+                        <nav className="flex items-center space-x-6" aria-label="Footer navigation">
+                            {footerLinks.map((link, index) => (
+                                <Link
                                     key={index}
-                                    href={social.url}
-                                    className="rounded-full bg-white/10 p-2 transition-all hover:bg-[#febd12] hover:text-[#003a1d]"
-                                    aria-label={social.platform}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                    href={link.url}
+                                    className="text-sm font-medium text-[#010002] dark:text-[#f3f2f2] transition-colors duration-200 hover:text-[#008040] dark:hover:text-[#23b14d]"
                                 >
-                                    <FacebookIcon className="h-5 w-5" />
-                                </a>
+                                    {link.label}
+                                </Link>
                             ))}
+                        </nav>
+
+                        {/* Copyright */}
+                        <div className="text-sm text-[#010002]/70 dark:text-[#f3f2f2]/70">
+                            © {new Date().getFullYear()} OSAS Connect
                         </div>
                     </div>
-
-                    {/* Column 2: Quick Links */}
-                    <div>
-                        <h3 className="mb-6 text-lg font-semibold text-[#febd12]">Quick Links</h3>
-                        <ul className="space-y-3 text-sm">
-                            {quickLinks.map((link, index) => (
-                                <li key={index}>
-                                    <Link
-                                        href={link.url}
-                                        className="text-white/70 transition-colors hover:text-[#febd12]"
-                                    >
-                                        {link.label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Column 3: Support */}
-                    <div>
-                        <h3 className="mb-6 text-lg font-semibold text-[#febd12]">Support</h3>
-                        <ul className="space-y-3 text-sm">
-                            {supportLinks.map((link, index) => (
-                                <li key={index}>
-                                    <Link
-                                        href={link.url}
-                                        className="text-white/70 transition-colors hover:text-[#febd12]"
-                                    >
-                                        {link.label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Column 4: Contact & Support */}
-                    <div className="mb-6 sm:mb-0">
-                        <h3 className="mb-6 text-lg font-medium text-[#febd12]">
-                            Contact & Support
-                        </h3>
-                        <ul className="space-y-4 text-sm">
-                            <li className="flex flex-col space-y-2 rounded-md bg-white/5 p-3 transition-colors hover:bg-white/10 sm:flex-row sm:items-start sm:space-x-3 sm:space-y-0">
-                                <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#febd12]" />
-                                <span className="text-white/80">
-                                    Office of Student Affairs and Services
-                                    University Campus
-                                </span>
-                            </li>
-                            <li className="flex flex-col space-y-2 rounded-md bg-white/5 p-3 transition-colors hover:bg-white/10 sm:flex-row sm:items-start sm:space-x-3 sm:space-y-0">
-                                <Mail className="h-5 w-5 flex-shrink-0 text-[#febd12] sm:mt-0.5" />
-                                <div className="flex-1 break-words">
-                                    <a href={`mailto:minsubcscholarship.edu.ph@gmail.com`}
-                                        className="text-white/80 hover:text-[#febd12] break-all">
-                                        minsubcscholarship.edu.ph@gmail.com
-                                    </a>
-                                </div>
-                            </li>
-                            <li className="flex flex-col space-y-2 rounded-md bg-white/5 p-3 transition-colors hover:bg-white/10 sm:flex-row sm:items-start sm:space-x-3 sm:space-y-0">
-                                <MessageCircle className="h-5 w-5 flex-shrink-0 text-[#febd12] sm:mt-0.5" />
-                                <a href={`viber://chat?number=%2B63 9482968080`} className="text-white/80 hover:text-[#febd12]">
-                                    Viber: 0948-296-8080
-                                </a>
-                            </li>
-                            <li className="flex flex-col space-y-2 rounded-md bg-white/5 p-3 transition-colors hover:bg-white/10 sm:flex-row sm:items-start sm:space-x-3 sm:space-y-0">
-                                <Clock className="h-5 w-5 flex-shrink-0 text-[#febd12] sm:mt-0.5" />
-                                <span className="text-white/80">
-                                    Monday-Friday: 8:00 AM - 5:00 PM
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                {/* Bottom Copyright */}
-                <div className="border-t border-white/10 py-6 text-center">
-                    <p className="text-sm text-white/60">&copy; {new Date().getFullYear()} OSAS Connect. All rights reserved.</p>
                 </div>
             </div>
         </footer>

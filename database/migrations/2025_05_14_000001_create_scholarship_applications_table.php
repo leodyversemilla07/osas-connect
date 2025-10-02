@@ -25,6 +25,7 @@ return new class extends Migration
                     'incomplete',
                     'verified',
                     'under_evaluation',
+                    'interview_scheduled',
                     'approved',
                     'rejected',
                     'end',

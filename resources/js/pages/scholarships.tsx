@@ -96,7 +96,7 @@ function ScholarshipCard({ scholarship, isAuthenticated }: { scholarship: Schola
     const colors = scholarshipColors[scholarship.type];
 
     return (
-        <Card className={`rounded-lg overflow-hidden shadow-md transition-all hover:shadow-lg hover:-translate-y-1 dark:bg-[#1a1a1a] border-b-4 border-[#23b14d] ${colors.card}`}>
+        <Card className={`rounded-lg overflow-hidden border border-[#010002]/10 dark:border-[#f3f2f2]/10 ${colors.card}`}>
             <CardContent className="p-6">
                 <div className="flex items-center gap-2">
                     <GraduationCap className={`h-5 w-5 ${colors.icon}`} />
@@ -171,20 +171,28 @@ export default function Scholarships({ auth, scholarships }: ScholarshipsProps) 
             <div className="flex min-h-screen flex-col items-center bg-[#f3f2f2] text-[#010002] dark:bg-[#121212] dark:text-[#f3f2f2]">
                 <SiteHeader />
 
-                <main className="mt-16 w-full flex-1 p-6 lg:p-8">
-                    <div className="mx-auto max-w-7xl">
+                <main className="mt-16 w-full flex-1">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         {/* Hero Section */}
-                        <div className="relative overflow-hidden rounded-xl shadow-lg">
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#005a2d]/95 to-[#008040]/90"></div>
-                            <div className="relative flex min-h-[40vh] flex-col items-center justify-center px-6 py-12 md:px-10 lg:px-16">
-                                <div className="text-center">
-                                    <div className="inline-block rounded-full bg-[#febd12]/20 px-4 py-1 text-sm font-medium text-[#febd12]">
-                                        Available Opportunities
+                        <div className="relative overflow-hidden min-h-[60vh] flex items-center">
+                            {/* Subtle background pattern */}
+                            <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
+                                <div className="absolute inset-0" style={{
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60 xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                                }}></div>
+                            </div>
+
+                            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
+                                <div className="text-center space-y-8">
+                                    <div className="inline-flex items-center gap-2 bg-[#febd12]/20 dark:bg-[#febd12]/30 px-4 py-2 rounded-full">
+                                        <span className="text-sm font-medium text-[#010002] dark:text-[#febd12]">Available Opportunities</span>
                                     </div>
-                                    <h1 className="mt-4 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
+
+                                    <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-[#010002] dark:text-white leading-tight">
                                         Find Your Perfect Scholarship
                                     </h1>
-                                    <p className="mt-6 max-w-2xl mx-auto text-xl text-white/90">
+
+                                    <p className="text-xl text-[#010002]/70 dark:text-[#f3f2f2]/70 max-w-3xl mx-auto leading-relaxed">
                                         Browse through our comprehensive collection of scholarships, financial aid, and student assistantship programs
                                     </p>
                                 </div>
@@ -254,27 +262,6 @@ export default function Scholarships({ auth, scholarships }: ScholarshipsProps) 
                                 </div>
                             )}
                         </section>
-
-                        {/* CTA Section - Only show for unauthenticated users */}
-                        {!isAuthenticated && (
-                            <section className="mt-16 mb-8">
-                                <div className="rounded-2xl bg-gradient-to-r from-[#005a2d] to-[#008040] p-8 shadow-xl overflow-hidden relative">
-                                    <div className="relative z-10 flex flex-col items-center justify-center text-center py-12">
-                                        <h2 className="text-3xl font-bold text-white leading-tight md:text-4xl lg:text-5xl">
-                                            Ready to Apply for a Scholarship?
-                                        </h2>
-                                        <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
-                                            Take the next step towards your academic and professional goals. Apply for our scholarships today!
-                                        </p>
-                                        <Link href={route('login')} className="mt-6">
-                                            <Button variant="default" className="px-8 py-3 text-base font-semibold">
-                                                Login to Apply
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </section>
-                        )}
                     </div>
                 </main>
 
