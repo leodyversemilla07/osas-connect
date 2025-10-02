@@ -1,6 +1,6 @@
-import { FormEventHandler, useCallback, useState } from 'react';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { FormEventHandler, useCallback, useState } from 'react';
 
 import DeleteUser from '@/components/delete-user';
 import { Button } from '@/components/ui/button';
@@ -9,19 +9,19 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
 // Profile components
-import { BasicInfoSection } from '@/components/profile/basic-info-section';
 import { AcademicInfoSection } from '@/components/profile/academic-info-section';
-import { PersonalInfoSection } from '@/components/profile/personal-info-section';
+import { AssetsAppliancesSection } from '@/components/profile/assets-appliances-section';
+import { BasicInfoSection } from '@/components/profile/basic-info-section';
 import { FamilyBackgroundSection } from '@/components/profile/family-background-section';
 import { FinancialInfoSection } from '@/components/profile/financial-info-section';
-import { AssetsAppliancesSection } from '@/components/profile/assets-appliances-section';
+import { PersonalInfoSection } from '@/components/profile/personal-info-section';
 import { SubmitSection } from '@/components/profile/submit-section';
 
 // Types and hooks
-import type { ProfileProps, UserRole } from '@/types/profile';
 import { useProfileForm } from '@/hooks/use-profile-form';
 import { useProfileInitialData } from '@/hooks/use-profile-initial-data';
 import { useRoleInfo } from '@/hooks/use-role-info';
+import type { ProfileProps, UserRole } from '@/types/profile';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,10 +33,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 /**
  * Enhanced Profile component with step-based navigation
  */
-export default function Profile({
-    photoUrl,
-    profile
-}: ProfileProps) {
+export default function Profile({ photoUrl, profile }: ProfileProps) {
     const { auth } = usePage<SharedData>().props;
 
     // Get role-specific information with proper type casting
@@ -46,26 +43,15 @@ export default function Profile({
     // Step navigation state
     const [currentStep, setCurrentStep] = useState(1);
 
-    const sectionTitles = isStudent ? [
-        "Basic Information",
-        "Academic Information",
-        "Personal Details",
-        "Family Background",
-        "Financial Information"
-    ] : ["Basic Information"];
+    const sectionTitles = isStudent
+        ? ['Basic Information', 'Academic Information', 'Personal Details', 'Family Background', 'Financial Information']
+        : ['Basic Information'];
     const totalSections = sectionTitles.length;
 
     // Initialize form data and state management
     const initialData = useProfileInitialData(profile, auth.user, isStudent);
 
-    const {
-        data,
-        errors,
-        processing,
-        updateField,
-        handleCourseChange,
-        submitForm
-    } = useProfileForm(initialData, isStudent);
+    const { data, errors, processing, updateField, handleCourseChange, submitForm } = useProfileForm(initialData, isStudent);
 
     // Simple navigation functions
     const goToNextStep = useCallback(() => {
@@ -81,14 +67,17 @@ export default function Profile({
     }, [currentStep]);
 
     // Form submission handler - can be called from any step
-    const handleSubmit: FormEventHandler = useCallback((e) => {
-        e.preventDefault();
+    const handleSubmit: FormEventHandler = useCallback(
+        (e) => {
+            e.preventDefault();
 
-        // Navigate to step with validation errors
-        submitForm((errorStep: number) => {
-            setCurrentStep(errorStep);
-        });
-    }, [submitForm, setCurrentStep]);
+            // Navigate to step with validation errors
+            submitForm((errorStep: number) => {
+                setCurrentStep(errorStep);
+            });
+        },
+        [submitForm, setCurrentStep],
+    );
 
     // Render current step content
     const renderStepContent = () => {
@@ -107,45 +96,20 @@ export default function Profile({
 
             case 2:
                 return isStudent ? (
-                    <AcademicInfoSection
-                        data={data}
-                        errors={errors}
-                        updateField={updateField}
-                        handleCourseChange={handleCourseChange}
-                    />
+                    <AcademicInfoSection data={data} errors={errors} updateField={updateField} handleCourseChange={handleCourseChange} />
                 ) : null;
 
             case 3:
-                return isStudent ? (
-                    <PersonalInfoSection
-                        data={data}
-                        errors={errors}
-                        updateField={updateField}
-                    />
-                ) : null;
+                return isStudent ? <PersonalInfoSection data={data} errors={errors} updateField={updateField} /> : null;
 
             case 4:
-                return isStudent ? (
-                    <FamilyBackgroundSection
-                        data={data}
-                        errors={errors}
-                        updateField={updateField}
-                    />
-                ) : null;
+                return isStudent ? <FamilyBackgroundSection data={data} errors={errors} updateField={updateField} /> : null;
 
             case 5:
                 return isStudent ? (
                     <>
-                        <FinancialInfoSection
-                            data={data}
-                            errors={errors}
-                            updateField={updateField}
-                        />
-                        <AssetsAppliancesSection
-                            data={data}
-                            errors={errors}
-                            updateField={updateField}
-                        />
+                        <FinancialInfoSection data={data} errors={errors} updateField={updateField} />
+                        <AssetsAppliancesSection data={data} errors={errors} updateField={updateField} />
                     </>
                 ) : null;
 
@@ -159,16 +123,14 @@ export default function Profile({
             <Head title="Profile settings" />
             <SettingsLayout>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6" role="form">
-                    <div className="grid gap-6">{renderStepContent()}
+                    <div className="grid gap-6">
+                        {renderStepContent()}
 
                         {/* Save Button - Always present */}
-                        <SubmitSection
-                            processing={processing}
-                            progress={null}
-                        />
+                        <SubmitSection processing={processing} progress={null} />
 
                         {/* Navigation buttons */}
-                        <div className="flex justify-between mt-6">
+                        <div className="mt-6 flex justify-between">
                             {currentStep > 1 ? (
                                 <Button
                                     type="button"
@@ -183,12 +145,7 @@ export default function Profile({
                                 <div />
                             )}
                             {currentStep < totalSections && (
-                                <Button
-                                    type="button"
-                                    onClick={goToNextStep}
-                                    disabled={processing}
-                                    aria-label="Go to next step"
-                                >
+                                <Button type="button" onClick={goToNextStep} disabled={processing} aria-label="Go to next step">
                                     Next
                                 </Button>
                             )}
@@ -200,17 +157,26 @@ export default function Profile({
                         <Card className="border-destructive/50 bg-destructive/5">
                             <CardContent className="pt-6">
                                 <div className="flex items-start gap-3">
-                                    <div className="rounded-full bg-destructive/10 p-2">
-                                        <svg className="h-5 w-5 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <div className="bg-destructive/10 rounded-full p-2">
+                                        <svg className="text-destructive h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            />
                                         </svg>
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="font-medium text-destructive mb-2">Please fix the following errors:</h3>
-                                        <ul className="text-sm space-y-1">
+                                        <h3 className="text-destructive mb-2 font-medium">Please fix the following errors:</h3>
+                                        <ul className="space-y-1 text-sm">
                                             {Object.entries(errors).map(([field, message]) => (
                                                 <li key={field} className="text-muted-foreground">
-                                                    • <span className="font-medium">{field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span> {message}
+                                                    •{' '}
+                                                    <span className="font-medium">
+                                                        {field.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}:
+                                                    </span>{' '}
+                                                    {message}
                                                 </li>
                                             ))}
                                         </ul>

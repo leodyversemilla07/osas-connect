@@ -4,21 +4,21 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { route } from 'ziggy-js';
 import {
-    BookOpen,
-    Users,
-    GraduationCap,
-    UserCog,
-    ClipboardList,
+    Activity,
     Award,
-    Search,
-    LayoutDashboard,
+    BookOpen,
+    ClipboardList,
     FileText,
     Github,
-    Activity,
-    MessageSquare
+    GraduationCap,
+    LayoutDashboard,
+    MessageSquare,
+    Search,
+    UserCog,
+    Users,
 } from 'lucide-react';
+import { route } from 'ziggy-js';
 import AppLogo from './app-logo';
 
 const adminNavItems: NavItem[] = [
@@ -57,7 +57,7 @@ const adminNavItems: NavItem[] = [
         href: route('admin.recent-logins'),
         icon: Activity,
         roles: ['admin'],
-    }
+    },
 ];
 
 const osasNavItems: NavItem[] = [
@@ -65,26 +65,26 @@ const osasNavItems: NavItem[] = [
         title: 'Dashboard',
         href: route('osas.dashboard'),
         icon: LayoutDashboard,
-        roles: ['osas_staff']
+        roles: ['osas_staff'],
     },
     {
         title: 'Applications',
         href: route('osas.applications'),
         icon: ClipboardList,
-        roles: ['osas_staff']
+        roles: ['osas_staff'],
     },
     {
         title: 'Student Records',
         href: route('osas.students'),
         icon: Users,
-        roles: ['osas_staff']
+        roles: ['osas_staff'],
     },
     {
         title: 'Scholarships',
         href: route('osas.manage.scholarships'),
         icon: Award,
-        roles: ['osas_staff']
-    }
+        roles: ['osas_staff'],
+    },
 ];
 
 const studentNavItems: NavItem[] = [
@@ -92,26 +92,26 @@ const studentNavItems: NavItem[] = [
         title: 'Dashboard',
         href: route('student.dashboard'),
         icon: LayoutDashboard,
-        roles: ['student']
+        roles: ['student'],
     },
     {
         title: 'Browse Scholarships',
         href: route('student.scholarships.index'),
         icon: Search,
-        roles: ['student']
+        roles: ['student'],
     },
     {
         title: 'My Applications',
         href: route('student.applications'),
         icon: FileText,
-        roles: ['student']
+        roles: ['student'],
     },
     {
         title: 'Interviews',
         href: route('student.interviews.index'),
         icon: MessageSquare,
-        roles: ['student']
-    }
+        roles: ['student'],
+    },
 ];
 
 const footerNavItems: NavItem[] = [

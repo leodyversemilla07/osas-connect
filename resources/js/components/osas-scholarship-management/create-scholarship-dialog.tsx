@@ -1,30 +1,19 @@
-import { useState } from 'react';
-import { useForm } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter
-} from '@/components/ui/dialog';
-import { Plus, X, Loader2, CalendarIcon } from 'lucide-react';
-import { toast } from 'sonner';
 import InputError from '@/components/input-error';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+import { useForm } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { CalendarIcon, Loader2, Plus, X } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface CreateScholarshipForm {
     name: string;
@@ -92,7 +81,10 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
     };
 
     const removeCriterion = (index: number) => {
-        setData('criteria', data.criteria.filter((_, i) => i !== index));
+        setData(
+            'criteria',
+            data.criteria.filter((_, i) => i !== index),
+        );
     };
 
     const addDocument = () => {
@@ -103,7 +95,10 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
     };
 
     const removeDocument = (index: number) => {
-        setData('required_documents', data.required_documents.filter((_, i) => i !== index));
+        setData(
+            'required_documents',
+            data.required_documents.filter((_, i) => i !== index),
+        );
     };
 
     const handleTypeChange = (type: string) => {
@@ -120,13 +115,13 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     'General Weighted Average (GWA) between 1.000 - 1.450',
                     'No grade below 1.75 in any course',
                     'No Dropped/Deferred/Failed marks',
-                    'Minimum of 18 units enrollment'
+                    'Minimum of 18 units enrollment',
                 ]);
                 setData('required_documents', [
                     'Official Transcript of Records',
                     'Certificate of Enrollment',
                     'Certificate of Good Moral Character',
-                    'Recent ID Picture (2x2)'
+                    'Recent ID Picture (2x2)',
                 ]);
                 break;
             case 'academic_partial':
@@ -135,13 +130,13 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     'General Weighted Average (GWA) between 1.460 - 1.750',
                     'No grade below 1.75 in any course',
                     'No Dropped/Deferred/Failed marks',
-                    'Minimum of 18 units enrollment'
+                    'Minimum of 18 units enrollment',
                 ]);
                 setData('required_documents', [
                     'Official Transcript of Records',
                     'Certificate of Enrollment',
                     'Certificate of Good Moral Character',
-                    'Recent ID Picture (2x2)'
+                    'Recent ID Picture (2x2)',
                 ]);
                 break;
             case 'student_assistantship':
@@ -150,14 +145,14 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     'General Weighted Average (GWA) not below 2.25',
                     'No failing grades',
                     'Available for minimum 15 hours/week work commitment',
-                    'Enrolled in at least 12 units'
+                    'Enrolled in at least 12 units',
                 ]);
                 setData('required_documents', [
                     'Official Transcript of Records',
                     'Certificate of Enrollment',
                     'Certificate of Good Moral Character',
                     'Work Schedule Commitment Letter',
-                    'Recommendation from Department Head'
+                    'Recommendation from Department Head',
                 ]);
                 break;
             case 'performing_arts_full':
@@ -167,14 +162,14 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     'Member for at least one (1) semester',
                     'Participated in at least two (2) major University activities',
                     'Recommended by group coach/adviser',
-                    'Maintaining reasonable academic standing'
+                    'Maintaining reasonable academic standing',
                 ]);
                 setData('required_documents', [
                     'Certificate of Group Membership',
                     'Recommendation Letter from Coach/Adviser',
                     'List of Performances/Activities',
                     'Official Transcript of Records',
-                    'Certificate of Enrollment'
+                    'Certificate of Enrollment',
                 ]);
                 break;
             case 'performing_arts_partial':
@@ -184,14 +179,14 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     'Member for at least one (1) semester',
                     'Participated in at least two (2) major University activities',
                     'Recommended by group coach/adviser',
-                    'Maintaining reasonable academic standing'
+                    'Maintaining reasonable academic standing',
                 ]);
                 setData('required_documents', [
                     'Certificate of Group Membership',
                     'Recommendation Letter from Coach/Adviser',
                     'List of Performances/Activities',
                     'Official Transcript of Records',
-                    'Certificate of Enrollment'
+                    'Certificate of Enrollment',
                 ]);
                 break;
             case 'economic_assistance':
@@ -200,7 +195,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     'General Weighted Average (GWA) of at least 2.25',
                     'From economically disadvantaged family',
                     'MSWDO Indigency Certificate required',
-                    'Full-time student status'
+                    'Full-time student status',
                 ]);
                 setData('required_documents', [
                     'MSWDO Indigency Certificate',
@@ -208,7 +203,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     'Barangay Certificate of Residency',
                     'Official Transcript of Records',
                     'Certificate of Enrollment',
-                    'Family Income Statement'
+                    'Family Income Statement',
                 ]);
                 break;
             case 'others':
@@ -225,12 +220,10 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
                 <DialogHeader className="space-y-3">
                     <DialogTitle>Create New Scholarship</DialogTitle>
-                    <DialogDescription>
-                        Set up a new scholarship program with eligibility criteria and requirements.
-                    </DialogDescription>
+                    <DialogDescription>Set up a new scholarship program with eligibility criteria and requirements.</DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -243,8 +236,8 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 placeholder="Enter scholarship name"
-                                className={errors.name ? "border-destructive" : ""}
-                                aria-invalid={errors.name ? "true" : undefined}
+                                className={errors.name ? 'border-destructive' : ''}
+                                aria-invalid={errors.name ? 'true' : undefined}
                                 required
                             />
                             {errors.name && <InputError message={errors.name} />}
@@ -254,7 +247,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                             <div className="space-y-2">
                                 <Label htmlFor="type">Type</Label>
                                 <Select value={data.type} onValueChange={handleTypeChange}>
-                                    <SelectTrigger className={errors.type ? "border-destructive" : ""}>
+                                    <SelectTrigger className={errors.type ? 'border-destructive' : ''}>
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -273,7 +266,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                             <div className="space-y-2">
                                 <Label htmlFor="status">Status</Label>
                                 <Select value={data.status} onValueChange={(value) => setData('status', value)}>
-                                    <SelectTrigger className={errors.status ? "border-destructive" : ""}>
+                                    <SelectTrigger className={errors.status ? 'border-destructive' : ''}>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -296,7 +289,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                     value={data.type_specification}
                                     onChange={(e) => setData('type_specification', e.target.value)}
                                     placeholder="Enter custom scholarship type name"
-                                    className={errors.type_specification ? "border-destructive" : ""}
+                                    className={errors.type_specification ? 'border-destructive' : ''}
                                     required
                                 />
                                 {errors.type_specification && <InputError message={errors.type_specification} />}
@@ -311,12 +304,12 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                 onChange={(e) => setData('description', e.target.value)}
                                 rows={2}
                                 placeholder="Describe the scholarship program, its purpose, and benefits..."
-                                className={`resize-none ${errors.description ? "border-destructive" : ""}`}
+                                className={`resize-none ${errors.description ? 'border-destructive' : ''}`}
                                 required
                             />
                             {errors.description && <InputError message={errors.description} />}
                         </div>
-                        
+
                         <div className="space-y-2">
                             <Label htmlFor="funding_source">Funding Source</Label>
                             <Input
@@ -324,7 +317,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                 value={data.funding_source}
                                 onChange={(e) => setData('funding_source', e.target.value)}
                                 placeholder="Enter funding source (e.g., Government, Private Donor, University Fund)"
-                                className={errors.funding_source ? "border-destructive" : ""}
+                                className={errors.funding_source ? 'border-destructive' : ''}
                                 required
                             />
                             {errors.funding_source && <InputError message={errors.funding_source} />}
@@ -341,7 +334,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                     value={data.amount}
                                     onChange={(e) => setData('amount', e.target.value)}
                                     placeholder="0.00"
-                                    className={errors.amount ? "border-destructive" : ""}
+                                    className={errors.amount ? 'border-destructive' : ''}
                                     required
                                 />
                                 {errors.amount && <InputError message={errors.amount} />}
@@ -356,7 +349,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                     value={data.slots_available}
                                     onChange={(e) => setData('slots_available', e.target.value)}
                                     placeholder="1"
-                                    className={errors.slots_available ? "border-destructive" : ""}
+                                    className={errors.slots_available ? 'border-destructive' : ''}
                                     required
                                 />
                                 {errors.slots_available && <InputError message={errors.slots_available} />}
@@ -369,16 +362,12 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                         <Button
                                             variant="outline"
                                             className={cn(
-                                                "w-full justify-start text-left font-normal",
-                                                !data.deadline && "text-muted-foreground",
-                                                errors.deadline && "border-destructive"
+                                                'w-full justify-start text-left font-normal',
+                                                !data.deadline && 'text-muted-foreground',
+                                                errors.deadline && 'border-destructive',
                                             )}
                                         >
-                                            {data.deadline ? (
-                                                format(new Date(data.deadline), "PPP")
-                                            ) : (
-                                                <span>Pick a deadline date</span>
-                                            )}
+                                            {data.deadline ? format(new Date(data.deadline), 'PPP') : <span>Pick a deadline date</span>}
                                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                         </Button>
                                     </PopoverTrigger>
@@ -410,9 +399,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     <div className="space-y-3">
                         <div>
                             <Label className="text-base font-medium">Eligibility Criteria</Label>
-                            <p className="text-sm text-muted-foreground">
-                                Define the requirements for this scholarship
-                            </p>
+                            <p className="text-muted-foreground text-sm">Define the requirements for this scholarship</p>
                         </div>
 
                         <div className="flex gap-2">
@@ -422,12 +409,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                 placeholder="Enter a criterion (e.g., Minimum GPA of 2.5)"
                                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCriterion())}
                             />
-                            <Button
-                                type="button"
-                                onClick={addCriterion}
-                                size="sm"
-                                variant="ghost"
-                            >
+                            <Button type="button" onClick={addCriterion} size="sm" variant="ghost">
                                 <Plus className="h-4 w-4" />
                             </Button>
                         </div>
@@ -441,7 +423,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="ml-1 h-auto p-0 text-muted-foreground hover:text-foreground"
+                                            className="text-muted-foreground hover:text-foreground ml-1 h-auto p-0"
                                             onClick={() => removeCriterion(index)}
                                         >
                                             <X className="h-3 w-3" />
@@ -456,9 +438,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     <div className="space-y-3">
                         <div>
                             <Label className="text-base font-medium">Required Documents</Label>
-                            <p className="text-sm text-muted-foreground">
-                                List all documents applicants must submit
-                            </p>
+                            <p className="text-muted-foreground text-sm">List all documents applicants must submit</p>
                         </div>
 
                         <div className="flex gap-2">
@@ -468,12 +448,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                 placeholder="Enter a required document (e.g., Official Transcript of Records)"
                                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDocument())}
                             />
-                            <Button
-                                type="button"
-                                onClick={addDocument}
-                                size="sm"
-                                variant="ghost"
-                            >
+                            <Button type="button" onClick={addDocument} size="sm" variant="ghost">
                                 <Plus className="h-4 w-4" />
                             </Button>
                         </div>
@@ -487,7 +462,7 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="ml-1 h-auto p-0 text-muted-foreground hover:text-foreground"
+                                            className="text-muted-foreground hover:text-foreground ml-1 h-auto p-0"
                                             onClick={() => removeDocument(index)}
                                         >
                                             <X className="h-3 w-3" />
@@ -499,18 +474,10 @@ export default function CreateScholarshipDialog({ isOpen, onClose }: CreateSchol
                     </div>
 
                     <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={onClose}
-                            disabled={processing}
-                        >
+                        <Button type="button" variant="ghost" onClick={onClose} disabled={processing}>
                             Cancel
                         </Button>
-                        <Button
-                            type="submit"
-                            disabled={processing}
-                        >
+                        <Button type="submit" disabled={processing}>
                             {processing ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

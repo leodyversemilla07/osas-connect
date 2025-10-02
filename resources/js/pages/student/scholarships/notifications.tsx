@@ -1,23 +1,12 @@
-import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-    Bell,
-    CheckCircle2,
-    Calendar,
-    DollarSign,
-    FileText,
-    AlertCircle,
-    Clock,
-    Trash2,
-    Eye,
-    RefreshCw
-} from 'lucide-react';
+import AppLayout from '@/layouts/app-layout';
+import { Head, router } from '@inertiajs/react';
+import { AlertCircle, Bell, Calendar, CheckCircle2, Clock, DollarSign, Eye, FileText, RefreshCw, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 interface NotificationData {
     application_id?: number;
@@ -50,33 +39,33 @@ interface BreadcrumbItem {
 
 const getNotificationIcon = (type: string) => {
     const icons = {
-        'application_status': <FileText className="h-5 w-5" />,
-        'document_request': <FileText className="h-5 w-5" />,
-        'interview_schedule': <Calendar className="h-5 w-5" />,
-        'stipend_release': <DollarSign className="h-5 w-5" />,
-        'renewal_reminder': <Clock className="h-5 w-5" />
+        application_status: <FileText className="h-5 w-5" />,
+        document_request: <FileText className="h-5 w-5" />,
+        interview_schedule: <Calendar className="h-5 w-5" />,
+        stipend_release: <DollarSign className="h-5 w-5" />,
+        renewal_reminder: <Clock className="h-5 w-5" />,
     };
     return icons[type as keyof typeof icons] || <Bell className="h-5 w-5" />;
 };
 
 const getNotificationColor = (type: string) => {
     const colors = {
-        'application_status': 'text-blue-600 bg-blue-100',
-        'document_request': 'text-orange-600 bg-orange-100',
-        'interview_schedule': 'text-purple-600 bg-purple-100',
-        'stipend_release': 'text-green-600 bg-green-100',
-        'renewal_reminder': 'text-yellow-600 bg-yellow-100'
+        application_status: 'text-blue-600 bg-blue-100',
+        document_request: 'text-orange-600 bg-orange-100',
+        interview_schedule: 'text-purple-600 bg-purple-100',
+        stipend_release: 'text-green-600 bg-green-100',
+        renewal_reminder: 'text-yellow-600 bg-yellow-100',
     };
     return colors[type as keyof typeof colors] || 'text-gray-600 bg-gray-100';
 };
 
 const getNotificationTypeLabel = (type: string) => {
     const labels = {
-        'application_status': 'Application Status',
-        'document_request': 'Document Request',
-        'interview_schedule': 'Interview Schedule',
-        'stipend_release': 'Stipend Release',
-        'renewal_reminder': 'Renewal Reminder'
+        application_status: 'Application Status',
+        document_request: 'Document Request',
+        interview_schedule: 'Interview Schedule',
+        stipend_release: 'Stipend Release',
+        renewal_reminder: 'Renewal Reminder',
     };
     return labels[type as keyof typeof labels] || 'Notification';
 };
@@ -107,8 +96,8 @@ export default function Notifications({ notifications, unreadCount }: Notificati
         { title: 'Notifications', href: '#' },
     ];
 
-    const unreadNotifications = notifications.filter(n => !n.read_at);
-    const readNotifications = notifications.filter(n => n.read_at);
+    const unreadNotifications = notifications.filter((n) => !n.read_at);
+    const readNotifications = notifications.filter((n) => n.read_at);
 
     const getFilteredNotifications = () => {
         switch (selectedTab) {
@@ -148,7 +137,7 @@ export default function Notifications({ notifications, unreadCount }: Notificati
     const handleDeleteSelected = async () => {
         try {
             await router.post('/student/notifications/delete-selected', {
-                notifications: selectedNotifications
+                notifications: selectedNotifications,
             });
             setSelectedNotifications([]);
         } catch (error) {
@@ -169,11 +158,7 @@ export default function Notifications({ notifications, unreadCount }: Notificati
     };
 
     const toggleNotificationSelection = (notificationId: number) => {
-        setSelectedNotifications(prev =>
-            prev.includes(notificationId)
-                ? prev.filter(id => id !== notificationId)
-                : [...prev, notificationId]
-        );
+        setSelectedNotifications((prev) => (prev.includes(notificationId) ? prev.filter((id) => id !== notificationId) : [...prev, notificationId]));
     };
 
     const filteredNotifications = getFilteredNotifications();
@@ -185,58 +170,44 @@ export default function Notifications({ notifications, unreadCount }: Notificati
                 <meta name="description" content="View and manage your scholarship notifications" />
             </Head>
 
-            <div className="max-w-4xl mx-auto p-6 space-y-6">
+            <div className="mx-auto max-w-4xl space-y-6 p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-3">
+                        <h1 className="flex items-center gap-3 text-3xl font-bold text-gray-900 dark:text-gray-100">
                             <Bell className="h-8 w-8" />
                             Notifications
-                            {unreadCount > 0 && (
-                                <Badge className="bg-red-600 text-white">
-                                    {unreadCount}
-                                </Badge>
-                            )}
+                            {unreadCount > 0 && <Badge className="bg-red-600 text-white">{unreadCount}</Badge>}
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-1">
+                        <p className="mt-1 text-gray-600 dark:text-gray-400">
                             Stay updated with your scholarship applications and important announcements
                         </p>
                     </div>
 
                     <div className="flex gap-2">
                         {unreadCount > 0 && (
-                            <Button
-                                variant="outline"
-                                onClick={handleMarkAllAsRead}
-                            >
-                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                            <Button variant="outline" onClick={handleMarkAllAsRead}>
+                                <CheckCircle2 className="mr-2 h-4 w-4" />
                                 Mark All Read
                             </Button>
                         )}
 
                         {selectedNotifications.length > 0 && (
-                            <Button
-                                variant="outline"
-                                onClick={handleDeleteSelected}
-                                className="text-red-600 hover:text-red-700"
-                            >
-                                <Trash2 className="h-4 w-4 mr-2" />
+                            <Button variant="outline" onClick={handleDeleteSelected} className="text-red-600 hover:text-red-700">
+                                <Trash2 className="mr-2 h-4 w-4" />
                                 Delete Selected ({selectedNotifications.length})
                             </Button>
                         )}
 
-                        <Button
-                            variant="outline"
-                            onClick={() => window.location.reload()}
-                        >
-                            <RefreshCw className="h-4 w-4 mr-2" />
+                        <Button variant="outline" onClick={() => window.location.reload()}>
+                            <RefreshCw className="mr-2 h-4 w-4" />
                             Refresh
                         </Button>
                     </div>
                 </div>
 
                 {/* Statistics */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -287,16 +258,15 @@ export default function Notifications({ notifications, unreadCount }: Notificati
                     </CardHeader>
                     <CardContent>
                         {filteredNotifications.length === 0 ? (
-                            <div className="text-center py-12">
-                                <Bell className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                            <div className="py-12 text-center">
+                                <Bell className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+                                <h3 className="mb-2 text-lg font-medium text-gray-900">
                                     {selectedTab === 'unread' ? 'No Unread Notifications' : 'No Notifications'}
                                 </h3>
                                 <p className="text-gray-600">
                                     {selectedTab === 'unread'
                                         ? "You're all caught up! No new notifications to read."
-                                        : "You'll receive notifications here when there are updates about your scholarship applications."
-                                    }
+                                        : "You'll receive notifications here when there are updates about your scholarship applications."}
                                 </p>
                             </div>
                         ) : (
@@ -304,10 +274,9 @@ export default function Notifications({ notifications, unreadCount }: Notificati
                                 {filteredNotifications.map((notification) => (
                                     <div
                                         key={notification.id}
-                                        className={`p-4 border rounded-lg cursor-pointer transition-colors ${!notification.read_at
-                                            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100'
-                                            : 'bg-white hover:bg-gray-50'
-                                            } ${selectedNotifications.includes(notification.id) ? 'ring-2 ring-blue-500' : ''}`}
+                                        className={`cursor-pointer rounded-lg border p-4 transition-colors ${
+                                            !notification.read_at ? 'border-blue-200 bg-blue-50 hover:bg-blue-100' : 'bg-white hover:bg-gray-50'
+                                        } ${selectedNotifications.includes(notification.id) ? 'ring-2 ring-blue-500' : ''}`}
                                         onClick={() => handleNotificationClick(notification)}
                                     >
                                         <div className="flex items-start gap-4">
@@ -323,35 +292,27 @@ export default function Notifications({ notifications, unreadCount }: Notificati
                                             />
 
                                             {/* Icon */}
-                                            <div className={`p-2 rounded-full ${getNotificationColor(notification.type)}`}>
+                                            <div className={`rounded-full p-2 ${getNotificationColor(notification.type)}`}>
                                                 {getNotificationIcon(notification.type)}
                                             </div>
 
                                             {/* Content */}
-                                            <div className="flex-1 min-w-0">
+                                            <div className="min-w-0 flex-1">
                                                 <div className="flex items-start justify-between">
                                                     <div className="flex-1">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <h4 className="font-medium text-gray-900">
-                                                                {notification.title}
-                                                            </h4>
+                                                        <div className="mb-1 flex items-center gap-2">
+                                                            <h4 className="font-medium text-gray-900">{notification.title}</h4>
                                                             <Badge variant="outline" className="text-xs">
                                                                 {getNotificationTypeLabel(notification.type)}
                                                             </Badge>
-                                                            {!notification.read_at && (
-                                                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                                            )}
+                                                            {!notification.read_at && <div className="h-2 w-2 rounded-full bg-blue-600"></div>}
                                                         </div>
-                                                        <p className="text-sm text-gray-600 mb-2">
-                                                            {notification.message}
-                                                        </p>
-                                                        <p className="text-xs text-gray-500">
-                                                            {formatRelativeTime(notification.created_at)}
-                                                        </p>
+                                                        <p className="mb-2 text-sm text-gray-600">{notification.message}</p>
+                                                        <p className="text-xs text-gray-500">{formatRelativeTime(notification.created_at)}</p>
                                                     </div>
 
                                                     {/* Actions */}
-                                                    <div className="flex gap-1 ml-4">
+                                                    <div className="ml-4 flex gap-1">
                                                         {!notification.read_at && (
                                                             <Button
                                                                 variant="ghost"
@@ -400,8 +361,8 @@ export default function Notifications({ notifications, unreadCount }: Notificati
                     <Alert>
                         <AlertCircle className="h-4 w-4" />
                         <AlertDescription>
-                            You don't have any notifications yet. Once you start applying for scholarships,
-                            you'll receive updates about your applications here.
+                            You don't have any notifications yet. Once you start applying for scholarships, you'll receive updates about your
+                            applications here.
                         </AlertDescription>
                     </Alert>
                 )}

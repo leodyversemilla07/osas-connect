@@ -1,12 +1,11 @@
-import { Head, useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar, Clock, User, GraduationCap, ArrowLeft } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeft, Calendar, Clock, GraduationCap, User } from 'lucide-react';
+import { FormEvent } from 'react';
 
 interface Student {
     id: number;
@@ -43,8 +42,8 @@ export default function InterviewSchedule({ application }: Props) {
         interview_time: '',
         location: '',
         notes: '',
-    });    
-    
+    });
+
     const submit = (e: FormEvent) => {
         e.preventDefault();
         form.post(route('osas.scholarships.interview.store', application.id), {
@@ -63,7 +62,7 @@ export default function InterviewSchedule({ application }: Props) {
             const displayTime = new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
                 hour: 'numeric',
                 minute: '2-digit',
-                hour12: true
+                hour12: true,
             });
             timeOptions.push({ value: timeString, label: displayTime });
         }
@@ -72,31 +71,31 @@ export default function InterviewSchedule({ application }: Props) {
     return (
         <>
             <Head title="Schedule Interview" />
-            
+
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             {/* Header */}
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="mb-6 flex items-center justify-between">
                                 <div className="flex items-center space-x-4">
                                     <Link
                                         href={route('osas.applications.review', application.id)}
                                         className="flex items-center text-gray-500 hover:text-gray-700"
                                     >
-                                        <ArrowLeft className="h-5 w-5 mr-1" />
+                                        <ArrowLeft className="mr-1 h-5 w-5" />
                                         Back to Application
                                     </Link>
                                 </div>
                                 <h1 className="text-2xl font-bold text-gray-900">Schedule Interview</h1>
                             </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                                 {/* Student Information */}
                                 <Card>
                                     <CardHeader>
                                         <CardTitle className="flex items-center">
-                                            <User className="h-5 w-5 mr-2" />
+                                            <User className="mr-2 h-5 w-5" />
                                             Student Information
                                         </CardTitle>
                                     </CardHeader>
@@ -132,7 +131,7 @@ export default function InterviewSchedule({ application }: Props) {
                                 <Card>
                                     <CardHeader>
                                         <CardTitle className="flex items-center">
-                                            <GraduationCap className="h-5 w-5 mr-2" />
+                                            <GraduationCap className="mr-2 h-5 w-5" />
                                             Scholarship Information
                                         </CardTitle>
                                     </CardHeader>
@@ -147,7 +146,7 @@ export default function InterviewSchedule({ application }: Props) {
                                         </div>
                                         <div>
                                             <span className="font-medium">Application Status:</span>
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
                                                 {application.status}
                                             </span>
                                         </div>
@@ -155,10 +154,7 @@ export default function InterviewSchedule({ application }: Props) {
                                             <div>
                                                 <span className="font-medium">Current Interview:</span>
                                                 <p className="text-gray-600">
-                                                    {application.interview_date ? 
-                                                        new Date(application.interview_date).toLocaleString() : 
-                                                        'Scheduled'
-                                                    }
+                                                    {application.interview_date ? new Date(application.interview_date).toLocaleString() : 'Scheduled'}
                                                 </p>
                                             </div>
                                         )}
@@ -169,7 +165,7 @@ export default function InterviewSchedule({ application }: Props) {
                                 <Card>
                                     <CardHeader>
                                         <CardTitle className="flex items-center">
-                                            <Calendar className="h-5 w-5 mr-2" />
+                                            <Calendar className="mr-2 h-5 w-5" />
                                             {application.interview_scheduled ? 'Reschedule Interview' : 'Schedule Interview'}
                                         </CardTitle>
                                     </CardHeader>
@@ -223,9 +219,7 @@ export default function InterviewSchedule({ application }: Props) {
                                                     required
                                                     className="mt-1"
                                                 />
-                                                {form.errors.location && (
-                                                    <p className="mt-1 text-sm text-red-600">{form.errors.location}</p>
-                                                )}
+                                                {form.errors.location && <p className="mt-1 text-sm text-red-600">{form.errors.location}</p>}
                                             </div>
 
                                             <div>
@@ -238,24 +232,21 @@ export default function InterviewSchedule({ application }: Props) {
                                                     rows={3}
                                                     className="mt-1"
                                                 />
-                                                {form.errors.notes && (
-                                                    <p className="mt-1 text-sm text-red-600">{form.errors.notes}</p>
-                                                )}
+                                                {form.errors.notes && <p className="mt-1 text-sm text-red-600">{form.errors.notes}</p>}
                                             </div>
 
                                             <div className="flex space-x-3">
-                                                <Button
-                                                    type="submit"
-                                                    disabled={form.processing}
-                                                    className="flex-1"
-                                                >
-                                                    <Clock className="h-4 w-4 mr-2" />
-                                                    {form.processing ? 'Scheduling...' : 
-                                                     application.interview_scheduled ? 'Reschedule Interview' : 'Schedule Interview'}
+                                                <Button type="submit" disabled={form.processing} className="flex-1">
+                                                    <Clock className="mr-2 h-4 w-4" />
+                                                    {form.processing
+                                                        ? 'Scheduling...'
+                                                        : application.interview_scheduled
+                                                          ? 'Reschedule Interview'
+                                                          : 'Schedule Interview'}
                                                 </Button>
                                                 <Link
                                                     href={route('osas.applications.review', application.id)}
-                                                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                                    className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                                                 >
                                                     Cancel
                                                 </Link>
@@ -271,7 +262,7 @@ export default function InterviewSchedule({ application }: Props) {
                                     <CardTitle>Interview Guidelines</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <ul className="list-disc list-inside space-y-1 text-gray-600">
+                                    <ul className="list-inside list-disc space-y-1 text-gray-600">
                                         <li>Interviews should be scheduled at least 24 hours in advance</li>
                                         <li>Students will receive an email notification with interview details</li>
                                         <li>Prepare interview questions based on the scholarship criteria</li>

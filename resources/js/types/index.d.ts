@@ -176,7 +176,6 @@ export interface OsasStaffProfile {
     staff_id: string;
 }
 
-
 export interface User {
     id: number;
     last_name: string;

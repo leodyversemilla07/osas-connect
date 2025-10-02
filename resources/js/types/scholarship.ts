@@ -32,15 +32,15 @@ export interface ScholarshipApplication {
     canCancel: boolean;
 }
 
-export type ApplicationStatus = 
-    | 'draft' 
-    | 'submitted' 
-    | 'under_verification' 
+export type ApplicationStatus =
+    | 'draft'
+    | 'submitted'
+    | 'under_verification'
     | 'incomplete'
     | 'verified'
-    | 'under_evaluation' 
-    | 'approved' 
-    | 'rejected' 
+    | 'under_evaluation'
+    | 'approved'
+    | 'rejected'
     | 'end';
 
 export interface ApplicationDocument {

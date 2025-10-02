@@ -1,8 +1,8 @@
-import React from "react";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import InputError from "@/components/input-error";
-import { cn } from "@/lib/utils";
+import InputError from '@/components/input-error';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn } from '@/lib/utils';
+import React from 'react';
 
 interface RadioWithLabelOption {
     value: string;
@@ -20,7 +20,7 @@ interface RadioWithLabelProps {
     error?: string;
     className?: string;
     description?: string;
-    orientation?: "horizontal" | "vertical";
+    orientation?: 'horizontal' | 'vertical';
     disabled?: boolean;
 }
 
@@ -33,7 +33,7 @@ const RadioWithLabel: React.FC<RadioWithLabelProps> = ({
     required = false,
     error,
     description,
-    orientation = "vertical",
+    orientation = 'vertical',
     disabled = false,
 }) => {
     const errorId = error ? `${id}-error` : undefined;
@@ -46,7 +46,7 @@ const RadioWithLabel: React.FC<RadioWithLabelProps> = ({
                 {required && <span className="text-red-500">*</span>}
             </Label>
             {description && (
-                <p id={descriptionId} className="text-sm text-muted-foreground">
+                <p id={descriptionId} className="text-muted-foreground text-sm">
                     {description}
                 </p>
             )}
@@ -54,27 +54,15 @@ const RadioWithLabel: React.FC<RadioWithLabelProps> = ({
                 value={value}
                 onValueChange={onChange}
                 disabled={disabled}
-                className={cn(
-                    "mt-2",
-                    orientation === "horizontal" && "flex flex-wrap gap-4"
-                )}
+                className={cn('mt-2', orientation === 'horizontal' && 'flex flex-wrap gap-4')}
                 aria-describedby={cn(errorId, descriptionId)}
                 aria-invalid={!!error}
             >
                 {options.map((option) => {
-                    const optionId =
-                        option.id ||
-                        `${id}-${option.value.toLowerCase().replace(/\s+/g, "-")}`;
+                    const optionId = option.id || `${id}-${option.value.toLowerCase().replace(/\s+/g, '-')}`;
                     return (
-                        <div
-                            key={option.value}
-                            className="flex items-center space-x-2"
-                        >
-                            <RadioGroupItem
-                                value={option.value}
-                                id={optionId}
-                                disabled={disabled}
-                            />
+                        <div key={option.value} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option.value} id={optionId} disabled={disabled} />
                             <Label htmlFor={optionId}>{option.label}</Label>
                         </div>
                     );

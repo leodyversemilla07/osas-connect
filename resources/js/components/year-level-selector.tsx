@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { SelectorWithLabel } from "@/components/selector-with-label";
+import { SelectorWithLabel } from '@/components/selector-with-label';
+import { useMemo } from 'react';
 
 export interface YearLevelSelectorProps {
     value: string;
@@ -10,19 +10,13 @@ export interface YearLevelSelectorProps {
 }
 
 const YEAR_LEVEL_OPTIONS = [
-    { value: "1st Year", label: "1st Year" },
-    { value: "2nd Year", label: "2nd Year" },
-    { value: "3rd Year", label: "3rd Year" },
-    { value: "4th Year", label: "4th Year" },
+    { value: '1st Year', label: '1st Year' },
+    { value: '2nd Year', label: '2nd Year' },
+    { value: '3rd Year', label: '3rd Year' },
+    { value: '4th Year', label: '4th Year' },
 ];
 
-export default function YearLevelSelector({
-    value,
-    onChange,
-    error,
-    required = false,
-    className = "",
-}: YearLevelSelectorProps) {
+export default function YearLevelSelector({ value, onChange, error, required = false, className = '' }: YearLevelSelectorProps) {
     const options = useMemo(() => YEAR_LEVEL_OPTIONS, []);
     return (
         <SelectorWithLabel

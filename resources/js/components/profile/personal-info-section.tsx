@@ -1,48 +1,40 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User } from 'lucide-react';
-import { InputWithLabel } from '@/components/input-with-label';
-import { DatePicker } from '@/components/date-picker';
 import Address from '@/components/address';
-import PlaceOfBirth from '@/components/place-of-birth';
-import ReligionSelector from '@/components/religion-selector';
 import CivilStatusSelector from '@/components/civil-status-selector';
-import SexSelector from '@/components/sex-selector';
+import { DatePicker } from '@/components/date-picker';
+import { InputWithLabel } from '@/components/input-with-label';
+import PlaceOfBirth from '@/components/place-of-birth';
 import PwdRadio from '@/components/pwd-radio';
+import ReligionSelector from '@/components/religion-selector';
 import ResidenceTypeSelector from '@/components/residence-type-selector';
+import SexSelector from '@/components/sex-selector';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { ProfileSectionProps } from '@/types/profile';
+import { User } from 'lucide-react';
+import React from 'react';
 
 /**
  * Personal Information Section Component
  * Handles personal details like civil status, contact info, address, etc.
  */
-export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' | 'errors' | 'updateField'>>(({
-    data,
-    errors,
-    updateField
-}) => {
+export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' | 'errors' | 'updateField'>>(({ data, errors, updateField }) => {
     return (
         <Card data-testid="personal-info-section">
             <CardHeader>
                 <div className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-primary" />
+                    <User className="text-primary h-5 w-5" />
                     <CardTitle>Personal Information</CardTitle>
                 </div>
                 <CardDescription>Your personal details and contact information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 {/* Civil Status and Gender */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <CivilStatusSelector
                         value={data.civil_status || ''}
                         onChange={(value) => updateField('civil_status', value)}
                         error={errors.civil_status}
                     />
-                    <SexSelector
-                        value={data.sex || ''}
-                        onChange={(value) => updateField('sex', value)}
-                        error={errors.sex}
-                    />
+                    <SexSelector value={data.sex || ''} onChange={(value) => updateField('sex', value)} error={errors.sex} />
                 </div>
 
                 {/* Birth Information */}
@@ -80,10 +72,9 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                     processing={false}
                 />
 
-
                 {/* Contact Information */}
                 <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <InputWithLabel
                             id="mobile_number"
                             label="Mobile Number"
@@ -109,8 +100,8 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
 
                 {/* PWD Information */}
                 <PwdRadio
-                    value={data.is_pwd ? "Yes" : "No"}
-                    onChange={(value) => updateField('is_pwd', value === "Yes")}
+                    value={data.is_pwd ? 'Yes' : 'No'}
+                    onChange={(value) => updateField('is_pwd', value === 'Yes')}
                     disabilityType={data.disability_type || ''}
                     onDisabilityTypeChange={(value) => updateField('disability_type', value)}
                     error={errors.is_pwd}
@@ -118,7 +109,7 @@ export const PersonalInfoSection = React.memo<Pick<ProfileSectionProps, 'data' |
                 />
 
                 {/* Additional Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <ReligionSelector
                         value={data.religion || ''}
                         onChange={(value: string) => updateField('religion', value)}

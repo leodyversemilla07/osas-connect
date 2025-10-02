@@ -13,15 +13,12 @@ export class NumberFormatter {
             return '';
         }
 
-        const clampedValue = Math.max(
-            this.MIN_VALUE,
-            Math.min(this.MAX_VALUE, value)
-        );
+        const clampedValue = Math.max(this.MIN_VALUE, Math.min(this.MAX_VALUE, value));
 
         return clampedValue.toLocaleString('en-US', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
-            useGrouping: false
+            useGrouping: false,
         });
     }
 
@@ -36,10 +33,7 @@ export class NumberFormatter {
 
         if (isNaN(parsed)) return 0;
 
-        return Math.max(
-            this.MIN_VALUE,
-            Math.min(this.MAX_VALUE, Math.round(parsed * 100) / 100)
-        );
+        return Math.max(this.MIN_VALUE, Math.min(this.MAX_VALUE, Math.round(parsed * 100) / 100));
     }
 
     /**
@@ -52,7 +46,7 @@ export class NumberFormatter {
 
         return new Intl.NumberFormat('en-PH', {
             style: 'currency',
-            currency: 'PHP'
+            currency: 'PHP',
         }).format(value);
     }
 

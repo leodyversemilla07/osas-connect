@@ -1,6 +1,6 @@
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import InputError from "@/components/input-error";
+import InputError from '@/components/input-error';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface SelectorWithLabelProps {
     id: string;
@@ -22,11 +22,11 @@ export function SelectorWithLabel({
     value,
     onChange,
     options,
-    placeholder = "Select an option",
+    placeholder = 'Select an option',
     error,
     required = false,
     disabled = false,
-    className = "",
+    className = '',
     description,
 }: SelectorWithLabelProps) {
     const errorId = error ? `${id}-error` : undefined;
@@ -35,21 +35,22 @@ export function SelectorWithLabel({
     return (
         <div className={`grid gap-2 ${className}`}>
             <Label htmlFor={id}>
-                {label}{required && <span className="text-red-500">*</span>}
+                {label}
+                {required && <span className="text-red-500">*</span>}
             </Label>
             {description && (
-                <p id={descriptionId} className="text-sm text-muted-foreground">
+                <p id={descriptionId} className="text-muted-foreground text-sm">
                     {description}
                 </p>
             )}
             <Select value={value} onValueChange={onChange} disabled={disabled}>
                 <SelectTrigger
                     id={id}
-                    aria-describedby={[errorId, descriptionId].filter(Boolean).join(" ")}
+                    aria-describedby={[errorId, descriptionId].filter(Boolean).join(' ')}
                     aria-invalid={!!error}
-                    className="mt-0 truncate w-full max-w-full"
+                    className="mt-0 w-full max-w-full truncate"
                 >
-                    <SelectValue placeholder={placeholder} className="truncate w-full max-w-full" />
+                    <SelectValue placeholder={placeholder} className="w-full max-w-full truncate" />
                 </SelectTrigger>
                 <SelectContent>
                     {options.map((option) => (

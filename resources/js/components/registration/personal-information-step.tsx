@@ -1,14 +1,14 @@
-import { memo, useCallback, useMemo } from "react";
-import { DatePicker } from "@/components/date-picker";
-import Address from "@/components/address";
-import PlaceOfBirth from "@/components/place-of-birth";
-import type { RegisterForm } from "@/hooks/use-registration-form";
-import { InputWithLabel } from "@/components/input-with-label";
-import CivilStatusSelector from "@/components/civil-status-selector";
-import ReligionSelector from "@/components/religion-selector";
-import ResidenceTypeSelector from "@/components/residence-type-selector";
-import SexSelector from "@/components/sex-selector";
-import PwdRadio from "@/components/pwd-radio";
+import Address from '@/components/address';
+import CivilStatusSelector from '@/components/civil-status-selector';
+import { DatePicker } from '@/components/date-picker';
+import { InputWithLabel } from '@/components/input-with-label';
+import PlaceOfBirth from '@/components/place-of-birth';
+import PwdRadio from '@/components/pwd-radio';
+import ReligionSelector from '@/components/religion-selector';
+import ResidenceTypeSelector from '@/components/residence-type-selector';
+import SexSelector from '@/components/sex-selector';
+import type { RegisterForm } from '@/hooks/use-registration-form';
+import { memo, useCallback, useMemo } from 'react';
 
 interface PersonalInformationStepProps {
     data: RegisterForm;
@@ -22,21 +22,12 @@ interface PersonalInformationStepProps {
 }
 
 const PersonalInformationStep = memo<PersonalInformationStepProps>(
-    ({
-        data,
-        errors,
-        onFieldChange,
-        onMobileNumberChange,
-        onResidenceTypeChange,
-        onPwdChange,
-        onDateOfBirthSelect,
-        processing = false,
-    }) => {
+    ({ data, errors, onFieldChange, onMobileNumberChange, onResidenceTypeChange, onPwdChange, onDateOfBirthSelect, processing = false }) => {
         const handleFieldChange = useCallback(
             (field: keyof RegisterForm) => (value: string) => {
                 onFieldChange(field, value);
             },
-            [onFieldChange]
+            [onFieldChange],
         );
 
         const addressData = {
@@ -48,10 +39,10 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
         };
 
         const handleAddressChange = useCallback(
-            (field: "street" | "barangay" | "city" | "province" | "zip_code", value: string) => {
+            (field: 'street' | 'barangay' | 'city' | 'province' | 'zip_code', value: string) => {
                 onFieldChange(field, value);
             },
-            [onFieldChange]
+            [onFieldChange],
         );
 
         const placeOfBirthData = {
@@ -59,30 +50,30 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
         };
 
         const handlePlaceOfBirthChange = useCallback(
-            (field: "place_of_birth", value: string) => {
+            (field: 'place_of_birth', value: string) => {
                 onFieldChange(field, value);
             },
-            [onFieldChange]
+            [onFieldChange],
         );
         const mobilePrefix = useMemo(
             () => (
-                <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm rounded-l-md">
+                <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-sm text-gray-500">
                     +63
                 </span>
             ),
-            []
+            [],
         );
 
         return (
             <div className="space-y-6">
                 {/* Row 1: First Name | Middle Name */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputWithLabel
                         id="first_name"
                         label="First Name"
                         required
                         value={data.first_name}
-                        onChange={handleFieldChange("first_name")}
+                        onChange={handleFieldChange('first_name')}
                         placeholder="Enter your first name"
                         error={errors.first_name}
                         className="w-full"
@@ -92,7 +83,7 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         label="Middle Name"
                         required
                         value={data.middle_name}
-                        onChange={handleFieldChange("middle_name")}
+                        onChange={handleFieldChange('middle_name')}
                         placeholder="Enter your middle name"
                         error={errors.middle_name}
                         className="w-full"
@@ -100,31 +91,25 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                 </div>
 
                 {/* Row 2: Last Name | Sex */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputWithLabel
                         id="last_name"
                         label="Last Name"
                         required
                         value={data.last_name}
-                        onChange={handleFieldChange("last_name")}
+                        onChange={handleFieldChange('last_name')}
                         placeholder="Enter your last name"
                         error={errors.last_name}
                         className="w-full"
                     />
-                    <SexSelector
-                        value={data.sex}
-                        onChange={handleFieldChange("sex")}
-                        error={errors.sex}
-                        required
-                        className="w-full"
-                    />
+                    <SexSelector value={data.sex} onChange={handleFieldChange('sex')} error={errors.sex} required className="w-full" />
                 </div>
 
                 {/* Row 3: Civil Status | Date of Birth */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <CivilStatusSelector
                         value={data.civil_status}
-                        onChange={handleFieldChange("civil_status")}
+                        onChange={handleFieldChange('civil_status')}
                         error={errors.civil_status}
                         required
                         className="w-full"
@@ -143,23 +128,13 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                 </div>
 
                 {/* Place of Birth */}
-                <PlaceOfBirth
-                    data={placeOfBirthData}
-                    setData={handlePlaceOfBirthChange}
-                    errors={errors}
-                    processing={processing}
-                />
+                <PlaceOfBirth data={placeOfBirthData} setData={handlePlaceOfBirthChange} errors={errors} processing={processing} />
 
                 {/* Address */}
-                <Address
-                    data={addressData}
-                    setData={handleAddressChange}
-                    errors={errors}
-                    processing={processing}
-                />
+                <Address data={addressData} setData={handleAddressChange} errors={errors} processing={processing} />
 
                 {/* Mobile and Telephone Number */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputWithLabel
                         id="mobile_number"
                         label="Mobile Number"
@@ -176,7 +151,7 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         id="telephone_number"
                         label="Telephone Number"
                         value={data.telephone_number}
-                        onChange={handleFieldChange("telephone_number")}
+                        onChange={handleFieldChange('telephone_number')}
                         placeholder="Enter telephone number"
                         error={errors.telephone_number}
                         className="w-full"
@@ -184,10 +159,10 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                 </div>
 
                 {/* Religion and Residence Type */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <ReligionSelector
                         value={data.religion}
-                        onChange={handleFieldChange("religion")}
+                        onChange={handleFieldChange('religion')}
                         error={errors.religion}
                         required
                         className="w-full"
@@ -199,7 +174,7 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                         required
                         className="w-full"
                         guardianName={data.guardian_name}
-                        onGuardianNameChange={handleFieldChange("guardian_name")}
+                        onGuardianNameChange={handleFieldChange('guardian_name')}
                         guardianError={errors.guardian_name}
                     />
                 </div>
@@ -209,16 +184,16 @@ const PersonalInformationStep = memo<PersonalInformationStepProps>(
                     value={data.is_pwd}
                     onChange={onPwdChange}
                     disabilityType={data.disability_type}
-                    onDisabilityTypeChange={handleFieldChange("disability_type")}
+                    onDisabilityTypeChange={handleFieldChange('disability_type')}
                     error={errors.is_pwd}
                     disabilityTypeError={errors.disability_type}
                     required
                 />
             </div>
         );
-    }
+    },
 );
 
-PersonalInformationStep.displayName = "PersonalInformationStep";
+PersonalInformationStep.displayName = 'PersonalInformationStep';
 
 export default PersonalInformationStep;

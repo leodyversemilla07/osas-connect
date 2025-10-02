@@ -1,18 +1,18 @@
+import Address from '@/components/address';
+import CourseSelector from '@/components/course-selector';
+import { DatePicker } from '@/components/date-picker';
+import { InputWithLabel } from '@/components/input-with-label';
+import PlaceOfBirth from '@/components/place-of-birth';
+import ReligionSelector from '@/components/religion-selector';
+import { SelectorWithLabel } from '@/components/selector-with-label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, type User as UserType } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Save } from 'lucide-react';
-import { type User as UserType, type BreadcrumbItem } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
-import { InputWithLabel } from '@/components/input-with-label';
-import Address from '@/components/address';
-import { SelectorWithLabel } from '@/components/selector-with-label';
-import { DatePicker } from "@/components/date-picker";
-import PlaceOfBirth from "@/components/place-of-birth";
-import ReligionSelector from "@/components/religion-selector";
-import { Button } from "@/components/ui/button";
-import CourseSelector from "@/components/course-selector";
 
 interface UserWithProfile extends UserType {
     studentProfile?: {
@@ -88,11 +88,11 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
             existing_scholarships: user.studentProfile?.existing_scholarships || '',
             civil_status: user.studentProfile?.civil_status || '',
             sex: user.studentProfile?.sex || '',
-            date_of_birth: user.studentProfile?.date_of_birth ?
-                (typeof user.studentProfile.date_of_birth === 'string'
+            date_of_birth: user.studentProfile?.date_of_birth
+                ? typeof user.studentProfile.date_of_birth === 'string'
                     ? user.studentProfile.date_of_birth.split('T')[0]
                     : new Date(user.studentProfile.date_of_birth).toISOString().split('T')[0]
-                ) : '',
+                : '',
             place_of_birth: user.studentProfile?.place_of_birth || '',
             mobile_number: user.studentProfile?.mobile_number || '',
             telephone_number: user.studentProfile?.telephone_number || '',
@@ -168,8 +168,8 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
 
             <div className="flex h-full flex-1 flex-col space-y-6 p-6">
                 {/* Header */}
-                <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
-                    <div className="flex items-center gap-4 mb-2">
+                <div className="border-b border-gray-100 pb-4 dark:border-gray-800">
+                    <div className="mb-2 flex items-center gap-4">
                         <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                             Edit {user.role === 'student' ? 'Student' : 'Staff'}
                         </h1>
@@ -182,17 +182,15 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                 {/* Success Message */}
                 {wasSuccessful && (
                     <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-                        <AlertDescription className="text-green-800 dark:text-green-200 text-sm">
-                            Profile updated successfully!
-                        </AlertDescription>
+                        <AlertDescription className="text-sm text-green-800 dark:text-green-200">Profile updated successfully!</AlertDescription>
                     </Alert>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Basic Information */}
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Basic Information</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
+                        <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Basic Information</h2>
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                             <InputWithLabel
                                 id="first_name"
                                 label="First Name"
@@ -223,9 +221,9 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                     </div>
 
                     {/* Contact Information */}
-                    <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Contact Information</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
+                        <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Contact Information</h2>
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <InputWithLabel
                                 id="email"
                                 label="Email Address"
@@ -243,9 +241,9 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                     {user.role === 'student' && (
                         <>
                             {/* Academic Information */}
-                            <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Academic Information</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Academic Information</h2>
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <InputWithLabel
                                         id="student_id"
                                         label="Student ID"
@@ -260,7 +258,8 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                         onChange={(value) => {
                                             setData('course', value);
                                             // Reset major if course changes
-                                            if (!(value in {"Bachelor of Secondary Education":1,"Bachelor of Science in Entrepreneurship":1})) setData('major', '');
+                                            if (!(value in { 'Bachelor of Secondary Education': 1, 'Bachelor of Science in Entrepreneurship': 1 }))
+                                                setData('major', '');
                                         }}
                                         error={errors.course}
                                         required
@@ -285,7 +284,7 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                         required
                                     />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                                     <InputWithLabel
                                         id="existing_scholarships"
                                         label="Existing Scholarships"
@@ -299,9 +298,9 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                             </div>
 
                             {/* Personal Information */}
-                            <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Personal Information</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Personal Information</h2>
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <SelectorWithLabel
                                         id="civil_status"
                                         label="Civil Status"
@@ -343,7 +342,7 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <PlaceOfBirth
                                         data={{ place_of_birth: data.place_of_birth ?? '' }}
                                         setData={setData}
@@ -373,7 +372,7 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <InputWithLabel
                                         id="mobile_number"
                                         label="Mobile Number"
@@ -428,15 +427,15 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                             </div>
 
                             {/* Address Information */}
-                            <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Address Information</h2>
+                            <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Address Information</h2>
                                 <Address
                                     data={{
                                         street: data.street ?? '',
                                         barangay: data.barangay ?? '',
                                         city: data.city ?? '',
                                         province: data.province ?? '',
-                                        zip_code: data.zip_code ?? ''
+                                        zip_code: data.zip_code ?? '',
                                     }}
                                     setData={(field, value) => setData(field, value)}
                                     errors={errors}
@@ -445,9 +444,9 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                             </div>
 
                             {/* Family Background */}
-                            <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Family Background</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Family Background</h2>
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                     <SelectorWithLabel
                                         id="status_of_parents"
                                         label="Status of Parents"
@@ -477,9 +476,9 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                             </div>
 
                             {/* Father's Information */}
-                            <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Father's Information</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Father's Information</h2>
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <InputWithLabel
                                         id="father_name"
                                         label="Full Name"
@@ -506,7 +505,7 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                         placeholder="+639123456789"
                                     />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <InputWithLabel
                                         id="father_email"
                                         label="Email Address"
@@ -533,7 +532,7 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                         placeholder="Company name"
                                     />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <InputWithLabel
                                         id="father_monthly_income"
                                         label="Monthly Income"
@@ -563,9 +562,9 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                             </div>
 
                             {/* Mother's Information */}
-                            <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Mother's Information</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Mother's Information</h2>
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <InputWithLabel
                                         id="mother_name"
                                         label="Full Name"
@@ -592,7 +591,7 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                         placeholder="+639123456789"
                                     />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <InputWithLabel
                                         id="mother_email"
                                         label="Email Address"
@@ -619,7 +618,7 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                                         placeholder="Company name"
                                     />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                                     <InputWithLabel
                                         id="mother_monthly_income"
                                         label="Monthly Income"
@@ -652,8 +651,8 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
 
                     {/* Staff-specific sections */}
                     {user.role === 'osas_staff' && (
-                        <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Staff Information</h2>
+                        <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
+                            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Staff Information</h2>
                             <div className="max-w-md">
                                 <InputWithLabel
                                     id="staff_id"
@@ -669,21 +668,19 @@ export default function EditUserProfile({ user }: EditUserProfileProps) {
                     )}
 
                     {/* Form Actions */}
-                    <div className="flex items-center justify-end gap-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center justify-end gap-6 border-t border-gray-100 pt-6 dark:border-gray-800">
                         <Button
                             asChild
                             variant="ghost"
-                            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors disabled:opacity-50"
+                            className="text-sm text-gray-500 transition-colors hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-300"
                         >
-                            <Link href={route(backRoute, user.id)}>
-                                Cancel
-                            </Link>
+                            <Link href={route(backRoute, user.id)}>Cancel</Link>
                         </Button>
                         <Button
                             type="submit"
                             disabled={processing}
                             variant="default"
-                            className="text-sm flex items-center gap-2 border-b border-transparent hover:border-gray-400 dark:hover:border-gray-500 pb-1"
+                            className="flex items-center gap-2 border-b border-transparent pb-1 text-sm hover:border-gray-400 dark:hover:border-gray-500"
                         >
                             <Save className="h-4 w-4" />
                             {processing ? 'Saving...' : 'Save Changes'}

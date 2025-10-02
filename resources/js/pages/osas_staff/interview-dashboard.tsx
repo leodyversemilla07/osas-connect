@@ -1,19 +1,10 @@
-import { Head, Link } from '@inertiajs/react';
-import { type BreadcrumbItem } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Calendar,
-    Clock,
-    TrendingUp,
-    CheckCircle,
-    XCircle,
-    UserX,
-    AlertCircle,
-    ArrowRight
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link } from '@inertiajs/react';
+import { AlertCircle, ArrowRight, Calendar, CheckCircle, Clock, TrendingUp, UserX, XCircle } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -101,14 +92,9 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
             rescheduled: { label: 'Rescheduled', variant: 'outline' as const },
         };
 
-        const config = statusConfig[status as keyof typeof statusConfig] ||
-            { label: status, variant: 'outline' as const };
+        const config = statusConfig[status as keyof typeof statusConfig] || { label: status, variant: 'outline' as const };
 
-        return (
-            <Badge variant={config.variant}>
-                {config.label}
-            </Badge>
-        );
+        return <Badge variant={config.variant}>{config.label}</Badge>;
     };
 
     const getStatusIcon = (status: string) => {
@@ -129,14 +115,14 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
             month: 'short',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
         });
     };
 
     const formatTime = (dateString: string) => {
         return new Date(dateString).toLocaleTimeString('en-US', {
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
         });
     };
 
@@ -149,24 +135,20 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                 <div className="space-y-6">
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h1 className="text-3xl font-bold tracking-tight">
-                                Interview Dashboard
-                            </h1>
-                            <p className="text-muted-foreground">
-                                Manage and track interview activities and statistics
-                            </p>
+                            <h1 className="text-3xl font-bold tracking-tight">Interview Dashboard</h1>
+                            <p className="text-muted-foreground">Manage and track interview activities and statistics</p>
                         </div>
                         <Button asChild>
                             <Link href={route('osas.interviews.index')}>
                                 View All Interviews
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                                <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
                         </Button>
                     </div>
                 </div>
 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardContent className="p-6">
                             <div className="flex items-center">
@@ -174,12 +156,8 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                                     <Calendar className="h-8 w-8 text-blue-600" />
                                 </div>
                                 <div className="ml-4">
-                                    <p className="text-sm font-medium text-muted-foreground truncate">
-                                        Total Interviews
-                                    </p>
-                                    <p className="text-2xl font-semibold">
-                                        {statistics.total_interviews}
-                                    </p>
+                                    <p className="text-muted-foreground truncate text-sm font-medium">Total Interviews</p>
+                                    <p className="text-2xl font-semibold">{statistics.total_interviews}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -192,12 +170,8 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                                     <Clock className="h-8 w-8 text-yellow-600" />
                                 </div>
                                 <div className="ml-4">
-                                    <p className="text-sm font-medium text-muted-foreground truncate">
-                                        Scheduled
-                                    </p>
-                                    <p className="text-2xl font-semibold">
-                                        {statistics.scheduled}
-                                    </p>
+                                    <p className="text-muted-foreground truncate text-sm font-medium">Scheduled</p>
+                                    <p className="text-2xl font-semibold">{statistics.scheduled}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -210,12 +184,8 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                                     <CheckCircle className="h-8 w-8 text-green-600" />
                                 </div>
                                 <div className="ml-4">
-                                    <p className="text-sm font-medium text-muted-foreground truncate">
-                                        Completed
-                                    </p>
-                                    <p className="text-2xl font-semibold">
-                                        {statistics.completed}
-                                    </p>
+                                    <p className="text-muted-foreground truncate text-sm font-medium">Completed</p>
+                                    <p className="text-2xl font-semibold">{statistics.completed}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -228,12 +198,8 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                                     <TrendingUp className="h-8 w-8 text-indigo-600" />
                                 </div>
                                 <div className="ml-4">
-                                    <p className="text-sm font-medium text-muted-foreground truncate">
-                                        Completion Rate
-                                    </p>
-                                    <p className="text-2xl font-semibold">
-                                        {statistics.completion_rate}%
-                                    </p>
+                                    <p className="text-muted-foreground truncate text-sm font-medium">Completion Rate</p>
+                                    <p className="text-2xl font-semibold">{statistics.completion_rate}%</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -241,30 +207,29 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                 </div>
 
                 {/* Today's Interviews */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center text-lg font-semibold">
-                                <AlertCircle className="h-5 w-5 mr-2 text-orange-600" />
+                                <AlertCircle className="mr-2 h-5 w-5 text-orange-600" />
                                 Today's Interviews ({todayInterviews.length})
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             {todayInterviews.length === 0 ? (
-                                <p className="text-muted-foreground text-center py-8">
-                                    No interviews scheduled for today
-                                </p>
+                                <p className="text-muted-foreground py-8 text-center">No interviews scheduled for today</p>
                             ) : (
                                 <div className="space-y-4">
                                     {todayInterviews.slice(0, 5).map((interview) => (
-                                        <div key={interview.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+                                        <div key={interview.id} className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
                                             <div className="flex items-center space-x-3">
                                                 {getStatusIcon(interview.status)}
                                                 <div>
                                                     <p className="font-medium">
-                                                        {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
+                                                        {interview.application.student.student_profile.first_name}{' '}
+                                                        {interview.application.student.student_profile.last_name}
                                                     </p>
-                                                    <p className="text-sm text-muted-foreground">
+                                                    <p className="text-muted-foreground text-sm">
                                                         {formatTime(interview.schedule)} • {interview.location}
                                                     </p>
                                                 </div>
@@ -272,18 +237,14 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                                             <div className="flex items-center space-x-2">
                                                 {getStatusBadge(interview.status)}
                                                 <Button variant="outline" size="sm" asChild>
-                                                    <Link href={route('osas.interviews.show', interview.id)}>
-                                                        View
-                                                    </Link>
+                                                    <Link href={route('osas.interviews.show', interview.id)}>View</Link>
                                                 </Button>
                                             </div>
                                         </div>
                                     ))}
                                     {todayInterviews.length > 5 && (
-                                        <Button variant="outline" size="sm" className="w-full mt-4" asChild>
-                                            <Link href={route('osas.interviews.index')}>
-                                                View all {todayInterviews.length} interviews
-                                            </Link>
+                                        <Button variant="outline" size="sm" className="mt-4 w-full" asChild>
+                                            <Link href={route('osas.interviews.index')}>View all {todayInterviews.length} interviews</Link>
                                         </Button>
                                     )}
                                 </div>
@@ -295,26 +256,25 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center text-lg font-semibold">
-                                <Calendar className="h-5 w-5 mr-2 text-blue-600" />
+                                <Calendar className="mr-2 h-5 w-5 text-blue-600" />
                                 Upcoming Interviews ({upcomingInterviews.length})
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             {upcomingInterviews.length === 0 ? (
-                                <p className="text-muted-foreground text-center py-8">
-                                    No upcoming interviews scheduled
-                                </p>
+                                <p className="text-muted-foreground py-8 text-center">No upcoming interviews scheduled</p>
                             ) : (
                                 <div className="space-y-4">
                                     {upcomingInterviews.slice(0, 5).map((interview) => (
-                                        <div key={interview.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
+                                        <div key={interview.id} className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
                                             <div className="flex items-center space-x-3">
                                                 {getStatusIcon(interview.status)}
                                                 <div>
                                                     <p className="font-medium">
-                                                        {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
+                                                        {interview.application.student.student_profile.first_name}{' '}
+                                                        {interview.application.student.student_profile.last_name}
                                                     </p>
-                                                    <p className="text-sm text-muted-foreground">
+                                                    <p className="text-muted-foreground text-sm">
                                                         {formatDate(interview.schedule)} • {interview.location}
                                                     </p>
                                                 </div>
@@ -322,18 +282,14 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                                             <div className="flex items-center space-x-2">
                                                 {getStatusBadge(interview.status)}
                                                 <Button variant="outline" size="sm" asChild>
-                                                    <Link href={route('osas.interviews.show', interview.id)}>
-                                                        View
-                                                    </Link>
+                                                    <Link href={route('osas.interviews.show', interview.id)}>View</Link>
                                                 </Button>
                                             </div>
                                         </div>
                                     ))}
                                     {upcomingInterviews.length > 5 && (
-                                        <Button variant="outline" size="sm" className="w-full mt-4" asChild>
-                                            <Link href={route('osas.interviews.index')}>
-                                                View all {upcomingInterviews.length} interviews
-                                            </Link>
+                                        <Button variant="outline" size="sm" className="mt-4 w-full" asChild>
+                                            <Link href={route('osas.interviews.index')}>View all {upcomingInterviews.length} interviews</Link>
                                         </Button>
                                     )}
                                 </div>
@@ -343,16 +299,12 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                 </div>
 
                 {/* Quick Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                     <Card>
                         <CardContent className="p-6">
                             <div className="space-y-2">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Interviews This Week
-                                </p>
-                                <p className="text-2xl font-semibold">
-                                    {statistics.this_week_count}
-                                </p>
+                                <p className="text-muted-foreground text-sm font-medium">Interviews This Week</p>
+                                <p className="text-2xl font-semibold">{statistics.this_week_count}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -360,12 +312,8 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                     <Card>
                         <CardContent className="p-6">
                             <div className="space-y-2">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Average Interview Score
-                                </p>
-                                <p className="text-2xl font-semibold">
-                                    {statistics.average_score || 'N/A'}
-                                </p>
+                                <p className="text-muted-foreground text-sm font-medium">Average Interview Score</p>
+                                <p className="text-2xl font-semibold">{statistics.average_score || 'N/A'}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -373,12 +321,8 @@ export default function InterviewDashboard({ statistics, upcomingInterviews, tod
                     <Card>
                         <CardContent className="p-6">
                             <div className="space-y-2">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    No-Show Count
-                                </p>
-                                <p className="text-2xl font-semibold text-destructive">
-                                    {statistics.no_show}
-                                </p>
+                                <p className="text-muted-foreground text-sm font-medium">No-Show Count</p>
+                                <p className="text-destructive text-2xl font-semibold">{statistics.no_show}</p>
                             </div>
                         </CardContent>
                     </Card>

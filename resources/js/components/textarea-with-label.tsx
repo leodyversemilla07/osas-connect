@@ -1,6 +1,6 @@
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import InputError from "@/components/input-error";
+import InputError from '@/components/input-error';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface TextareaWithLabelProps {
     id: string;
@@ -23,25 +23,26 @@ export function TextareaWithLabel({
     error,
     required = false,
     disabled = false,
-    className = "",
+    className = '',
 }: TextareaWithLabelProps) {
     const errorId = error ? `${id}-error` : undefined;
 
     return (
         <div className={`grid gap-2 ${className}`}>
             <Label htmlFor={id}>
-                {label}{required && <span className="text-destructive">*</span>}
+                {label}
+                {required && <span className="text-destructive">*</span>}
             </Label>
             <Textarea
                 id={id}
                 value={value}
-                onChange={e => onChange(e.target.value)}
+                onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
                 disabled={disabled}
                 aria-describedby={errorId}
                 aria-invalid={!!error}
                 required={required}
-                className="min-h-[100px] border-border"
+                className="border-border min-h-[100px]"
             />
             <InputError id={errorId} message={error} />
         </div>

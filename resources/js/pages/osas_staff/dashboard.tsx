@@ -1,20 +1,12 @@
-import { Head, usePage } from '@inertiajs/react';
-import { type BreadcrumbItem, type SharedData } from '@/types';
 import AppLayout from '@/layouts/app-layout';
-import { ClipboardList, FileCheck, BookOpen, FileText, MoreHorizontal, Eye } from 'lucide-react';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+import { BookOpen, ClipboardList, Eye, FileCheck, FileText, MoreHorizontal } from 'lucide-react';
 
 // Import Shadcn UI components
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -23,6 +15,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,103 +24,89 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-    const variants: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
+const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+    const variants: { [key: string]: 'default' | 'secondary' | 'destructive' | 'outline' } = {
         pending: 'outline',
         approved: 'default',
-        rejected: 'destructive'
+        rejected: 'destructive',
     };
     return variants[status] || 'secondary';
 };
 
 export default function StaffDashboard() {
-    const { pendingApplications = [], recentDocuments = [] } = usePage<SharedData & {
-        pendingApplications: Array<{
-            id: number;
-            studentName: string;
-            scholarshipName: string;
-            dateSubmitted: string;
-            status: string;
-            studentId: string;
-        }>;
-        recentDocuments: Array<{
-            id: number;
-            studentName: string;
-            documentType: string;
-            submissionDate: string;
-            status: string;
-        }>;
-    }>().props;
+    const { pendingApplications = [], recentDocuments = [] } = usePage<
+        SharedData & {
+            pendingApplications: Array<{
+                id: number;
+                studentName: string;
+                scholarshipName: string;
+                dateSubmitted: string;
+                status: string;
+                studentId: string;
+            }>;
+            recentDocuments: Array<{
+                id: number;
+                studentName: string;
+                documentType: string;
+                submissionDate: string;
+                status: string;
+            }>;
+        }
+    >().props;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="OSAS Staff Dashboard" />
 
             <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4">OSAS Staff Dashboard</h1>
+                <h1 className="mb-4 text-2xl font-bold">OSAS Staff Dashboard</h1>
 
                 {/* Stats Cards */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Pending Applications
-                            </CardTitle>
-                            <ClipboardList className="h-4 w-4 text-muted-foreground" />
+                            <CardTitle className="text-sm font-medium">Pending Applications</CardTitle>
+                            <ClipboardList className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{pendingApplications?.length || 0}</div>
-                            <p className="text-xs text-muted-foreground">
-                                +20.1% from last month
-                            </p>
+                            <p className="text-muted-foreground text-xs">+20.1% from last month</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Active Scholarships
-                            </CardTitle>
-                            <BookOpen className="h-4 w-4 text-muted-foreground" />
+                            <CardTitle className="text-sm font-medium">Active Scholarships</CardTitle>
+                            <BookOpen className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">24</div>
-                            <p className="text-xs text-muted-foreground">
-                                +180.1% from last month
-                            </p>
+                            <p className="text-muted-foreground text-xs">+180.1% from last month</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Recent Documents
-                            </CardTitle>
-                            <FileCheck className="h-4 w-4 text-muted-foreground" />
+                            <CardTitle className="text-sm font-medium">Recent Documents</CardTitle>
+                            <FileCheck className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{recentDocuments?.length || 0}</div>
-                            <p className="text-xs text-muted-foreground">
-                                +19% from last month
-                            </p>
+                            <p className="text-muted-foreground text-xs">+19% from last month</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Reports
-                            </CardTitle>
-                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
+                            <FileText className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">12</div>
-                            <p className="text-xs text-muted-foreground">
-                                +201 since last hour
-                            </p>
+                            <p className="text-muted-foreground text-xs">+201 since last hour</p>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Content Grid */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mb-6">
+                <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                     {/* Recent Applications */}
                     <Card className="col-span-4">
                         <CardHeader>
@@ -150,9 +129,7 @@ export default function StaffDashboard() {
                                             <TableCell className="font-medium">{app.studentName}</TableCell>
                                             <TableCell>{app.scholarshipName}</TableCell>
                                             <TableCell>
-                                                <Badge variant={getStatusVariant(app.status)}>
-                                                    {app.status}
-                                                </Badge>
+                                                <Badge variant={getStatusVariant(app.status)}>{app.status}</Badge>
                                             </TableCell>
                                             <TableCell className="text-right">{app.dateSubmitted}</TableCell>
                                             <TableCell>
@@ -180,7 +157,7 @@ export default function StaffDashboard() {
                                 </TableBody>
                             </Table>
                             {pendingApplications?.length === 0 && (
-                                <div className="flex items-center justify-center h-24">
+                                <div className="flex h-24 items-center justify-center">
                                     <p className="text-muted-foreground">No pending applications</p>
                                 </div>
                             )}

@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UsersIcon, DollarSignIcon, GraduationCapIcon, ClipboardListIcon } from 'lucide-react';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Head, router } from '@inertiajs/react';
+import { ClipboardListIcon, DollarSignIcon, GraduationCapIcon, UsersIcon } from 'lucide-react';
+import { useState } from 'react';
+import {
+    Area,
+    AreaChart,
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    Legend,
+    Line,
+    LineChart,
+    Pie,
+    PieChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
@@ -122,10 +138,14 @@ export default function AnalyticsDashboard({ statistics, current_year, available
 
     const handleYearChange = (year: string) => {
         setSelectedYear(year);
-        router.get('/osas-staff/analytics', { year }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        router.get(
+            '/osas-staff/analytics',
+            { year },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
     };
 
     // Prepare chart data
@@ -154,49 +174,44 @@ export default function AnalyticsDashboard({ statistics, current_year, available
     return (
         <>
             <Head title="Analytics Dashboard" />
-            
-            <div className="container mx-auto p-6 space-y-6">
+
+            <div className="container mx-auto space-y-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
-                        <p className="text-muted-foreground">
-                            Comprehensive insights into scholarship management performance
-                        </p>
+                        <p className="text-muted-foreground">Comprehensive insights into scholarship management performance</p>
                     </div>
-                    
+
                     <div className="flex items-center gap-4">
                         <Select value={selectedYear} onValueChange={handleYearChange}>
                             <SelectTrigger className="w-32">
                                 <SelectValue placeholder="Select year" />
                             </SelectTrigger>
                             <SelectContent>
-                                {available_years.map(year => (
+                                {available_years.map((year) => (
                                     <SelectItem key={year} value={year.toString()}>
                                         {year}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        
-                        <Button
-                            variant="outline"
-                            onClick={() => router.visit('/osas-staff/analytics/export/applications')}
-                        >
+
+                        <Button variant="outline" onClick={() => router.visit('/osas-staff/analytics/export/applications')}>
                             Export Data
                         </Button>
                     </div>
                 </div>
 
                 {/* Overview Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-                            <UsersIcon className="h-4 w-4 text-muted-foreground" />
+                            <UsersIcon className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{formatNumber(statistics.overview.total_students)}</div>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-muted-foreground text-xs">
                                 {formatNumber(statistics.overview.students_with_scholarships)} with scholarships
                             </p>
                         </CardContent>
@@ -205,45 +220,39 @@ export default function AnalyticsDashboard({ statistics, current_year, available
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Applications</CardTitle>
-                            <ClipboardListIcon className="h-4 w-4 text-muted-foreground" />
+                            <ClipboardListIcon className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{formatNumber(statistics.applications.total)}</div>
-                            <p className="text-xs text-muted-foreground">
-                                {statistics.applications.approval_rate}% approval rate
-                            </p>
+                            <p className="text-muted-foreground text-xs">{statistics.applications.approval_rate}% approval rate</p>
                         </CardContent>
                     </Card>
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Total Disbursed</CardTitle>
-                            <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
+                            <DollarSignIcon className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{formatCurrency(statistics.overview.total_disbursed)}</div>
-                            <p className="text-xs text-muted-foreground">
-                                {statistics.stipends.disbursement_rate}% of total budget
-                            </p>
+                            <p className="text-muted-foreground text-xs">{statistics.stipends.disbursement_rate}% of total budget</p>
                         </CardContent>
                     </Card>
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Active Scholarships</CardTitle>
-                            <GraduationCapIcon className="h-4 w-4 text-muted-foreground" />
+                            <GraduationCapIcon className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{formatNumber(statistics.overview.active_scholarships)}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Out of {statistics.scholarships.total_scholarships} total
-                            </p>
+                            <p className="text-muted-foreground text-xs">Out of {statistics.scholarships.total_scholarships} total</p>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Trend Analysis */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <Card>
                         <CardHeader>
                             <CardTitle>Year-over-Year Growth</CardTitle>
@@ -254,14 +263,16 @@ export default function AnalyticsDashboard({ statistics, current_year, available
                         <CardContent className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium">Applications Growth</span>
-                                <Badge variant={statistics.trends.applications_growth >= 0 ? "default" : "destructive"}>
-                                    {statistics.trends.applications_growth >= 0 ? '+' : ''}{statistics.trends.applications_growth}%
+                                <Badge variant={statistics.trends.applications_growth >= 0 ? 'default' : 'destructive'}>
+                                    {statistics.trends.applications_growth >= 0 ? '+' : ''}
+                                    {statistics.trends.applications_growth}%
                                 </Badge>
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium">Disbursements Growth</span>
-                                <Badge variant={statistics.trends.disbursements_growth >= 0 ? "default" : "destructive"}>
-                                    {statistics.trends.disbursements_growth >= 0 ? '+' : ''}{statistics.trends.disbursements_growth}%
+                                <Badge variant={statistics.trends.disbursements_growth >= 0 ? 'default' : 'destructive'}>
+                                    {statistics.trends.disbursements_growth >= 0 ? '+' : ''}
+                                    {statistics.trends.disbursements_growth}%
                                 </Badge>
                             </div>
                         </CardContent>
@@ -290,7 +301,7 @@ export default function AnalyticsDashboard({ statistics, current_year, available
                 </div>
 
                 {/* Charts */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <Card>
                         <CardHeader>
                             <CardTitle>Monthly Application Trends</CardTitle>
@@ -304,20 +315,8 @@ export default function AnalyticsDashboard({ statistics, current_year, available
                                     <YAxis />
                                     <Tooltip />
                                     <Legend />
-                                    <Line 
-                                        type="monotone" 
-                                        dataKey="applications" 
-                                        stroke="#8884d8" 
-                                        strokeWidth={2}
-                                        name="Applications"
-                                    />
-                                    <Line 
-                                        type="monotone" 
-                                        dataKey="interviews" 
-                                        stroke="#82ca9d" 
-                                        strokeWidth={2}
-                                        name="Interviews"
-                                    />
+                                    <Line type="monotone" dataKey="applications" stroke="#8884d8" strokeWidth={2} name="Applications" />
+                                    <Line type="monotone" dataKey="interviews" stroke="#82ca9d" strokeWidth={2} name="Interviews" />
                                 </LineChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -352,7 +351,7 @@ export default function AnalyticsDashboard({ statistics, current_year, available
                     </Card>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <Card>
                         <CardHeader>
                             <CardTitle>Scholarship Type Distribution</CardTitle>
@@ -383,13 +382,7 @@ export default function AnalyticsDashboard({ statistics, current_year, available
                                     <XAxis dataKey="month" />
                                     <YAxis />
                                     <Tooltip formatter={(value) => [formatCurrency(Number(value)), 'Amount']} />
-                                    <Area 
-                                        type="monotone" 
-                                        dataKey="amount" 
-                                        stroke="#82ca9d" 
-                                        fill="#82ca9d" 
-                                        fillOpacity={0.6}
-                                    />
+                                    <Area type="monotone" dataKey="amount" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -407,13 +400,13 @@ export default function AnalyticsDashboard({ statistics, current_year, available
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b">
-                                        <th className="text-left p-2">Scholarship Name</th>
-                                        <th className="text-left p-2">Type</th>
-                                        <th className="text-center p-2">Applications</th>
-                                        <th className="text-center p-2">Approved</th>
-                                        <th className="text-center p-2">Approval Rate</th>
-                                        <th className="text-right p-2">Budget</th>
-                                        <th className="text-right p-2">Disbursed</th>
+                                        <th className="p-2 text-left">Scholarship Name</th>
+                                        <th className="p-2 text-left">Type</th>
+                                        <th className="p-2 text-center">Applications</th>
+                                        <th className="p-2 text-center">Approved</th>
+                                        <th className="p-2 text-center">Approval Rate</th>
+                                        <th className="p-2 text-right">Budget</th>
+                                        <th className="p-2 text-right">Disbursed</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -423,11 +416,11 @@ export default function AnalyticsDashboard({ statistics, current_year, available
                                             <td className="p-2">
                                                 <Badge variant="outline">{scholarship.type}</Badge>
                                             </td>
-                                            <td className="text-center p-2">{scholarship.total_applications}</td>
-                                            <td className="text-center p-2">{scholarship.approved_applications}</td>
-                                            <td className="text-center p-2">{scholarship.approval_rate}%</td>
-                                            <td className="text-right p-2">{formatCurrency(scholarship.total_stipend_budget)}</td>
-                                            <td className="text-right p-2">{formatCurrency(scholarship.disbursed_amount)}</td>
+                                            <td className="p-2 text-center">{scholarship.total_applications}</td>
+                                            <td className="p-2 text-center">{scholarship.approved_applications}</td>
+                                            <td className="p-2 text-center">{scholarship.approval_rate}%</td>
+                                            <td className="p-2 text-right">{formatCurrency(scholarship.total_stipend_budget)}</td>
+                                            <td className="p-2 text-right">{formatCurrency(scholarship.disbursed_amount)}</td>
                                         </tr>
                                     ))}
                                 </tbody>

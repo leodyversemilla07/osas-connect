@@ -1,10 +1,9 @@
-import React from "react";
-import { Head } from "@inertiajs/react";
-import AppLayout from "@/layouts/app-layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Users, Plus, Filter } from "lucide-react";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import { Head } from '@inertiajs/react';
+import { Calendar, Filter, MapPin, Plus, Users } from 'lucide-react';
 
 interface Event {
     id: number;
@@ -56,19 +55,15 @@ export default function Events({ events = [] }: EventsPageProps) {
     return (
         <AppLayout>
             <Head title="Events Management" />
-            
-            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="md:flex md:items-center md:justify-between mb-8">
+                <div className="mb-8 md:flex md:items-center md:justify-between">
                     <div className="min-w-0 flex-1">
-                        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                            Events Management
-                        </h2>
-                        <p className="mt-1 text-sm text-gray-500">
-                            Manage scholarship-related events and activities
-                        </p>
+                        <h2 className="text-2xl leading-7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">Events Management</h2>
+                        <p className="mt-1 text-sm text-gray-500">Manage scholarship-related events and activities</p>
                     </div>
-                    <div className="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+                    <div className="mt-4 flex space-x-3 md:mt-0 md:ml-4">
                         <Button variant="outline" size="sm">
                             <Filter className="mr-2 h-4 w-4" />
                             Filter
@@ -84,11 +79,9 @@ export default function Events({ events = [] }: EventsPageProps) {
                 {events.length === 0 ? (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-12">
-                            <Calendar className="h-12 w-12 text-gray-400 mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No events scheduled</h3>
-                            <p className="text-gray-500 text-center mb-6">
-                                Get started by creating your first event for scholarship activities.
-                            </p>
+                            <Calendar className="mb-4 h-12 w-12 text-gray-400" />
+                            <h3 className="mb-2 text-lg font-medium text-gray-900">No events scheduled</h3>
+                            <p className="mb-6 text-center text-gray-500">Get started by creating your first event for scholarship activities.</p>
                             <Button>
                                 <Plus className="mr-2 h-4 w-4" />
                                 Create Event
@@ -96,21 +89,17 @@ export default function Events({ events = [] }: EventsPageProps) {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {events.map((event) => (
-                            <Card key={event.id} className="hover:shadow-lg transition-shadow">
+                            <Card key={event.id} className="transition-shadow hover:shadow-lg">
                                 <CardHeader>
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">
                                             <CardTitle className="text-lg">{event.title}</CardTitle>
-                                            <CardDescription className="mt-2">
-                                                {event.description}
-                                            </CardDescription>
+                                            <CardDescription className="mt-2">{event.description}</CardDescription>
                                         </div>
-                                        <div className="flex flex-col space-y-1 ml-2">
-                                            <Badge className={getStatusColor(event.status)}>
-                                                {event.status}
-                                            </Badge>
+                                        <div className="ml-2 flex flex-col space-y-1">
+                                            <Badge className={getStatusColor(event.status)}>{event.status}</Badge>
                                             <Badge variant="outline" className={getTypeColor(event.type)}>
                                                 {event.type}
                                             </Badge>

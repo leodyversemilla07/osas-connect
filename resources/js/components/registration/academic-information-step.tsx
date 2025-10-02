@@ -1,8 +1,8 @@
-import React, { memo } from "react";
-import { InputWithLabel } from "@/components/input-with-label";
-import CourseSelector from "@/components/course-selector";
-import YearLevelSelector from "@/components/year-level-selector";
-import type { RegisterForm } from "@/hooks/use-registration-form";
+import CourseSelector from '@/components/course-selector';
+import { InputWithLabel } from '@/components/input-with-label';
+import YearLevelSelector from '@/components/year-level-selector';
+import type { RegisterForm } from '@/hooks/use-registration-form';
+import { memo } from 'react';
 
 interface AcademicInformationStepProps {
     data: RegisterForm;
@@ -11,12 +11,7 @@ interface AcademicInformationStepProps {
     onCourseChange: (value: string) => void;
 }
 
-const AcademicInformationStep = memo<AcademicInformationStepProps>(({
-    data,
-    errors,
-    onFieldChange,
-    onCourseChange,
-}) => {
+const AcademicInformationStep = memo<AcademicInformationStepProps>(({ data, errors, onFieldChange, onCourseChange }) => {
     return (
         <div className="space-y-6">
             <div>
@@ -25,13 +20,13 @@ const AcademicInformationStep = memo<AcademicInformationStepProps>(({
                     label="Student ID"
                     required
                     value={data.student_id}
-                    onChange={value => onFieldChange('student_id', value)}
+                    onChange={(value) => onFieldChange('student_id', value)}
                     placeholder="MBC2025-0001"
                     pattern="MBC[0-9]{4}-[0-9]{4}"
                     error={errors.student_id}
                     className="w-full"
                 />
-                <p className="mt-1 text-sm text-muted-foreground">Format: MBCYYYY-NNNN (e.g., MBC2025-0001)</p>
+                <p className="text-muted-foreground mt-1 text-sm">Format: MBCYYYY-NNNN (e.g., MBC2025-0001)</p>
             </div>
 
             <div>
@@ -41,7 +36,7 @@ const AcademicInformationStep = memo<AcademicInformationStepProps>(({
                     error={errors.course}
                     required
                     majorValue={data.major}
-                    onMajorChange={value => onFieldChange('major', value)}
+                    onMajorChange={(value) => onFieldChange('major', value)}
                     majorError={errors.major}
                     className="w-full"
                 />
@@ -50,7 +45,7 @@ const AcademicInformationStep = memo<AcademicInformationStepProps>(({
             <div>
                 <YearLevelSelector
                     value={data.year_level}
-                    onChange={value => onFieldChange('year_level', value)}
+                    onChange={(value) => onFieldChange('year_level', value)}
                     error={errors.year_level}
                     required
                     className="w-full"
@@ -62,12 +57,12 @@ const AcademicInformationStep = memo<AcademicInformationStepProps>(({
                     id="scholarships"
                     label="Current Scholarships (Optional)"
                     value={data.scholarships}
-                    onChange={value => onFieldChange('scholarships', value)}
+                    onChange={(value) => onFieldChange('scholarships', value)}
                     placeholder="List any current scholarships (separate multiple with commas)"
                     error={errors.scholarships}
                     className="w-full"
                 />
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="text-muted-foreground mt-1 text-sm">
                     If you have multiple scholarships, separate them with commas. Leave blank if none.
                 </p>
             </div>

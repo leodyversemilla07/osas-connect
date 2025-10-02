@@ -1,30 +1,25 @@
-import React, { memo } from 'react';
-import { GraduationCap } from 'lucide-react';
+import CourseSelector from '@/components/course-selector';
+import { InputWithLabel } from '@/components/input-with-label';
+import { SelectorWithLabel } from '@/components/selector-with-label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { InputWithLabel } from "@/components/input-with-label";
-import CourseSelector from "@/components/course-selector";
-import { SelectorWithLabel } from "@/components/selector-with-label";
 import type { ProfileSectionProps } from '@/types/profile';
+import { GraduationCap } from 'lucide-react';
+import { memo } from 'react';
 
 // Academic level options
 const YEAR_LEVELS = [
     { value: '1st Year', label: '1st Year' },
     { value: '2nd Year', label: '2nd Year' },
     { value: '3rd Year', label: '3rd Year' },
-    { value: '4th Year', label: '4th Year' }
+    { value: '4th Year', label: '4th Year' },
 ] as const;
 
-export const AcademicInfoSection = memo<ProfileSectionProps>(({
-    data,
-    errors,
-    updateField,
-    handleCourseChange
-}) => {
+export const AcademicInfoSection = memo<ProfileSectionProps>(({ data, errors, updateField, handleCourseChange }) => {
     return (
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <GraduationCap className="h-5 w-5 text-primary" />
+                    <GraduationCap className="text-primary h-5 w-5" />
                     Academic Information
                 </CardTitle>
                 <CardDescription>Your educational background details</CardDescription>
@@ -62,7 +57,7 @@ export const AcademicInfoSection = memo<ProfileSectionProps>(({
                         error={errors.existing_scholarships}
                         className="w-full"
                     />
-                    <p className="text-sm text-muted-foreground">List any current scholarships or financial aid you're receiving</p>
+                    <p className="text-muted-foreground text-sm">List any current scholarships or financial aid you're receiving</p>
                 </div>
             </CardContent>
         </Card>

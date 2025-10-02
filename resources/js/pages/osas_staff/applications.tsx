@@ -1,8 +1,7 @@
-import { Head } from '@inertiajs/react';
-import { type BreadcrumbItem } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import * as React from "react"
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -14,84 +13,60 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
-} from "@tanstack/react-table"
+} from '@tanstack/react-table';
+import * as React from 'react';
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuTrigger,
+    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
     Pagination,
     PaginationContent,
+    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-    PaginationEllipsis,
-} from "@/components/ui/pagination"
+} from '@/components/ui/pagination';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import { Progress } from "@/components/ui/progress"
-import {
-    X,
-    Download,
-    MoreVertical,
-    Eye,
+    AlertTriangle,
+    ArrowUpDown,
     Calendar,
     CheckCircle,
-    XCircle,
-    ArrowUpDown,
-    User,
-    ShieldCheck,
-    AlertTriangle,
-    GraduationCap,
-    HelpCircle,
+    Download,
+    Eye,
     FileText,
+    GraduationCap,
     Grid,
+    HelpCircle,
+    Keyboard,
     List,
-    Timer,
-    Search,
+    MoreVertical,
     RefreshCw,
-    Keyboard
-} from "lucide-react"
-import { Link } from "@inertiajs/react"
-import { cn } from "@/lib/utils"
+    Search,
+    ShieldCheck,
+    Timer,
+    User,
+    X,
+    XCircle,
+} from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -161,28 +136,28 @@ interface ApplicationsPageProps {
 }
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
-    searchPlaceholder?: string
+    columns: ColumnDef<TData, TValue>[];
+    data: TData[];
+    searchPlaceholder?: string;
 }
 
 interface ApplicationData {
-    id: number
-    status: string
-    priority: string
-    submitted_at?: string
+    id: number;
+    status: string;
+    priority: string;
+    submitted_at?: string;
     student: {
-        name: string
-        student_id: string
-        email: string
-        course: string
-        year_level: string
-    }
+        name: string;
+        student_id: string;
+        email: string;
+        course: string;
+        year_level: string;
+    };
     scholarship: {
-        name: string
-        type: string
-        amount?: string
-    }
+        name: string;
+        type: string;
+        amount?: string;
+    };
 }
 
 // Updated comprehensive status configuration (removed extra statuses)
@@ -237,13 +212,13 @@ const statusConfig = {
 
 // Scholarship type mappings for better display
 const SCHOLARSHIP_TYPES = {
-    'academic_full': 'Academic (Full)',
-    'academic_partial': 'Academic (Partial)',
-    'student_assistantship': 'Student Assistantship',
-    'performing_arts_full': 'Performing Arts (Full)',
-    'performing_arts_partial': 'Performing Arts (Partial)',
-    'economic_assistance': 'Economic Assistance',
-    'others': 'Custom Type',
+    academic_full: 'Academic (Full)',
+    academic_partial: 'Academic (Partial)',
+    student_assistantship: 'Student Assistantship',
+    performing_arts_full: 'Performing Arts (Full)',
+    performing_arts_partial: 'Performing Arts (Partial)',
+    economic_assistance: 'Economic Assistance',
+    others: 'Custom Type',
 } as const;
 
 const getScholarshipTypeDisplay = (type: string): string => {
@@ -252,13 +227,13 @@ const getScholarshipTypeDisplay = (type: string): string => {
 
 const getScholarshipTypeColor = (type: string): string => {
     const colors = {
-        'academic_full': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-        'academic_partial': 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300',
-        'student_assistantship': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-        'performing_arts_full': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
-        'performing_arts_partial': 'bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-300',
-        'economic_assistance': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300',
-        'others': 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
+        academic_full: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        academic_partial: 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300',
+        student_assistantship: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+        performing_arts_full: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+        performing_arts_partial: 'bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-300',
+        economic_assistance: 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300',
+        others: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
     };
     return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
 };
@@ -299,38 +274,46 @@ const StatusCell = ({ status }: { status: string }) => {
 
     return (
         <Badge className={cn(finalConfig.color)}>
-            <StatusIcon className="h-3 w-3 mr-1" />
+            <StatusIcon className="mr-1 h-3 w-3" />
             {finalConfig.label}
         </Badge>
     );
 };
 
 // Mobile-friendly Card Component
-const ApplicationCard = ({ application, onQuickAction }: {
+const ApplicationCard = ({
+    application,
+    onQuickAction,
+}: {
     application: Application;
     onQuickAction: (action: 'approve' | 'reject' | 'schedule', app: Application) => void;
 }) => {
-    const isOverdue = application.deadline && new Date(application.deadline) < new Date() &&
-        ['submitted', 'under_verification'].includes(application.status);
+    const isOverdue =
+        application.deadline && new Date(application.deadline) < new Date() && ['submitted', 'under_verification'].includes(application.status);
 
     return (
-        <Card className={cn(
-            "p-4 transition-all duration-200 hover:shadow-md border-l-4",
-            application.priority === 'high' ? 'border-l-red-500' :
-                application.priority === 'medium' ? 'border-l-yellow-500' : 'border-l-green-500'
-        )}>
+        <Card
+            className={cn(
+                'border-l-4 p-4 transition-all duration-200 hover:shadow-md',
+                application.priority === 'high'
+                    ? 'border-l-red-500'
+                    : application.priority === 'medium'
+                      ? 'border-l-yellow-500'
+                      : 'border-l-green-500',
+            )}
+        >
             <div className="space-y-4">
                 {/* Header */}
                 <div className="flex items-start justify-between">
                     <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-muted-foreground" />
+                            <User className="text-muted-foreground h-4 w-4" />
                             <span className="font-semibold">{application.student.name}</span>
                             <Badge variant="outline" className="text-xs">
                                 #{application.id}
                             </Badge>
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-muted-foreground text-sm">
                             {application.student.student_id} • {application.student.course} {application.student.year_level}
                         </div>
                     </div>
@@ -343,13 +326,13 @@ const ApplicationCard = ({ application, onQuickAction }: {
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
                                 <Link href={route('osas.applications.review', application.id)}>
-                                    <Eye className="h-4 w-4 mr-2" />
+                                    <Eye className="mr-2 h-4 w-4" />
                                     Review Application
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href={route('osas.students.details', application.student.id)}>
-                                    <User className="h-4 w-4 mr-2" />
+                                    <User className="mr-2 h-4 w-4" />
                                     View Profile
                                 </Link>
                             </DropdownMenuItem>
@@ -359,14 +342,12 @@ const ApplicationCard = ({ application, onQuickAction }: {
 
                 {/* Scholarship Info */}
                 <div className="space-y-2">
-                    <div className="font-medium text-sm">{application.scholarship.name}</div>
+                    <div className="text-sm font-medium">{application.scholarship.name}</div>
                     <div className="flex items-center gap-2">
                         <Badge className={cn(getScholarshipTypeColor(application.scholarship.type))}>
                             {getScholarshipTypeDisplay(application.scholarship.type)}
                         </Badge>
-                        <span className="text-sm font-medium text-green-600">
-                            {formatCurrency(application.scholarship.amount)}
-                        </span>
+                        <span className="text-sm font-medium text-green-600">{formatCurrency(application.scholarship.amount)}</span>
                     </div>
                 </div>
 
@@ -374,16 +355,16 @@ const ApplicationCard = ({ application, onQuickAction }: {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <StatusCell status={application.status} />
-                        <Badge variant={
-                            application.priority === 'high' ? 'destructive' :
-                                application.priority === 'medium' ? 'default' : 'secondary'
-                        } className="text-xs">
+                        <Badge
+                            variant={application.priority === 'high' ? 'destructive' : application.priority === 'medium' ? 'default' : 'secondary'}
+                            className="text-xs"
+                        >
                             {application.priority}
                         </Badge>
                     </div>
                     {isOverdue && (
                         <Badge variant="destructive" className="text-xs">
-                            <Timer className="h-3 w-3 mr-1" />
+                            <Timer className="mr-1 h-3 w-3" />
                             Overdue
                         </Badge>
                     )}
@@ -393,7 +374,9 @@ const ApplicationCard = ({ application, onQuickAction }: {
                 <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                         <span>Documents</span>
-                        <span>{application.verified_documents_count}/{application.documents_count} verified</span>
+                        <span>
+                            {application.verified_documents_count}/{application.documents_count} verified
+                        </span>
                     </div>
                     <Progress
                         value={application.documents_count > 0 ? (application.verified_documents_count / application.documents_count) * 100 : 0}
@@ -409,11 +392,11 @@ const ApplicationCard = ({ application, onQuickAction }: {
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    className="flex-1 text-green-600 border-green-200 hover:bg-green-50"
+                                    className="flex-1 border-green-200 text-green-600 hover:bg-green-50"
                                     onClick={() => onQuickAction('approve', application)}
                                     disabled={!['verified', 'under_evaluation'].includes(application.status)}
                                 >
-                                    <CheckCircle className="h-4 w-4 mr-1" />
+                                    <CheckCircle className="mr-1 h-4 w-4" />
                                     Approve
                                 </Button>
                             </TooltipTrigger>
@@ -429,11 +412,11 @@ const ApplicationCard = ({ application, onQuickAction }: {
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    className="flex-1 text-red-600 border-red-200 hover:bg-red-50"
+                                    className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
                                     onClick={() => onQuickAction('reject', application)}
                                     disabled={['approved', 'rejected', 'end'].includes(application.status)}
                                 >
-                                    <XCircle className="h-4 w-4 mr-1" />
+                                    <XCircle className="mr-1 h-4 w-4" />
                                     Reject
                                 </Button>
                             </TooltipTrigger>
@@ -449,11 +432,11 @@ const ApplicationCard = ({ application, onQuickAction }: {
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    className="flex-1 text-blue-600 border-blue-200 hover:bg-blue-50"
+                                    className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
                                     onClick={() => onQuickAction('schedule', application)}
                                     disabled={!['verified', 'under_evaluation'].includes(application.status)}
                                 >
-                                    <Calendar className="h-4 w-4 mr-1" />
+                                    <Calendar className="mr-1 h-4 w-4" />
                                     Interview
                                 </Button>
                             </TooltipTrigger>
@@ -465,9 +448,9 @@ const ApplicationCard = ({ application, onQuickAction }: {
                 </div>
 
                 {/* Timestamp */}
-                <div className="text-xs text-muted-foreground pt-2 border-t">
-                    Submitted {new Date(application.submitted_at).toLocaleDateString()} •
-                    Updated {new Date(application.updated_at).toLocaleDateString()}
+                <div className="text-muted-foreground border-t pt-2 text-xs">
+                    Submitted {new Date(application.submitted_at).toLocaleDateString()} • Updated{' '}
+                    {new Date(application.updated_at).toLocaleDateString()}
                 </div>
             </div>
         </Card>
@@ -476,10 +459,10 @@ const ApplicationCard = ({ application, onQuickAction }: {
 
 const columns: ColumnDef<Application>[] = [
     {
-        id: "select",
+        id: 'select',
         header: ({ table }) => (
             <Checkbox
-                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
                 onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                 aria-label="Select all"
                 className="translate-y-[2px]"
@@ -497,45 +480,35 @@ const columns: ColumnDef<Application>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "id",
+        accessorKey: 'id',
         header: ({ column }) => {
             return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    className="h-8 px-2 lg:px-3"
-                >
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="h-8 px-2 lg:px-3">
                     ID
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
-            )
+            );
         },
-        cell: ({ row }) => (
-            <div className="font-medium">#{row.getValue("id")}</div>
-        ),
+        cell: ({ row }) => <div className="font-medium">#{row.getValue('id')}</div>,
     },
     {
-        id: "student",
+        id: 'student',
         header: ({ column }) => {
             return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    className="h-8 px-2 lg:px-3"
-                >
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="h-8 px-2 lg:px-3">
                     Student
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
-            )
+            );
         },
         cell: ({ row }) => {
             const student = row.original.student;
             return (
                 <div className="flex items-center space-x-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
+                    <User className="text-muted-foreground h-4 w-4" />
                     <div>
                         <div className="font-medium">{student.name}</div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-muted-foreground text-sm">
                             {student.student_id} • {student.course} {student.year_level}
                         </div>
                     </div>
@@ -549,38 +522,30 @@ const columns: ColumnDef<Application>[] = [
         },
     },
     {
-        id: "scholarship",
-        header: "Scholarship",
+        id: 'scholarship',
+        header: 'Scholarship',
         cell: ({ row }) => {
             const scholarship = row.original.scholarship;
             return (
                 <div>
                     <div className="font-medium">{scholarship.name}</div>
-                    <div className="flex items-center gap-2 mt-1">
-                        <Badge className={cn(getScholarshipTypeColor(scholarship.type))}>
-                            {getScholarshipTypeDisplay(scholarship.type)}
-                        </Badge>
-                        <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                            {formatCurrency(scholarship.amount)}
-                        </span>
+                    <div className="mt-1 flex items-center gap-2">
+                        <Badge className={cn(getScholarshipTypeColor(scholarship.type))}>{getScholarshipTypeDisplay(scholarship.type)}</Badge>
+                        <span className="text-sm font-medium text-green-600 dark:text-green-400">{formatCurrency(scholarship.amount)}</span>
                     </div>
                 </div>
             );
         },
     },
     {
-        id: "status",
+        id: 'status',
         header: ({ column }) => {
             return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    className="h-8 px-2 lg:px-3"
-                >
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="h-8 px-2 lg:px-3">
                     Status
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
-            )
+            );
         },
         cell: ({ row }) => {
             const status = row.original.status;
@@ -589,36 +554,24 @@ const columns: ColumnDef<Application>[] = [
         accessorFn: (row) => row.status,
     },
     {
-        id: "priority",
+        id: 'priority',
         header: ({ column }) => {
             return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    className="h-8 px-2 lg:px-3"
-                >
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="h-8 px-2 lg:px-3">
                     Priority
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
-            )
+            );
         },
         cell: ({ row }) => {
             const priority = row.original.priority;
-            return (
-                <Badge variant={
-                    priority === 'high' ? 'destructive' :
-                        priority === 'medium' ? 'default' :
-                            'secondary'
-                }>
-                    {priority}
-                </Badge>
-            );
+            return <Badge variant={priority === 'high' ? 'destructive' : priority === 'medium' ? 'default' : 'secondary'}>{priority}</Badge>;
         },
         accessorFn: (row) => row.priority,
     },
     {
-        id: "documents",
-        header: "Documents",
+        id: 'documents',
+        header: 'Documents',
         cell: ({ row }) => {
             const documentsCount = row.original.documents_count;
             const verifiedCount = row.original.verified_documents_count;
@@ -629,74 +582,52 @@ const columns: ColumnDef<Application>[] = [
                     <div className="text-sm">
                         {verifiedCount}/{documentsCount} verified
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                        <div
-                            className="bg-blue-600 h-1.5 rounded-full transition-all"
-                            style={{ width: `${percentage}%` }}
-                        />
+                    <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                        <div className="h-1.5 rounded-full bg-blue-600 transition-all" style={{ width: `${percentage}%` }} />
                     </div>
                 </div>
             );
         },
     },
     {
-        id: "submitted_at",
+        id: 'submitted_at',
         header: ({ column }) => {
             return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    className="h-8 px-2 lg:px-3"
-                >
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="h-8 px-2 lg:px-3">
                     Submitted
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
-            )
+            );
         },
         cell: ({ row }) => {
             const date = new Date(row.original.submitted_at);
-            return (
-                <div className="text-sm">
-                    {date.toLocaleDateString()}
-                </div>
-            );
+            return <div className="text-sm">{date.toLocaleDateString()}</div>;
         },
         accessorFn: (row) => row.submitted_at,
     },
     {
-        id: "deadline",
+        id: 'deadline',
         header: ({ column }) => {
             return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    className="h-8 px-2 lg:px-3"
-                >
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="h-8 px-2 lg:px-3">
                     Deadline
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
-            )
+            );
         },
         cell: ({ row }) => {
             const deadlineValue = row.original.deadline;
 
             // Handle null/undefined deadline
             if (!deadlineValue) {
-                return (
-                    <div className="text-sm text-muted-foreground">
-                        No deadline
-                    </div>
-                );
+                return <div className="text-muted-foreground text-sm">No deadline</div>;
             }
 
             const deadline = new Date(deadlineValue);
             const isOverdue = deadline < new Date() && ['submitted', 'under_verification'].includes(row.original.status);
 
             return (
-                <div className={cn(
-                    "text-sm",
-                    isOverdue ? "text-red-600 font-medium" : ""
-                )}>
+                <div className={cn('text-sm', isOverdue ? 'font-medium text-red-600' : '')}>
                     {deadline.toLocaleDateString()}
                     {isOverdue && <div className="text-xs">(Overdue)</div>}
                 </div>
@@ -705,7 +636,7 @@ const columns: ColumnDef<Application>[] = [
         accessorFn: (row) => row.deadline,
     },
     {
-        id: "actions",
+        id: 'actions',
         cell: ({ row }) => {
             const application = row.original;
 
@@ -721,20 +652,20 @@ const columns: ColumnDef<Application>[] = [
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
                             <Link href={route('osas.applications.review', application.id)}>
-                                <Eye className="h-4 w-4 mr-2" />
+                                <Eye className="mr-2 h-4 w-4" />
                                 Review Application
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href={route('osas.applications.interview', application.id)}>
-                                <Calendar className="h-4 w-4 mr-2" />
+                                <Calendar className="mr-2 h-4 w-4" />
                                 Schedule Interview
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                             <Link href={route('osas.students.details', application.student.id)}>
-                                <User className="h-4 w-4 mr-2" />
+                                <User className="mr-2 h-4 w-4" />
                                 View Student Profile
                             </Link>
                         </DropdownMenuItem>
@@ -743,21 +674,17 @@ const columns: ColumnDef<Application>[] = [
             );
         },
     },
-]
+];
 
-function DataTable<TData, TValue>({
-    columns,
-    data,
-    searchPlaceholder = "Search applications...",
-}: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
-    const [globalFilter, setGlobalFilter] = React.useState("")
-    const [statusFilter, setStatusFilter] = React.useState<string>("all")
-    const [priorityFilter, setPriorityFilter] = React.useState<string>("all")
-    const [viewMode, setViewMode] = React.useState<'table' | 'cards'>('table')
+function DataTable<TData, TValue>({ columns, data, searchPlaceholder = 'Search applications...' }: DataTableProps<TData, TValue>) {
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [rowSelection, setRowSelection] = React.useState({});
+    const [globalFilter, setGlobalFilter] = React.useState('');
+    const [statusFilter, setStatusFilter] = React.useState<string>('all');
+    const [priorityFilter, setPriorityFilter] = React.useState<string>('all');
+    const [viewMode, setViewMode] = React.useState<'table' | 'cards'>('table');
     const [quickActionDialog, setQuickActionDialog] = React.useState<{
         isOpen: boolean;
         application: Application | null;
@@ -766,7 +693,7 @@ function DataTable<TData, TValue>({
         isOpen: false,
         application: null,
         action: null,
-    })
+    });
 
     const table = useReactTable({
         data,
@@ -789,14 +716,14 @@ function DataTable<TData, TValue>({
         },
         globalFilterFn: (row, columnId, value) => {
             // Custom global filter function to search across all relevant fields
-            const search = value.toLowerCase()
-            const rowData = row.original as ApplicationData
+            const search = value.toLowerCase();
+            const rowData = row.original as ApplicationData;
 
             // Safely access nested properties
-            const student = rowData.student || {}
-            const scholarship = rowData.scholarship || {}
-            const status = rowData.status || ''
-            const priority = rowData.priority || ''
+            const student = rowData.student || {};
+            const scholarship = rowData.scholarship || {};
+            const status = rowData.status || '';
+            const priority = rowData.priority || '';
 
             return (
                 student?.name?.toLowerCase().includes(search) ||
@@ -809,7 +736,7 @@ function DataTable<TData, TValue>({
                 status?.toLowerCase().includes(search) ||
                 priority?.toLowerCase().includes(search) ||
                 String(rowData.id || '').includes(search)
-            )
+            );
         },
         state: {
             sorting,
@@ -818,45 +745,45 @@ function DataTable<TData, TValue>({
             rowSelection,
             globalFilter,
         },
-    })
+    });
 
     // Apply additional filters
     React.useEffect(() => {
-        const filters: ColumnFiltersState = []
+        const filters: ColumnFiltersState = [];
 
-        if (statusFilter !== "all") {
-            filters.push({ id: "status", value: statusFilter })
+        if (statusFilter !== 'all') {
+            filters.push({ id: 'status', value: statusFilter });
         }
 
-        if (priorityFilter !== "all") {
-            filters.push({ id: "priority", value: priorityFilter })
+        if (priorityFilter !== 'all') {
+            filters.push({ id: 'priority', value: priorityFilter });
         }
 
-        setColumnFilters(filters)
-    }, [statusFilter, priorityFilter])
+        setColumnFilters(filters);
+    }, [statusFilter, priorityFilter]);
 
-    const selectedRows = table.getFilteredSelectedRowModel().rows.length
-    const totalRows = table.getFilteredRowModel().rows.length
+    const selectedRows = table.getFilteredSelectedRowModel().rows.length;
+    const totalRows = table.getFilteredRowModel().rows.length;
 
     // Get unique status and priority values for filters
     const uniqueStatuses = React.useMemo(() => {
-        const statuses = new Set(data.map((row) => (row as ApplicationData).status))
-        return Array.from(statuses)
-    }, [data])
+        const statuses = new Set(data.map((row) => (row as ApplicationData).status));
+        return Array.from(statuses);
+    }, [data]);
 
     const uniquePriorities = React.useMemo(() => {
-        const priorities = new Set(data.map((row) => (row as ApplicationData).priority))
-        return Array.from(priorities)
-    }, [data])
+        const priorities = new Set(data.map((row) => (row as ApplicationData).priority));
+        return Array.from(priorities);
+    }, [data]);
 
     const resetFilters = React.useCallback(() => {
-        setGlobalFilter("")
-        setStatusFilter("all")
-        setPriorityFilter("all")
-        table.resetColumnFilters()
-    }, [table])
+        setGlobalFilter('');
+        setStatusFilter('all');
+        setPriorityFilter('all');
+        table.resetColumnFilters();
+    }, [table]);
 
-    const hasActiveFilters = globalFilter || statusFilter !== "all" || priorityFilter !== "all"
+    const hasActiveFilters = globalFilter || statusFilter !== 'all' || priorityFilter !== 'all';
 
     // Quick action handler
     const handleQuickAction = (action: 'approve' | 'reject' | 'schedule', application: Application) => {
@@ -914,24 +841,24 @@ function DataTable<TData, TValue>({
             {/* Enhanced Search and Filters */}
             <div className="flex flex-col space-y-4">
                 <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                    <div className="flex flex-1 flex-col space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
+                    <div className="flex flex-1 flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
                         {/* Global Search with enhanced styling */}
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-4 w-4 text-muted-foreground" />
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <Search className="text-muted-foreground h-4 w-4" />
                             </div>
                             <Input
                                 placeholder={searchPlaceholder}
-                                value={globalFilter ?? ""}
+                                value={globalFilter ?? ''}
                                 onChange={(event) => setGlobalFilter(event.target.value)}
-                                className="h-9 w-full sm:w-[300px] pl-10 pr-4 border-2 focus:border-primary transition-colors"
+                                className="focus:border-primary h-9 w-full border-2 pr-4 pl-10 transition-colors sm:w-[300px]"
                             />
                             {globalFilter && (
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="absolute inset-y-0 right-0 px-3 h-full"
-                                    onClick={() => setGlobalFilter("")}
+                                    className="absolute inset-y-0 right-0 h-full px-3"
+                                    onClick={() => setGlobalFilter('')}
                                 >
                                     <X className="h-4 w-4" />
                                 </Button>
@@ -940,7 +867,7 @@ function DataTable<TData, TValue>({
 
                         {/* Status Filter */}
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="h-9 w-full sm:w-[180px] border-2">
+                            <SelectTrigger className="h-9 w-full border-2 sm:w-[180px]">
                                 <SelectValue placeholder="All statuses" />
                             </SelectTrigger>
                             <SelectContent>
@@ -955,7 +882,7 @@ function DataTable<TData, TValue>({
 
                         {/* Priority Filter */}
                         <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                            <SelectTrigger className="h-9 w-full sm:w-[150px] border-2">
+                            <SelectTrigger className="h-9 w-full border-2 sm:w-[150px]">
                                 <SelectValue placeholder="All priorities" />
                             </SelectTrigger>
                             <SelectContent>
@@ -970,11 +897,7 @@ function DataTable<TData, TValue>({
 
                         {/* Clear Filters */}
                         {hasActiveFilters && (
-                            <Button
-                                variant="ghost"
-                                onClick={resetFilters}
-                                className="h-9 px-3 text-muted-foreground hover:text-foreground"
-                            >
+                            <Button variant="ghost" onClick={resetFilters} className="text-muted-foreground hover:text-foreground h-9 px-3">
                                 Reset
                                 <X className="ml-2 h-4 w-4" />
                             </Button>
@@ -993,24 +916,34 @@ function DataTable<TData, TValue>({
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs">
                                     <div className="space-y-1 text-xs">
-                                        <div><kbd>/</kbd> Focus search</div>
-                                        <div><kbd>r</kbd> Reset filters</div>
-                                        <div><kbd>t</kbd> Table view</div>
-                                        <div><kbd>c</kbd> Cards view</div>
-                                        <div><kbd>Esc</kbd> Clear search</div>
+                                        <div>
+                                            <kbd>/</kbd> Focus search
+                                        </div>
+                                        <div>
+                                            <kbd>r</kbd> Reset filters
+                                        </div>
+                                        <div>
+                                            <kbd>t</kbd> Table view
+                                        </div>
+                                        <div>
+                                            <kbd>c</kbd> Cards view
+                                        </div>
+                                        <div>
+                                            <kbd>Esc</kbd> Clear search
+                                        </div>
                                     </div>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
 
-                        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+                        <div className="bg-muted flex items-center gap-1 rounded-lg p-1">
                             <Button
                                 variant={viewMode === 'table' ? 'default' : 'ghost'}
                                 size="sm"
                                 onClick={() => setViewMode('table')}
                                 className="h-8 px-3"
                             >
-                                <List className="h-4 w-4 mr-1" />
+                                <List className="mr-1 h-4 w-4" />
                                 Table
                             </Button>
                             <Button
@@ -1019,7 +952,7 @@ function DataTable<TData, TValue>({
                                 onClick={() => setViewMode('cards')}
                                 className="h-8 px-3"
                             >
-                                <Grid className="h-4 w-4 mr-1" />
+                                <Grid className="mr-1 h-4 w-4" />
                                 Cards
                             </Button>
                         </div>
@@ -1032,7 +965,7 @@ function DataTable<TData, TValue>({
                 <div className="space-y-4">
                     {/* Results count */}
                     <div className="flex items-center justify-between">
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-muted-foreground text-sm">
                             Showing {table.getRowModel().rows.length} of {table.getFilteredRowModel().rows.length} applications
                         </div>
                         {selectedRows > 0 && (
@@ -1043,21 +976,19 @@ function DataTable<TData, TValue>({
                     </div>
 
                     {/* Cards Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <ApplicationCard
-                                    key={row.id}
-                                    application={row.original as Application}
-                                    onQuickAction={handleQuickAction}
-                                />
-                            ))
+                            table
+                                .getRowModel()
+                                .rows.map((row) => (
+                                    <ApplicationCard key={row.id} application={row.original as Application} onQuickAction={handleQuickAction} />
+                                ))
                         ) : (
                             <div className="col-span-full">
                                 <Card className="p-8">
-                                    <div className="text-center space-y-2">
+                                    <div className="space-y-2 text-center">
                                         <div className="text-muted-foreground text-sm">No applications found</div>
-                                        <div className="text-xs text-muted-foreground">Try adjusting your search or filters</div>
+                                        <div className="text-muted-foreground text-xs">Try adjusting your search or filters</div>
                                     </div>
                                 </Card>
                             </div>
@@ -1065,15 +996,12 @@ function DataTable<TData, TValue>({
                     </div>
 
                     {/* Enhanced Shadcn Pagination for cards */}
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card/30 rounded-lg p-4 border">
+                    <div className="bg-card/30 flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-4">
                             <div className="flex items-center space-x-2">
                                 <p className="text-sm font-medium">Cards per page</p>
-                                <Select
-                                    value={`${table.getState().pagination.pageSize}`}
-                                    onValueChange={(value) => table.setPageSize(Number(value))}
-                                >
-                                    <SelectTrigger className="h-9 w-[70px] bg-background">
+                                <Select value={`${table.getState().pagination.pageSize}`} onValueChange={(value) => table.setPageSize(Number(value))}>
+                                    <SelectTrigger className="bg-background h-9 w-[70px]">
                                         <SelectValue placeholder={table.getState().pagination.pageSize} />
                                     </SelectTrigger>
                                     <SelectContent side="top">
@@ -1086,9 +1014,9 @@ function DataTable<TData, TValue>({
                                 </Select>
                             </div>
 
-                            <div className="text-sm text-muted-foreground">
-                                Showing <span className="font-medium text-foreground">{table.getRowModel().rows.length}</span> of{" "}
-                                <span className="font-medium text-foreground">{table.getFilteredRowModel().rows.length}</span> applications
+                            <div className="text-muted-foreground text-sm">
+                                Showing <span className="text-foreground font-medium">{table.getRowModel().rows.length}</span> of{' '}
+                                <span className="text-foreground font-medium">{table.getFilteredRowModel().rows.length}</span> applications
                             </div>
                         </div>
 
@@ -1105,7 +1033,9 @@ function DataTable<TData, TValue>({
                                                 }
                                             }}
                                             size="default"
-                                            className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-accent"}
+                                            className={
+                                                !table.getCanPreviousPage() ? 'pointer-events-none opacity-50' : 'hover:bg-accent cursor-pointer'
+                                            }
                                         />
                                     </PaginationItem>
 
@@ -1132,7 +1062,7 @@ function DataTable<TData, TValue>({
                                                         >
                                                             {i}
                                                         </PaginationLink>
-                                                    </PaginationItem>
+                                                    </PaginationItem>,
                                                 );
                                             }
                                         } else {
@@ -1152,7 +1082,7 @@ function DataTable<TData, TValue>({
                                                     >
                                                         1
                                                     </PaginationLink>
-                                                </PaginationItem>
+                                                </PaginationItem>,
                                             );
 
                                             // Add ellipsis if needed
@@ -1160,7 +1090,7 @@ function DataTable<TData, TValue>({
                                                 pages.push(
                                                     <PaginationItem key="ellipsis1">
                                                         <PaginationEllipsis />
-                                                    </PaginationItem>
+                                                    </PaginationItem>,
                                                 );
                                             }
 
@@ -1184,7 +1114,7 @@ function DataTable<TData, TValue>({
                                                             >
                                                                 {i}
                                                             </PaginationLink>
-                                                        </PaginationItem>
+                                                        </PaginationItem>,
                                                     );
                                                 }
                                             }
@@ -1194,7 +1124,7 @@ function DataTable<TData, TValue>({
                                                 pages.push(
                                                     <PaginationItem key="ellipsis2">
                                                         <PaginationEllipsis />
-                                                    </PaginationItem>
+                                                    </PaginationItem>,
                                                 );
                                             }
 
@@ -1214,7 +1144,7 @@ function DataTable<TData, TValue>({
                                                         >
                                                             {totalPages}
                                                         </PaginationLink>
-                                                    </PaginationItem>
+                                                    </PaginationItem>,
                                                 );
                                             }
                                         }
@@ -1232,7 +1162,7 @@ function DataTable<TData, TValue>({
                                                 }
                                             }}
                                             size="default"
-                                            className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-accent"}
+                                            className={!table.getCanNextPage() ? 'pointer-events-none opacity-50' : 'hover:bg-accent cursor-pointer'}
                                         />
                                     </PaginationItem>
                                 </PaginationContent>
@@ -1250,18 +1180,28 @@ function DataTable<TData, TValue>({
                                 <Badge variant="secondary" className="rounded-sm px-1 font-normal">
                                     {selectedRows}
                                 </Badge>
-                                <span className="text-sm text-muted-foreground">
-                                    of {totalRows} row(s) selected
-                                </span>
+                                <span className="text-muted-foreground text-sm">of {totalRows} row(s) selected</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={() => {
-                                        const selectedData = table.getFilteredSelectedRowModel().rows.map(row => row.original);
+                                        const selectedData = table.getFilteredSelectedRowModel().rows.map((row) => row.original);
                                         // Export functionality - convert to CSV
-                                        const headers = ['Student Name', 'Student ID', 'Email', 'Course', 'Year Level', 'Scholarship', 'Type', 'Amount', 'Status', 'Priority', 'Submitted At'];
+                                        const headers = [
+                                            'Student Name',
+                                            'Student ID',
+                                            'Email',
+                                            'Course',
+                                            'Year Level',
+                                            'Scholarship',
+                                            'Type',
+                                            'Amount',
+                                            'Status',
+                                            'Priority',
+                                            'Submitted At',
+                                        ];
                                         const csvContent = [
                                             headers.join(','),
                                             ...selectedData.map((app) => {
@@ -1277,9 +1217,9 @@ function DataTable<TData, TValue>({
                                                     `"${appData.scholarship?.amount || ''}"`,
                                                     `"${appData.status || ''}"`,
                                                     `"${appData.priority || ''}"`,
-                                                    `"${appData.submitted_at || ''}"`
+                                                    `"${appData.submitted_at || ''}"`,
                                                 ].join(',');
-                                            })
+                                            }),
                                         ].join('\n');
 
                                         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1293,14 +1233,10 @@ function DataTable<TData, TValue>({
                                         document.body.removeChild(link);
                                     }}
                                 >
-                                    <Download className="h-4 w-4 mr-2" />
+                                    <Download className="mr-2 h-4 w-4" />
                                     Export Selected
                                 </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => table.resetRowSelection()}
-                                >
+                                <Button variant="outline" size="sm" onClick={() => table.resetRowSelection()}>
                                     Clear Selection
                                 </Button>
                             </div>
@@ -1316,14 +1252,9 @@ function DataTable<TData, TValue>({
                                         {headerGroup.headers.map((header) => {
                                             return (
                                                 <TableHead key={header.id} className="h-12">
-                                                    {header.isPlaceholder
-                                                        ? null
-                                                        : flexRender(
-                                                            header.column.columnDef.header,
-                                                            header.getContext()
-                                                        )}
+                                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                                 </TableHead>
-                                            )
+                                            );
                                         })}
                                     </TableRow>
                                 ))}
@@ -1331,14 +1262,9 @@ function DataTable<TData, TValue>({
                             <TableBody>
                                 {table.getRowModel().rows?.length ? (
                                     table.getRowModel().rows.map((row) => (
-                                        <TableRow
-                                            key={row.id}
-                                            data-state={row.getIsSelected() && "selected"}
-                                        >
+                                        <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                                             {row.getVisibleCells().map((cell) => (
-                                                <TableCell key={cell.id}>
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                </TableCell>
+                                                <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                                             ))}
                                         </TableRow>
                                     ))
@@ -1354,15 +1280,12 @@ function DataTable<TData, TValue>({
                     </div>
 
                     {/* Enhanced Shadcn Pagination */}
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card/30 rounded-lg p-4 border">
+                    <div className="bg-card/30 flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
                         {/* Rows per page */}
                         <div className="flex items-center space-x-2">
-                            <p className="text-sm font-medium text-muted-foreground">Rows per page</p>
-                            <Select
-                                value={`${table.getState().pagination.pageSize}`}
-                                onValueChange={(value) => table.setPageSize(Number(value))}
-                            >
-                                <SelectTrigger className="h-9 w-[70px] bg-background">
+                            <p className="text-muted-foreground text-sm font-medium">Rows per page</p>
+                            <Select value={`${table.getState().pagination.pageSize}`} onValueChange={(value) => table.setPageSize(Number(value))}>
+                                <SelectTrigger className="bg-background h-9 w-[70px]">
                                     <SelectValue placeholder={table.getState().pagination.pageSize} />
                                 </SelectTrigger>
                                 <SelectContent side="top">
@@ -1373,9 +1296,9 @@ function DataTable<TData, TValue>({
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <div className="text-sm text-muted-foreground">
-                                Showing <span className="font-medium text-foreground">{table.getRowModel().rows.length}</span> of{" "}
-                                <span className="font-medium text-foreground">{table.getFilteredRowModel().rows.length}</span> applications
+                            <div className="text-muted-foreground text-sm">
+                                Showing <span className="text-foreground font-medium">{table.getRowModel().rows.length}</span> of{' '}
+                                <span className="text-foreground font-medium">{table.getFilteredRowModel().rows.length}</span> applications
                             </div>
                         </div>
 
@@ -1391,7 +1314,7 @@ function DataTable<TData, TValue>({
                                                 e.preventDefault();
                                                 table.previousPage();
                                             }}
-                                            className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                            className={!table.getCanPreviousPage() ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                                         />
                                     </PaginationItem>
 
@@ -1418,7 +1341,7 @@ function DataTable<TData, TValue>({
                                                         >
                                                             {i}
                                                         </PaginationLink>
-                                                    </PaginationItem>
+                                                    </PaginationItem>,
                                                 );
                                             }
                                         } else {
@@ -1437,7 +1360,7 @@ function DataTable<TData, TValue>({
                                                     >
                                                         1
                                                     </PaginationLink>
-                                                </PaginationItem>
+                                                </PaginationItem>,
                                             );
 
                                             // Show ellipsis if current page is far from start
@@ -1445,7 +1368,7 @@ function DataTable<TData, TValue>({
                                                 pages.push(
                                                     <PaginationItem key="ellipsis1">
                                                         <PaginationEllipsis />
-                                                    </PaginationItem>
+                                                    </PaginationItem>,
                                                 );
                                             }
 
@@ -1468,7 +1391,7 @@ function DataTable<TData, TValue>({
                                                         >
                                                             {i}
                                                         </PaginationLink>
-                                                    </PaginationItem>
+                                                    </PaginationItem>,
                                                 );
                                             }
 
@@ -1477,7 +1400,7 @@ function DataTable<TData, TValue>({
                                                 pages.push(
                                                     <PaginationItem key="ellipsis2">
                                                         <PaginationEllipsis />
-                                                    </PaginationItem>
+                                                    </PaginationItem>,
                                                 );
                                             }
 
@@ -1496,7 +1419,7 @@ function DataTable<TData, TValue>({
                                                     >
                                                         {totalPages}
                                                     </PaginationLink>
-                                                </PaginationItem>
+                                                </PaginationItem>,
                                             );
                                         }
 
@@ -1511,7 +1434,7 @@ function DataTable<TData, TValue>({
                                                 e.preventDefault();
                                                 table.nextPage();
                                             }}
-                                            className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                            className={!table.getCanNextPage() ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                                         />
                                     </PaginationItem>
                                 </PaginationContent>
@@ -1522,9 +1445,7 @@ function DataTable<TData, TValue>({
             )}
 
             {/* Quick Action Dialog */}
-            <Dialog open={quickActionDialog.isOpen} onOpenChange={(open) =>
-                setQuickActionDialog(prev => ({ ...prev, isOpen: open }))
-            }>
+            <Dialog open={quickActionDialog.isOpen} onOpenChange={(open) => setQuickActionDialog((prev) => ({ ...prev, isOpen: open }))}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
@@ -1536,23 +1457,17 @@ function DataTable<TData, TValue>({
                             {quickActionDialog.application && (
                                 <>
                                     {quickActionDialog.action === 'approve' &&
-                                        `Are you sure you want to approve ${quickActionDialog.application.student.name}'s application?`
-                                    }
+                                        `Are you sure you want to approve ${quickActionDialog.application.student.name}'s application?`}
                                     {quickActionDialog.action === 'reject' &&
-                                        `Are you sure you want to reject ${quickActionDialog.application.student.name}'s application?`
-                                    }
+                                        `Are you sure you want to reject ${quickActionDialog.application.student.name}'s application?`}
                                     {quickActionDialog.action === 'schedule' &&
-                                        `Schedule an interview for ${quickActionDialog.application.student.name}'s application.`
-                                    }
+                                        `Schedule an interview for ${quickActionDialog.application.student.name}'s application.`}
                                 </>
                             )}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setQuickActionDialog(prev => ({ ...prev, isOpen: false }))}
-                        >
+                        <Button variant="outline" onClick={() => setQuickActionDialog((prev) => ({ ...prev, isOpen: false }))}>
                             Cancel
                         </Button>
                         <Button
@@ -1571,12 +1486,11 @@ function DataTable<TData, TValue>({
                 </DialogContent>
             </Dialog>
         </div>
-    )
+    );
 }
 
 // Status configuration
 export default function ApplicationsPage({ applications }: ApplicationsPageProps) {
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Application Management" />
@@ -1588,9 +1502,7 @@ export default function ApplicationsPage({ applications }: ApplicationsPageProps
                         <div className="flex items-center justify-between">
                             <div>
                                 <CardTitle className="text-3xl">Application Management</CardTitle>
-                                <CardDescription className="text-base mt-2">
-                                    Review and manage scholarship applications from students
-                                </CardDescription>
+                                <CardDescription className="mt-2 text-base">Review and manage scholarship applications from students</CardDescription>
                             </div>
                             <div className="flex items-center gap-2">
                                 <TooltipProvider>
@@ -1600,7 +1512,7 @@ export default function ApplicationsPage({ applications }: ApplicationsPageProps
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => window.location.reload()}
-                                                className="h-8 px-3 flex items-center gap-2"
+                                                className="flex h-8 items-center gap-2 px-3"
                                             >
                                                 <RefreshCw className="h-4 w-4" />
                                                 Refresh
@@ -1618,11 +1530,7 @@ export default function ApplicationsPage({ applications }: ApplicationsPageProps
 
                 {/* Application Management */}
                 <div>
-                    <DataTable
-                        columns={columns}
-                        data={applications}
-                        searchPlaceholder="Search by student name, ID, or email..."
-                    />
+                    <DataTable columns={columns} data={applications} searchPlaceholder="Search by student name, ID, or email..." />
                 </div>
             </div>
         </AppLayout>

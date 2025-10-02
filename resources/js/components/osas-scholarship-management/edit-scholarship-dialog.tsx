@@ -1,30 +1,19 @@
-import { useState } from 'react';
-import { useForm } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter
-} from '@/components/ui/dialog';
-import { Plus, X, Loader2, CalendarIcon } from 'lucide-react';
-import { toast } from 'sonner';
 import InputError from '@/components/input-error';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+import { useForm } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { CalendarIcon, Loader2, Plus, X } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Scholarship {
     id: number;
@@ -67,7 +56,14 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
     const [editCriterion, setEditCriterion] = useState('');
     const [editDocument, setEditDocument] = useState('');
 
-    const { data: editData, setData: setEditData, put, processing: editProcessing, errors: editErrors, reset: resetEdit } = useForm<EditScholarshipForm>({
+    const {
+        data: editData,
+        setData: setEditData,
+        put,
+        processing: editProcessing,
+        errors: editErrors,
+        reset: resetEdit,
+    } = useForm<EditScholarshipForm>({
         id: 0,
         name: '',
         description: '',
@@ -130,7 +126,10 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
     };
 
     const removeEditCriterion = (index: number) => {
-        setEditData('criteria', editData.criteria.filter((_, i) => i !== index));
+        setEditData(
+            'criteria',
+            editData.criteria.filter((_, i) => i !== index),
+        );
     };
 
     const addEditDocument = () => {
@@ -141,7 +140,10 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
     };
 
     const removeEditDocument = (index: number) => {
-        setEditData('required_documents', editData.required_documents.filter((_, i) => i !== index));
+        setEditData(
+            'required_documents',
+            editData.required_documents.filter((_, i) => i !== index),
+        );
     };
 
     const handleEditTypeChange = (type: string) => {
@@ -158,13 +160,13 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     'General Weighted Average (GWA) between 1.000 - 1.450',
                     'No grade below 1.75 in any course',
                     'No Dropped/Deferred/Failed marks',
-                    'Minimum of 18 units enrollment'
+                    'Minimum of 18 units enrollment',
                 ]);
                 setEditData('required_documents', [
                     'Official Transcript of Records',
                     'Certificate of Enrollment',
                     'Certificate of Good Moral Character',
-                    'Recent ID Picture (2x2)'
+                    'Recent ID Picture (2x2)',
                 ]);
                 break;
             case 'academic_partial':
@@ -173,13 +175,13 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     'General Weighted Average (GWA) between 1.460 - 1.750',
                     'No grade below 1.75 in any course',
                     'No Dropped/Deferred/Failed marks',
-                    'Minimum of 18 units enrollment'
+                    'Minimum of 18 units enrollment',
                 ]);
                 setEditData('required_documents', [
                     'Official Transcript of Records',
                     'Certificate of Enrollment',
                     'Certificate of Good Moral Character',
-                    'Recent ID Picture (2x2)'
+                    'Recent ID Picture (2x2)',
                 ]);
                 break;
             case 'student_assistantship':
@@ -188,14 +190,14 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     'General Weighted Average (GWA) not below 2.25',
                     'No failing grades',
                     'Available for minimum 15 hours/week work commitment',
-                    'Enrolled in at least 12 units'
+                    'Enrolled in at least 12 units',
                 ]);
                 setEditData('required_documents', [
                     'Official Transcript of Records',
                     'Certificate of Enrollment',
                     'Certificate of Good Moral Character',
                     'Work Schedule Commitment Letter',
-                    'Recommendation from Department Head'
+                    'Recommendation from Department Head',
                 ]);
                 break;
             case 'performing_arts_full':
@@ -205,14 +207,14 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     'Member for at least one (1) semester',
                     'Participated in at least two (2) major University activities',
                     'Recommended by group coach/adviser',
-                    'Maintaining reasonable academic standing'
+                    'Maintaining reasonable academic standing',
                 ]);
                 setEditData('required_documents', [
                     'Certificate of Group Membership',
                     'Recommendation Letter from Coach/Adviser',
                     'List of Performances/Activities',
                     'Official Transcript of Records',
-                    'Certificate of Enrollment'
+                    'Certificate of Enrollment',
                 ]);
                 break;
             case 'performing_arts_partial':
@@ -222,14 +224,14 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     'Member for at least one (1) semester',
                     'Participated in at least two (2) major University activities',
                     'Recommended by group coach/adviser',
-                    'Maintaining reasonable academic standing'
+                    'Maintaining reasonable academic standing',
                 ]);
                 setEditData('required_documents', [
                     'Certificate of Group Membership',
                     'Recommendation Letter from Coach/Adviser',
                     'List of Performances/Activities',
                     'Official Transcript of Records',
-                    'Certificate of Enrollment'
+                    'Certificate of Enrollment',
                 ]);
                 break;
             case 'economic_assistance':
@@ -238,7 +240,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     'General Weighted Average (GWA) of at least 2.25',
                     'From economically disadvantaged family',
                     'MSWDO Indigency Certificate required',
-                    'Full-time student status'
+                    'Full-time student status',
                 ]);
                 setEditData('required_documents', [
                     'MSWDO Indigency Certificate',
@@ -246,7 +248,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     'Barangay Certificate of Residency',
                     'Official Transcript of Records',
                     'Certificate of Enrollment',
-                    'Family Income Statement'
+                    'Family Income Statement',
                 ]);
                 break;
             case 'others':
@@ -261,12 +263,10 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
                 <DialogHeader className="space-y-3">
                     <DialogTitle>Edit Scholarship</DialogTitle>
-                    <DialogDescription>
-                        Update the scholarship program details and requirements.
-                    </DialogDescription>
+                    <DialogDescription>Update the scholarship program details and requirements.</DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleEditSubmit} className="space-y-6">
@@ -279,8 +279,8 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                 value={editData.name}
                                 onChange={(e) => setEditData('name', e.target.value)}
                                 placeholder="Enter scholarship name"
-                                className={editErrors.name ? "border-destructive" : ""}
-                                aria-invalid={editErrors.name ? "true" : undefined}
+                                className={editErrors.name ? 'border-destructive' : ''}
+                                aria-invalid={editErrors.name ? 'true' : undefined}
                                 required
                             />
                             {editErrors.name && <InputError message={editErrors.name} />}
@@ -290,7 +290,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                             <div className="space-y-2">
                                 <Label htmlFor="edit_type">Type</Label>
                                 <Select value={editData.type} onValueChange={handleEditTypeChange}>
-                                    <SelectTrigger className={editErrors.type ? "border-destructive" : ""}>
+                                    <SelectTrigger className={editErrors.type ? 'border-destructive' : ''}>
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -309,7 +309,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                             <div className="space-y-2">
                                 <Label htmlFor="edit_status">Status</Label>
                                 <Select value={editData.status} onValueChange={(value) => setEditData('status', value)}>
-                                    <SelectTrigger className={editErrors.status ? "border-destructive" : ""}>
+                                    <SelectTrigger className={editErrors.status ? 'border-destructive' : ''}>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -332,7 +332,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                     value={editData.type_specification}
                                     onChange={(e) => setEditData('type_specification', e.target.value)}
                                     placeholder="Enter custom scholarship type name"
-                                    className={editErrors.type_specification ? "border-destructive" : ""}
+                                    className={editErrors.type_specification ? 'border-destructive' : ''}
                                     required
                                 />
                                 {editErrors.type_specification && <InputError message={editErrors.type_specification} />}
@@ -347,7 +347,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                 onChange={(e) => setEditData('description', e.target.value)}
                                 rows={2}
                                 placeholder="Describe the scholarship program, its purpose, and benefits..."
-                                className={`resize-none ${editErrors.description ? "border-destructive" : ""}`}
+                                className={`resize-none ${editErrors.description ? 'border-destructive' : ''}`}
                                 required
                             />
                             {editErrors.description && <InputError message={editErrors.description} />}
@@ -361,7 +361,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                 value={editData.funding_source}
                                 onChange={(e) => setEditData('funding_source', e.target.value)}
                                 placeholder="Enter funding source (e.g., Government, Private Donor, University Fund)"
-                                className={editErrors.funding_source ? "border-destructive" : ""}
+                                className={editErrors.funding_source ? 'border-destructive' : ''}
                                 required
                             />
                             {editErrors.funding_source && <InputError message={editErrors.funding_source} />}
@@ -378,7 +378,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                     value={editData.amount}
                                     onChange={(e) => setEditData('amount', e.target.value)}
                                     placeholder="0.00"
-                                    className={editErrors.amount ? "border-destructive" : ""}
+                                    className={editErrors.amount ? 'border-destructive' : ''}
                                     required
                                 />
                                 {editErrors.amount && <InputError message={editErrors.amount} />}
@@ -393,7 +393,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                     value={editData.slots_available}
                                     onChange={(e) => setEditData('slots_available', e.target.value)}
                                     placeholder="1"
-                                    className={editErrors.slots_available ? "border-destructive" : ""}
+                                    className={editErrors.slots_available ? 'border-destructive' : ''}
                                     required
                                 />
                                 {editErrors.slots_available && <InputError message={editErrors.slots_available} />}
@@ -406,16 +406,12 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                         <Button
                                             variant="outline"
                                             className={cn(
-                                                "w-full justify-start text-left font-normal",
-                                                !editData.deadline && "text-muted-foreground",
-                                                editErrors.deadline && "border-destructive"
+                                                'w-full justify-start text-left font-normal',
+                                                !editData.deadline && 'text-muted-foreground',
+                                                editErrors.deadline && 'border-destructive',
                                             )}
                                         >
-                                            {editData.deadline ? (
-                                                format(new Date(editData.deadline), "PPP")
-                                            ) : (
-                                                <span>Pick a deadline date</span>
-                                            )}
+                                            {editData.deadline ? format(new Date(editData.deadline), 'PPP') : <span>Pick a deadline date</span>}
                                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                         </Button>
                                     </PopoverTrigger>
@@ -447,9 +443,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     <div className="space-y-3">
                         <div>
                             <Label className="text-base font-medium">Eligibility Criteria</Label>
-                            <p className="text-sm text-muted-foreground">
-                                Define the requirements for this scholarship
-                            </p>
+                            <p className="text-muted-foreground text-sm">Define the requirements for this scholarship</p>
                         </div>
 
                         <div className="flex gap-2">
@@ -459,12 +453,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                 placeholder="Enter a criterion (e.g., Minimum GPA of 2.5)"
                                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addEditCriterion())}
                             />
-                            <Button
-                                type="button"
-                                onClick={addEditCriterion}
-                                size="sm"
-                                variant="ghost"
-                            >
+                            <Button type="button" onClick={addEditCriterion} size="sm" variant="ghost">
                                 <Plus className="h-4 w-4" />
                             </Button>
                         </div>
@@ -478,7 +467,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="ml-1 h-auto p-0 text-muted-foreground hover:text-foreground"
+                                            className="text-muted-foreground hover:text-foreground ml-1 h-auto p-0"
                                             onClick={() => removeEditCriterion(index)}
                                         >
                                             <X className="h-3 w-3" />
@@ -493,9 +482,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     <div className="space-y-3">
                         <div>
                             <Label className="text-base font-medium">Required Documents</Label>
-                            <p className="text-sm text-muted-foreground">
-                                List all documents applicants must submit
-                            </p>
+                            <p className="text-muted-foreground text-sm">List all documents applicants must submit</p>
                         </div>
 
                         <div className="flex gap-2">
@@ -505,12 +492,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                 placeholder="Enter a required document (e.g., Official Transcript of Records)"
                                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addEditDocument())}
                             />
-                            <Button
-                                type="button"
-                                onClick={addEditDocument}
-                                size="sm"
-                                variant="ghost"
-                            >
+                            <Button type="button" onClick={addEditDocument} size="sm" variant="ghost">
                                 <Plus className="h-4 w-4" />
                             </Button>
                         </div>
@@ -524,7 +506,7 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="ml-1 h-auto p-0 text-muted-foreground hover:text-foreground"
+                                            className="text-muted-foreground hover:text-foreground ml-1 h-auto p-0"
                                             onClick={() => removeEditDocument(index)}
                                         >
                                             <X className="h-3 w-3" />
@@ -536,18 +518,10 @@ export default function EditScholarshipDialog({ isOpen, onClose, scholarship }: 
                     </div>
 
                     <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={onClose}
-                            disabled={editProcessing}
-                        >
+                        <Button type="button" variant="ghost" onClick={onClose} disabled={editProcessing}>
                             Cancel
                         </Button>
-                        <Button
-                            type="submit"
-                            disabled={editProcessing}
-                        >
+                        <Button type="submit" disabled={editProcessing}>
                             {editProcessing ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

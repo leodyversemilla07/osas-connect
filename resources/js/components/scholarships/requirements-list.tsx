@@ -1,7 +1,6 @@
-import React from 'react';
-import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
 
 interface Requirement {
     id: string;
@@ -37,17 +36,29 @@ const getRequirementIcon = (status?: string) => {
 const getRequirementBadge = (type: string) => {
     switch (type) {
         case 'required':
-            return <Badge variant="destructive" className="text-xs">Required</Badge>;
+            return (
+                <Badge variant="destructive" className="text-xs">
+                    Required
+                </Badge>
+            );
         case 'optional':
-            return <Badge variant="secondary" className="text-xs">Optional</Badge>;
+            return (
+                <Badge variant="secondary" className="text-xs">
+                    Optional
+                </Badge>
+            );
         case 'recommended':
-            return <Badge variant="outline" className="text-xs">Recommended</Badge>;
+            return (
+                <Badge variant="outline" className="text-xs">
+                    Recommended
+                </Badge>
+            );
         default:
             return null;
     }
 };
 
-export function RequirementsList({ requirements, title = "Requirements", description }: RequirementsListProps) {
+export function RequirementsList({ requirements, title = 'Requirements', description }: RequirementsListProps) {
     return (
         <Card>
             <CardHeader>
@@ -57,21 +68,14 @@ export function RequirementsList({ requirements, title = "Requirements", descrip
             <CardContent>
                 <div className="space-y-3">
                     {requirements.map((requirement) => (
-                        <div
-                            key={requirement.id}
-                            className="flex items-start gap-3 p-3 border border-gray-200 dark:border-gray-800 rounded-lg"
-                        >
+                        <div key={requirement.id} className="flex items-start gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
                             {getRequirementIcon(requirement.status)}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        {requirement.title}
-                                    </h4>
+                            <div className="min-w-0 flex-1">
+                                <div className="mb-1 flex items-center gap-2">
+                                    <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{requirement.title}</h4>
                                     {getRequirementBadge(requirement.type)}
                                 </div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {requirement.description}
-                                </p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">{requirement.description}</p>
                             </div>
                         </div>
                     ))}
@@ -87,38 +91,38 @@ export function GeneralRequirementsList({ className }: GeneralRequirementsListPr
             id: 'enrollment',
             title: 'Current Enrollment',
             description: 'Must be currently enrolled as a regular student at the university',
-            type: 'required'
+            type: 'required',
         },
         {
             id: 'gpa',
             title: 'Academic Standing',
             description: 'Maintain a minimum GPA of 2.5 (may vary by scholarship type)',
-            type: 'required'
+            type: 'required',
         },
         {
             id: 'financial-need',
             title: 'Financial Need Assessment',
             description: 'Demonstrate financial need through required documentation',
-            type: 'required'
+            type: 'required',
         },
         {
             id: 'documents',
             title: 'Supporting Documents',
             description: 'Submit all required documents including transcripts, certificates, and recommendations',
-            type: 'required'
+            type: 'required',
         },
         {
             id: 'interview',
             title: 'Interview',
             description: 'Participate in an interview process when requested',
-            type: 'recommended'
+            type: 'recommended',
         },
         {
             id: 'community-service',
             title: 'Community Service',
             description: 'Active participation in community service or university activities',
-            type: 'optional'
-        }
+            type: 'optional',
+        },
     ];
 
     return (

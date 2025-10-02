@@ -1,18 +1,10 @@
-import { Head, Link, useForm } from '@inertiajs/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-    Calendar, 
-    Clock, 
-    User, 
-    GraduationCap, 
-    ArrowLeft,
-    MapPin,
-    Edit
-} from 'lucide-react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeft, Calendar, Clock, Edit, GraduationCap, MapPin, User } from 'lucide-react';
 import { FormEvent } from 'react';
 
 interface Student {
@@ -87,7 +79,7 @@ export default function InterviewEdit({ interview }: Props) {
             const displayTime = new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
                 hour: 'numeric',
                 minute: '2-digit',
-                hour12: true
+                hour12: true,
             });
             timeOptions.push({ value: timeString, label: displayTime });
         }
@@ -102,47 +94,45 @@ export default function InterviewEdit({ interview }: Props) {
 
     return (
         <>
-            <Head title={`Edit Interview - ${interview.application.student.student_profile.first_name} ${interview.application.student.student_profile.last_name}`} />
-            
+            <Head
+                title={`Edit Interview - ${interview.application.student.student_profile.first_name} ${interview.application.student.student_profile.last_name}`}
+            />
+
             <div className="py-6">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-6">
-                        <div className="flex items-center space-x-4 mb-4">
-                            <Link
-                                href={route('osas.interviews.show', interview.id)}
-                                className="flex items-center text-gray-500 hover:text-gray-700"
-                            >
-                                <ArrowLeft className="h-5 w-5 mr-1" />
+                        <div className="mb-4 flex items-center space-x-4">
+                            <Link href={route('osas.interviews.show', interview.id)} className="flex items-center text-gray-500 hover:text-gray-700">
+                                <ArrowLeft className="mr-1 h-5 w-5" />
                                 Back to Interview
                             </Link>
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            Edit Interview
-                        </h1>
+                        <h1 className="text-2xl font-bold text-gray-900">Edit Interview</h1>
                         <p className="mt-1 text-sm text-gray-500">
-                            Update interview details for {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
+                            Update interview details for {interview.application.student.student_profile.first_name}{' '}
+                            {interview.application.student.student_profile.last_name}
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         {/* Interview Form */}
                         <div className="lg:col-span-2">
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center">
-                                        <Edit className="h-5 w-5 mr-2" />
+                                        <Edit className="mr-2 h-5 w-5" />
                                         Edit Interview Details
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <form onSubmit={submit} className="space-y-6">
                                         {/* Interview Date */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             <div>
                                                 <Label htmlFor="date">Interview Date *</Label>
                                                 <div className="relative">
-                                                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                                    <Calendar className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                                                     <Input
                                                         id="date"
                                                         type="date"
@@ -156,15 +146,13 @@ export default function InterviewEdit({ interview }: Props) {
                                                         required
                                                     />
                                                 </div>
-                                                {form.errors.schedule && (
-                                                    <p className="mt-1 text-sm text-red-600">{form.errors.schedule}</p>
-                                                )}
+                                                {form.errors.schedule && <p className="mt-1 text-sm text-red-600">{form.errors.schedule}</p>}
                                             </div>
 
                                             <div>
                                                 <Label htmlFor="time">Interview Time *</Label>
                                                 <div className="relative">
-                                                    <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                                    <Clock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                                                     <select
                                                         id="time"
                                                         value={currentTime}
@@ -172,7 +160,7 @@ export default function InterviewEdit({ interview }: Props) {
                                                             const date = currentDate || today;
                                                             form.setData('schedule', `${date}T${e.target.value}`);
                                                         }}
-                                                        className="pl-10 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                        className="block w-full rounded-md border border-gray-300 px-3 py-2 pl-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none"
                                                         required
                                                     >
                                                         <option value="">Select time</option>
@@ -188,30 +176,26 @@ export default function InterviewEdit({ interview }: Props) {
 
                                         {/* Location */}
                                         <div>
-                                            <Label htmlFor="location">
-                                                Location {interview.interview_type === 'in_person' ? '*' : '(Optional)'}
-                                            </Label>
+                                            <Label htmlFor="location">Location {interview.interview_type === 'in_person' ? '*' : '(Optional)'}</Label>
                                             <div className="relative">
-                                                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                                <MapPin className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                                                 <Input
                                                     id="location"
                                                     type="text"
                                                     value={form.data.location}
                                                     onChange={(e) => form.setData('location', e.target.value)}
                                                     placeholder={
-                                                        interview.interview_type === 'online' 
-                                                            ? 'Meeting link will be provided' 
+                                                        interview.interview_type === 'online'
+                                                            ? 'Meeting link will be provided'
                                                             : interview.interview_type === 'phone'
-                                                            ? 'Phone number will be provided'
-                                                            : 'Enter meeting location'
+                                                              ? 'Phone number will be provided'
+                                                              : 'Enter meeting location'
                                                     }
                                                     className="pl-10"
                                                     required={interview.interview_type === 'in_person'}
                                                 />
                                             </div>
-                                            {form.errors.location && (
-                                                <p className="mt-1 text-sm text-red-600">{form.errors.location}</p>
-                                            )}
+                                            {form.errors.location && <p className="mt-1 text-sm text-red-600">{form.errors.location}</p>}
                                         </div>
 
                                         {/* Notes */}
@@ -224,24 +208,18 @@ export default function InterviewEdit({ interview }: Props) {
                                                 rows={4}
                                                 placeholder="Any additional information about the interview..."
                                             />
-                                            {form.errors.notes && (
-                                                <p className="mt-1 text-sm text-red-600">{form.errors.notes}</p>
-                                            )}
+                                            {form.errors.notes && <p className="mt-1 text-sm text-red-600">{form.errors.notes}</p>}
                                         </div>
 
                                         {/* Submit Buttons */}
                                         <div className="flex justify-end space-x-3 pt-6">
                                             <Link
                                                 href={route('osas.interviews.show', interview.id)}
-                                                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
                                             >
                                                 Cancel
                                             </Link>
-                                            <Button
-                                                type="submit"
-                                                disabled={form.processing}
-                                                className="bg-indigo-600 hover:bg-indigo-700"
-                                            >
+                                            <Button type="submit" disabled={form.processing} className="bg-indigo-600 hover:bg-indigo-700">
                                                 {form.processing ? 'Updating...' : 'Update Interview'}
                                             </Button>
                                         </div>
@@ -255,7 +233,7 @@ export default function InterviewEdit({ interview }: Props) {
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center">
-                                        <User className="h-5 w-5 mr-2" />
+                                        <User className="mr-2 h-5 w-5" />
                                         Application Details
                                     </CardTitle>
                                 </CardHeader>
@@ -263,55 +241,42 @@ export default function InterviewEdit({ interview }: Props) {
                                     <div>
                                         <h4 className="font-medium text-gray-900">Student Information</h4>
                                         <p className="text-sm text-gray-600">
-                                            {interview.application.student.student_profile.first_name} {interview.application.student.student_profile.last_name}
+                                            {interview.application.student.student_profile.first_name}{' '}
+                                            {interview.application.student.student_profile.last_name}
                                         </p>
-                                        <p className="text-sm text-gray-500">
-                                            {interview.application.student.student_id}
-                                        </p>
+                                        <p className="text-sm text-gray-500">{interview.application.student.student_id}</p>
                                     </div>
 
                                     <div>
                                         <h4 className="font-medium text-gray-900">Academic Information</h4>
-                                        <div className="flex items-center text-sm text-gray-600 mt-1">
-                                            <GraduationCap className="h-4 w-4 mr-1" />
+                                        <div className="mt-1 flex items-center text-sm text-gray-600">
+                                            <GraduationCap className="mr-1 h-4 w-4" />
                                             {interview.application.student.student_profile.course}
                                         </div>
-                                        <p className="text-sm text-gray-500">
-                                            Year {interview.application.student.student_profile.year_level}
-                                        </p>
+                                        <p className="text-sm text-gray-500">Year {interview.application.student.student_profile.year_level}</p>
                                     </div>
 
                                     <div>
                                         <h4 className="font-medium text-gray-900">Scholarship</h4>
-                                        <p className="text-sm text-gray-600">
-                                            {interview.application.scholarship.name}
-                                        </p>
-                                        <p className="text-sm text-gray-500 capitalize">
-                                            {interview.application.scholarship.type}
-                                        </p>
+                                        <p className="text-sm text-gray-600">{interview.application.scholarship.name}</p>
+                                        <p className="text-sm text-gray-500 capitalize">{interview.application.scholarship.type}</p>
                                     </div>
 
                                     <div>
                                         <h4 className="font-medium text-gray-900">Interview Type</h4>
-                                        <p className="text-sm text-gray-600 capitalize">
-                                            {interview.interview_type.replace('_', ' ')}
-                                        </p>
+                                        <p className="text-sm text-gray-600 capitalize">{interview.interview_type.replace('_', ' ')}</p>
                                     </div>
 
                                     <div>
                                         <h4 className="font-medium text-gray-900">Interviewer</h4>
-                                        <p className="text-sm text-gray-600">
-                                            {interview.interviewer.name}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            {interview.interviewer.email}
-                                        </p>
+                                        <p className="text-sm text-gray-600">{interview.interviewer.name}</p>
+                                        <p className="text-sm text-gray-500">{interview.interviewer.email}</p>
                                     </div>
 
-                                    <div className="pt-3 border-t">
+                                    <div className="border-t pt-3">
                                         <Link
                                             href={route('osas.applications.review', interview.application.id)}
-                                            className="text-sm text-indigo-600 hover:text-indigo-900 font-medium"
+                                            className="text-sm font-medium text-indigo-600 hover:text-indigo-900"
                                         >
                                             View Full Application →
                                         </Link>
@@ -334,11 +299,11 @@ export default function InterviewEdit({ interview }: Props) {
                                                 month: 'long',
                                                 day: 'numeric',
                                                 hour: '2-digit',
-                                                minute: '2-digit'
+                                                minute: '2-digit',
                                             })}
                                         </p>
                                     </div>
-                                    
+
                                     {interview.location && (
                                         <div>
                                             <h4 className="font-medium text-gray-900">Current Location</h4>

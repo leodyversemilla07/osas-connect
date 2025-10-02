@@ -31,14 +31,8 @@ export default function ThemeSelector({ value, onChange, disabled = false }: The
 
     return (
         <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Page Theme Override
-            </label>
-            <Select 
-                value={value || 'default'} 
-                onValueChange={handleValueChange}
-                disabled={disabled}
-            >
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Page Theme Override</label>
+            <Select value={value || 'default'} onValueChange={handleValueChange} disabled={disabled}>
                 <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select theme override">
                         <div className="flex items-center gap-2">

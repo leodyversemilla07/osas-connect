@@ -1,7 +1,7 @@
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function SiteHeader() {
     const { auth } = usePage<SharedData>().props;
@@ -41,9 +41,9 @@ export default function SiteHeader() {
     ];
 
     return (
-        <header className="fixed top-0 z-50 w-full border-b border-[#005a2d]/10 dark:border-[#f3f2f2]/10 bg-white/50 dark:bg-[#121212]/50">
+        <header className="fixed top-0 z-50 w-full border-b border-[#005a2d]/10 bg-white/50 dark:border-[#f3f2f2]/10 dark:bg-[#121212]/50">
             <div className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="flex h-14 items-center justify-between w-full">
+                <div className="flex h-14 w-full items-center justify-between">
                     {/* Logo */}
                     <div className="flex flex-shrink-0 items-center">
                         <Link href="/" className="text-lg font-semibold text-[#005a2d] dark:text-[#23b14d]">
@@ -52,12 +52,12 @@ export default function SiteHeader() {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="hidden md:flex items-center space-x-6" aria-label="Primary navigation">
+                    <nav className="hidden items-center space-x-6 md:flex" aria-label="Primary navigation">
                         {navItems.map((item, index) => (
                             <Link
                                 key={index}
                                 href={item.url}
-                                className="text-sm font-medium text-[#010002] dark:text-[#f3f2f2] transition-colors duration-200 hover:text-[#008040] dark:hover:text-[#23b14d]"
+                                className="text-sm font-medium text-[#010002] transition-colors duration-200 hover:text-[#008040] dark:text-[#f3f2f2] dark:hover:text-[#23b14d]"
                             >
                                 {item.label}
                             </Link>
@@ -69,7 +69,7 @@ export default function SiteHeader() {
                         {auth.user ? (
                             <Link
                                 href={route('dashboard')}
-                                className="text-sm font-medium text-[#005a2d] dark:text-[#23b14d] hover:text-[#008040] dark:hover:text-[#008040] transition-colors duration-200"
+                                className="text-sm font-medium text-[#005a2d] transition-colors duration-200 hover:text-[#008040] dark:text-[#23b14d] dark:hover:text-[#008040]"
                             >
                                 Dashboard
                             </Link>
@@ -77,13 +77,13 @@ export default function SiteHeader() {
                             <>
                                 <Link
                                     href={route('login')}
-                                    className="text-sm font-medium text-[#010002] dark:text-[#f3f2f2] hover:text-[#008040] dark:hover:text-[#23b14d] transition-colors duration-200 mr-4"
+                                    className="mr-4 text-sm font-medium text-[#010002] transition-colors duration-200 hover:text-[#008040] dark:text-[#f3f2f2] dark:hover:text-[#23b14d]"
                                 >
                                     Log in
                                 </Link>
                                 <Link
                                     href={route('register')}
-                                    className="text-sm font-medium bg-[#005a2d] hover:bg-[#008040] text-white px-4 py-2 rounded-md transition-colors duration-200"
+                                    className="rounded-md bg-[#005a2d] px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-[#008040]"
                                 >
                                     Register
                                 </Link>
@@ -93,7 +93,7 @@ export default function SiteHeader() {
                         {/* Mobile menu button */}
                         <button
                             type="button"
-                            className="md:hidden ml-4 p-3 text-[#010002] dark:text-[#f3f2f2] hover:text-[#008040] dark:hover:text-[#23b14d] transition-colors duration-200 rounded-md hover:bg-[#005a2d]/5 dark:hover:bg-[#23b14d]/10 focus:outline-none focus:ring-2 focus:ring-[#008040] dark:focus:ring-[#23b14d] focus:ring-offset-2"
+                            className="ml-4 rounded-md p-3 text-[#010002] transition-colors duration-200 hover:bg-[#005a2d]/5 hover:text-[#008040] focus:ring-2 focus:ring-[#008040] focus:ring-offset-2 focus:outline-none md:hidden dark:text-[#f3f2f2] dark:hover:bg-[#23b14d]/10 dark:hover:text-[#23b14d] dark:focus:ring-[#23b14d]"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
                             aria-expanded={isMenuOpen}
@@ -106,24 +106,24 @@ export default function SiteHeader() {
 
             {/* Mobile menu */}
             {isMenuOpen && (
-                <div className="md:hidden border-t border-[#005a2d]/10 dark:border-[#f3f2f2]/10 bg-white dark:bg-[#121212]">
-                    <nav className="px-4 py-4 space-y-3">
+                <div className="border-t border-[#005a2d]/10 bg-white md:hidden dark:border-[#f3f2f2]/10 dark:bg-[#121212]">
+                    <nav className="space-y-3 px-4 py-4">
                         {navItems.map((item, index) => (
                             <Link
                                 key={index}
                                 href={item.url}
-                                className="block text-sm font-medium text-[#010002] dark:text-[#f3f2f2] hover:text-[#008040] dark:hover:text-[#23b14d] transition-colors duration-200"
+                                className="block text-sm font-medium text-[#010002] transition-colors duration-200 hover:text-[#008040] dark:text-[#f3f2f2] dark:hover:text-[#23b14d]"
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 {item.label}
                             </Link>
                         ))}
 
-                        <div className="pt-3 border-t border-[#005a2d]/10 dark:border-[#f3f2f2]/10">
+                        <div className="border-t border-[#005a2d]/10 pt-3 dark:border-[#f3f2f2]/10">
                             {auth.user ? (
                                 <Link
                                     href={route('dashboard')}
-                                    className="block text-sm font-medium text-[#005a2d] dark:text-[#23b14d] hover:text-[#008040] dark:hover:text-[#008040] transition-colors duration-200"
+                                    className="block text-sm font-medium text-[#005a2d] transition-colors duration-200 hover:text-[#008040] dark:text-[#23b14d] dark:hover:text-[#008040]"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Dashboard
@@ -132,14 +132,14 @@ export default function SiteHeader() {
                                 <div className="space-y-3">
                                     <Link
                                         href={route('login')}
-                                        className="block text-sm font-medium text-[#010002] dark:text-[#f3f2f2] hover:text-[#008040] dark:hover:text-[#23b14d] transition-colors duration-200"
+                                        className="block text-sm font-medium text-[#010002] transition-colors duration-200 hover:text-[#008040] dark:text-[#f3f2f2] dark:hover:text-[#23b14d]"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
                                         Log in
                                     </Link>
                                     <Link
                                         href={route('register')}
-                                        className="block text-sm font-medium bg-[#005a2d] hover:bg-[#008040] text-white px-4 py-2 rounded-md text-center transition-colors duration-200"
+                                        className="block rounded-md bg-[#005a2d] px-4 py-2 text-center text-sm font-medium text-white transition-colors duration-200 hover:bg-[#008040]"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
                                         Register

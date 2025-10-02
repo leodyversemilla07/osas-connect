@@ -1,16 +1,12 @@
-import { useMemo } from 'react';
-import type { ProfileFormData, SiblingInfo } from '@/types/profile';
 import type { User } from '@/types';
+import type { ProfileFormData, SiblingInfo } from '@/types/profile';
+import { useMemo } from 'react';
 
 /**
  * Custom hook to initialize profile form data
  * Transforms server data into a consistent format for the form
  */
-export function useProfileInitialData(
-    profile: Record<string, unknown>,
-    user: User,
-    isStudent: boolean
-): ProfileFormData {
+export function useProfileInitialData(profile: Record<string, unknown>, user: User, isStudent: boolean): ProfileFormData {
     const initialData = useMemo(() => {
         // Helper function for safe data extraction
         const safeString = (value: unknown, fallback: string = ''): string => {
@@ -42,13 +38,13 @@ export function useProfileInitialData(
 
         const safeSiblings = (value: unknown): SiblingInfo[] | null => {
             if (!Array.isArray(value)) return null;
-            return value.map(sibling => ({
+            return value.map((sibling) => ({
                 name: safeString(sibling?.name),
                 age: safeNumber(sibling?.age),
                 civil_status: safeString(sibling?.civil_status),
                 educational_attainment: safeString(sibling?.educational_attainment),
                 occupation: safeString(sibling?.occupation),
-                monthly_income: safeNumber(sibling?.monthly_income)
+                monthly_income: safeNumber(sibling?.monthly_income),
             }));
         };
 
@@ -78,22 +74,19 @@ export function useProfileInitialData(
             email: safeString(profile.email, user.email || ''),
 
             // Role-specific fields with better handling
-            student_id: safeString(profile.student_id,
-                user.role === 'student' ? user.student_profile?.student_id || '' : ''
-            ),
-            staff_id: safeString(profile.staff_id,
-                user.role === 'osas_staff' ? user.osas_staff_profile?.staff_id || '' : ''
-            ),
-            admin_id: safeString(profile.admin_id,
-                user.role === 'admin' ? (user.admin_profile?.admin_id || user.id?.toString()) || '' : ''
-            ),
+            student_id: safeString(profile.student_id, user.role === 'student' ? user.student_profile?.student_id || '' : ''),
+            staff_id: safeString(profile.staff_id, user.role === 'osas_staff' ? user.osas_staff_profile?.staff_id || '' : ''),
+            admin_id: safeString(profile.admin_id, user.role === 'admin' ? user.admin_profile?.admin_id || user.id?.toString() || '' : ''),
 
             // Student-specific data
             ...(isStudent && {
                 course: safeString(profile.course),
-                major: safeString(profile.major), year_level: safeString(profile.year_level), current_gwa: safeNullableNumber(profile.current_gwa),
+                major: safeString(profile.major),
+                year_level: safeString(profile.year_level),
+                current_gwa: safeNullableNumber(profile.current_gwa),
                 enrollment_status: safeString(profile.enrollment_status),
-                units: safeNullableNumber(profile.units), existing_scholarships: safeNullableString(profile.existing_scholarships),
+                units: safeNullableNumber(profile.units),
+                existing_scholarships: safeNullableString(profile.existing_scholarships),
 
                 // Personal Information
                 civil_status: safeString(profile.civil_status),
@@ -137,13 +130,14 @@ export function useProfileInitialData(
                 mother_address: safeNullableString(profile.mother_address),
                 mother_telephone: safeNullableString(profile.mother_telephone),
                 mother_mobile: safeNullableString(profile.mother_mobile),
-                mother_email: safeNullableString(profile.mother_email), mother_occupation: safeNullableString(profile.mother_occupation),
+                mother_email: safeNullableString(profile.mother_email),
+                mother_occupation: safeNullableString(profile.mother_occupation),
                 mother_company: safeNullableString(profile.mother_company),
                 mother_monthly_income: safeNullableNumber(profile.mother_monthly_income),
                 mother_years_service: safeNullableNumber(profile.mother_years_service),
                 mother_education: safeNullableString(profile.mother_education),
                 mother_school: safeNullableString(profile.mother_school),
-                mother_unemployment_reason: safeNullableString(profile.mother_unemployment_reason),                // Siblings Information
+                mother_unemployment_reason: safeNullableString(profile.mother_unemployment_reason), // Siblings Information
                 total_siblings: safeNumber(profile.total_siblings),
                 siblings: safeSiblings(profile.siblings),
 
@@ -208,7 +202,7 @@ export function useProfileInitialData(
                 other_annual_expense_details: safeNullableString(profile.other_annual_expense_details),
                 subtotal_annual_expenses: safeNumber(profile.subtotal_annual_expenses),
                 total_annual_expenses: safeNumber(profile.total_annual_expenses),
-            })
+            }),
         };
     }, [profile, user, isStudent]);
 

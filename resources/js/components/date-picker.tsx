@@ -1,11 +1,11 @@
-import React from "react";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { ChevronDownIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import InputError from "@/components/input-error";
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { ChevronDownIcon } from 'lucide-react';
+import React from 'react';
 
 export interface DatePickerProps {
     id: string;
@@ -29,9 +29,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     onChange,
     required = false,
     error,
-    placeholder = "Select date",
+    placeholder = 'Select date',
     disabled = false,
-    minDate = new Date("1900-01-01"),
+    minDate = new Date('1900-01-01'),
     maxDate = new Date(),
     className,
     description,
@@ -52,12 +52,12 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     };
 
     return (
-        <div className={cn("grid gap-2", className)}>
+        <div className={cn('grid gap-2', className)}>
             <Label htmlFor={id}>
                 {label} {required && <span className="text-red-500">*</span>}
             </Label>
             {description && (
-                <p id={descriptionId} className="text-sm text-muted-foreground">
+                <p id={descriptionId} className="text-muted-foreground text-sm">
                     {description}
                 </p>
             )}
@@ -67,10 +67,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                         id={id}
                         variant="outline"
                         disabled={disabled}
-                        className={cn(
-                            "w-full justify-between font-normal",
-                            !value && "text-muted-foreground"
-                        )}
+                        className={cn('w-full justify-between font-normal', !value && 'text-muted-foreground')}
                         aria-describedby={cn(errorId, descriptionId)}
                         aria-invalid={!!error}
                         aria-expanded={open}

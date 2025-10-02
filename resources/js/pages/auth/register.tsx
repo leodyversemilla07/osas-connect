@@ -1,17 +1,17 @@
-import { Head } from "@inertiajs/react";
-import { FormEventHandler, useCallback } from "react";
-import { route } from "ziggy-js";
-import AuthLayout from "@/layouts/auth-layout";
-import { Button } from "@/components/ui/button";
-import TextLink from "@/components/text-link";
-import { LoaderCircle } from "lucide-react";
-import StepProgress from "@/components/step-progress";
-import PersonalInformationStep from "@/components/registration/personal-information-step";
-import AcademicInformationStep from "@/components/registration/academic-information-step";
-import AccountSetupStep from "@/components/registration/account-setup-step";
-import ReviewSubmitStep from "@/components/registration/review-submit-step";
-import { useRegistrationForm } from "@/hooks/use-registration-form";
-import { useRegistrationSteps, STEP_TITLES } from "@/hooks/use-registration-steps";
+import AcademicInformationStep from '@/components/registration/academic-information-step';
+import AccountSetupStep from '@/components/registration/account-setup-step';
+import PersonalInformationStep from '@/components/registration/personal-information-step';
+import ReviewSubmitStep from '@/components/registration/review-submit-step';
+import StepProgress from '@/components/step-progress';
+import TextLink from '@/components/text-link';
+import { Button } from '@/components/ui/button';
+import { useRegistrationForm } from '@/hooks/use-registration-form';
+import { STEP_TITLES, useRegistrationSteps } from '@/hooks/use-registration-steps';
+import AuthLayout from '@/layouts/auth-layout';
+import { Head } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
+import { FormEventHandler, useCallback } from 'react';
+import { route } from 'ziggy-js';
 
 export default function Register() {
     // Custom hooks for cleaner state management
@@ -28,30 +28,26 @@ export default function Register() {
         submitForm,
     } = useRegistrationForm();
 
-    const {
-        currentStep,
-        totalSteps,
-        setCurrentStep,
-        goToNextStep,
-        goToPreviousStep,
-        validateAllSteps,
-        findFirstInvalidStep,
-    } = useRegistrationSteps();
+    const { currentStep, totalSteps, setCurrentStep, goToNextStep, goToPreviousStep, validateAllSteps, findFirstInvalidStep } =
+        useRegistrationSteps();
 
     // Simplified form submission
-    const submit: FormEventHandler = useCallback((e) => {
-        e.preventDefault();
+    const submit: FormEventHandler = useCallback(
+        (e) => {
+            e.preventDefault();
 
-        if (currentStep === totalSteps) {
-            if (!validateAllSteps(data)) {
-                const invalidStep = findFirstInvalidStep(data);
-                setCurrentStep(invalidStep);
-                return;
+            if (currentStep === totalSteps) {
+                if (!validateAllSteps(data)) {
+                    const invalidStep = findFirstInvalidStep(data);
+                    setCurrentStep(invalidStep);
+                    return;
+                }
+
+                submitForm(setCurrentStep);
             }
-
-            submitForm(setCurrentStep);
-        }
-    }, [currentStep, totalSteps, validateAllSteps, data, findFirstInvalidStep, setCurrentStep, submitForm]);
+        },
+        [currentStep, totalSteps, validateAllSteps, data, findFirstInvalidStep, setCurrentStep, submitForm],
+    );
 
     // Handle next step navigation
     const handleNextStep = useCallback(() => {
@@ -75,32 +71,13 @@ export default function Register() {
                 );
 
             case 2:
-                return (
-                    <AcademicInformationStep
-                        data={data}
-                        errors={errors}
-                        onFieldChange={updateField}
-                        onCourseChange={handleCourseChange}
-                    />
-                );
+                return <AcademicInformationStep data={data} errors={errors} onFieldChange={updateField} onCourseChange={handleCourseChange} />;
 
             case 3:
-                return (
-                    <AccountSetupStep
-                        data={data}
-                        errors={errors}
-                        onFieldChange={updateField}
-                    />
-                );
+                return <AccountSetupStep data={data} errors={errors} onFieldChange={updateField} />;
 
             case 4:
-                return (
-                    <ReviewSubmitStep
-                        data={data}
-                        errors={errors}
-                        onFieldChange={updateField}
-                    />
-                );
+                return <ReviewSubmitStep data={data} errors={errors} onFieldChange={updateField} />;
 
             default:
                 return null;
@@ -108,32 +85,19 @@ export default function Register() {
     };
 
     return (
-        <AuthLayout
-            title="Create a student account"
-            description="Enter your details below to create your student account for OSAS Connect"
-        >
+        <AuthLayout title="Create a student account" description="Enter your details below to create your student account for OSAS Connect">
             <Head title="Student Registration" />
 
-            <StepProgress
-                steps={STEP_TITLES}
-                currentStep={currentStep}
-                totalSteps={totalSteps}
-            />
+            <StepProgress steps={STEP_TITLES} currentStep={currentStep} totalSteps={totalSteps} />
 
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     {renderStepContent()}
 
                     {/* Navigation buttons */}
-                    <div className="flex justify-between mt-6">
+                    <div className="mt-6 flex justify-between">
                         {currentStep > 1 ? (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={goToPreviousStep}
-                                disabled={processing}
-                                aria-label="Go to previous step"
-                            >
+                            <Button type="button" variant="outline" onClick={goToPreviousStep} disabled={processing} aria-label="Go to previous step">
                                 Previous
                             </Button>
                         ) : (
@@ -141,27 +105,18 @@ export default function Register() {
                         )}
 
                         {currentStep < totalSteps ? (
-                            <Button
-                                type="button"
-                                onClick={handleNextStep}
-                                disabled={processing}
-                                aria-label="Go to next step"
-                            >
+                            <Button type="button" onClick={handleNextStep} disabled={processing} aria-label="Go to next step">
                                 Next
                             </Button>
                         ) : (
-                            <Button
-                                type="submit"
-                                disabled={processing || !data.terms_agreement}
-                                aria-label="Submit registration"
-                            >
+                            <Button type="submit" disabled={processing || !data.terms_agreement} aria-label="Submit registration">
                                 {processing ? (
                                     <>
                                         <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                                         Creating Account...
                                     </>
                                 ) : (
-                                    "Create Account"
+                                    'Create Account'
                                 )}
                             </Button>
                         )}

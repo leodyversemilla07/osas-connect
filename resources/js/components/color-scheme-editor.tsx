@@ -1,10 +1,9 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Palette, RotateCcw } from 'lucide-react';
 import ColorPicker from './color-picker';
-import { RotateCcw, Palette } from 'lucide-react';
 
 export interface ColorScheme {
     primary?: string;
@@ -41,7 +40,7 @@ const colorSchemePresets = [
             background: '#f0f9ff',
             text: '#0c4a6e',
             enabled: true,
-        }
+        },
     },
     {
         name: 'Forest Green',
@@ -52,7 +51,7 @@ const colorSchemePresets = [
             background: '#f0fdf4',
             text: '#14532d',
             enabled: true,
-        }
+        },
     },
     {
         name: 'Purple Dreams',
@@ -63,7 +62,7 @@ const colorSchemePresets = [
             background: '#faf5ff',
             text: '#581c87',
             enabled: true,
-        }
+        },
     },
     {
         name: 'Sunset Orange',
@@ -74,7 +73,7 @@ const colorSchemePresets = [
             background: '#fff7ed',
             text: '#9a3412',
             enabled: true,
-        }
+        },
     },
     {
         name: 'Rose Gold',
@@ -85,7 +84,7 @@ const colorSchemePresets = [
             background: '#fff1f2',
             text: '#9f1239',
             enabled: true,
-        }
+        },
     },
 ];
 
@@ -117,26 +116,19 @@ export default function ColorSchemeEditor({ value, onChange, disabled = false }:
                             Customize the colors for this page. When enabled, these colors will override the default theme.
                         </CardDescription>
                     </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={resetToDefault}
-                        disabled={disabled}
-                    >
-                        <RotateCcw className="h-4 w-4 mr-2" />
+                    <Button variant="outline" size="sm" onClick={resetToDefault} disabled={disabled}>
+                        <RotateCcw className="mr-2 h-4 w-4" />
                         Reset
                     </Button>
                 </div>
             </CardHeader>
-            
+
             <CardContent className="space-y-6">
                 {/* Enable/Disable Toggle */}
                 <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                         <Label htmlFor="color-scheme-enabled">Enable Custom Colors</Label>
-                        <p className="text-sm text-muted-foreground">
-                            Use custom colors for this page instead of the default theme
-                        </p>
+                        <p className="text-muted-foreground text-sm">Use custom colors for this page instead of the default theme</p>
                     </div>
                     <Switch
                         id="color-scheme-enabled"
@@ -151,28 +143,19 @@ export default function ColorSchemeEditor({ value, onChange, disabled = false }:
                         {/* Preset Color Schemes */}
                         <div className="space-y-3">
                             <Label>Quick Presets</Label>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                                 {colorSchemePresets.map((preset) => (
                                     <button
                                         key={preset.name}
-                                        className="p-3 rounded-lg border-2 hover:border-primary/50 transition-colors text-left"
+                                        className="hover:border-primary/50 rounded-lg border-2 p-3 text-left transition-colors"
                                         onClick={() => handlePresetSelect(preset.scheme)}
                                         disabled={disabled}
                                     >
-                                        <div className="flex items-center gap-2 mb-2">
+                                        <div className="mb-2 flex items-center gap-2">
                                             <div className="flex gap-1">
-                                                <div
-                                                    className="w-3 h-3 rounded-full"
-                                                    style={{ backgroundColor: preset.scheme.primary }}
-                                                />
-                                                <div
-                                                    className="w-3 h-3 rounded-full"
-                                                    style={{ backgroundColor: preset.scheme.secondary }}
-                                                />
-                                                <div
-                                                    className="w-3 h-3 rounded-full"
-                                                    style={{ backgroundColor: preset.scheme.accent }}
-                                                />
+                                                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: preset.scheme.primary }} />
+                                                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: preset.scheme.secondary }} />
+                                                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: preset.scheme.accent }} />
                                             </div>
                                         </div>
                                         <p className="text-sm font-medium">{preset.name}</p>
@@ -182,35 +165,35 @@ export default function ColorSchemeEditor({ value, onChange, disabled = false }:
                         </div>
 
                         {/* Individual Color Controls */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <ColorPicker
                                 label="Primary Color"
                                 value={currentScheme.primary}
                                 onChange={(primary) => handleSchemeChange({ primary })}
                                 disabled={disabled}
                             />
-                            
+
                             <ColorPicker
                                 label="Secondary Color"
                                 value={currentScheme.secondary}
                                 onChange={(secondary) => handleSchemeChange({ secondary })}
                                 disabled={disabled}
                             />
-                            
+
                             <ColorPicker
                                 label="Accent Color"
                                 value={currentScheme.accent}
                                 onChange={(accent) => handleSchemeChange({ accent })}
                                 disabled={disabled}
                             />
-                            
+
                             <ColorPicker
                                 label="Background Color"
                                 value={currentScheme.background}
                                 onChange={(background) => handleSchemeChange({ background })}
                                 disabled={disabled}
                             />
-                            
+
                             <ColorPicker
                                 label="Text Color"
                                 value={currentScheme.text}
@@ -222,40 +205,35 @@ export default function ColorSchemeEditor({ value, onChange, disabled = false }:
                         {/* Color Preview */}
                         <div className="space-y-3">
                             <Label>Preview</Label>
-                            <div 
-                                className="p-4 rounded-lg border"
-                                style={{ 
+                            <div
+                                className="rounded-lg border p-4"
+                                style={{
                                     backgroundColor: currentScheme.background,
-                                    color: currentScheme.text 
+                                    color: currentScheme.text,
                                 }}
                             >
-                                <h3 
-                                    className="text-lg font-semibold mb-2"
-                                    style={{ color: currentScheme.primary }}
-                                >
+                                <h3 className="mb-2 text-lg font-semibold" style={{ color: currentScheme.primary }}>
                                     Sample Page Title
                                 </h3>
-                                <p className="mb-3">
-                                    This is how your page content will look with the selected colors.
-                                </p>
+                                <p className="mb-3">This is how your page content will look with the selected colors.</p>
                                 <div className="flex gap-2">
                                     <button
-                                        className="px-3 py-1 rounded text-sm font-medium text-white"
+                                        className="rounded px-3 py-1 text-sm font-medium text-white"
                                         style={{ backgroundColor: currentScheme.primary }}
                                     >
                                         Primary Button
                                     </button>
                                     <button
-                                        className="px-3 py-1 rounded text-sm font-medium text-white"
+                                        className="rounded px-3 py-1 text-sm font-medium text-white"
                                         style={{ backgroundColor: currentScheme.secondary }}
                                     >
                                         Secondary Button
                                     </button>
                                     <span
-                                        className="px-3 py-1 rounded text-sm font-medium"
-                                        style={{ 
+                                        className="rounded px-3 py-1 text-sm font-medium"
+                                        style={{
                                             backgroundColor: currentScheme.accent,
-                                            color: currentScheme.background 
+                                            color: currentScheme.background,
                                         }}
                                     >
                                         Accent Element

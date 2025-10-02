@@ -1,11 +1,11 @@
-import { memo } from "react";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import InputError from "@/components/input-error";
-import TextLink from "@/components/text-link";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import type { RegisterForm } from "@/hooks/use-registration-form";
+import InputError from '@/components/input-error';
+import TextLink from '@/components/text-link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import type { RegisterForm } from '@/hooks/use-registration-form';
+import { memo } from 'react';
 
 interface ReviewSubmitStepProps {
     data: RegisterForm;
@@ -13,11 +13,7 @@ interface ReviewSubmitStepProps {
     onFieldChange: (field: keyof RegisterForm, value: string | boolean) => void;
 }
 
-const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({
-    data,
-    errors,
-    onFieldChange,
-}) => {
+const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({ data, errors, onFieldChange }) => {
     const formatMobileNumber = (number: string) => {
         return number ? `+63${number}` : 'N/A';
     };
@@ -36,24 +32,24 @@ const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({
     return (
         <div className="space-y-8">
             <Card>
-                <CardHeader className="text-center pb-4 mb-4">
-                    <CardTitle className="text-xl font-semibold text-foreground">Review Your Information</CardTitle>
-                    <p className="text-sm text-muted-foreground mt-2">
+                <CardHeader className="mb-4 pb-4 text-center">
+                    <CardTitle className="text-foreground text-xl font-semibold">Review Your Information</CardTitle>
+                    <p className="text-muted-foreground mt-2 text-sm">
                         Please review all the information you've entered. You can go back to previous steps to make changes if needed.
                     </p>
                 </CardHeader>
                 <CardContent className="p-8 pt-2">
                     {/* Personal Information Section */}
                     <div className="space-y-6">
-                        <div className="pb-2 border-b border-border">
-                            <Label className="text-lg font-semibold text-primary">Personal Information</Label>
+                        <div className="border-border border-b pb-2">
+                            <Label className="text-primary text-lg font-semibold">Personal Information</Label>
                         </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                             <div className="space-y-4">
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Full Name</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Full Name</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {[data.first_name, data.middle_name, data.last_name]
                                             .filter((v) => v && v.trim() !== '' && v !== 'N/A')
                                             .join(' ') || 'N/A'}
@@ -61,36 +57,36 @@ const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({
                                 </div>
 
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Sex</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Sex</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.sex)}
                                     </p>
                                 </div>
 
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Civil Status</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Civil Status</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.civil_status)}
                                     </p>
                                 </div>
 
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Date of Birth</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Date of Birth</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.date_of_birth)}
                                     </p>
                                 </div>
 
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Place of Birth</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Place of Birth</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.place_of_birth)}
                                     </p>
                                 </div>
 
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Religion</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Religion</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.religion)}
                                     </p>
                                 </div>
@@ -98,47 +94,47 @@ const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({
 
                             <div className="space-y-4">
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Address</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted leading-relaxed">
+                                    <Label className="text-foreground text-sm font-semibold">Address</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm leading-relaxed">
                                         {formatAddress()}
                                     </p>
                                 </div>
 
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Mobile Number</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Mobile Number</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {formatMobileNumber(data.mobile_number)}
                                     </p>
                                 </div>
 
                                 {data.telephone_number && (
                                     <div className="flex flex-col space-y-1">
-                                        <Label className="text-sm font-semibold text-foreground">Telephone</Label>
-                                        <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                        <Label className="text-foreground text-sm font-semibold">Telephone</Label>
+                                        <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                             {displayValue(data.telephone_number)}
                                         </p>
                                     </div>
                                 )}
 
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Residence Type</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Residence Type</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.residence_type)}
                                     </p>
                                 </div>
 
                                 {data.residence_type === 'With Guardian' && (
                                     <div className="flex flex-col space-y-1">
-                                        <Label className="text-sm font-semibold text-foreground">Guardian Name</Label>
-                                        <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                        <Label className="text-foreground text-sm font-semibold">Guardian Name</Label>
+                                        <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                             {displayValue(data.guardian_name)}
                                         </p>
                                     </div>
                                 )}
 
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">PWD Status</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">PWD Status</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.is_pwd)}
                                         {data.is_pwd === 'Yes' && data.disability_type && ` - ${displayValue(data.disability_type)}`}
                                     </p>
@@ -151,30 +147,30 @@ const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({
 
                     {/* Academic Information Section */}
                     <div className="space-y-6">
-                        <div className="pb-2 border-b border-border">
-                            <Label className="text-lg font-semibold text-primary">Academic Information</Label>
+                        <div className="border-border border-b pb-2">
+                            <Label className="text-primary text-lg font-semibold">Academic Information</Label>
                         </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                             <div className="space-y-4">
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Student ID</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Student ID</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.student_id)}
                                     </p>
                                 </div>
 
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Course</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Course</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.course)}
                                     </p>
                                 </div>
 
                                 {data.major && data.major !== 'None' && (
                                     <div className="flex flex-col space-y-1">
-                                        <Label className="text-sm font-semibold text-foreground">Major</Label>
-                                        <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                        <Label className="text-foreground text-sm font-semibold">Major</Label>
+                                        <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                             {displayValue(data.major)}
                                         </p>
                                     </div>
@@ -183,16 +179,16 @@ const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({
 
                             <div className="space-y-4">
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Year Level</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Year Level</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.year_level)}
                                     </p>
                                 </div>
 
                                 {data.scholarships && (
                                     <div className="flex flex-col space-y-1">
-                                        <Label className="text-sm font-semibold text-foreground">Scholarships</Label>
-                                        <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                        <Label className="text-foreground text-sm font-semibold">Scholarships</Label>
+                                        <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                             {displayValue(data.scholarships)}
                                         </p>
                                     </div>
@@ -205,15 +201,15 @@ const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({
 
                     {/* Account Information Section */}
                     <div className="space-y-6">
-                        <div className="pb-2 border-b border-border">
-                            <Label className="text-lg font-semibold text-primary">Account Information</Label>
+                        <div className="border-border border-b pb-2">
+                            <Label className="text-primary text-lg font-semibold">Account Information</Label>
                         </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                             <div className="space-y-4">
                                 <div className="flex flex-col space-y-1">
-                                    <Label className="text-sm font-semibold text-foreground">Email Address</Label>
-                                    <p className="text-sm text-muted-foreground pl-2 py-1 rounded border-l-2 border-muted">
+                                    <Label className="text-foreground text-sm font-semibold">Email Address</Label>
+                                    <p className="text-muted-foreground border-muted rounded border-l-2 py-1 pl-2 text-sm">
                                         {displayValue(data.email)}
                                     </p>
                                 </div>
@@ -226,33 +222,30 @@ const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({
             <Separator className="my-4" />
 
             {/* Terms and Conditions */}
-            <Card className="border border-border">
+            <Card className="border-border border">
                 <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
                         <Checkbox
                             id="terms_agreement"
                             checked={data.terms_agreement}
                             onCheckedChange={(checked) => onFieldChange('terms_agreement', checked === true)}
-                            aria-describedby={errors.terms_agreement ? "terms-error" : "terms-description"}
-                            className="h-5 w-5 mt-0.5 border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                            aria-describedby={errors.terms_agreement ? 'terms-error' : 'terms-description'}
+                            className="border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground mt-0.5 h-5 w-5"
                         />
                         <div className="flex-1 space-y-2">
-                            <Label
-                                htmlFor="terms_agreement"
-                                className="text-sm font-semibold leading-relaxed cursor-pointer"
-                            >
-                                I agree to the Terms and Conditions and Privacy Policy{' '}
-                                <span className="text-red-500">*</span>
+                            <Label htmlFor="terms_agreement" className="cursor-pointer text-sm leading-relaxed font-semibold">
+                                I agree to the Terms and Conditions and Privacy Policy <span className="text-red-500">*</span>
                             </Label>
-                            <p id="terms-description" className="text-xs text-muted-foreground leading-relaxed">
+                            <p id="terms-description" className="text-muted-foreground text-xs leading-relaxed">
                                 By checking this box, you acknowledge that you have read, understood, and agree to be bound by our{' '}
-                                <TextLink href="/terms" target="_blank" className="underline hover:text-primary transition-colors">
+                                <TextLink href="/terms" target="_blank" className="hover:text-primary underline transition-colors">
                                     Terms and Conditions
-                                </TextLink>
-                                {' '}and{' '}
-                                <TextLink href="/privacy" target="_blank" className="underline hover:text-primary transition-colors">
+                                </TextLink>{' '}
+                                and{' '}
+                                <TextLink href="/privacy" target="_blank" className="hover:text-primary underline transition-colors">
                                     Privacy Policy
-                                </TextLink>.
+                                </TextLink>
+                                .
                             </p>
                         </div>
                     </div>
@@ -260,23 +253,23 @@ const ReviewSubmitStep = memo<ReviewSubmitStepProps>(({
                 </CardContent>
             </Card>
 
-            <Card className="border border-border">
+            <Card className="border-border border">
                 <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-semibold text-primary flex items-center gap-2">
+                    <CardTitle className="text-primary flex items-center gap-2 text-lg font-semibold">
                         <span>Ready to Submit?</span>
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                    <div className="bg-muted/20 rounded-lg p-4 border border-muted/40">
-                        <p className="text-sm text-muted-foreground leading-relaxed">
+                    <div className="bg-muted/20 border-muted/40 rounded-lg border p-4">
+                        <p className="text-muted-foreground text-sm leading-relaxed">
                             Once you submit this registration, you'll receive a confirmation email at{' '}
-                            <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded">{data.email}</span>.{' '}
-                            Please check your email (including spam folder) and follow the instructions to verify your account.
+                            <span className="text-foreground bg-muted rounded px-2 py-0.5 font-semibold">{data.email}</span>. Please check your email
+                            (including spam folder) and follow the instructions to verify your account.
                         </p>
                     </div>
                 </CardContent>
             </Card>
-        </div >
+        </div>
     );
 });
 

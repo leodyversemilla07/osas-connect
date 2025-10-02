@@ -1,28 +1,32 @@
-import { router, Link, Head } from '@inertiajs/react';
-import {
-    TrashIcon, UserCircle, Building2, GraduationCap, Shield,
-    Mail, Phone, MapPin, User2,
-    BookOpen, School, Award,
-    Pencil as PencilIcon,
-    type LucideIcon,
-    Users, FileText, Loader2, ChevronRight
-} from 'lucide-react';
-import { type User, type StudentProfile } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
-import { BreadcrumbItem } from '@/types';
-import { useState } from 'react';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
+import { BreadcrumbItem, type StudentProfile, type User } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import {
+    Award,
+    BookOpen,
+    Building2,
+    ChevronRight,
+    FileText,
+    GraduationCap,
+    Loader2,
+    Mail,
+    MapPin,
+    Pencil as PencilIcon,
+    Phone,
+    School,
+    Shield,
+    TrashIcon,
+    User2,
+    UserCircle,
+    Users,
+    type LucideIcon,
+} from 'lucide-react';
+import { useState } from 'react';
 
 // Course abbreviation mapping
 const COURSE_ABBREVIATIONS: Record<string, string> = {
@@ -189,7 +193,8 @@ interface UserProfileProps {
 
 function ProfileHeader({ user }: { user: UserWithProfile }) {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false); const handleDelete = async () => {
+    const [isDeleting, setIsDeleting] = useState(false);
+    const handleDelete = async () => {
         setIsDeleting(true);
         try {
             const deleteRoute = user.role === 'student' ? 'admin.students.destroy' : 'admin.staff.destroy';
@@ -197,7 +202,7 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
                 onFinish: () => {
                     setIsDeleting(false);
                     setIsDeleteDialogOpen(false);
-                }
+                },
             });
         } catch {
             setIsDeleting(false);
@@ -232,15 +237,11 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
     return (
         <>
             <Head title={`${user.first_name} ${user.last_name} | ${user.role.charAt(0).toUpperCase() + user.role.slice(1)} Profile`} />
-            <div className="border-b border-gray-100 dark:border-gray-800 pb-6">
+            <div className="border-b border-gray-100 pb-6 dark:border-gray-800">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                            User Profile
-                        </h1>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                            View and manage user information
-                        </p>
+                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">User Profile</h1>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">View and manage user information</p>
                     </div>
                     <div className="flex items-center gap-3">
                         {user.role === 'student' && (
@@ -249,27 +250,27 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleGeneratePDF}
-                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+                                    className="text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
                                 >
-                                    <FileText className="h-4 w-4 mr-2" />
+                                    <FileText className="mr-2 h-4 w-4" />
                                     Generate Scholarship PDF
                                 </Button>
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleGenerateChedPDF}
-                                    className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/20"
+                                    className="text-green-600 hover:bg-green-50 hover:text-green-700 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:text-green-300"
                                 >
-                                    <FileText className="h-4 w-4 mr-2" />
+                                    <FileText className="mr-2 h-4 w-4" />
                                     Generate CHED PDF
                                 </Button>
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleGenerateAnnex1PDF}
-                                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:text-purple-300 dark:hover:bg-purple-900/20"
+                                    className="text-purple-600 hover:bg-purple-50 hover:text-purple-700 dark:text-purple-400 dark:hover:bg-purple-900/20 dark:hover:text-purple-300"
                                 >
-                                    <FileText className="h-4 w-4 mr-2" />
+                                    <FileText className="mr-2 h-4 w-4" />
                                     Generate Annex 1 PDF
                                 </Button>
                             </>
@@ -279,10 +280,10 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
                                 variant="ghost"
                                 size="sm"
                                 asChild
-                                className="text-gray-600 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-900/20"
+                                className="text-gray-600 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-900/20 dark:hover:text-gray-300"
                             >
                                 <Link href={route(editRoute, user.id)}>
-                                    <PencilIcon className="h-4 w-4 mr-2" />
+                                    <PencilIcon className="mr-2 h-4 w-4" />
                                     Edit
                                 </Link>
                             </Button>
@@ -292,9 +293,9 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setIsDeleteDialogOpen(true)}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                                className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
                             >
-                                <TrashIcon className="h-4 w-4 mr-2" />
+                                <TrashIcon className="mr-2 h-4 w-4" />
                                 Delete
                             </Button>
                         )}
@@ -306,19 +307,18 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader className="space-y-3">
-                        <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                            Delete User
-                        </DialogTitle>
+                        <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">Delete User</DialogTitle>
                         <DialogDescription className="text-gray-600 dark:text-gray-400">
-                            Are you sure you want to delete {user.first_name} {user.last_name}? This action cannot be undone and will permanently remove all user data.
+                            Are you sure you want to delete {user.first_name} {user.last_name}? This action cannot be undone and will permanently
+                            remove all user data.
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="py-4">
-                        <div className="rounded-lg bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800/30 p-4">
+                        <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800/30 dark:bg-red-900/20">
                             <div className="flex items-start space-x-3">
                                 <div className="flex-shrink-0">
-                                    <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
                                         <TrashIcon className="h-4 w-4 text-red-600 dark:text-red-400" />
                                     </div>
                                 </div>
@@ -335,28 +335,18 @@ function ProfileHeader({ user }: { user: UserWithProfile }) {
                     </div>
 
                     <DialogFooter className="gap-2">
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsDeleteDialogOpen(false)}
-                            disabled={isDeleting}
-                            className="flex-1"
-                        >
+                        <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isDeleting} className="flex-1">
                             Cancel
                         </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={handleDelete}
-                            disabled={isDeleting}
-                            className="flex-1"
-                        >
+                        <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="flex-1">
                             {isDeleting ? (
                                 <>
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Deleting...
                                 </>
                             ) : (
                                 <>
-                                    <TrashIcon className="h-4 w-4 mr-2" />
+                                    <TrashIcon className="mr-2 h-4 w-4" />
                                     Delete User
                                 </>
                             )}
@@ -397,15 +387,13 @@ function UserAvatar({ user }: { user: UserWithProfile }) {
 
     // Get staff ID from various possible sources
     const getStaffId = () => {
-        return user.staffInfo?.staff_id ||
-            user.osasStaffProfile?.staff_id ||
-            user.studentProfile?.student_id;
+        return user.staffInfo?.staff_id || user.osasStaffProfile?.staff_id || user.studentProfile?.student_id;
     };
 
     const staffId = getStaffId();
 
     return (
-        <div className="flex items-center gap-6 pb-6 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-6 border-b border-gray-100 pb-6 dark:border-gray-800">
             <div className="relative">
                 <Avatar className="h-24 w-24">
                     <AvatarImage src={user.avatar?.toString() || ''} alt={`${user.first_name} ${user.last_name}`} />
@@ -419,7 +407,7 @@ function UserAvatar({ user }: { user: UserWithProfile }) {
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                     {user.first_name} {user.middle_name} {user.last_name}
                 </h2>
-                <div className="flex items-center gap-2 mt-2">
+                <div className="mt-2 flex items-center gap-2">
                     <Badge variant={getRoleBadgeVariant()} className="flex items-center gap-1.5">
                         {getRoleIcon()}
                         {user.role === 'osas_staff' ? 'OSAS Staff' : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
@@ -435,28 +423,24 @@ function UserAvatar({ user }: { user: UserWithProfile }) {
     );
 }
 
-function InfoItem({ icon: Icon, label, value }: { icon: LucideIcon, label: string, value: React.ReactNode }) {
+function InfoItem({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: React.ReactNode }) {
     return (
         <div className="py-3 first:pt-0 last:pb-0">
             <div className="flex items-start gap-3">
-                <Icon className="h-4 w-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
+                <Icon className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400 dark:text-gray-500" />
                 <div className="flex-1">
-                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                        {label}
-                    </div>
-                    <div className="text-sm text-gray-900 dark:text-gray-100">
-                        {value}
-                    </div>
+                    <div className="mb-1 text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">{label}</div>
+                    <div className="text-sm text-gray-900 dark:text-gray-100">{value}</div>
                 </div>
             </div>
         </div>
     );
 }
 
-function SectionHeader({ icon: Icon, title }: { icon: LucideIcon, title: string }) {
+function SectionHeader({ icon: Icon, title }: { icon: LucideIcon; title: string }) {
     return (
-        <div className="pb-4 mb-4 border-b border-gray-100 dark:border-gray-800">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+        <div className="mb-4 border-b border-gray-100 pb-4 dark:border-gray-800">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
                 <Icon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                 {title}
             </h2>
@@ -464,12 +448,8 @@ function SectionHeader({ icon: Icon, title }: { icon: LucideIcon, title: string 
     );
 }
 
-function InfoCard({ children, className }: { children: React.ReactNode, className?: string }) {
-    return (
-        <div className={cn("bg-white dark:bg-gray-800/30 rounded-lg p-6 shadow-sm", className)}>
-            {children}
-        </div>
-    );
+function InfoCard({ children, className }: { children: React.ReactNode; className?: string }) {
+    return <div className={cn('rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800/30', className)}>{children}</div>;
 }
 
 function PersonalInfoCard({ user }: { user: UserWithProfile }) {
@@ -491,11 +471,7 @@ function PersonalInfoCard({ user }: { user: UserWithProfile }) {
                             label="Civil Status"
                             value={personalInfo.civil_status || user.civil_status || studentProfile?.civil_status || 'Not provided'}
                         />
-                        <InfoItem
-                            icon={User2}
-                            label="Sex"
-                            value={personalInfo.sex || user.sex || studentProfile?.sex || 'Not provided'}
-                        />
+                        <InfoItem icon={User2} label="Sex" value={personalInfo.sex || user.sex || studentProfile?.sex || 'Not provided'} />
                     </>
                 )}
 
@@ -508,20 +484,12 @@ function PersonalInfoCard({ user }: { user: UserWithProfile }) {
                     />
                 )}
                 {(personalInfo.place_of_birth || studentProfile?.place_of_birth) && (
-                    <InfoItem
-                        icon={MapPin}
-                        label="Place of Birth"
-                        value={personalInfo.place_of_birth || studentProfile?.place_of_birth || ''}
-                    />
+                    <InfoItem icon={MapPin} label="Place of Birth" value={personalInfo.place_of_birth || studentProfile?.place_of_birth || ''} />
                 )}
 
                 {/* Religion */}
                 {(personalInfo.religion || studentProfile?.religion) && (
-                    <InfoItem
-                        icon={User2}
-                        label="Religion"
-                        value={personalInfo.religion || studentProfile?.religion || ''}
-                    />
+                    <InfoItem icon={User2} label="Religion" value={personalInfo.religion || studentProfile?.religion || ''} />
                 )}
 
                 {/* PWD Status */}
@@ -531,7 +499,7 @@ function PersonalInfoCard({ user }: { user: UserWithProfile }) {
                         label="PWD Status"
                         value={
                             <div className="space-y-1">
-                                <p className="text-blue-600 dark:text-blue-400 font-medium">Person with Disability</p>
+                                <p className="font-medium text-blue-600 dark:text-blue-400">Person with Disability</p>
                                 {(personalInfo.disability_type || studentProfile?.disability_type) && (
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
                                         Type: {personalInfo.disability_type || studentProfile?.disability_type}
@@ -552,7 +520,6 @@ function ContactInfoCard({ user }: { user: UserWithProfile }) {
             <SectionHeader icon={Phone} title="Contact Information" />
 
             <div className="space-y-4">
-
                 {user.role === 'student' && (
                     <InfoItem
                         icon={Phone}
@@ -569,20 +536,11 @@ function ContactInfoCard({ user }: { user: UserWithProfile }) {
                     />
                 )}
 
-                <InfoItem
-                    icon={Mail}
-                    label="Email"
-                    value={user.email}
-                />
+                <InfoItem icon={Mail} label="Email" value={user.email} />
 
                 {(user.contactInfo?.residence_type || user.studentProfile?.residence_type) && (
-                    <InfoItem
-                        icon={MapPin}
-                        label="Residence Type"
-                        value={user.contactInfo?.residence_type || user.studentProfile?.residence_type}
-                    />
+                    <InfoItem icon={MapPin} label="Residence Type" value={user.contactInfo?.residence_type || user.studentProfile?.residence_type} />
                 )}
-
             </div>
         </InfoCard>
     );
@@ -604,39 +562,11 @@ function AddressInfoCard({ user }: { user: UserWithProfile }) {
             <SectionHeader icon={MapPin} title="Address Information" />
 
             <div className="space-y-4">
-                <InfoItem
-                    icon={MapPin}
-                    label="Complete Address"
-                    value={addressParts.join(', ')}
-                />
-                {street && (
-                    <InfoItem
-                        icon={MapPin}
-                        label="Street"
-                        value={street}
-                    />
-                )}
-                {barangay && (
-                    <InfoItem
-                        icon={MapPin}
-                        label="Barangay"
-                        value={barangay}
-                    />
-                )}
-                {city && (
-                    <InfoItem
-                        icon={MapPin}
-                        label="City"
-                        value={city}
-                    />
-                )}
-                {province && (
-                    <InfoItem
-                        icon={MapPin}
-                        label="Province"
-                        value={province}
-                    />
-                )}
+                <InfoItem icon={MapPin} label="Complete Address" value={addressParts.join(', ')} />
+                {street && <InfoItem icon={MapPin} label="Street" value={street} />}
+                {barangay && <InfoItem icon={MapPin} label="Barangay" value={barangay} />}
+                {city && <InfoItem icon={MapPin} label="City" value={city} />}
+                {province && <InfoItem icon={MapPin} label="Province" value={province} />}
             </div>
         </InfoCard>
     );
@@ -677,22 +607,18 @@ function FamilyBackgroundCard({ user }: { user: UserWithProfile }) {
                     />
                 )}
                 {(familyInfo.guardian_name || studentProfile?.guardian_name) && (
-                    <InfoItem
-                        icon={User2}
-                        label="Guardian Name"
-                        value={familyInfo.guardian_name || studentProfile?.guardian_name || ''}
-                    />
+                    <InfoItem icon={User2} label="Guardian Name" value={familyInfo.guardian_name || studentProfile?.guardian_name || ''} />
                 )}
 
                 {/* Siblings list if available */}
                 {(familyInfo.siblings || studentProfile?.siblings) && (
                     <div className="mt-4">
-                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Siblings</h3>
+                        <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Siblings</h3>
                         <div className="space-y-2">
                             {((familyInfo.siblings || studentProfile?.siblings || []) as Sibling[]).map((sibling, index) => (
-                                <div key={index} className="text-sm bg-gray-50 dark:bg-gray-800/50 p-2 rounded">
+                                <div key={index} className="rounded bg-gray-50 p-2 text-sm dark:bg-gray-800/50">
                                     <p className="font-medium">{sibling.name}</p>
-                                    <div className="grid grid-cols-2 gap-2 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    <div className="mt-1 grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
                                         <p>Age: {sibling.age}</p>
                                         {sibling.occupation && <p>Occupation: {sibling.occupation}</p>}
                                         {sibling.school && <p>School: {sibling.school}</p>}
@@ -719,11 +645,7 @@ function FatherInfoCard({ user }: { user: UserWithProfile }) {
             <SectionHeader icon={User2} title="Father's Information" />
 
             <div className="space-y-4">
-                <InfoItem
-                    icon={User2}
-                    label="Full Name"
-                    value={fatherInfo.father_name || studentProfile?.father_name || ''}
-                />
+                <InfoItem icon={User2} label="Full Name" value={fatherInfo.father_name || studentProfile?.father_name || ''} />
                 {(fatherInfo.father_age || (studentProfile && studentProfile.father_age)) && (
                     <InfoItem
                         icon={User2}
@@ -732,32 +654,16 @@ function FatherInfoCard({ user }: { user: UserWithProfile }) {
                     />
                 )}
                 {(fatherInfo.father_mobile || studentProfile?.father_mobile) && (
-                    <InfoItem
-                        icon={Phone}
-                        label="Mobile Number"
-                        value={fatherInfo.father_mobile || studentProfile?.father_mobile || ''}
-                    />
+                    <InfoItem icon={Phone} label="Mobile Number" value={fatherInfo.father_mobile || studentProfile?.father_mobile || ''} />
                 )}
                 {(fatherInfo.father_email || studentProfile?.father_email) && (
-                    <InfoItem
-                        icon={Mail}
-                        label="Email"
-                        value={fatherInfo.father_email || studentProfile?.father_email || ''}
-                    />
+                    <InfoItem icon={Mail} label="Email" value={fatherInfo.father_email || studentProfile?.father_email || ''} />
                 )}
                 {(fatherInfo.father_occupation || studentProfile?.father_occupation) && (
-                    <InfoItem
-                        icon={Building2}
-                        label="Occupation"
-                        value={fatherInfo.father_occupation || studentProfile?.father_occupation || ''}
-                    />
+                    <InfoItem icon={Building2} label="Occupation" value={fatherInfo.father_occupation || studentProfile?.father_occupation || ''} />
                 )}
                 {(fatherInfo.father_company || studentProfile?.father_company) && (
-                    <InfoItem
-                        icon={Building2}
-                        label="Company"
-                        value={fatherInfo.father_company || studentProfile?.father_company || ''}
-                    />
+                    <InfoItem icon={Building2} label="Company" value={fatherInfo.father_company || studentProfile?.father_company || ''} />
                 )}
                 {(fatherInfo.father_monthly_income || (studentProfile && studentProfile.father_monthly_income)) && (
                     <InfoItem
@@ -767,18 +673,10 @@ function FatherInfoCard({ user }: { user: UserWithProfile }) {
                     />
                 )}
                 {(fatherInfo.father_education || studentProfile?.father_education) && (
-                    <InfoItem
-                        icon={School}
-                        label="Education"
-                        value={fatherInfo.father_education || studentProfile?.father_education || ''}
-                    />
+                    <InfoItem icon={School} label="Education" value={fatherInfo.father_education || studentProfile?.father_education || ''} />
                 )}
                 {(fatherInfo.father_school || studentProfile?.father_school) && (
-                    <InfoItem
-                        icon={School}
-                        label="School"
-                        value={fatherInfo.father_school || studentProfile?.father_school || ''}
-                    />
+                    <InfoItem icon={School} label="School" value={fatherInfo.father_school || studentProfile?.father_school || ''} />
                 )}
             </div>
         </InfoCard>
@@ -797,11 +695,7 @@ function MotherInfoCard({ user }: { user: UserWithProfile }) {
             <SectionHeader icon={User2} title="Mother's Information" />
 
             <div className="space-y-4">
-                <InfoItem
-                    icon={User2}
-                    label="Full Name"
-                    value={motherInfo.mother_name || studentProfile?.mother_name || ''}
-                />
+                <InfoItem icon={User2} label="Full Name" value={motherInfo.mother_name || studentProfile?.mother_name || ''} />
                 {(motherInfo.mother_age || (studentProfile && studentProfile.mother_age)) && (
                     <InfoItem
                         icon={User2}
@@ -810,32 +704,16 @@ function MotherInfoCard({ user }: { user: UserWithProfile }) {
                     />
                 )}
                 {(motherInfo.mother_mobile || studentProfile?.mother_mobile) && (
-                    <InfoItem
-                        icon={Phone}
-                        label="Mobile Number"
-                        value={motherInfo.mother_mobile || studentProfile?.mother_mobile || ''}
-                    />
+                    <InfoItem icon={Phone} label="Mobile Number" value={motherInfo.mother_mobile || studentProfile?.mother_mobile || ''} />
                 )}
                 {(motherInfo.mother_email || studentProfile?.mother_email) && (
-                    <InfoItem
-                        icon={Mail}
-                        label="Email"
-                        value={motherInfo.mother_email || studentProfile?.mother_email || ''}
-                    />
+                    <InfoItem icon={Mail} label="Email" value={motherInfo.mother_email || studentProfile?.mother_email || ''} />
                 )}
                 {(motherInfo.mother_occupation || studentProfile?.mother_occupation) && (
-                    <InfoItem
-                        icon={Building2}
-                        label="Occupation"
-                        value={motherInfo.mother_occupation || studentProfile?.mother_occupation || ''}
-                    />
+                    <InfoItem icon={Building2} label="Occupation" value={motherInfo.mother_occupation || studentProfile?.mother_occupation || ''} />
                 )}
                 {(motherInfo.mother_company || studentProfile?.mother_company) && (
-                    <InfoItem
-                        icon={Building2}
-                        label="Company"
-                        value={motherInfo.mother_company || studentProfile?.mother_company || ''}
-                    />
+                    <InfoItem icon={Building2} label="Company" value={motherInfo.mother_company || studentProfile?.mother_company || ''} />
                 )}
                 {(motherInfo.mother_monthly_income || (studentProfile && studentProfile.mother_monthly_income)) && (
                     <InfoItem
@@ -845,18 +723,10 @@ function MotherInfoCard({ user }: { user: UserWithProfile }) {
                     />
                 )}
                 {(motherInfo.mother_education || studentProfile?.mother_education) && (
-                    <InfoItem
-                        icon={School}
-                        label="Education"
-                        value={motherInfo.mother_education || studentProfile?.mother_education || ''}
-                    />
+                    <InfoItem icon={School} label="Education" value={motherInfo.mother_education || studentProfile?.mother_education || ''} />
                 )}
                 {(motherInfo.mother_school || studentProfile?.mother_school) && (
-                    <InfoItem
-                        icon={School}
-                        label="School"
-                        value={motherInfo.mother_school || studentProfile?.mother_school || ''}
-                    />
+                    <InfoItem icon={School} label="School" value={motherInfo.mother_school || studentProfile?.mother_school || ''} />
                 )}
             </div>
         </InfoCard>
@@ -888,29 +758,13 @@ function AcademicInfoCard({ user }: { user: UserWithProfile }) {
                         value={
                             <div className="space-y-1">
                                 <p className="font-medium">{course}</p>
-                                {major && (
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        Major in {major}
-                                    </p>
-                                )}
+                                {major && <p className="text-xs text-gray-500 dark:text-gray-400">Major in {major}</p>}
                             </div>
                         }
                     />
                 )}
-                {yearLevel && (
-                    <InfoItem
-                        icon={GraduationCap}
-                        label="Year Level"
-                        value={<span className="font-medium">{yearLevel}</span>}
-                    />
-                )}
-                {scholarships && (
-                    <InfoItem
-                        icon={Award}
-                        label="Scholarships"
-                        value={<span className="font-medium">{scholarships}</span>}
-                    />
-                )}
+                {yearLevel && <InfoItem icon={GraduationCap} label="Year Level" value={<span className="font-medium">{yearLevel}</span>} />}
+                {scholarships && <InfoItem icon={Award} label="Scholarships" value={<span className="font-medium">{scholarships}</span>} />}
             </div>
         </InfoCard>
     );
@@ -927,28 +781,28 @@ const StudentIDCard = ({ student }: { student: UserWithProfile }) => {
     const studentId = student.academicInfo?.student_id || student.student_id || student.studentProfile?.student_id || '';
 
     return (
-        <div className="w-full max-w-[350px] rounded-xl overflow-hidden shadow-2xl bg-white">
+        <div className="w-full max-w-[350px] overflow-hidden rounded-xl bg-white shadow-2xl">
             {/* Top section - Enhanced header with gradient */}
-            <div className="bg-gradient-to-r from-green-800 to-green-700 text-white p-5 relative">
-                <div className="absolute top-0 left-0 w-full h-full opacity-10">
+            <div className="relative bg-gradient-to-r from-green-800 to-green-700 p-5 text-white">
+                <div className="absolute top-0 left-0 h-full w-full opacity-10">
                     {/* Subtle pattern overlay */}
                     <div
-                        className="w-full h-full"
+                        className="h-full w-full"
                         style={{
                             backgroundImage:
                                 "url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fillOpacity='1' fillRule='evenodd'/%3E%3C/svg%3E\")",
-                            backgroundSize: "100px 100px",
+                            backgroundSize: '100px 100px',
                         }}
                     ></div>
                 </div>
 
-                <div className="flex items-start relative z-10">
-                    <div className="w-20 h-20 mr-4 flex-shrink-0">
-                        <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                <div className="relative z-10 flex items-start">
+                    <div className="mr-4 h-20 w-20 flex-shrink-0">
+                        <div className="flex h-full w-full items-center justify-center overflow-hidden">
                             <img
                                 src="https://www.minsu.edu.ph/template/images/logo.png"
                                 alt="Mindoro State University Logo"
-                                className="w-full h-full object-contain"
+                                className="h-full w-full object-contain"
                             />
                         </div>
                     </div>
@@ -956,13 +810,13 @@ const StudentIDCard = ({ student }: { student: UserWithProfile }) => {
                     <div className="flex-1">
                         <h1 className="text-2xl font-bold tracking-wider">MINDORO</h1>
                         <h1 className="text-2xl font-bold tracking-wider">STATE UNIVERSITY</h1>
-                        <p className="text-sm mt-1 opacity-90 font-light">ORIENTAL MINDORO, PHILIPPINES 5211</p>
+                        <p className="mt-1 text-sm font-light opacity-90">ORIENTAL MINDORO, PHILIPPINES 5211</p>
                     </div>
                 </div>
 
                 {/* Centered STUDENT IDENTIFICATION CARD text */}
                 <div className="mt-4 text-center">
-                    <div className="bg-green-900 bg-opacity-30 py-1 px-4 rounded-md inline-block mx-auto">
+                    <div className="bg-opacity-30 mx-auto inline-block rounded-md bg-green-900 px-4 py-1">
                         <p className="text-sm font-medium tracking-wide">STUDENT IDENTIFICATION CARD</p>
                     </div>
                 </div>
@@ -972,15 +826,16 @@ const StudentIDCard = ({ student }: { student: UserWithProfile }) => {
             <div className="bg-white">
                 <div className="flex">
                     {/* Enhanced photo section */}
-                    <div className="w-1/3 p-4 relative">
-                        <div className="border-2 border-yellow-400 rounded-md shadow-md overflow-hidden">
-                            <div className="aspect-square relative bg-gradient-to-b from-gray-100 to-gray-200">
-                                <Avatar className="w-full h-full rounded-none">
+                    <div className="relative w-1/3 p-4">
+                        <div className="overflow-hidden rounded-md border-2 border-yellow-400 shadow-md">
+                            <div className="relative aspect-square bg-gradient-to-b from-gray-100 to-gray-200">
+                                <Avatar className="h-full w-full rounded-none">
                                     {student.avatar ? (
                                         <AvatarImage src={student.avatar} alt={`${student.first_name}'s photo`} />
                                     ) : (
                                         <AvatarFallback className="text-lg">
-                                            {student.first_name[0]}{student.last_name[0]}
+                                            {student.first_name[0]}
+                                            {student.last_name[0]}
                                         </AvatarFallback>
                                     )}
                                 </Avatar>
@@ -989,16 +844,18 @@ const StudentIDCard = ({ student }: { student: UserWithProfile }) => {
                     </div>
 
                     {/* Enhanced student details */}
-                    <div className="w-2/3 bg-gradient-to-br from-green-800 to-green-700 text-white p-4">
+                    <div className="w-2/3 bg-gradient-to-br from-green-800 to-green-700 p-4 text-white">
                         <div className="border-l-2 border-yellow-400 pl-3">
                             <h2 className="text-3xl font-bold">{student.last_name}</h2>
-                            <p className="text-lg font-medium">{student.first_name} {student.middle_name?.[0] || ''}</p>
+                            <p className="text-lg font-medium">
+                                {student.first_name} {student.middle_name?.[0] || ''}
+                            </p>
                         </div>
 
                         <div className="mt-6 mb-2">
                             <div className="flex items-center">
                                 <ChevronRight className="h-4 w-4 text-yellow-400" />
-                                <h3 className="text-3xl font-bold ml-1">{courseAbbr}</h3>
+                                <h3 className="ml-1 text-3xl font-bold">{courseAbbr}</h3>
                             </div>
                         </div>
                     </div>
@@ -1006,37 +863,39 @@ const StudentIDCard = ({ student }: { student: UserWithProfile }) => {
             </div>
 
             {/* ID Number and Issue Date - Enhanced dark section */}
-            <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-3 px-4">
+            <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-4 py-3 text-white">
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                     <div className="flex items-center">
-                        <div className="w-1 h-3 bg-yellow-400 mr-2"></div>
-                        <p className="text-xs font-medium uppercase tracking-wide">Student ID Number</p>
+                        <div className="mr-2 h-3 w-1 bg-yellow-400"></div>
+                        <p className="text-xs font-medium tracking-wide uppercase">Student ID Number</p>
                     </div>
                     <div>
                         <p className="text-xs font-bold tracking-wider">{studentId}</p>
                     </div>
                     <div className="flex items-center">
-                        <div className="w-1 h-3 bg-yellow-400 mr-2"></div>
-                        <p className="text-xs font-medium uppercase tracking-wide">Issued</p>
+                        <div className="mr-2 h-3 w-1 bg-yellow-400"></div>
+                        <p className="text-xs font-medium tracking-wide uppercase">Issued</p>
                     </div>
                     <div>
-                        <p className="text-xs font-bold tracking-wider">AY {new Date().getFullYear()}-{new Date().getFullYear() + 1}</p>
+                        <p className="text-xs font-bold tracking-wider">
+                            AY {new Date().getFullYear()}-{new Date().getFullYear() + 1}
+                        </p>
                     </div>
                 </div>
             </div>
 
             {/* Enhanced signature section */}
             <div className="bg-white p-5 text-center">
-                <div className="h-8 mb-2 flex items-center justify-center">
-                    <div className="w-40 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+                <div className="mb-2 flex h-8 items-center justify-center">
+                    <div className="h-px w-40 bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
                 </div>
-                <p className="font-bold text-sm text-gray-800">DR. ENYA MARIE D. APOSTOL</p>
+                <p className="text-sm font-bold text-gray-800">DR. ENYA MARIE D. APOSTOL</p>
                 <p className="text-xs text-gray-600">University President</p>
             </div>
 
             {/* Enhanced footer */}
-            <div className="bg-gradient-to-r from-green-800 to-green-700 border-t-2 border-yellow-400 p-3">
-                <p className="text-[10px] text-center text-white leading-tight font-light">
+            <div className="border-t-2 border-yellow-400 bg-gradient-to-r from-green-800 to-green-700 p-3">
+                <p className="text-center text-[10px] leading-tight font-light text-white">
                     <span className="font-medium">MAIN CAMPUS</span>, Alcate, Victoria
                     <span className="mx-2">•</span>
                     <span className="font-medium">BONGABONG CAMPUS</span>, Labasan, Bongabong
@@ -1066,11 +925,11 @@ export default function UserProfile({ user }: UserProfileProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <div className="w-full py-12 px-4">
-                <div className="max-w-none mx-auto space-y-8">
+            <div className="w-full px-4 py-12">
+                <div className="mx-auto max-w-none space-y-8">
                     <ProfileHeader user={user} />
                     {/* Main content */}
-                    <div className="grid gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-4">
                         <div className="space-y-8 xl:col-span-1">
                             <PersonalInfoCard user={user} />
                             {user.role === 'student' && <FamilyBackgroundCard user={user} />}

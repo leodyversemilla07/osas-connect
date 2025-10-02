@@ -1,16 +1,15 @@
-import React from 'react';
-import { Head } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
 import ApplicationStatusDetails from '@/components/application-status-details';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Download, Calendar, DollarSign } from 'lucide-react';
-import { router } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 import { ApplicationStatus } from '@/types/application-status';
+import { Head, router } from '@inertiajs/react';
+import { ArrowLeft, Calendar, DollarSign, Download } from 'lucide-react';
+import React from 'react';
 
 interface ApplicationStatusPageProps {
     application: {
         id: number;
-        status: string;  // Laravel sends string, we'll cast to ApplicationStatus type in component
+        status: string; // Laravel sends string, we'll cast to ApplicationStatus type in component
         statusLabel: string;
         submittedAt?: string;
         verifiedAt?: string;
@@ -64,10 +63,7 @@ interface ApplicationStatusPageProps {
     };
 }
 
-const ApplicationStatusPage: React.FC<ApplicationStatusPageProps> = ({
-    application,
-    can
-}) => {
+const ApplicationStatusPage: React.FC<ApplicationStatusPageProps> = ({ application, can }) => {
     const breadcrumbs = [
         { title: 'Dashboard', href: '/dashboard' },
         { title: 'Applications', href: '/student/applications' },
@@ -85,7 +81,7 @@ const ApplicationStatusPage: React.FC<ApplicationStatusPageProps> = ({
             },
             onError: (errors) => {
                 console.error('Upload failed:', errors);
-            }
+            },
         });
     };
 
@@ -107,63 +103,54 @@ const ApplicationStatusPage: React.FC<ApplicationStatusPageProps> = ({
 
     const getPageTitle = () => {
         switch (application.status) {
-            case 'approved': return 'Application Approved';
-            case 'rejected': return 'Application Status';
-            case 'under_verification': return 'Under Verification';
-            case 'under_evaluation': return 'Under Evaluation';
-            case 'verified': return 'Documents Verified';
-            default: return 'Application Status';
+            case 'approved':
+                return 'Application Approved';
+            case 'rejected':
+                return 'Application Status';
+            case 'under_verification':
+                return 'Under Verification';
+            case 'under_evaluation':
+                return 'Under Evaluation';
+            case 'verified':
+                return 'Documents Verified';
+            default:
+                return 'Application Status';
         }
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head>
-                <title>{getPageTitle()} - {application.scholarship.name}</title>
-                <meta
-                    name="description"
-                    content={`Track your ${application.scholarship.name} scholarship application status and progress.`}
-                />
+                <title>
+                    {getPageTitle()} - {application.scholarship.name}
+                </title>
+                <meta name="description" content={`Track your ${application.scholarship.name} scholarship application status and progress.`} />
             </Head>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 {/* Header Actions */}
-                <div className="flex justify-between items-center mb-6">
-                    <Button
-                        variant="outline"
-                        onClick={() => router.visit('/student/applications')}
-                        className="flex items-center gap-2"
-                    >
+                <div className="mb-6 flex items-center justify-between">
+                    <Button variant="outline" onClick={() => router.visit('/student/applications')} className="flex items-center gap-2">
                         <ArrowLeft className="h-4 w-4" />
                         Back to Applications
                     </Button>
 
                     <div className="flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            onClick={handleDownloadApplication}
-                            className="flex items-center gap-2"
-                        >
+                        <Button variant="outline" onClick={handleDownloadApplication} className="flex items-center gap-2">
                             <Download className="h-4 w-4" />
                             Download PDF
                         </Button>
 
                         {/* Admin/Staff Actions */}
                         {can.schedule_interview && application.status === 'verified' && (
-                            <Button
-                                onClick={handleScheduleInterview}
-                                className="flex items-center gap-2"
-                            >
+                            <Button onClick={handleScheduleInterview} className="flex items-center gap-2">
                                 <Calendar className="h-4 w-4" />
                                 Schedule Interview
                             </Button>
                         )}
 
                         {can.record_stipend && application.status === 'approved' && (
-                            <Button
-                                onClick={handleRecordStipend}
-                                className="flex items-center gap-2"
-                            >
+                            <Button onClick={handleRecordStipend} className="flex items-center gap-2">
                                 <DollarSign className="h-4 w-4" />
                                 Record Stipend
                             </Button>
@@ -176,10 +163,10 @@ const ApplicationStatusPage: React.FC<ApplicationStatusPageProps> = ({
                     application={{
                         ...application,
                         status: application.status as ApplicationStatus,
-                        documents: application.documents.map(doc => ({
+                        documents: application.documents.map((doc) => ({
                             ...doc,
-                            status: doc.status as 'pending' | 'verified' | 'rejected'
-                        }))
+                            status: doc.status as 'pending' | 'verified' | 'rejected',
+                        })),
                     }}
                     onDocumentUpload={handleDocumentUpload}
                     onViewDocument={handleViewDocument}

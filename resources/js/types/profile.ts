@@ -41,7 +41,7 @@ export interface PersonalData {
 
 export interface FamilyData {
     status_of_parents?: string | null;
-    
+
     // Father's Information
     father_name?: string | null;
     father_age?: number | null;
@@ -70,7 +70,7 @@ export interface FamilyData {
     mother_years_service?: number | null;
     mother_education?: string | null;
     mother_school?: string | null;
-    mother_unemployment_reason?: string | null;    // Siblings Information
+    mother_unemployment_reason?: string | null; // Siblings Information
     total_siblings?: number;
     siblings?: SiblingInfo[] | null;
 }
@@ -140,14 +140,20 @@ export interface FinancialData {
 }
 
 // Complete profile data interface
-export interface ProfileFormData extends 
-    BasicProfileData, 
-    RoleSpecificData, 
-    AcademicData, 
-    PersonalData, 
-    FamilyData, 
-    FinancialData {
-    [key: string]: string | number | boolean | File | Blob | Date | null | undefined | Array<string | number | boolean | null | undefined> | Array<{ [key: string]: string | number }> | SiblingInfo[] | null;
+export interface ProfileFormData extends BasicProfileData, RoleSpecificData, AcademicData, PersonalData, FamilyData, FinancialData {
+    [key: string]:
+        | string
+        | number
+        | boolean
+        | File
+        | Blob
+        | Date
+        | null
+        | undefined
+        | Array<string | number | boolean | null | undefined>
+        | Array<{ [key: string]: string | number }>
+        | SiblingInfo[]
+        | null;
 }
 
 // Error handling types

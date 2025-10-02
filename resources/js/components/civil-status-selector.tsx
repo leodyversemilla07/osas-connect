@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { SelectorWithLabel } from "@/components/selector-with-label";
+import { SelectorWithLabel } from '@/components/selector-with-label';
+import { useMemo } from 'react';
 
 export interface CivilStatusSelectorProps {
     value: string;
@@ -10,24 +10,18 @@ export interface CivilStatusSelectorProps {
 }
 
 const CIVIL_STATUS_OPTIONS = [
-    { value: "Single", label: "Single" },
-    { value: "Married", label: "Married" },
-    { value: "Divorced", label: "Divorced" },
-    { value: "Widowed", label: "Widowed" },
-    { value: "Separated", label: "Separated" },
-    { value: "Civil Union", label: "Civil Union" },
-    { value: "Domestic Partnership", label: "Domestic Partnership" },
-    { value: "Other", label: "Other" },
-    { value: "Prefer not to say", label: "Prefer not to say" },
+    { value: 'Single', label: 'Single' },
+    { value: 'Married', label: 'Married' },
+    { value: 'Divorced', label: 'Divorced' },
+    { value: 'Widowed', label: 'Widowed' },
+    { value: 'Separated', label: 'Separated' },
+    { value: 'Civil Union', label: 'Civil Union' },
+    { value: 'Domestic Partnership', label: 'Domestic Partnership' },
+    { value: 'Other', label: 'Other' },
+    { value: 'Prefer not to say', label: 'Prefer not to say' },
 ];
 
-export default function CivilStatusSelector({
-    value,
-    onChange,
-    error,
-    required = false,
-    className = "",
-}: CivilStatusSelectorProps) {
+export default function CivilStatusSelector({ value, onChange, error, required = false, className = '' }: CivilStatusSelectorProps) {
     const options = useMemo(() => CIVIL_STATUS_OPTIONS, []);
     return (
         <SelectorWithLabel

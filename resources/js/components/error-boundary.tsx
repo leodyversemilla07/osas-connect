@@ -1,7 +1,7 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
     children?: ReactNode;
@@ -29,10 +29,10 @@ export default class ErrorBoundary extends Component<Props, State> {
     public render() {
         if (this.state.hasError) {
             return (
-                <div className="fixed inset-0 flex items-center justify-center bg-white/70 z-50">
-                    <Alert variant="destructive" className="my-6 p-6 rounded-lg shadow-lg flex flex-col items-center text-center animate-fade-in">
-                        <div className="flex items-center justify-center mb-4">
-                            <RefreshCcw className="h-8 w-8 text-red-600 mr-2 animate-spin-slow" aria-hidden="true" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70">
+                    <Alert variant="destructive" className="animate-fade-in my-6 flex flex-col items-center rounded-lg p-6 text-center shadow-lg">
+                        <div className="mb-4 flex items-center justify-center">
+                            <RefreshCcw className="animate-spin-slow mr-2 h-8 w-8 text-red-600" aria-hidden="true" />
                             <AlertTitle className="text-xl font-bold text-red-700">Something went wrong</AlertTitle>
                         </div>
                         <AlertDescription className="mt-2 text-base text-gray-700">
@@ -42,7 +42,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                             <Button
                                 variant="destructive"
                                 onClick={() => window.location.reload()}
-                                className="gap-2 px-6 py-2 text-base font-semibold rounded-md shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition-all duration-150"
+                                className="gap-2 rounded-md px-6 py-2 text-base font-semibold shadow transition-all duration-150 hover:bg-red-700 focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:outline-none"
                                 aria-label="Reload Page"
                             >
                                 <RefreshCcw className="h-5 w-5" />

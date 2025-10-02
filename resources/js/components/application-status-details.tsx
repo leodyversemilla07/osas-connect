@@ -1,37 +1,34 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import {
-    Clock,
-    FileText,
-    MessageSquare,
-    User,
-    Calendar,
-    CheckCircle,
-    XCircle,
-    Eye,
-    FileCheck,
-    GraduationCap,
-    Award,
-    DollarSign,
-    Upload
-} from 'lucide-react';
-import {
-    ApplicationStatusData,
-    DocumentVerificationStatus
-} from '@/types/application-status';
-import {
-    getStatusBadgeConfig,
+    formatCurrency,
+    formatDate,
+    formatDateTime,
     getDocumentStatusConfig,
     getDocumentStatusLabel,
     getScholarshipTypeLabel,
-    formatCurrency,
-    formatDate,
-    formatDateTime
+    getStatusBadgeConfig,
 } from '@/lib/application-status';
+import { ApplicationStatusData, DocumentVerificationStatus } from '@/types/application-status';
+import {
+    Award,
+    Calendar,
+    CheckCircle,
+    Clock,
+    DollarSign,
+    Eye,
+    FileCheck,
+    FileText,
+    GraduationCap,
+    MessageSquare,
+    Upload,
+    User,
+    XCircle,
+} from 'lucide-react';
+import React from 'react';
 
 // Props interface using the imported types
 interface ApplicationStatusDetailsProps {
@@ -54,10 +51,14 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
         if (!uploaded) return <Upload className="h-4 w-4 text-gray-400" />;
 
         switch (status) {
-            case 'verified': return <CheckCircle className="h-4 w-4 text-green-600" />;
-            case 'rejected': return <XCircle className="h-4 w-4 text-red-600" />;
-            case 'pending': return <Clock className="h-4 w-4 text-yellow-600" />;
-            default: return <FileText className="h-4 w-4 text-blue-600" />;
+            case 'verified':
+                return <CheckCircle className="h-4 w-4 text-green-600" />;
+            case 'rejected':
+                return <XCircle className="h-4 w-4 text-red-600" />;
+            case 'pending':
+                return <Clock className="h-4 w-4 text-yellow-600" />;
+            default:
+                return <FileText className="h-4 w-4 text-blue-600" />;
         }
     };
 
@@ -66,14 +67,22 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
         const iconClass = `h-4 w-4 ${status === 'completed' ? 'text-green-600' : status === 'current' ? 'text-blue-600' : 'text-gray-400'}`;
 
         switch (iconName) {
-            case 'document-plus': return <FileText className={iconClass} />;
-            case 'check-circle': return <CheckCircle className={iconClass} />;
-            case 'eye': return <Eye className={iconClass} />;
-            case 'document-check': return <FileCheck className={iconClass} />;
-            case 'academic-cap': return <GraduationCap className={iconClass} />;
-            case 'check-badge': return <Award className={iconClass} />;
-            case 'x-circle': return <XCircle className={iconClass} />;
-            default: return <Clock className={iconClass} />;
+            case 'document-plus':
+                return <FileText className={iconClass} />;
+            case 'check-circle':
+                return <CheckCircle className={iconClass} />;
+            case 'eye':
+                return <Eye className={iconClass} />;
+            case 'document-check':
+                return <FileCheck className={iconClass} />;
+            case 'academic-cap':
+                return <GraduationCap className={iconClass} />;
+            case 'check-badge':
+                return <Award className={iconClass} />;
+            case 'x-circle':
+                return <XCircle className={iconClass} />;
+            default:
+                return <Clock className={iconClass} />;
         }
     };
 
@@ -83,15 +92,12 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
             <Card>
                 <CardContent className="p-6">
                     <div className="space-y-4">
-                        <div className="flex justify-between items-start">
+                        <div className="flex items-start justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                    {application.scholarship.name}
-                                </h1>
-                                <p className="text-gray-600 dark:text-gray-400 mt-1">
-                                    Application #{application.id}
-                                </p>
-                            </div>                            <Badge
+                                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{application.scholarship.name}</h1>
+                                <p className="mt-1 text-gray-600 dark:text-gray-400">Application #{application.id}</p>
+                            </div>{' '}
+                            <Badge
                                 variant={getStatusBadgeConfig(application.status).variant}
                                 className={`text-sm ${getStatusBadgeConfig(application.status).className || ''}`}
                             >
@@ -116,15 +122,16 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                 </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="space-y-6 lg:col-span-2">
                     {/* Status Alert */}
                     {application.status === 'approved' && (
                         <Alert className="border-green-200 bg-green-50 dark:bg-green-900/20">
                             <CheckCircle className="h-4 w-4 text-green-600" />
                             <AlertDescription className="text-green-800 dark:text-green-200">
-                                Congratulations! Your scholarship application has been approved. You will receive further instructions about stipend disbursement.
+                                Congratulations! Your scholarship application has been approved. You will receive further instructions about stipend
+                                disbursement.
                             </AlertDescription>
                         </Alert>
                     )}
@@ -133,7 +140,8 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                         <Alert className="border-red-200 bg-red-50 dark:bg-red-900/20">
                             <XCircle className="h-4 w-4 text-red-600" />
                             <AlertDescription className="text-red-800 dark:text-red-200">
-                                We regret to inform you that your scholarship application was not approved at this time. Please check the feedback below for more details.
+                                We regret to inform you that your scholarship application was not approved at this time. Please check the feedback
+                                below for more details.
                             </AlertDescription>
                         </Alert>
                     )}
@@ -156,30 +164,22 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">                                <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Scholarship Type
-                                </label>
-                                <p className="text-gray-900 dark:text-gray-100 capitalize">
-                                    {getScholarshipTypeLabel(application.scholarship.type)}
-                                </p>
-                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                {' '}
                                 <div>
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Monthly Amount
-                                    </label>
-                                    <p className="text-gray-900 dark:text-gray-100">
-                                        {application.scholarship.amount}
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Scholarship Type</label>
+                                    <p className="text-gray-900 capitalize dark:text-gray-100">
+                                        {getScholarshipTypeLabel(application.scholarship.type)}
                                     </p>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Monthly Amount</label>
+                                    <p className="text-gray-900 dark:text-gray-100">{application.scholarship.amount}</p>
                                 </div>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Description
-                                </label>
-                                <p className="text-gray-900 dark:text-gray-100 mt-1">
-                                    {application.scholarship.description}
-                                </p>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                                <p className="mt-1 text-gray-900 dark:text-gray-100">{application.scholarship.description}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -193,10 +193,8 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                                    {application.purposeLetter}
-                                </p>
+                            <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                                <p className="leading-relaxed whitespace-pre-wrap text-gray-700 dark:text-gray-300">{application.purposeLetter}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -208,27 +206,25 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                                 <FileText className="h-5 w-5" />
                                 Submitted Documents
                             </CardTitle>
-                            <CardDescription>
-                                All documents submitted with your application
-                            </CardDescription>
+                            <CardDescription>All documents submitted with your application</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
                                 {application.documents.map((doc) => (
-                                    <div key={doc.type} className="flex items-center justify-between p-3 border rounded-lg">
+                                    <div key={doc.type} className="flex items-center justify-between rounded-lg border p-3">
                                         <div className="flex items-center gap-3">
                                             {getDocumentStatusIcon(doc.status, doc.uploaded)}
                                             <div>
-                                                <p className="font-medium">{doc.name}</p>                                                {doc.uploaded && doc.uploadedAt && (
-                                                    <p className="text-sm text-gray-500">
-                                                        Uploaded on {formatDate(doc.uploadedAt)}
-                                                    </p>
+                                                <p className="font-medium">{doc.name}</p>{' '}
+                                                {doc.uploaded && doc.uploadedAt && (
+                                                    <p className="text-sm text-gray-500">Uploaded on {formatDate(doc.uploadedAt)}</p>
                                                 )}
                                                 {doc.status === 'rejected' && (
                                                     <p className="text-sm text-red-600">Document needs to be re-uploaded</p>
                                                 )}
                                             </div>
-                                        </div>                                        <div className="flex items-center gap-2">
+                                        </div>{' '}
+                                        <div className="flex items-center gap-2">
                                             <Badge
                                                 variant={getDocumentStatusConfig(doc.status as DocumentVerificationStatus, doc.uploaded).variant}
                                                 className="text-xs"
@@ -239,7 +235,8 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                                                 <Button variant="outline" size="sm" onClick={() => onViewDocument(doc.type)}>
                                                     <Eye className="h-4 w-4" />
                                                 </Button>
-                                            )}                                            {canUpdateDocuments && (!doc.uploaded || doc.status === 'rejected') && (
+                                            )}{' '}
+                                            {canUpdateDocuments && (!doc.uploaded || doc.status === 'rejected') && (
                                                 <label className="cursor-pointer">
                                                     <Button variant="outline" size="sm" asChild>
                                                         <span>
@@ -275,17 +272,17 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                                     Interview Schedule
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>                                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                                <p className="font-medium text-blue-900 dark:text-blue-100">
-                                    {formatDateTime(application.interviewSchedule)}
-                                </p>
-                                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                                    Please arrive 15 minutes early for your interview.
-                                </p>
-                            </div>
+                            <CardContent>
+                                {' '}
+                                <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
+                                    <p className="font-medium text-blue-900 dark:text-blue-100">{formatDateTime(application.interviewSchedule)}</p>
+                                    <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                                        Please arrive 15 minutes early for your interview.
+                                    </p>
+                                </div>
                                 {application.interviewNotes && (
-                                    <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <h4 className="font-medium mb-2">Interview Notes</h4>
+                                    <div className="mt-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                                        <h4 className="mb-2 font-medium">Interview Notes</h4>
                                         <p className="text-gray-700 dark:text-gray-300">{application.interviewNotes}</p>
                                     </div>
                                 )}
@@ -305,39 +302,27 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                             <CardContent className="space-y-4">
                                 {application.verifierComments && (
                                     <div>
-                                        <h4 className="font-medium mb-2 text-gray-700 dark:text-gray-300">
-                                            Verifier Comments
-                                        </h4>
-                                        <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                                            <p className="text-gray-700 dark:text-gray-300">
-                                                {application.verifierComments}
-                                            </p>
+                                        <h4 className="mb-2 font-medium text-gray-700 dark:text-gray-300">Verifier Comments</h4>
+                                        <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                                            <p className="text-gray-700 dark:text-gray-300">{application.verifierComments}</p>
                                         </div>
                                     </div>
                                 )}
 
                                 {application.committeeRecommendation && (
                                     <div>
-                                        <h4 className="font-medium mb-2 text-gray-700 dark:text-gray-300">
-                                            Committee Recommendation
-                                        </h4>
-                                        <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                                            <p className="text-gray-700 dark:text-gray-300">
-                                                {application.committeeRecommendation}
-                                            </p>
+                                        <h4 className="mb-2 font-medium text-gray-700 dark:text-gray-300">Committee Recommendation</h4>
+                                        <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
+                                            <p className="text-gray-700 dark:text-gray-300">{application.committeeRecommendation}</p>
                                         </div>
                                     </div>
                                 )}
 
                                 {application.adminRemarks && (
                                     <div>
-                                        <h4 className="font-medium mb-2 text-gray-700 dark:text-gray-300">
-                                            Admin Remarks
-                                        </h4>
-                                        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                                            <p className="text-gray-700 dark:text-gray-300">
-                                                {application.adminRemarks}
-                                            </p>
+                                        <h4 className="mb-2 font-medium text-gray-700 dark:text-gray-300">Admin Remarks</h4>
+                                        <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
+                                            <p className="text-gray-700 dark:text-gray-300">{application.adminRemarks}</p>
                                         </div>
                                     </div>
                                 )}
@@ -357,19 +342,13 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                             <CardContent>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Total Amount Received
-                                        </label>                                        <p className="text-lg font-semibold text-green-600">
-                                            {formatCurrency(application.amountReceived || 0)}
-                                        </p>
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Amount Received</label>{' '}
+                                        <p className="text-lg font-semibold text-green-600">{formatCurrency(application.amountReceived || 0)}</p>
                                     </div>
                                     {application.lastStipendDate && (
                                         <div>
-                                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                Last Release Date
-                                            </label>                                            <p className="text-gray-900 dark:text-gray-100">
-                                                {formatDate(application.lastStipendDate)}
-                                            </p>
+                                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Last Release Date</label>{' '}
+                                            <p className="text-gray-900 dark:text-gray-100">{formatDate(application.lastStipendDate)}</p>
                                         </div>
                                     )}
                                 </div>
@@ -390,28 +369,16 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Student Number
-                                </label>
-                                <p className="text-gray-900 dark:text-gray-100">
-                                    {application.student.studentNumber}
-                                </p>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Student Number</label>
+                                <p className="text-gray-900 dark:text-gray-100">{application.student.studentNumber}</p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Course
-                                </label>
-                                <p className="text-gray-900 dark:text-gray-100">
-                                    {application.student.course}
-                                </p>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Course</label>
+                                <p className="text-gray-900 dark:text-gray-100">{application.student.course}</p>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Year Level
-                                </label>
-                                <p className="text-gray-900 dark:text-gray-100">
-                                    {application.student.yearLevel}
-                                </p>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Year Level</label>
+                                <p className="text-gray-900 dark:text-gray-100">{application.student.yearLevel}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -428,24 +395,25 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                             <div className="space-y-4">
                                 {application.timeline.map((step, index) => (
                                     <div key={index} className="flex items-start gap-3">
-                                        <div className={`mt-1 ${step.status === 'completed' ? 'text-green-600' : step.status === 'current' ? 'text-blue-600' : 'text-gray-400'}`}>
+                                        <div
+                                            className={`mt-1 ${step.status === 'completed' ? 'text-green-600' : step.status === 'current' ? 'text-blue-600' : 'text-gray-400'}`}
+                                        >
                                             {getTimelineIcon(step.icon, step.status)}
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className={`text-sm font-medium ${step.status === 'completed' ? 'text-green-700 dark:text-green-300' :
-                                                step.status === 'current' ? 'text-blue-700 dark:text-blue-300' :
-                                                    'text-gray-500 dark:text-gray-400'
-                                                }`}>
+                                        <div className="min-w-0 flex-1">
+                                            <p
+                                                className={`text-sm font-medium ${
+                                                    step.status === 'completed'
+                                                        ? 'text-green-700 dark:text-green-300'
+                                                        : step.status === 'current'
+                                                          ? 'text-blue-700 dark:text-blue-300'
+                                                          : 'text-gray-500 dark:text-gray-400'
+                                                }`}
+                                            >
                                                 {step.title}
                                             </p>
-                                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                                {step.description}
-                                            </p>
-                                            {step.date && (
-                                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                                                    {step.date}
-                                                </p>
-                                            )}
+                                            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{step.description}</p>
+                                            {step.date && <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">{step.date}</p>}
                                         </div>
                                     </div>
                                 ))}
@@ -463,46 +431,31 @@ const ApplicationStatusDetails: React.FC<ApplicationStatusDetailsProps> = ({
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Application Started
-                                </label>                                <p className="text-gray-900 dark:text-gray-100">
-                                    {formatDate(application.createdAt)}
-                                </p>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Application Started</label>{' '}
+                                <p className="text-gray-900 dark:text-gray-100">{formatDate(application.createdAt)}</p>
                             </div>
                             {application.submittedAt && (
                                 <div>
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Submitted
-                                    </label>                                    <p className="text-gray-900 dark:text-gray-100">
-                                        {formatDate(application.submittedAt)}
-                                    </p>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Submitted</label>{' '}
+                                    <p className="text-gray-900 dark:text-gray-100">{formatDate(application.submittedAt)}</p>
                                 </div>
                             )}
                             {application.verifiedAt && (
                                 <div>
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Verified
-                                    </label>                                    <p className="text-gray-900 dark:text-gray-100">
-                                        {formatDate(application.verifiedAt)}
-                                    </p>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Verified</label>{' '}
+                                    <p className="text-gray-900 dark:text-gray-100">{formatDate(application.verifiedAt)}</p>
                                 </div>
                             )}
                             {application.approvedAt && (
                                 <div>
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Approved
-                                    </label>                                    <p className="text-gray-900 dark:text-gray-100">
-                                        {formatDate(application.approvedAt)}
-                                    </p>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Approved</label>{' '}
+                                    <p className="text-gray-900 dark:text-gray-100">{formatDate(application.approvedAt)}</p>
                                 </div>
                             )}
                             {application.rejectedAt && (
                                 <div>
-                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Rejected
-                                    </label>                                    <p className="text-gray-900 dark:text-gray-100">
-                                        {formatDate(application.rejectedAt)}
-                                    </p>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Rejected</label>{' '}
+                                    <p className="text-gray-900 dark:text-gray-100">{formatDate(application.rejectedAt)}</p>
                                 </div>
                             )}
                         </CardContent>

@@ -1,9 +1,9 @@
-import React, { memo } from 'react';
-import { User } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { InputWithLabel } from '@/components/input-with-label';
 import { PhotoIdUpload } from '@/components/profile/photo-id-upload';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { ProfileSectionProps } from '@/types/profile';
+import { User } from 'lucide-react';
+import { memo } from 'react';
 
 interface BasicInfoSectionProps extends ProfileSectionProps {
     photoUrl?: string;
@@ -11,25 +11,18 @@ interface BasicInfoSectionProps extends ProfileSectionProps {
     roleDisplayName: string;
 }
 
-export const BasicInfoSection = memo<BasicInfoSectionProps>(({
-    data,
-    errors,
-    updateField,
-    photoUrl,
-    roleIdField,
-    roleDisplayName
-}) => {
+export const BasicInfoSection = memo<BasicInfoSectionProps>(({ data, errors, updateField, photoUrl, roleIdField, roleDisplayName }) => {
     return (
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-primary" />
+                    <User className="text-primary h-5 w-5" />
                     Basic Information
                 </CardTitle>
                 <CardDescription>Your core identity details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputWithLabel
                         id="first_name"
                         label="First Name"
@@ -72,15 +65,12 @@ export const BasicInfoSection = memo<BasicInfoSectionProps>(({
                     id={roleIdField}
                     label={roleDisplayName}
                     value={data[roleIdField as keyof typeof data] as string}
-                    onChange={() => { }} // Read-only
+                    onChange={() => {}} // Read-only
                     error={errors[roleIdField]}
                     disabled
                     data-testid="role-id-input"
                 />
-                <PhotoIdUpload
-                    onChange={(file) => updateField('photo_id', file)}
-                    existingPhotoUrl={photoUrl}
-                />
+                <PhotoIdUpload onChange={(file) => updateField('photo_id', file)} existingPhotoUrl={photoUrl} />
             </CardContent>
         </Card>
     );

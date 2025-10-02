@@ -58,27 +58,20 @@ export interface ApplicationTimelineStep {
     icon: string;
 }
 
-export type ApplicationStatus = 
-    | 'draft' 
-    | 'submitted' 
-    | 'under_verification' 
+export type ApplicationStatus =
+    | 'draft'
+    | 'submitted'
+    | 'under_verification'
     | 'incomplete'
     | 'verified'
-    | 'under_evaluation' 
-    | 'approved' 
-    | 'rejected' 
+    | 'under_evaluation'
+    | 'approved'
+    | 'rejected'
     | 'end';
 
-export type DocumentVerificationStatus = 
-    | 'pending'
-    | 'verified'
-    | 'rejected'
-    | 'missing';
+export type DocumentVerificationStatus = 'pending' | 'verified' | 'rejected' | 'missing';
 
-export type TimelineStepStatus = 
-    | 'completed'
-    | 'current'
-    | 'pending';
+export type TimelineStepStatus = 'completed' | 'current' | 'pending';
 
 export interface ApplicationPermissions {
     update_documents: boolean;
@@ -123,88 +116,88 @@ export interface DocumentTypeConfig {
 
 // Pre-configured document types for MinSU scholarships
 export const SCHOLARSHIP_DOCUMENTS: DocumentTypeConfig = {
-    'transcript_records': {
+    transcript_records: {
         name: 'Official Transcript of Records',
         description: 'Latest copy from registrar',
         required: true,
         acceptedFormats: ['.pdf'],
-        maxSize: 5
+        maxSize: 5,
     },
-    'birth_certificate': {
+    birth_certificate: {
         name: 'Birth Certificate',
         description: 'PSA-issued copy',
         required: true,
         acceptedFormats: ['.pdf'],
-        maxSize: 5
+        maxSize: 5,
     },
-    'good_moral': {
+    good_moral: {
         name: 'Certificate of Good Moral Character',
         description: 'From previous school',
         required: true,
         acceptedFormats: ['.pdf'],
-        maxSize: 5
+        maxSize: 5,
     },
-    'income_statement': {
+    income_statement: {
         name: 'Family Income Statement',
         description: 'BIR Form or Certificate of Indigency',
         required: true,
         acceptedFormats: ['.pdf'],
-        maxSize: 5
+        maxSize: 5,
     },
-    'enrollment_certificate': {
+    enrollment_certificate: {
         name: 'Certificate of Enrollment',
         description: 'Current semester',
         required: true,
         acceptedFormats: ['.pdf'],
-        maxSize: 5
+        maxSize: 5,
     },
-    'recommendation_letter': {
+    recommendation_letter: {
         name: 'Letter of Recommendation',
         description: 'From faculty or advisor',
         required: false,
         acceptedFormats: ['.pdf'],
-        maxSize: 5
+        maxSize: 5,
     },
-    'portfolio': {
+    portfolio: {
         name: 'Performance Portfolio',
         description: 'For performing arts scholarships',
         required: false,
         acceptedFormats: ['.pdf'],
-        maxSize: 10
+        maxSize: 10,
     },
-    'medical_certificate': {
+    medical_certificate: {
         name: 'Medical Certificate',
         description: 'Recent health clearance',
         required: false,
         acceptedFormats: ['.pdf'],
-        maxSize: 5
-    }
+        maxSize: 5,
+    },
 };
 
 // Status progress mapping
 export const STATUS_PROGRESS_MAP: { [key in ApplicationStatus]: number } = {
-    'draft': 10,
-    'submitted': 25,
-    'under_verification': 40,
-    'incomplete': 35,
-    'verified': 60,
-    'under_evaluation': 80,
-    'approved': 100,
-    'rejected': 100,
-    'end': 100
+    draft: 10,
+    submitted: 25,
+    under_verification: 40,
+    incomplete: 35,
+    verified: 60,
+    under_evaluation: 80,
+    approved: 100,
+    rejected: 100,
+    end: 100,
 };
 
 // Timeline icon mapping
 export const TIMELINE_ICONS: { [key: string]: string } = {
     'document-plus': 'FileText',
     'check-circle': 'CheckCircle',
-    'eye': 'Eye',
+    eye: 'Eye',
     'document-check': 'FileCheck',
     'academic-cap': 'GraduationCap',
     'check-badge': 'Award',
     'x-circle': 'XCircle',
-    'clock': 'Clock',
-    'calendar': 'Calendar',
-    'user': 'User',
-    'message': 'MessageSquare'
+    clock: 'Clock',
+    calendar: 'Calendar',
+    user: 'User',
+    message: 'MessageSquare',
 };

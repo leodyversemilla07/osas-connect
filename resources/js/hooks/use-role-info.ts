@@ -17,19 +17,27 @@ export function useRoleInfo(role: UserRole): UseRoleInfoReturn {
     const roleInfo = useMemo(() => {
         const roleIdField = (() => {
             switch (role) {
-                case 'student': return 'student_id';
-                case 'osas_staff': return 'staff_id';
-                case 'admin': return 'admin_id';
-                default: return 'student_id';
+                case 'student':
+                    return 'student_id';
+                case 'osas_staff':
+                    return 'staff_id';
+                case 'admin':
+                    return 'admin_id';
+                default:
+                    return 'student_id';
             }
         })();
 
         const roleDisplayName = (() => {
             switch (role) {
-                case 'student': return 'Student ID';
-                case 'osas_staff': return 'Staff ID';
-                case 'admin': return 'Admin ID';
-                default: return 'ID';
+                case 'student':
+                    return 'Student ID';
+                case 'osas_staff':
+                    return 'Staff ID';
+                case 'admin':
+                    return 'Admin ID';
+                default:
+                    return 'ID';
             }
         })();
 
@@ -38,7 +46,7 @@ export function useRoleInfo(role: UserRole): UseRoleInfoReturn {
             roleDisplayName,
             isStudent: role === 'student',
             isStaff: role === 'osas_staff',
-            isAdmin: role === 'admin'
+            isAdmin: role === 'admin',
         };
     }, [role]);
 

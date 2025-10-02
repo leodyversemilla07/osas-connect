@@ -1,28 +1,15 @@
-import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-    Search,
-    Filter,
-    GraduationCap,
-    Users,
-    BookOpen,
-    Target,
-    Clock,
-    AlertCircle,
-    ExternalLink,
-    Grid,
-    List,
-    X
-} from 'lucide-react';
+import AppLayout from '@/layouts/app-layout';
+import { Head, router } from '@inertiajs/react';
+import { AlertCircle, BookOpen, Clock, ExternalLink, Filter, GraduationCap, Grid, List, Search, Target, Users, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface Scholarship {
     id: number;
@@ -63,24 +50,24 @@ interface BreadcrumbItem {
 
 const getScholarshipTypeIcon = (type: string) => {
     const icons = {
-        'academic_full': <GraduationCap className="h-5 w-5" />,
-        'academic_partial': <GraduationCap className="h-5 w-5" />,
-        'student_assistantship': <Users className="h-5 w-5" />,
-        'performing_arts_full': <BookOpen className="h-5 w-5" />,
-        'performing_arts_partial': <BookOpen className="h-5 w-5" />,
-        'economic_assistance': <Target className="h-5 w-5" />
+        academic_full: <GraduationCap className="h-5 w-5" />,
+        academic_partial: <GraduationCap className="h-5 w-5" />,
+        student_assistantship: <Users className="h-5 w-5" />,
+        performing_arts_full: <BookOpen className="h-5 w-5" />,
+        performing_arts_partial: <BookOpen className="h-5 w-5" />,
+        economic_assistance: <Target className="h-5 w-5" />,
     };
     return icons[type as keyof typeof icons] || <GraduationCap className="h-5 w-5" />;
 };
 
 const getScholarshipTypeColor = (type: string) => {
     const colors = {
-        'academic_full': 'bg-blue-100 text-blue-800',
-        'academic_partial': 'bg-blue-100 text-blue-800',
-        'student_assistantship': 'bg-green-100 text-green-800',
-        'performing_arts_full': 'bg-purple-100 text-purple-800',
-        'performing_arts_partial': 'bg-purple-100 text-purple-800',
-        'economic_assistance': 'bg-orange-100 text-orange-800'
+        academic_full: 'bg-blue-100 text-blue-800',
+        academic_partial: 'bg-blue-100 text-blue-800',
+        student_assistantship: 'bg-green-100 text-green-800',
+        performing_arts_full: 'bg-purple-100 text-purple-800',
+        performing_arts_partial: 'bg-purple-100 text-purple-800',
+        economic_assistance: 'bg-orange-100 text-orange-800',
     };
     return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800';
 };
@@ -101,13 +88,15 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
 
     // Filter and sort scholarships
     const filteredScholarships = scholarships
-        .filter(scholarship => {
+        .filter((scholarship) => {
             // Search filter
             if (searchTerm) {
                 const searchLower = searchTerm.toLowerCase();
-                if (!scholarship.name.toLowerCase().includes(searchLower) &&
+                if (
+                    !scholarship.name.toLowerCase().includes(searchLower) &&
                     !scholarship.description.toLowerCase().includes(searchLower) &&
-                    !scholarship.typeLabel.toLowerCase().includes(searchLower)) {
+                    !scholarship.typeLabel.toLowerCase().includes(searchLower)
+                ) {
                     return false;
                 }
             }
@@ -180,20 +169,16 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
         const isExpired = daysLeft <= 0;
 
         return (
-            <Card className="h-full hover:shadow-lg transition-shadow">
+            <Card className="h-full transition-shadow hover:shadow-lg">
                 <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between mb-2">
+                    <div className="mb-2 flex items-start justify-between">
                         <div className="flex items-center gap-2">
                             {getScholarshipTypeIcon(scholarship.type)}
-                            <Badge className={getScholarshipTypeColor(scholarship.type)}>
-                                {scholarship.typeLabel}
-                            </Badge>
+                            <Badge className={getScholarshipTypeColor(scholarship.type)}>{scholarship.typeLabel}</Badge>
                         </div>
                         {scholarship.stipendAmount && (
                             <div className="text-right">
-                                <div className="text-lg font-bold text-green-600">
-                                    ₱{scholarship.stipendAmount.toLocaleString()}
-                                </div>
+                                <div className="text-lg font-bold text-green-600">₱{scholarship.stipendAmount.toLocaleString()}</div>
                                 <div className="text-xs text-gray-500">Stipend</div>
                             </div>
                         )}
@@ -201,7 +186,7 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                     <CardTitle className="text-lg leading-tight">{scholarship.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <p className="text-gray-600 text-sm line-clamp-3">{scholarship.description}</p>
+                    <p className="line-clamp-3 text-sm text-gray-600">{scholarship.description}</p>
 
                     <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-between">
@@ -225,27 +210,19 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                     {isExpiringSoon && (
                         <Alert className="border-orange-200 bg-orange-50">
                             <Clock className="h-4 w-4" />
-                            <AlertDescription className="text-orange-800">
-                                Only {daysLeft} days left to apply!
-                            </AlertDescription>
+                            <AlertDescription className="text-orange-800">Only {daysLeft} days left to apply!</AlertDescription>
                         </Alert>
                     )}
 
                     {isExpired && (
                         <Alert className="border-red-200 bg-red-50">
                             <AlertCircle className="h-4 w-4" />
-                            <AlertDescription className="text-red-800">
-                                Application deadline has passed
-                            </AlertDescription>
+                            <AlertDescription className="text-red-800">Application deadline has passed</AlertDescription>
                         </Alert>
                     )}
 
                     <div className="flex gap-2 pt-4">
-                        <Button
-                            className="flex-1"
-                            onClick={() => router.visit(`/student/scholarships/${scholarship.id}`)}
-                            variant="outline"
-                        >
+                        <Button className="flex-1" onClick={() => router.visit(`/student/scholarships/${scholarship.id}`)} variant="outline">
                             View Details
                         </Button>
                         {scholarship.canApply && !isExpired && (
@@ -254,7 +231,7 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                                 className="bg-blue-600 hover:bg-blue-700"
                             >
                                 Apply
-                                <ExternalLink className="h-4 w-4 ml-1" />
+                                <ExternalLink className="ml-1 h-4 w-4" />
                             </Button>
                         )}
                     </div>
@@ -275,14 +252,8 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                         <div className="flex items-center gap-3">
                             {getScholarshipTypeIcon(scholarship.type)}
                             <h3 className="text-lg font-semibold">{scholarship.name}</h3>
-                            <Badge className={getScholarshipTypeColor(scholarship.type)}>
-                                {scholarship.typeLabel}
-                            </Badge>
-                            {isExpiringSoon && (
-                                <Badge className="bg-orange-100 text-orange-800">
-                                    {daysLeft} days left
-                                </Badge>
-                            )}
+                            <Badge className={getScholarshipTypeColor(scholarship.type)}>{scholarship.typeLabel}</Badge>
+                            {isExpiringSoon && <Badge className="bg-orange-100 text-orange-800">{daysLeft} days left</Badge>}
                         </div>
 
                         <p className="text-gray-600">{scholarship.description}</p>
@@ -290,9 +261,7 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                         <div className="grid grid-cols-3 gap-4 text-sm">
                             <div>
                                 <span className="text-gray-600">Deadline:</span>
-                                <span className="ml-2 font-medium">
-                                    {new Date(scholarship.applicationDeadline).toLocaleDateString()}
-                                </span>
+                                <span className="ml-2 font-medium">{new Date(scholarship.applicationDeadline).toLocaleDateString()}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Slots:</span>
@@ -310,18 +279,13 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                     <div className="flex flex-col items-end gap-3">
                         {scholarship.stipendAmount && (
                             <div className="text-right">
-                                <div className="text-xl font-bold text-green-600">
-                                    ₱{scholarship.stipendAmount.toLocaleString()}
-                                </div>
+                                <div className="text-xl font-bold text-green-600">₱{scholarship.stipendAmount.toLocaleString()}</div>
                                 <div className="text-xs text-gray-500">Stipend Amount</div>
                             </div>
                         )}
 
                         <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                onClick={() => router.visit(`/student/scholarships/${scholarship.id}`)}
-                            >
+                            <Button variant="outline" onClick={() => router.visit(`/student/scholarships/${scholarship.id}`)}>
                                 View Details
                             </Button>
                             {scholarship.canApply && !isExpired && (
@@ -346,30 +310,20 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                 <meta name="description" content="Find and apply for scholarships at MinSU" />
             </Head>
 
-            <div className="max-w-7xl mx-auto p-6 space-y-6">
+            <div className="mx-auto max-w-7xl space-y-6 p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between"></div>
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                        Available Scholarships
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">
-                        Discover scholarship opportunities that match your profile
-                    </p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Available Scholarships</h1>
+                    <p className="mt-1 text-gray-600 dark:text-gray-400">Discover scholarship opportunities that match your profile</p>
                 </div>
 
                 <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                    >
+                    <Button variant="outline" onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}>
                         {viewMode === 'grid' ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
                     </Button>
-                    <Button
-                        variant="outline"
-                        onClick={() => setShowFilters(!showFilters)}
-                    >
-                        <Filter className="h-4 w-4 mr-2" />
+                    <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
+                        <Filter className="mr-2 h-4 w-4" />
                         Filters
                     </Button>
                 </div>
@@ -395,13 +349,13 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                             />
                         </div>
                         <Button onClick={handleSearch}>
-                            <Search className="h-4 w-4 mr-2" />
+                            <Search className="mr-2 h-4 w-4" />
                             Search
                         </Button>
                     </div>
 
                     {/* Filters */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                         {/* Type Filter */}
                         <div className="space-y-2">
                             <Label>Scholarship Type</Label>
@@ -438,15 +392,10 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
 
                         {/* Stipend Range */}
                         <div className="space-y-2">
-                            <Label>Stipend Range: ₱{stipendRange[0].toLocaleString()} - ₱{stipendRange[1].toLocaleString()}</Label>
-                            <Slider
-                                value={stipendRange}
-                                onValueChange={setStipendRange}
-                                max={100000}
-                                min={0}
-                                step={5000}
-                                className="w-full"
-                            />
+                            <Label>
+                                Stipend Range: ₱{stipendRange[0].toLocaleString()} - ₱{stipendRange[1].toLocaleString()}
+                            </Label>
+                            <Slider value={stipendRange} onValueChange={setStipendRange} max={100000} min={0} step={5000} className="w-full" />
                         </div>
 
                         {/* GWA Filter */}
@@ -467,7 +416,7 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                     <div className="flex gap-2">
                         <Button onClick={handleSearch}>Apply Filters</Button>
                         <Button variant="outline" onClick={clearFilters}>
-                            <X className="h-4 w-4 mr-2" />
+                            <X className="mr-2 h-4 w-4" />
                             Clear All
                         </Button>
                     </div>
@@ -486,7 +435,7 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                         />
                     </div>
                     <Button onClick={handleSearch}>
-                        <Search className="h-4 w-4 mr-2" />
+                        <Search className="mr-2 h-4 w-4" />
                         Search
                     </Button>
                 </div>
@@ -499,18 +448,10 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
                 </p>
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">View:</span>
-                    <Button
-                        variant={viewMode === 'grid' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setViewMode('grid')}
-                    >
+                    <Button variant={viewMode === 'grid' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('grid')}>
                         <Grid className="h-4 w-4" />
                     </Button>
-                    <Button
-                        variant={viewMode === 'list' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setViewMode('list')}
-                    >
+                    <Button variant={viewMode === 'list' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('list')}>
                         <List className="h-4 w-4" />
                     </Button>
                 </div>
@@ -519,26 +460,22 @@ export default function ScholarshipsSearch({ scholarships, filters, searchParams
             {/* Scholarships Grid/List */}
             {filteredScholarships.length === 0 ? (
                 <Card className="p-12 text-center">
-                    <GraduationCap className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No scholarships found</h3>
-                    <p className="text-gray-600 mb-4">
-                        Try adjusting your search criteria or filters to find more results.
-                    </p>
+                    <GraduationCap className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+                    <h3 className="mb-2 text-lg font-medium text-gray-900">No scholarships found</h3>
+                    <p className="mb-4 text-gray-600">Try adjusting your search criteria or filters to find more results.</p>
                     <Button onClick={clearFilters}>Clear All Filters</Button>
                 </Card>
             ) : (
-                <div className={
-                    viewMode === 'grid'
-                        ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-                        : 'space-y-4'
-                }>
-                    {filteredScholarships.map((scholarship) => (
-                        viewMode === 'grid'
-                            ? <ScholarshipCard key={scholarship.id} scholarship={scholarship} />
-                            : <ScholarshipListItem key={scholarship.id} scholarship={scholarship} />
-                    ))}
+                <div className={viewMode === 'grid' ? 'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3' : 'space-y-4'}>
+                    {filteredScholarships.map((scholarship) =>
+                        viewMode === 'grid' ? (
+                            <ScholarshipCard key={scholarship.id} scholarship={scholarship} />
+                        ) : (
+                            <ScholarshipListItem key={scholarship.id} scholarship={scholarship} />
+                        ),
+                    )}
                 </div>
             )}
-        </AppLayout >
+        </AppLayout>
     );
 }

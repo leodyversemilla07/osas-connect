@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { SelectorWithLabel } from "@/components/selector-with-label";
-import { InputWithLabel } from "@/components/input-with-label";
+import { InputWithLabel } from '@/components/input-with-label';
+import { SelectorWithLabel } from '@/components/selector-with-label';
+import { useMemo } from 'react';
 
 export interface ResidenceTypeSelectorProps {
     value: string;
@@ -15,8 +15,8 @@ export interface ResidenceTypeSelectorProps {
 
 const RESIDENCE_TYPE_OPTIONS = [
     { value: "Parent's House", label: "Parent's House" },
-    { value: "Boarding House", label: "Boarding House" },
-    { value: "With Guardian", label: "With Guardian" },
+    { value: 'Boarding House', label: 'Boarding House' },
+    { value: 'With Guardian', label: 'With Guardian' },
 ];
 
 export default function ResidenceTypeSelector({
@@ -24,8 +24,8 @@ export default function ResidenceTypeSelector({
     onChange,
     error,
     required = false,
-    className = "",
-    guardianName = "",
+    className = '',
+    guardianName = '',
     onGuardianNameChange,
     guardianError,
 }: ResidenceTypeSelectorProps) {
@@ -43,7 +43,7 @@ export default function ResidenceTypeSelector({
                 error={error}
                 className={className}
             />
-            {(value === "With Guardian") && (
+            {value === 'With Guardian' && (
                 <InputWithLabel
                     id="guardian_name"
                     label="Guardian Name"

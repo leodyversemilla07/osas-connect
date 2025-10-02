@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Palette, Pipette } from 'lucide-react';
+import { useState } from 'react';
 
 interface ColorPickerProps {
     value?: string;
@@ -41,7 +41,7 @@ export default function ColorPicker({ value = '#2563eb', onChange, disabled = fa
     const handleHexChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
         setHexValue(newValue);
-        
+
         // Validate hex color format
         if (/^#[0-9A-F]{6}$/i.test(newValue)) {
             onChange(newValue);
@@ -53,15 +53,8 @@ export default function ColorPicker({ value = '#2563eb', onChange, disabled = fa
             {label && <Label>{label}</Label>}
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <Button
-                        variant="outline"
-                        disabled={disabled}
-                        className="w-full justify-start gap-2"
-                    >
-                        <div
-                            className="w-4 h-4 rounded border"
-                            style={{ backgroundColor: value }}
-                        />
+                    <Button variant="outline" disabled={disabled} className="w-full justify-start gap-2">
+                        <div className="h-4 w-4 rounded border" style={{ backgroundColor: value }} />
                         {value}
                         <Palette className="ml-auto h-4 w-4" />
                     </Button>
@@ -72,16 +65,16 @@ export default function ColorPicker({ value = '#2563eb', onChange, disabled = fa
                             <TabsTrigger value="presets">Presets</TabsTrigger>
                             <TabsTrigger value="custom">Custom</TabsTrigger>
                         </TabsList>
-                        
+
                         <TabsContent value="presets" className="space-y-3">
                             <div className="grid grid-cols-4 gap-2">
                                 {colorPresets.map((color) => (
                                     <button
                                         key={color.value}
-                                        className="w-full aspect-square rounded border-2 hover:scale-105 transition-transform"
-                                        style={{ 
+                                        className="aspect-square w-full rounded border-2 transition-transform hover:scale-105"
+                                        style={{
                                             backgroundColor: color.value,
-                                            borderColor: value === color.value ? '#000' : 'transparent'
+                                            borderColor: value === color.value ? '#000' : 'transparent',
                                         }}
                                         onClick={() => {
                                             handleColorChange(color.value);
@@ -92,18 +85,12 @@ export default function ColorPicker({ value = '#2563eb', onChange, disabled = fa
                                 ))}
                             </div>
                         </TabsContent>
-                        
+
                         <TabsContent value="custom" className="space-y-3">
                             <div className="space-y-2">
                                 <Label htmlFor="hex-input">Hex Color</Label>
                                 <div className="flex gap-2">
-                                    <Input
-                                        id="hex-input"
-                                        value={hexValue}
-                                        onChange={handleHexChange}
-                                        placeholder="#2563eb"
-                                        className="font-mono"
-                                    />
+                                    <Input id="hex-input" value={hexValue} onChange={handleHexChange} placeholder="#2563eb" className="font-mono" />
                                     <Button
                                         size="icon"
                                         variant="outline"
@@ -118,13 +105,10 @@ export default function ColorPicker({ value = '#2563eb', onChange, disabled = fa
                                     </Button>
                                 </div>
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label>Preview</Label>
-                                <div
-                                    className="w-full h-10 rounded border"
-                                    style={{ backgroundColor: hexValue }}
-                                />
+                                <div className="h-10 w-full rounded border" style={{ backgroundColor: hexValue }} />
                             </div>
                         </TabsContent>
                     </Tabs>

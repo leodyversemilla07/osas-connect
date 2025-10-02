@@ -1,8 +1,8 @@
-import { Head } from '@inertiajs/react';
-import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
+import SiteHeader from '@/components/site-header';
 import { Badge } from '@/components/ui/badge';
-import { Users, Shield, Heart, CheckCircle } from 'lucide-react';
+import { Head } from '@inertiajs/react';
+import { CheckCircle, Heart, Shield, Users } from 'lucide-react';
 
 // Hardcoded content from PageSeeder.php for the 'about' page
 const pageContent = {
@@ -14,7 +14,8 @@ const pageContent = {
     mission: {
         badge: 'Our Mission',
         title: 'Our Mission',
-        description: 'To provide a streamlined, efficient, and transparent scholarship management system that connects deserving students with educational opportunities.',
+        description:
+            'To provide a streamlined, efficient, and transparent scholarship management system that connects deserving students with educational opportunities.',
         features: [
             'Streamlined application process',
             'Transparent selection criteria',
@@ -81,7 +82,7 @@ const getIcon = (iconName: string) => {
         Users,
         Shield,
         Heart,
-        CheckCircle
+        CheckCircle,
     };
     return icons[iconName as keyof typeof icons] || Users;
 };
@@ -102,25 +103,28 @@ export default function About() {
                 <main className="mt-16 w-full flex-1">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         {/* Hero Section */}
-                        <div className="relative overflow-hidden min-h-[60vh] flex items-center">
+                        <div className="relative flex min-h-[60vh] items-center overflow-hidden">
                             {/* Subtle background pattern */}
                             <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
-                                <div className="absolute inset-0" style={{
-                                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-                                }}></div>
+                                <div
+                                    className="absolute inset-0"
+                                    style={{
+                                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                                    }}
+                                ></div>
                             </div>
 
-                            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-                                <div className="text-center space-y-8">
-                                    <div className="inline-flex items-center gap-2 bg-[#febd12]/20 dark:bg-[#febd12]/30 px-4 py-2 rounded-full">
+                            <div className="relative mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+                                <div className="space-y-8 text-center">
+                                    <div className="inline-flex items-center gap-2 rounded-full bg-[#febd12]/20 px-4 py-2 dark:bg-[#febd12]/30">
                                         <span className="text-sm font-medium text-[#010002] dark:text-[#febd12]">{pageContent.hero.badge}</span>
                                     </div>
 
-                                    <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-[#010002] dark:text-white leading-tight">
+                                    <h1 className="text-4xl leading-tight font-bold text-[#010002] sm:text-6xl lg:text-7xl dark:text-white">
                                         {pageContent.hero.title}
                                     </h1>
 
-                                    <p className="text-xl text-[#010002]/70 dark:text-[#f3f2f2]/70 max-w-3xl mx-auto leading-relaxed">
+                                    <p className="mx-auto max-w-3xl text-xl leading-relaxed text-[#010002]/70 dark:text-[#f3f2f2]/70">
                                         {pageContent.hero.subtitle}
                                     </p>
                                 </div>
@@ -129,21 +133,21 @@ export default function About() {
 
                         {/* Our Mission Section */}
                         <section className="mt-16 py-8 sm:mt-24 sm:py-16">
-                            <div className="text-center mb-8 sm:mb-12">
+                            <div className="mb-8 text-center sm:mb-12">
                                 <Badge variant="secondary" className="mb-3">
                                     {pageContent.mission.badge}
                                 </Badge>
-                                <h2 className="text-2xl sm:text-3xl font-bold text-[#005a2d]">{pageContent.mission.title}</h2>
-                                <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-base sm:text-lg text-[#010002]/70 dark:text-[#f3f2f2]/70 px-4">
+                                <h2 className="text-2xl font-bold text-[#005a2d] sm:text-3xl">{pageContent.mission.title}</h2>
+                                <p className="mx-auto mt-3 max-w-2xl px-4 text-base text-[#010002]/70 sm:mt-4 sm:text-lg dark:text-[#f3f2f2]/70">
                                     {pageContent.mission.description}
                                 </p>
                             </div>
 
-                            <div className="mt-8 max-w-3xl mx-auto px-4">
+                            <div className="mx-auto mt-8 max-w-3xl px-4">
                                 <ul className="space-y-4">
                                     {pageContent.mission.features.map((feature, index) => (
                                         <li key={index} className="flex items-start gap-3">
-                                            <CheckCircle className="h-5 w-5 text-[#23b14d] flex-shrink-0 mt-0.5" />
+                                            <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#23b14d]" />
                                             <span className="text-base text-[#010002]/80 dark:text-[#f3f2f2]/80">{feature}</span>
                                         </li>
                                     ))}
@@ -153,28 +157,26 @@ export default function About() {
 
                         {/* Our Vision Section */}
                         <section className="py-8 sm:py-16">
-                            <div className="text-center mb-8 sm:mb-12">
+                            <div className="mb-8 text-center sm:mb-12">
                                 <Badge variant="outline" className="mb-3">
                                     {pageContent.vision.badge}
                                 </Badge>
-                                <h2 className="text-2xl sm:text-3xl font-bold text-[#005a2d] px-4">{pageContent.vision.title}</h2>
-                                <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-base sm:text-lg text-[#010002]/70 dark:text-[#f3f2f2]/70 px-4">
+                                <h2 className="px-4 text-2xl font-bold text-[#005a2d] sm:text-3xl">{pageContent.vision.title}</h2>
+                                <p className="mx-auto mt-3 max-w-2xl px-4 text-base text-[#010002]/70 sm:mt-4 sm:text-lg dark:text-[#f3f2f2]/70">
                                     {pageContent.vision.subtitle}
                                 </p>
                             </div>
 
-                            <div className="grid gap-6 px-4 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3 sm:px-0">
+                            <div className="grid gap-6 px-4 sm:grid-cols-2 sm:gap-8 sm:px-0 lg:grid-cols-3">
                                 {pageContent.vision.values.map((value, index) => {
                                     const IconComponent = getIcon(value.icon);
                                     return (
-                                        <div key={index} className="transition-all hover:bg-[#febd12]/5 dark:hover:bg-[#febd12]/10 p-6 rounded-lg">
+                                        <div key={index} className="rounded-lg p-6 transition-all hover:bg-[#febd12]/5 dark:hover:bg-[#febd12]/10">
                                             <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#febd12]/10">
                                                 <IconComponent className="h-8 w-8 text-[#febd12]" />
                                             </div>
                                             <h3 className="mb-3 text-xl font-semibold text-[#005a2d]">{value.title}</h3>
-                                            <p className="text-base text-[#010002]/80 dark:text-[#f3f2f2]/80">
-                                                {value.description}
-                                            </p>
+                                            <p className="text-base text-[#010002]/80 dark:text-[#f3f2f2]/80">{value.description}</p>
                                         </div>
                                     );
                                 })}
@@ -183,29 +185,35 @@ export default function About() {
 
                         {/* Team Section */}
                         <section className="py-8 sm:py-16">
-                            <div className="text-center mb-8 sm:mb-12">
+                            <div className="mb-8 text-center sm:mb-12">
                                 <Badge variant="secondary" className="mb-3">
                                     {pageContent.team.badge}
                                 </Badge>
-                                <h2 className="text-2xl sm:text-3xl font-bold text-[#005a2d] px-4">{pageContent.team.title}</h2>
-                                <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-base sm:text-lg text-[#010002]/70 dark:text-[#f3f2f2]/70 px-4">
+                                <h2 className="px-4 text-2xl font-bold text-[#005a2d] sm:text-3xl">{pageContent.team.title}</h2>
+                                <p className="mx-auto mt-3 max-w-2xl px-4 text-base text-[#010002]/70 sm:mt-4 sm:text-lg dark:text-[#f3f2f2]/70">
                                     {pageContent.team.subtitle}
                                 </p>
                             </div>
-                            <div className="grid gap-6 px-4 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3 sm:px-0">
+                            <div className="grid gap-6 px-4 sm:grid-cols-2 sm:gap-8 sm:px-0 lg:grid-cols-3">
                                 {pageContent.team.members.map((member, index) => (
-                                    <div key={index} className="text-center p-6 rounded-lg hover:bg-[#005a2d]/5 dark:hover:bg-[#23b14d]/5 transition-all">
-                                        <div className="mb-6 mx-auto w-24 h-24">
+                                    <div
+                                        key={index}
+                                        className="rounded-lg p-6 text-center transition-all hover:bg-[#005a2d]/5 dark:hover:bg-[#23b14d]/5"
+                                    >
+                                        <div className="mx-auto mb-6 h-24 w-24">
                                             <img
                                                 src={member.image}
                                                 alt={member.name}
-                                                className="w-full h-full rounded-full object-cover"
+                                                className="h-full w-full rounded-full object-cover"
                                                 onError={(e) => {
-                                                    e.currentTarget.src = `https://via.placeholder.com/96x96/005a2d/ffffff?text=${member.name.split(' ').map(n => n[0]).join('')}`;
+                                                    e.currentTarget.src = `https://via.placeholder.com/96x96/005a2d/ffffff?text=${member.name
+                                                        .split(' ')
+                                                        .map((n) => n[0])
+                                                        .join('')}`;
                                                 }}
                                             />
                                         </div>
-                                        <h3 className="text-lg font-semibold text-[#005a2d] mb-2">{member.name}</h3>
+                                        <h3 className="mb-2 text-lg font-semibold text-[#005a2d]">{member.name}</h3>
                                         <p className="text-sm text-[#010002]/70 dark:text-[#f3f2f2]/70">{member.position}</p>
                                     </div>
                                 ))}

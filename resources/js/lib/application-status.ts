@@ -1,9 +1,9 @@
-import { 
-    ApplicationStatus, 
-    DocumentVerificationStatus, 
-    StatusBadgeConfig, 
+import {
+    ApplicationStatus,
+    ApplicationStatusData,
+    DocumentVerificationStatus,
     STATUS_PROGRESS_MAP,
-    ApplicationStatusData
+    StatusBadgeConfig,
 } from '@/types/application-status';
 
 /**
@@ -41,17 +41,17 @@ export const getApplicationProgress = (status: ApplicationStatus): number => {
  */
 export const getStatusLabel = (status: ApplicationStatus): string => {
     const labels: { [key in ApplicationStatus]: string } = {
-        'draft': 'Draft',
-        'submitted': 'Submitted',
-        'under_verification': 'Under Verification',
-        'incomplete': 'Incomplete Documents',
-        'verified': 'Documents Verified',
-        'under_evaluation': 'Under Evaluation',
-        'approved': 'Approved',
-        'rejected': 'Not Approved',
-        'end': 'Completed'
+        draft: 'Draft',
+        submitted: 'Submitted',
+        under_verification: 'Under Verification',
+        incomplete: 'Incomplete Documents',
+        verified: 'Documents Verified',
+        under_evaluation: 'Under Evaluation',
+        approved: 'Approved',
+        rejected: 'Not Approved',
+        end: 'Completed',
     };
-    
+
     return labels[status] || status;
 };
 
@@ -62,7 +62,7 @@ export const getDocumentStatusConfig = (status: DocumentVerificationStatus, uplo
     if (!uploaded) {
         return { variant: 'outline', className: 'bg-gray-100 text-gray-600' };
     }
-    
+
     switch (status) {
         case 'verified':
             return { variant: 'default', className: 'bg-green-100 text-green-800' };
@@ -80,14 +80,14 @@ export const getDocumentStatusConfig = (status: DocumentVerificationStatus, uplo
  */
 export const getDocumentStatusLabel = (status: DocumentVerificationStatus, uploaded: boolean): string => {
     if (!uploaded) return 'Missing';
-    
+
     const labels: { [key in DocumentVerificationStatus]: string } = {
-        'verified': 'Verified',
-        'rejected': 'Rejected',
-        'pending': 'Pending Review',
-        'missing': 'Missing'
+        verified: 'Verified',
+        rejected: 'Rejected',
+        pending: 'Pending Review',
+        missing: 'Missing',
     };
-    
+
     return labels[status] || 'Unknown';
 };
 
@@ -125,51 +125,32 @@ export const canRecordStipend = (status: ApplicationStatus): boolean => {
 export const getNextSteps = (status: ApplicationStatus): string[] => {
     switch (status) {
         case 'draft':
-            return [
-                'Complete your application form',
-                'Upload all required documents',
-                'Submit your application for review'
-            ];
+            return ['Complete your application form', 'Upload all required documents', 'Submit your application for review'];
         case 'submitted':
-            return [
-                'Wait for initial review by OSAS staff',
-                'You will be notified of any required document updates'
-            ];
+            return ['Wait for initial review by OSAS staff', 'You will be notified of any required document updates'];
         case 'under_verification':
             return [
                 'OSAS staff is verifying your submitted documents',
                 'Upload any missing or rejected documents',
-                'Wait for verification completion'
+                'Wait for verification completion',
             ];
         case 'incomplete':
-            return [
-                'Upload missing documents as indicated',
-                'Replace any rejected documents',
-                'Resubmit for verification'
-            ];
+            return ['Upload missing documents as indicated', 'Replace any rejected documents', 'Resubmit for verification'];
         case 'verified':
-            return [
-                'All documents have been verified',
-                'Wait for interview scheduling',
-                'Prepare for your scholarship interview'
-            ];
+            return ['All documents have been verified', 'Wait for interview scheduling', 'Prepare for your scholarship interview'];
         case 'under_evaluation':
-            return [
-                'Attend your scheduled interview',
-                'Wait for committee evaluation',
-                'Final decision will be communicated soon'
-            ];
+            return ['Attend your scheduled interview', 'Wait for committee evaluation', 'Final decision will be communicated soon'];
         case 'approved':
             return [
                 'Congratulations! Your application has been approved',
                 'Wait for stipend disbursement instructions',
-                'Maintain scholarship requirements throughout the period'
+                'Maintain scholarship requirements throughout the period',
             ];
         case 'rejected':
             return [
                 'Your application was not approved at this time',
                 'Review feedback provided by the committee',
-                'Consider applying for other available scholarships'
+                'Consider applying for other available scholarships',
             ];
         default:
             return ['Contact OSAS office for more information'];
@@ -184,7 +165,7 @@ export const formatCurrency = (amount: number): string => {
         style: 'currency',
         currency: 'PHP',
         minimumFractionDigits: 0,
-        maximumFractionDigits: 2
+        maximumFractionDigits: 2,
     }).format(amount);
 };
 
@@ -196,7 +177,7 @@ export const formatDate = (date: string | Date): string => {
     return dateObj.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
     });
 };
 
@@ -211,7 +192,7 @@ export const formatDateTime = (date: string | Date): string => {
         day: 'numeric',
         hour: 'numeric',
         minute: '2-digit',
-        hour12: true
+        hour12: true,
     });
 };
 
@@ -220,15 +201,15 @@ export const formatDateTime = (date: string | Date): string => {
  */
 export const getScholarshipTypeLabel = (type: string): string => {
     const typeLabels: { [key: string]: string } = {
-        'academic_full': 'Academic Full Scholarship',
-        'academic_partial': 'Academic Partial Scholarship',
-        'student_assistantship': 'Student Assistantship',
-        'performing_arts_full': 'Performing Arts Full Scholarship',
-        'performing_arts_partial': 'Performing Arts Partial Scholarship',
-        'economic_assistance': 'Economic Assistance Program'
+        academic_full: 'Academic Full Scholarship',
+        academic_partial: 'Academic Partial Scholarship',
+        student_assistantship: 'Student Assistantship',
+        performing_arts_full: 'Performing Arts Full Scholarship',
+        performing_arts_partial: 'Performing Arts Partial Scholarship',
+        economic_assistance: 'Economic Assistance Program',
     };
-    
-    return typeLabels[type] || type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+    return typeLabels[type] || type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 };
 
 /**
@@ -239,13 +220,13 @@ export const validateFileUpload = (file: File, maxSizeMB: number = 5): { valid: 
     if (!file.type.includes('pdf')) {
         return { valid: false, error: 'Only PDF files are allowed' };
     }
-    
+
     // Check file size
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
     if (file.size > maxSizeBytes) {
         return { valid: false, error: `File size must be less than ${maxSizeMB}MB` };
     }
-    
+
     return { valid: true };
 };
 
@@ -253,32 +234,32 @@ export const validateFileUpload = (file: File, maxSizeMB: number = 5): { valid: 
  * Calculate application completeness percentage
  */
 export const calculateCompleteness = (application: ApplicationStatusData): number => {
-    const requiredDocs = application.documents.filter(doc => doc.required);
-    const uploadedDocs = requiredDocs.filter(doc => doc.uploaded);
-    const verifiedDocs = requiredDocs.filter(doc => doc.status === 'verified');
-    
+    const requiredDocs = application.documents.filter((doc) => doc.required);
+    const uploadedDocs = requiredDocs.filter((doc) => doc.uploaded);
+    const verifiedDocs = requiredDocs.filter((doc) => doc.status === 'verified');
+
     let completeness = 0;
-    
+
     // Basic application submission (20%)
     if (application.status !== 'draft') {
         completeness += 20;
     }
-    
+
     // Document upload (40%)
     if (requiredDocs.length > 0) {
         completeness += (uploadedDocs.length / requiredDocs.length) * 40;
     }
-    
+
     // Document verification (30%)
     if (requiredDocs.length > 0) {
         completeness += (verifiedDocs.length / requiredDocs.length) * 30;
     }
-    
+
     // Final status (10%)
     if (['approved', 'rejected'].includes(application.status)) {
         completeness += 10;
     }
-    
+
     return Math.round(completeness);
 };
 
@@ -287,10 +268,15 @@ export const calculateCompleteness = (application: ApplicationStatusData): numbe
  */
 export const getPriorityColor = (priority: string): string => {
     switch (priority) {
-        case 'urgent': return 'text-red-600';
-        case 'high': return 'text-orange-600';
-        case 'medium': return 'text-yellow-600';
-        case 'low': return 'text-green-600';
-        default: return 'text-gray-600';
+        case 'urgent':
+            return 'text-red-600';
+        case 'high':
+            return 'text-orange-600';
+        case 'medium':
+            return 'text-yellow-600';
+        case 'low':
+            return 'text-green-600';
+        default:
+            return 'text-gray-600';
     }
 };

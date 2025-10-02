@@ -4,7 +4,7 @@ import { type User } from '@/types';
 
 export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: boolean }) {
     const getInitials = useInitials();
-    
+
     // Format full name from first, middle (if available), and last name
     const fullName = `${user.first_name}${user.middle_name ? ` ${user.middle_name} ` : ' '}${user.last_name}`;
 

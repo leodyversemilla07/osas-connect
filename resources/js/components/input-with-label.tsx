@@ -1,11 +1,11 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import InputError from "@/components/input-error";
+import InputError from '@/components/input-error';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface InputWithLabelProps {
     id: string;
     label: string;
-    type?: "text" | "email" | "tel" | "password" | "number" | "date";
+    type?: 'text' | 'email' | 'tel' | 'password' | 'number' | 'date';
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
@@ -20,7 +20,7 @@ interface InputWithLabelProps {
 export function InputWithLabel({
     id,
     label,
-    type = "text",
+    type = 'text',
     value,
     onChange,
     placeholder,
@@ -28,7 +28,7 @@ export function InputWithLabel({
     required = false,
     disabled = false,
     prefix,
-    className = "",
+    className = '',
     pattern,
 }: InputWithLabelProps) {
     const errorId = error ? `${id}-error` : undefined;
@@ -36,21 +36,22 @@ export function InputWithLabel({
     return (
         <div className={`grid gap-2 ${className}`}>
             <Label htmlFor={id}>
-                {label}{required && <span className="text-red-500">*</span>}
+                {label}
+                {required && <span className="text-red-500">*</span>}
             </Label>
-            <div className={prefix ? "flex" : undefined}>
+            <div className={prefix ? 'flex' : undefined}>
                 {prefix}
                 <Input
                     id={id}
                     type={type}
                     value={value}
-                    onChange={e => onChange(e.target.value)}
+                    onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
                     disabled={disabled}
                     aria-describedby={errorId}
                     aria-invalid={!!error}
                     required={required}
-                    className={prefix ? "rounded-l-none" : undefined}
+                    className={prefix ? 'rounded-l-none' : undefined}
                     pattern={pattern}
                 />
             </div>

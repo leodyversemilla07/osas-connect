@@ -1,31 +1,10 @@
-import * as React from "react"
-import { Head } from '@inertiajs/react';
-import { type BreadcrumbItem } from '@/types';
-import AppLayout from '@/layouts/app-layout';
+import CreateScholarshipDialog from '@/components/osas-scholarship-management/create-scholarship-dialog';
+import DeleteScholarshipDialog from '@/components/osas-scholarship-management/delete-scholarship-dialog';
+import EditScholarshipDialog from '@/components/osas-scholarship-management/edit-scholarship-dialog';
+import ViewScholarshipDialog from '@/components/osas-scholarship-management/view-scholarship-dialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Badge } from "@/components/ui/badge";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import {
     Pagination,
     PaginationContent,
@@ -34,21 +13,12 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-} from "@/components/ui/pagination";
-import CreateScholarshipDialog from '@/components/osas-scholarship-management/create-scholarship-dialog';
-import EditScholarshipDialog from '@/components/osas-scholarship-management/edit-scholarship-dialog';
-import ViewScholarshipDialog from '@/components/osas-scholarship-management/view-scholarship-dialog';
-import DeleteScholarshipDialog from '@/components/osas-scholarship-management/delete-scholarship-dialog';
-import {
-    Plus,
-    MoreHorizontal,
-    Eye,
-    Edit,
-    Trash2,
-    Users,
-    Clock
-} from 'lucide-react';
-import { useState } from 'react';
+} from '@/components/ui/pagination';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
 import {
     type ColumnDef,
     ColumnFiltersState,
@@ -60,7 +30,10 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
+import { Clock, Edit, Eye, MoreHorizontal, Plus, Trash2, Users } from 'lucide-react';
+import * as React from 'react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -123,8 +96,8 @@ interface ManageScholarshipsProps {
 }
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+    columns: ColumnDef<TData, TValue>[];
+    data: TData[];
 }
 
 interface ColumnActions {
@@ -145,13 +118,13 @@ const getStatusColor = (status: 'active' | 'inactive' | 'upcoming' | 'draft'): s
 
 // Shorter mappings for badges and table display
 const SCHOLARSHIP_TYPES = {
-    'academic_full': 'Academic (Full)',
-    'academic_partial': 'Academic (Partial)',
-    'student_assistantship': 'Student Assistantship',
-    'performing_arts_full': 'Performing Arts (Full)',
-    'performing_arts_partial': 'Performing Arts (Partial)',
-    'economic_assistance': 'Economic Assistance',
-    'others': 'Custom Type',
+    academic_full: 'Academic (Full)',
+    academic_partial: 'Academic (Partial)',
+    student_assistantship: 'Student Assistantship',
+    performing_arts_full: 'Performing Arts (Full)',
+    performing_arts_partial: 'Performing Arts (Partial)',
+    economic_assistance: 'Economic Assistance',
+    others: 'Custom Type',
 } as const;
 
 const getScholarshipTypeDisplay = (type: string): string => {
@@ -159,17 +132,22 @@ const getScholarshipTypeDisplay = (type: string): string => {
 };
 
 const getTypeColor = (type: string): string => {
-    const typeCategory = type.includes('academic') ? 'academic' :
-        type.includes('student_assistantship') ? 'assistantship' :
-            type.includes('performing_arts') ? 'arts' :
-                type.includes('economic') ? 'economic' : 'other';
+    const typeCategory = type.includes('academic')
+        ? 'academic'
+        : type.includes('student_assistantship')
+          ? 'assistantship'
+          : type.includes('performing_arts')
+            ? 'arts'
+            : type.includes('economic')
+              ? 'economic'
+              : 'other';
 
     const colors: Record<string, string> = {
-        'academic': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-        'assistantship': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-        'arts': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
-        'economic': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300',
-        'other': 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300'
+        academic: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        assistantship: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+        arts: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+        economic: 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300',
+        other: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
     };
     return colors[typeCategory];
 };
@@ -184,64 +162,51 @@ const formatCurrency = (amount: number): string => {
 
 const createColumns = (actions: ColumnActions): ColumnDef<Scholarship>[] => [
     {
-        accessorKey: "name",
-        header: "NAME",
+        accessorKey: 'name',
+        header: 'NAME',
         cell: ({ row }) => (
             <div className="max-w-[200px]">
-                <div className="font-medium text-gray-900 dark:text-gray-100">
-                    {row.getValue("name")}
-                </div>
+                <div className="font-medium text-gray-900 dark:text-gray-100">{row.getValue('name')}</div>
             </div>
         ),
     },
     {
-        accessorKey: "description",
-        header: "DESCRIPTION",
+        accessorKey: 'description',
+        header: 'DESCRIPTION',
         cell: ({ row }) => (
             <div className="max-w-[300px]">
-                <div className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3">
-                    {row.getValue("description")}
-                </div>
+                <div className="line-clamp-3 text-sm text-gray-700 dark:text-gray-300">{row.getValue('description')}</div>
             </div>
         ),
     },
     {
-        accessorKey: "type",
-        header: "TYPE",
+        accessorKey: 'type',
+        header: 'TYPE',
         cell: ({ row }) => {
-            const type = row.getValue("type") as string;
+            const type = row.getValue('type') as string;
             const displayType = getScholarshipTypeDisplay(type);
-            return (
-                <Badge className={getTypeColor(type)}>
-                    {displayType}
-                </Badge>
-            );
+            return <Badge className={getTypeColor(type)}>{displayType}</Badge>;
         },
     },
     {
-        accessorKey: "amount",
-        header: "AMOUNT",
-        cell: ({ row }) => (
-            <div className="font-medium">
-                {formatCurrency(row.getValue("amount"))}
-            </div>
-        ),
+        accessorKey: 'amount',
+        header: 'AMOUNT',
+        cell: ({ row }) => <div className="font-medium">{formatCurrency(row.getValue('amount'))}</div>,
     },
     {
-        accessorKey: "status",
-        header: "STATUS",
+        accessorKey: 'status',
+        header: 'STATUS',
         cell: ({ row }) => (
-            <Badge className={getStatusColor(row.getValue("status"))}>
-                {(row.getValue("status") as string).charAt(0).toUpperCase() +
-                    (row.getValue("status") as string).slice(1)}
+            <Badge className={getStatusColor(row.getValue('status'))}>
+                {(row.getValue('status') as string).charAt(0).toUpperCase() + (row.getValue('status') as string).slice(1)}
             </Badge>
         ),
     },
     {
-        accessorKey: "deadline",
-        header: "DEADLINE",
+        accessorKey: 'deadline',
+        header: 'DEADLINE',
         cell: ({ row }) => {
-            const deadline = row.getValue("deadline") as string | null;
+            const deadline = row.getValue('deadline') as string | null;
             if (!deadline) return <span className="text-gray-400">No deadline</span>;
 
             const deadlineDate = new Date(deadline);
@@ -252,10 +217,10 @@ const createColumns = (actions: ColumnActions): ColumnDef<Scholarship>[] => [
                 <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4 text-gray-400" />
                     <div>
-                        <div className="text-sm font-medium">
-                            {deadlineDate.toLocaleDateString()}
-                        </div>
-                        <div className={`text-xs ${daysLeft <= 7 && daysLeft > 0 ? 'text-red-500' : daysLeft <= 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                        <div className="text-sm font-medium">{deadlineDate.toLocaleDateString()}</div>
+                        <div
+                            className={`text-xs ${daysLeft <= 7 && daysLeft > 0 ? 'text-red-500' : daysLeft <= 0 ? 'text-red-600' : 'text-gray-500'}`}
+                        >
                             {daysLeft > 0 ? `${daysLeft} days left` : daysLeft === 0 ? 'Due today' : 'Expired'}
                         </div>
                     </div>
@@ -264,39 +229,32 @@ const createColumns = (actions: ColumnActions): ColumnDef<Scholarship>[] => [
         },
     },
     {
-        accessorKey: "applications",
-        header: "APPLICATIONS",
+        accessorKey: 'applications',
+        header: 'APPLICATIONS',
         cell: ({ row }) => (
             <div className="flex items-center gap-1">
                 <Users className="h-4 w-4 text-gray-400" />
                 <div className="text-sm">
-                    <div className="font-medium">
-                        {row.original.total_applications} total
-                    </div>
-                    <div className="text-gray-500">
-                        {row.original.approved_applications} approved
-                    </div>
+                    <div className="font-medium">{row.original.total_applications} total</div>
+                    <div className="text-gray-500">{row.original.approved_applications} approved</div>
                 </div>
             </div>
         ),
     },
     {
-        accessorKey: "remaining_slots",
-        header: "SLOTS",
+        accessorKey: 'remaining_slots',
+        header: 'SLOTS',
         cell: ({ row }) => (
             <div className="text-sm">
-                <div className="font-medium">
-                    {row.original.remaining_slots} remaining
-                </div>
-                <div className="text-gray-500">
-                    of {row.original.slots_available} total
-                </div>
+                <div className="font-medium">{row.original.remaining_slots} remaining</div>
+                <div className="text-gray-500">of {row.original.slots_available} total</div>
             </div>
         ),
-    }, {
-        id: "actions",
+    },
+    {
+        id: 'actions',
         enableHiding: false,
-        header: "ACTIONS",
+        header: 'ACTIONS',
         cell: ({ row }) => {
             const scholarship = row.original;
 
@@ -309,25 +267,16 @@ const createColumns = (actions: ColumnActions): ColumnDef<Scholarship>[] => [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={() => actions.onView(scholarship)}
-                        >
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => actions.onView(scholarship)}>
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={() => actions.onEdit(scholarship)}
-                        >
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => actions.onEdit(scholarship)}>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Scholarship
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            className="cursor-pointer text-red-600"
-                            onClick={() => actions.onDelete(scholarship)}
-                        >
+                        <DropdownMenuItem className="cursor-pointer text-red-600" onClick={() => actions.onDelete(scholarship)}>
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
                         </DropdownMenuItem>
@@ -338,14 +287,11 @@ const createColumns = (actions: ColumnActions): ColumnDef<Scholarship>[] => [
     },
 ];
 
-function DataTable<TData, TValue>({
-    columns,
-    data,
-}: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
+function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [rowSelection, setRowSelection] = React.useState({});
 
     const table = useReactTable({
         data,
@@ -364,7 +310,7 @@ function DataTable<TData, TValue>({
             columnVisibility,
             rowSelection,
         },
-    })
+    });
 
     return (
         <div className="w-full">
@@ -376,14 +322,9 @@ function DataTable<TData, TValue>({
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
+                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                         </TableHead>
-                                    )
+                                    );
                                 })}
                             </TableRow>
                         ))}
@@ -391,26 +332,15 @@ function DataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                >
+                                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </TableCell>
+                                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                                     ))}
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
                                     No results.
                                 </TableCell>
                             </TableRow>
@@ -419,9 +349,8 @@ function DataTable<TData, TValue>({
                 </Table>
             </div>
             <div className="flex items-center justify-between space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                    {table.getFilteredRowModel().rows.length} row(s) selected.
+                <div className="text-muted-foreground flex-1 text-sm">
+                    {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
                 </div>
                 <div className="flex items-center space-x-6 lg:space-x-8">
                     <div className="flex items-center space-x-2">
@@ -429,7 +358,7 @@ function DataTable<TData, TValue>({
                         <Select
                             value={`${table.getState().pagination.pageSize}`}
                             onValueChange={(value) => {
-                                table.setPageSize(Number(value))
+                                table.setPageSize(Number(value));
                             }}
                         >
                             <SelectTrigger className="h-8 w-[70px]">
@@ -513,7 +442,7 @@ function DataTable<TData, TValue>({
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default function ManageScholarships({ scholarships }: ManageScholarshipsProps) {
@@ -544,52 +473,43 @@ export default function ManageScholarships({ scholarships }: ManageScholarshipsP
 
             <div className="flex h-full flex-1 flex-col space-y-6 p-6">
                 {/* Header Section */}
-                <div className="border-b border-border pb-4">
+                <div className="border-border border-b pb-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-semibold text-foreground">Scholarship Management</h1>
-                            <p className="text-base text-muted-foreground">Manage scholarship programs and applications</p>
+                            <h1 className="text-foreground text-3xl font-semibold">Scholarship Management</h1>
+                            <p className="text-muted-foreground text-base">Manage scholarship programs and applications</p>
                         </div>
                         <Button
                             onClick={() => setIsCreateDialogOpen(true)}
                             variant="default"
                             className="bg-primary text-primary-foreground hover:bg-primary/90"
                         >
-                            <Plus className="h-4 w-4 mr-2" />
+                            <Plus className="mr-2 h-4 w-4" />
                             Add Scholarship
                         </Button>
                     </div>
                 </div>
 
                 <DataTable
-                    columns={createColumns({
-                        onEdit: openEditDialog,
-                        onView: openViewDialog,
-                        onDelete: openDeleteDialog
-                    }) as ColumnDef<Scholarship, unknown>[]}
+                    columns={
+                        createColumns({
+                            onEdit: openEditDialog,
+                            onView: openViewDialog,
+                            onDelete: openDeleteDialog,
+                        }) as ColumnDef<Scholarship, unknown>[]
+                    }
                     data={scholarships.data}
                 />
             </div>
 
             {/* Dialog Components */}
-            <CreateScholarshipDialog
-                isOpen={isCreateDialogOpen}
-                onClose={() => setIsCreateDialogOpen(false)}
-            />
+            <CreateScholarshipDialog isOpen={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} />
 
             {selectedScholarship && (
                 <>
-                    <EditScholarshipDialog
-                        isOpen={isEditDialogOpen}
-                        onClose={() => setIsEditDialogOpen(false)}
-                        scholarship={selectedScholarship}
-                    />
+                    <EditScholarshipDialog isOpen={isEditDialogOpen} onClose={() => setIsEditDialogOpen(false)} scholarship={selectedScholarship} />
 
-                    <ViewScholarshipDialog
-                        isOpen={isViewDialogOpen}
-                        onClose={() => setIsViewDialogOpen(false)}
-                        scholarship={selectedScholarship}
-                    />
+                    <ViewScholarshipDialog isOpen={isViewDialogOpen} onClose={() => setIsViewDialogOpen(false)} scholarship={selectedScholarship} />
 
                     <DeleteScholarshipDialog
                         isOpen={isDeleteDialogOpen}

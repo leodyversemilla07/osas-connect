@@ -1,13 +1,6 @@
-import { useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -63,9 +56,7 @@ export default function DeleteScholarshipDialog({ isOpen, onClose, scholarship }
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Delete Scholarship</DialogTitle>
-                    <DialogDescription>
-                        This action cannot be undone.
-                    </DialogDescription>
+                    <DialogDescription>This action cannot be undone.</DialogDescription>
                 </DialogHeader>
 
                 <div className="mt-4">
@@ -75,19 +66,10 @@ export default function DeleteScholarshipDialog({ isOpen, onClose, scholarship }
                 </div>
 
                 <DialogFooter className="gap-2">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={onClose}
-                    >
+                    <Button type="button" variant="ghost" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button
-                        type="button"
-                        variant="destructive"
-                        onClick={handleDelete}
-                        disabled={processing}
-                    >
+                    <Button type="button" variant="destructive" onClick={handleDelete} disabled={processing}>
                         {processing ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -1,7 +1,7 @@
-import { useForm } from "@inertiajs/react";
-import { useCallback } from "react";
-import { VALIDATION } from "@/lib/validation";
-import { route } from "ziggy-js";
+import { VALIDATION } from '@/lib/validation';
+import { useForm } from '@inertiajs/react';
+import { useCallback } from 'react';
+import { route } from 'ziggy-js';
 
 export type RegisterForm = {
     last_name: string;
@@ -66,72 +66,96 @@ const INITIAL_DATA: Required<RegisterForm> = {
 };
 
 export function useRegistrationForm() {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>(INITIAL_DATA);    // Optimized handlers that don't need useCallback since setData is stable
-    const updateField = useCallback((field: keyof RegisterForm, value: string | boolean) => {
-        setData(field, value);
-    }, [setData]);
+    const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>(INITIAL_DATA); // Optimized handlers that don't need useCallback since setData is stable
+    const updateField = useCallback(
+        (field: keyof RegisterForm, value: string | boolean) => {
+            setData(field, value);
+        },
+        [setData],
+    );
 
-    const updateMultipleFields = useCallback((updates: Partial<RegisterForm>) => {
-        setData(prevData => ({ ...prevData, ...updates }));
-    }, [setData]);
+    const updateMultipleFields = useCallback(
+        (updates: Partial<RegisterForm>) => {
+            setData((prevData) => ({ ...prevData, ...updates }));
+        },
+        [setData],
+    );
 
     // Specialized handlers for complex field interactions
-    const handleMobileNumberChange = useCallback((value: string) => {
-        // Remove any non-digit characters and ensure it doesn't start with 0
-        let cleanValue = value.replace(/\D/g, '');
-        if (cleanValue.startsWith('0')) cleanValue = cleanValue.substring(1);
-        // Limit to VALIDATION.MOBILE_NUMBER.LENGTH digits
-        if (cleanValue.length > VALIDATION.MOBILE_NUMBER.LENGTH) {
-            cleanValue = cleanValue.substring(0, VALIDATION.MOBILE_NUMBER.LENGTH);
-        }
-        setData('mobile_number', cleanValue);
-    }, [setData]);
+    const handleMobileNumberChange = useCallback(
+        (value: string) => {
+            // Remove any non-digit characters and ensure it doesn't start with 0
+            let cleanValue = value.replace(/\D/g, '');
+            if (cleanValue.startsWith('0')) cleanValue = cleanValue.substring(1);
+            // Limit to VALIDATION.MOBILE_NUMBER.LENGTH digits
+            if (cleanValue.length > VALIDATION.MOBILE_NUMBER.LENGTH) {
+                cleanValue = cleanValue.substring(0, VALIDATION.MOBILE_NUMBER.LENGTH);
+            }
+            setData('mobile_number', cleanValue);
+        },
+        [setData],
+    );
 
-    const handleCourseChange = useCallback((courseValue: string) => {
-        const newMajor = (courseValue !== "Bachelor of Secondary Education" &&
-            courseValue !== "Bachelor of Elementary Education") ? 'None' : data.major;
-        updateMultipleFields({ course: courseValue, major: newMajor });
-    }, [data.major, updateMultipleFields]);
+    const handleCourseChange = useCallback(
+        (courseValue: string) => {
+            const newMajor =
+                courseValue !== 'Bachelor of Secondary Education' && courseValue !== 'Bachelor of Elementary Education' ? 'None' : data.major;
+            updateMultipleFields({ course: courseValue, major: newMajor });
+        },
+        [data.major, updateMultipleFields],
+    );
 
-    const handleResidenceTypeChange = useCallback((residenceType: string) => {
-        const guardianName = residenceType === 'With Guardian' ? '' : 'Not Applicable';
-        updateMultipleFields({ residence_type: residenceType, guardian_name: guardianName });
-    }, [updateMultipleFields]);
+    const handleResidenceTypeChange = useCallback(
+        (residenceType: string) => {
+            const guardianName = residenceType === 'With Guardian' ? '' : 'Not Applicable';
+            updateMultipleFields({ residence_type: residenceType, guardian_name: guardianName });
+        },
+        [updateMultipleFields],
+    );
 
-    const handlePwdChange = useCallback((isPwd: string) => {
-        const disabilityType = isPwd === 'No' ? '' : data.disability_type;
-        updateMultipleFields({ is_pwd: isPwd, disability_type: disabilityType });
-    }, [data.disability_type, updateMultipleFields]);
+    const handlePwdChange = useCallback(
+        (isPwd: string) => {
+            const disabilityType = isPwd === 'No' ? '' : data.disability_type;
+            updateMultipleFields({ is_pwd: isPwd, disability_type: disabilityType });
+        },
+        [data.disability_type, updateMultipleFields],
+    );
 
-    const handleDateOfBirthSelect = useCallback((date: Date | undefined) => {
-        const dateString = date ? date.toISOString().split('T')[0] : '';
-        setData('date_of_birth', dateString);
-    }, [setData]);
+    const handleDateOfBirthSelect = useCallback(
+        (date: Date | undefined) => {
+            const dateString = date ? date.toISOString().split('T')[0] : '';
+            setData('date_of_birth', dateString);
+        },
+        [setData],
+    );
 
     interface ValidationErrors {
         [key: string]: string;
     }
 
-    const submitForm = useCallback((onStepError: (step: number) => void) => {
-        return post(route('register'), {
-            preserveScroll: true,
-            onSuccess: () => {
-                reset('password', 'password_confirmation');
-            },
-            onError: (errors: ValidationErrors) => {
-                console.error('Registration errors:', errors);
+    const submitForm = useCallback(
+        (onStepError: (step: number) => void) => {
+            return post(route('register'), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    reset('password', 'password_confirmation');
+                },
+                onError: (errors: ValidationErrors) => {
+                    console.error('Registration errors:', errors);
 
-                // Navigate to the step with errors
-                if (errors.email || errors.password || errors.password_confirmation) {
-                    onStepError(3);
-                } else if (errors.student_id || errors.course || errors.year_level) {
-                    onStepError(2);
-                } else {
-                    onStepError(1);
-                }
-            }
-        });
-    }, [post, reset]);
+                    // Navigate to the step with errors
+                    if (errors.email || errors.password || errors.password_confirmation) {
+                        onStepError(3);
+                    } else if (errors.student_id || errors.course || errors.year_level) {
+                        onStepError(2);
+                    } else {
+                        onStepError(1);
+                    }
+                },
+            });
+        },
+        [post, reset],
+    );
 
     return {
         data,

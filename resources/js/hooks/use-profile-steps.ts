@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState } from 'react';
 
 export const PROFILE_STEP_TITLES = [
-    "Basic Information",
-    "Academic Information", 
-    "Personal Details",
-    "Family Background",
-    "Financial Information"
+    'Basic Information',
+    'Academic Information',
+    'Personal Details',
+    'Family Background',
+    'Financial Information',
 ] as const;
 
 export function useProfileSteps(isStudent: boolean = true) {
@@ -27,11 +27,14 @@ export function useProfileSteps(isStudent: boolean = true) {
         }
     }, [currentStep]);
 
-    const goToStep = useCallback((step: number) => {
-        if (step >= 1 && step <= totalSteps) {
-            setCurrentStep(step);
-        }
-    }, [totalSteps]);
+    const goToStep = useCallback(
+        (step: number) => {
+            if (step >= 1 && step <= totalSteps) {
+                setCurrentStep(step);
+            }
+        },
+        [totalSteps],
+    );
 
     return {
         currentStep,

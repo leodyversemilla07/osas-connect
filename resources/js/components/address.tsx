@@ -1,10 +1,10 @@
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import InputError from "@/components/input-error";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import useLocationData from "@/hooks/use-location-data";
-import { useCallback } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import InputError from '@/components/input-error';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import useLocationData from '@/hooks/use-location-data';
+import { useCallback } from 'react';
 
 interface AddressProps {
     data: {
@@ -20,23 +20,16 @@ interface AddressProps {
 }
 
 export default function Address({ data, setData, errors, processing }: AddressProps) {
-    const {
-        provinces,
-        cities,
-        barangays,
-        handleProvinceChange,
-        handleCityChange,
-        handleBarangayChange
-    } = useLocationData(data, setData);
+    const { provinces, cities, barangays, handleProvinceChange, handleCityChange, handleBarangayChange } = useLocationData(data, setData);
 
     // Memoized handlers to prevent unnecessary re-renders
     const handleStreetChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setData("street", e.target.value);
+        setData('street', e.target.value);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleZipCodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setData("zip_code", e.target.value);
+        setData('zip_code', e.target.value);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -49,13 +42,13 @@ export default function Address({ data, setData, errors, processing }: AddressPr
                 <CardContent>
                     <div className="space-y-4">
                         {/* Row 1: Province | City/Municipality */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="province">
                                     Province<span className="text-red-500">*</span>
                                 </Label>
                                 <Select
-                                    value={provinces.find(p => p.name === data.province)?.code || ""}
+                                    value={provinces.find((p) => p.name === data.province)?.code || ''}
                                     onValueChange={handleProvinceChange}
                                     disabled={processing}
                                 >
@@ -77,7 +70,7 @@ export default function Address({ data, setData, errors, processing }: AddressPr
                                     City/Municipality<span className="text-red-500">*</span>
                                 </Label>
                                 <Select
-                                    value={cities.find(c => c.name === data.city)?.code || ""}
+                                    value={cities.find((c) => c.name === data.city)?.code || ''}
                                     onValueChange={handleCityChange}
                                     disabled={processing || cities.length === 0}
                                 >
@@ -97,13 +90,13 @@ export default function Address({ data, setData, errors, processing }: AddressPr
                         </div>
 
                         {/* Row 2: Barangay | Street/Sitio */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="barangay">
                                     Barangay<span className="text-red-500">*</span>
                                 </Label>
                                 <Select
-                                    value={barangays.find(b => b.name === data.barangay)?.code || ""}
+                                    value={barangays.find((b) => b.name === data.barangay)?.code || ''}
                                     onValueChange={handleBarangayChange}
                                     disabled={processing || barangays.length === 0}
                                 >
@@ -138,7 +131,7 @@ export default function Address({ data, setData, errors, processing }: AddressPr
                         </div>
 
                         {/* Row 3: Zip Code (single field, but keep grid for alignment) */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="zip_code">
                                     Zip Code<span className="text-red-500">*</span>

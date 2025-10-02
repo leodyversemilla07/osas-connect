@@ -1,4 +1,4 @@
-import { SelectorWithLabel } from "@/components/selector-with-label";
+import { SelectorWithLabel } from '@/components/selector-with-label';
 
 interface ReligionSelectorProps {
     id?: string;
@@ -19,7 +19,7 @@ const RELIGION_OPTIONS = [
     { value: 'Assemblies of God', label: 'Assemblies of God' },
     { value: 'Atheism', label: 'Atheism' },
     { value: 'Babaylan traditions', label: 'Babaylan traditions' },
-    { value: 'Bahá\'í Faith', label: 'Bahá\'í Faith' },
+    { value: "Bahá'í Faith", label: "Bahá'í Faith" },
     { value: 'Baptist', label: 'Baptist' },
     { value: 'Bathala belief system', label: 'Bathala belief system' },
     { value: 'Bible Baptist Church', label: 'Bible Baptist Church' },
@@ -39,7 +39,7 @@ const RELIGION_OPTIONS = [
     { value: 'Humanism', label: 'Humanism' },
     { value: 'Iglesia ni Cristo', label: 'Iglesia ni Cristo' },
     { value: 'Ifugao traditional religion', label: 'Ifugao traditional religion' },
-    { value: 'Jehovah\'s Witnesses', label: 'Jehovah\'s Witnesses' },
+    { value: "Jehovah's Witnesses", label: "Jehovah's Witnesses" },
     { value: 'Jesus Is Lord Church', label: 'Jesus Is Lord Church' },
     { value: 'Jainism', label: 'Jainism' },
     { value: 'Judaism', label: 'Judaism' },
@@ -92,7 +92,7 @@ export default function ReligionSelector({
     onChange,
     error,
     required = false,
-    className
+    className,
 }: ReligionSelectorProps) {
     return (
         <SelectorWithLabel

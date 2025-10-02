@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { SelectorWithLabel } from "@/components/selector-with-label";
+import { SelectorWithLabel } from '@/components/selector-with-label';
+import { useMemo } from 'react';
 
 export interface SexSelectorProps {
     value: string;
@@ -10,17 +10,11 @@ export interface SexSelectorProps {
 }
 
 const SEX_OPTIONS = [
-    { value: "Male", label: "Male" },
-    { value: "Female", label: "Female" },
+    { value: 'Male', label: 'Male' },
+    { value: 'Female', label: 'Female' },
 ];
 
-export default function SexSelector({
-    value,
-    onChange,
-    error,
-    required = false,
-    className = "",
-}: SexSelectorProps) {
+export default function SexSelector({ value, onChange, error, required = false, className = '' }: SexSelectorProps) {
     const options = useMemo(() => SEX_OPTIONS, []);
     return (
         <SelectorWithLabel

@@ -9,7 +9,7 @@ export default function SiteFooter() {
     ];
 
     return (
-        <footer className="w-full border-t border-[#005a2d]/10 dark:border-[#f3f2f2]/10 bg-white/30 dark:bg-[#121212]/30">
+        <footer className="w-full border-t border-[#005a2d]/10 bg-white/30 dark:border-[#f3f2f2]/10 dark:bg-[#121212]/30">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="py-8">
                     <div className="flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
@@ -26,7 +26,7 @@ export default function SiteFooter() {
                                 <Link
                                     key={index}
                                     href={link.url}
-                                    className="text-sm font-medium text-[#010002] dark:text-[#f3f2f2] transition-colors duration-200 hover:text-[#008040] dark:hover:text-[#23b14d]"
+                                    className="text-sm font-medium text-[#010002] transition-colors duration-200 hover:text-[#008040] dark:text-[#f3f2f2] dark:hover:text-[#23b14d]"
                                 >
                                     {link.label}
                                 </Link>
@@ -34,9 +34,7 @@ export default function SiteFooter() {
                         </nav>
 
                         {/* Copyright */}
-                        <div className="text-sm text-[#010002]/70 dark:text-[#f3f2f2]/70">
-                            © {new Date().getFullYear()} OSAS Connect
-                        </div>
+                        <div className="text-sm text-[#010002]/70 dark:text-[#f3f2f2]/70">© {new Date().getFullYear()} OSAS Connect</div>
                     </div>
                 </div>
             </div>

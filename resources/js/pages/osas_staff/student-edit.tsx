@@ -1,29 +1,24 @@
+import Address from '@/components/address';
+import CivilStatusSelector from '@/components/civil-status-selector';
+import CourseSelector from '@/components/course-selector';
+import { DatePicker } from '@/components/date-picker';
+import ErrorBoundary from '@/components/error-boundary';
+import { InputWithLabel } from '@/components/input-with-label';
+import PlaceOfBirth from '@/components/place-of-birth';
+import PwdRadio from '@/components/pwd-radio';
+import ReligionSelector from '@/components/religion-selector';
+import ResidenceTypeSelector from '@/components/residence-type-selector';
+import SexSelector from '@/components/sex-selector';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import YearLevelSelector from '@/components/year-level-selector';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, type User as UserType } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Save } from 'lucide-react';
-import { useMemo, useCallback } from 'react';
-import { type User as UserType, type BreadcrumbItem } from '@/types';
-import AppLayout from '@/layouts/app-layout';
+import { useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import ErrorBoundary from '@/components/error-boundary';
-import PlaceOfBirth from '@/components/place-of-birth';
-import { InputWithLabel } from '@/components/input-with-label';
-import CourseSelector from '@/components/course-selector';
-import Address from '@/components/address';
-import ReligionSelector from '@/components/religion-selector';
-import { DatePicker } from '@/components/date-picker';
-import ResidenceTypeSelector from "@/components/residence-type-selector";
-import SexSelector from "@/components/sex-selector";
-import CivilStatusSelector from "@/components/civil-status-selector";
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-} from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator';
-import YearLevelSelector from "@/components/year-level-selector";
-import PwdRadio from '@/components/pwd-radio';
 
 interface StudentWithProfile extends UserType {
     studentProfile: {
@@ -92,11 +87,11 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
         existing_scholarships: user.studentProfile.existing_scholarships || '',
         civil_status: user.studentProfile.civil_status || '',
         sex: user.studentProfile.sex || '',
-        date_of_birth: user.studentProfile.date_of_birth ?
-            (typeof user.studentProfile.date_of_birth === 'string'
+        date_of_birth: user.studentProfile.date_of_birth
+            ? typeof user.studentProfile.date_of_birth === 'string'
                 ? user.studentProfile.date_of_birth.split('T')[0]
                 : new Date(user.studentProfile.date_of_birth).toISOString().split('T')[0]
-            ) : '',
+            : '',
         place_of_birth: user.studentProfile.place_of_birth || '',
         mobile_number: user.studentProfile.mobile_number || '',
         telephone_number: user.studentProfile.telephone_number || '',
@@ -111,7 +106,8 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
         province: user.studentProfile.province || '',
         zip_code: user.studentProfile.zip_code || '',
         status_of_parents: user.studentProfile.status_of_parents || '',
-        father_name: user.studentProfile.father_name || '', father_age: user.studentProfile.father_age || 0,
+        father_name: user.studentProfile.father_name || '',
+        father_age: user.studentProfile.father_age || 0,
         father_address: user.studentProfile.father_address || '',
         father_telephone: user.studentProfile.father_telephone || '',
         father_mobile: user.studentProfile.father_mobile || '',
@@ -135,97 +131,112 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
         total_siblings: user.studentProfile.total_siblings || 0,
     });
 
-    const breadcrumbs: BreadcrumbItem[] = useMemo(() => [
-        {
-            title: 'Dashboard',
-            href: route('osas.dashboard'),
-        },
-        {
-            title: 'Students Records',
-            href: route('osas.students'),
-        },
-        {
-            title: 'Student Profile',
-            href: route('osas.students.details', user.id),
-        },
-        {
-            title: 'Edit Student Profile',
-            href: route('osas.students.edit', user.id),
-        },
-    ], [user.id]);
+    const breadcrumbs: BreadcrumbItem[] = useMemo(
+        () => [
+            {
+                title: 'Dashboard',
+                href: route('osas.dashboard'),
+            },
+            {
+                title: 'Students Records',
+                href: route('osas.students'),
+            },
+            {
+                title: 'Student Profile',
+                href: route('osas.students.details', user.id),
+            },
+            {
+                title: 'Edit Student Profile',
+                href: route('osas.students.edit', user.id),
+            },
+        ],
+        [user.id],
+    );
 
     // Memoize parent data to prevent infinite re-renders
-    const fatherData = useMemo(() => ({
-        name: data.father_name,
-        age: data.father_age,
-        address: data.father_address,
-        telephone: data.father_telephone,
-        mobile: data.father_mobile,
-        email: data.father_email,
-        occupation: data.father_occupation,
-        company: data.father_company,
-        monthly_income: data.father_monthly_income,
-        education: data.father_education,
-        school: data.father_school,
-    }), [
-        data.father_name,
-        data.father_age,
-        data.father_address,
-        data.father_telephone,
-        data.father_mobile,
-        data.father_email,
-        data.father_occupation,
-        data.father_company,
-        data.father_monthly_income,
-        data.father_education,
-        data.father_school,
-    ]);
+    const fatherData = useMemo(
+        () => ({
+            name: data.father_name,
+            age: data.father_age,
+            address: data.father_address,
+            telephone: data.father_telephone,
+            mobile: data.father_mobile,
+            email: data.father_email,
+            occupation: data.father_occupation,
+            company: data.father_company,
+            monthly_income: data.father_monthly_income,
+            education: data.father_education,
+            school: data.father_school,
+        }),
+        [
+            data.father_name,
+            data.father_age,
+            data.father_address,
+            data.father_telephone,
+            data.father_mobile,
+            data.father_email,
+            data.father_occupation,
+            data.father_company,
+            data.father_monthly_income,
+            data.father_education,
+            data.father_school,
+        ],
+    );
 
-    const motherData = useMemo(() => ({
-        name: data.mother_name,
-        age: data.mother_age,
-        address: data.mother_address,
-        telephone: data.mother_telephone,
-        mobile: data.mother_mobile,
-        email: data.mother_email,
-        occupation: data.mother_occupation,
-        company: data.mother_company,
-        monthly_income: data.mother_monthly_income,
-        education: data.mother_education,
-        school: data.mother_school,
-    }), [
-        data.mother_name,
-        data.mother_age,
-        data.mother_address,
-        data.mother_telephone,
-        data.mother_mobile,
-        data.mother_email,
-        data.mother_occupation,
-        data.mother_company,
-        data.mother_monthly_income,
-        data.mother_education,
-        data.mother_school,
-    ]);
+    const motherData = useMemo(
+        () => ({
+            name: data.mother_name,
+            age: data.mother_age,
+            address: data.mother_address,
+            telephone: data.mother_telephone,
+            mobile: data.mother_mobile,
+            email: data.mother_email,
+            occupation: data.mother_occupation,
+            company: data.mother_company,
+            monthly_income: data.mother_monthly_income,
+            education: data.mother_education,
+            school: data.mother_school,
+        }),
+        [
+            data.mother_name,
+            data.mother_age,
+            data.mother_address,
+            data.mother_telephone,
+            data.mother_mobile,
+            data.mother_email,
+            data.mother_occupation,
+            data.mother_company,
+            data.mother_monthly_income,
+            data.mother_education,
+            data.mother_school,
+        ],
+    );
 
     // Memoize the data change handler to prevent re-creation on every render
-    const handleDataChange = useCallback((field: string, value: string | number) => {
-        setData(field as keyof typeof data, value);
-    }, [setData]);
+    const handleDataChange = useCallback(
+        (field: string, value: string | number) => {
+            setData(field as keyof typeof data, value);
+        },
+        [setData],
+    );
 
-    const onSubmit = useCallback((e: React.FormEvent) => {
-        e.preventDefault();
-        put(route('osas.students.update', user.id), {
-            preserveScroll: true,
-            preserveState: true,
-            onSuccess: () => {
-                toast.success('Profile updated successfully!');
-                // Optionally, you can refresh the page or re-fetch data here if needed
-            },
-            onError: () => {
-                toast.error('Failed to update profile. Please check the form for errors.');
-            },
-        });
-    }, [put, user.id]);
+    const onSubmit = useCallback(
+        (e: React.FormEvent) => {
+            e.preventDefault();
+            put(route('osas.students.update', user.id), {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    toast.success('Profile updated successfully!');
+                    // Optionally, you can refresh the page or re-fetch data here if needed
+                },
+                onError: () => {
+                    toast.error('Failed to update profile. Please check the form for errors.');
+                },
+            });
+        },
+        [put, user.id],
+    );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -233,33 +244,22 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
             <ErrorBoundary>
                 <div className="flex h-full flex-1 flex-col space-y-6 p-6">
                     {/* Header */}
-                    <div className="mb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="mb-2 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div className="flex items-center gap-4">
                             <div>
-                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                                <h1 className="text-2xl leading-tight font-bold text-gray-900 md:text-3xl dark:text-gray-100">
                                     Edit Student Profile
                                 </h1>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                     Update student information, address, academic, and family details.
                                 </p>
                             </div>
                         </div>
                         <div className="flex gap-2 self-start md:self-center">
-                            <Button
-                                variant="ghost"
-                                asChild
-                                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                            >
-                                <Link href={route('osas.students.details', user.id)}>
-                                    Cancel
-                                </Link>
+                            <Button variant="ghost" asChild className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                                <Link href={route('osas.students.details', user.id)}>Cancel</Link>
                             </Button>
-                            <Button
-                                type="submit"
-                                form="edit-student-profile-form"
-                                disabled={processing}
-                                className="flex items-center gap-2"
-                            >
+                            <Button type="submit" form="edit-student-profile-form" disabled={processing} className="flex items-center gap-2">
                                 <Save className="h-4 w-4" />
                                 {processing ? 'Saving...' : 'Save Changes'}
                             </Button>
@@ -267,14 +267,10 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                     </div>
                     <Separator className="my-2" />
 
-                    <form
-                        onSubmit={onSubmit}
-                        className="space-y-8"
-                        id="edit-student-profile-form"
-                    >
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                    <form onSubmit={onSubmit} className="space-y-8" id="edit-student-profile-form">
+                        <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-3">
                             {/* Column 1 */}
-                            <div className="flex flex-col gap-8 h-full">
+                            <div className="flex h-full flex-col gap-8">
                                 {/* Student Information */}
                                 <Card>
                                     <CardHeader>
@@ -284,16 +280,14 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                         <div className="space-y-8">
                                             {/* Personal Details */}
                                             <div>
-                                                <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                                                    Personal Details
-                                                </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="mb-2 font-semibold text-gray-700 dark:text-gray-200">Personal Details</div>
+                                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                                     <InputWithLabel
                                                         id="first_name"
                                                         label="First Name"
                                                         required
                                                         value={data.first_name}
-                                                        onChange={value => handleDataChange('first_name', value)}
+                                                        onChange={(value) => handleDataChange('first_name', value)}
                                                         error={errors['first_name']}
                                                         placeholder="Enter first name"
                                                     />
@@ -302,7 +296,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                         label="Middle Name"
                                                         required
                                                         value={data.middle_name}
-                                                        onChange={value => handleDataChange('middle_name', value)}
+                                                        onChange={(value) => handleDataChange('middle_name', value)}
                                                         error={errors['middle_name']}
                                                         placeholder="Enter middle name"
                                                     />
@@ -311,20 +305,20 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                         label="Last Name"
                                                         required
                                                         value={data.last_name}
-                                                        onChange={value => handleDataChange('last_name', value)}
+                                                        onChange={(value) => handleDataChange('last_name', value)}
                                                         error={errors['last_name']}
                                                         placeholder="Enter last name"
                                                     />
                                                     <SexSelector
                                                         value={data.sex}
-                                                        onChange={value => handleDataChange('sex', value)}
+                                                        onChange={(value) => handleDataChange('sex', value)}
                                                         error={errors['sex']}
                                                         required
                                                         className="w-full"
                                                     />
                                                     <CivilStatusSelector
                                                         value={data.civil_status}
-                                                        onChange={value => handleDataChange('civil_status', value)}
+                                                        onChange={(value) => handleDataChange('civil_status', value)}
                                                         error={errors['civil_status']}
                                                         required
                                                         className="w-full"
@@ -334,7 +328,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                         label="Date of Birth"
                                                         required
                                                         value={data.date_of_birth ? new Date(data.date_of_birth) : undefined}
-                                                        onChange={date => setData('date_of_birth', date ? date.toISOString().split('T')[0] : '')}
+                                                        onChange={(date) => setData('date_of_birth', date ? date.toISOString().split('T')[0] : '')}
                                                         error={errors['date_of_birth']}
                                                         maxDate={new Date()}
                                                         className="w-full"
@@ -348,16 +342,16 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                         processing={processing}
                                                     />
                                                 </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                                                     <ReligionSelector
                                                         value={data.religion}
-                                                        onChange={value => setData('religion', value)}
+                                                        onChange={(value) => setData('religion', value)}
                                                         error={errors.religion}
                                                         required={false}
                                                     />
                                                     <ResidenceTypeSelector
                                                         value={data.residence_type}
-                                                        onChange={value => setData('residence_type', value)}
+                                                        onChange={(value) => setData('residence_type', value)}
                                                         error={errors.residence_type}
                                                         required={false}
                                                         className="w-full"
@@ -365,9 +359,9 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                     <div className="col-span-2">
                                                         <PwdRadio
                                                             value={data.is_pwd ? 'Yes' : 'No'}
-                                                            onChange={val => setData('is_pwd', val === 'Yes')}
+                                                            onChange={(val) => setData('is_pwd', val === 'Yes')}
                                                             disabilityType={data.disability_type || ''}
-                                                            onDisabilityTypeChange={val => setData('disability_type', val)}
+                                                            onDisabilityTypeChange={(val) => setData('disability_type', val)}
                                                             error={errors.is_pwd}
                                                             disabilityTypeError={errors.disability_type}
                                                             required={false}
@@ -383,7 +377,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                         barangay: data.barangay,
                                                         city: data.city,
                                                         province: data.province,
-                                                        zip_code: data.zip_code || ''
+                                                        zip_code: data.zip_code || '',
                                                     }}
                                                     setData={(field, value) => setData(field, value)}
                                                     errors={errors}
@@ -392,31 +386,29 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                             </div>
                                             {/* Academic Details */}
                                             <div>
-                                                <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                                                    Academic Details
-                                                </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="mb-2 font-semibold text-gray-700 dark:text-gray-200">Academic Details</div>
+                                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                                     <InputWithLabel
                                                         id="student_id"
                                                         label="Student ID"
                                                         value={data.student_id}
-                                                        onChange={value => setData('student_id', value)}
+                                                        onChange={(value) => setData('student_id', value)}
                                                         error={errors.student_id}
                                                         required
                                                         placeholder="e.g. MBC2023-1234"
                                                     />
                                                     <CourseSelector
                                                         value={data.course}
-                                                        onChange={value => setData('course', value)}
+                                                        onChange={(value) => setData('course', value)}
                                                         error={errors.course}
                                                         required
                                                         majorValue={data.major}
-                                                        onMajorChange={value => setData('major', value)}
+                                                        onMajorChange={(value) => setData('major', value)}
                                                         majorError={errors.major}
                                                     />
                                                     <YearLevelSelector
                                                         value={data.year_level}
-                                                        onChange={value => setData('year_level', value)}
+                                                        onChange={(value) => setData('year_level', value)}
                                                         error={errors.year_level}
                                                         required
                                                         className="w-full"
@@ -425,7 +417,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                         id="existing_scholarships"
                                                         label="Existing Scholarships"
                                                         value={data.existing_scholarships}
-                                                        onChange={value => setData('existing_scholarships', value)}
+                                                        onChange={(value) => setData('existing_scholarships', value)}
                                                         error={errors.existing_scholarships}
                                                         placeholder="List any current scholarships..."
                                                     />
@@ -433,16 +425,14 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                             </div>
                                             {/* Contact Information */}
                                             <div>
-                                                <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                                                    Contact Information
-                                                </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="mb-2 font-semibold text-gray-700 dark:text-gray-200">Contact Information</div>
+                                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                                     <InputWithLabel
                                                         id="email"
                                                         label="Email Address"
                                                         type="email"
                                                         value={data.email}
-                                                        onChange={value => setData('email', value)}
+                                                        onChange={(value) => setData('email', value)}
                                                         error={errors.email}
                                                         required
                                                     />
@@ -450,7 +440,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                         id="mobile_number"
                                                         label="Mobile Number"
                                                         value={data.mobile_number}
-                                                        onChange={value => setData('mobile_number', value)}
+                                                        onChange={(value) => setData('mobile_number', value)}
                                                         error={errors.mobile_number}
                                                         placeholder="+639123456789"
                                                     />
@@ -458,7 +448,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                         id="telephone_number"
                                                         label="Telephone Number"
                                                         value={data.telephone_number}
-                                                        onChange={value => setData('telephone_number', value)}
+                                                        onChange={(value) => setData('telephone_number', value)}
                                                         error={errors.telephone_number}
                                                         placeholder="(02) 123-4567"
                                                     />
@@ -466,15 +456,13 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                             </div>
                                             {/* Guardian & Siblings */}
                                             <div>
-                                                <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                                                    Guardian & Siblings
-                                                </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="mb-2 font-semibold text-gray-700 dark:text-gray-200">Guardian & Siblings</div>
+                                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                                     <InputWithLabel
                                                         id="guardian_name"
                                                         label="Guardian Name"
                                                         value={data.guardian_name}
-                                                        onChange={value => setData('guardian_name', value)}
+                                                        onChange={(value) => setData('guardian_name', value)}
                                                         error={errors.guardian_name}
                                                         placeholder="Guardian's full name"
                                                     />
@@ -483,7 +471,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                         label="Total Siblings"
                                                         type="number"
                                                         value={data.total_siblings?.toString() || ''}
-                                                        onChange={value => setData('total_siblings', value === '' ? 0 : parseInt(value))}
+                                                        onChange={(value) => setData('total_siblings', value === '' ? 0 : parseInt(value))}
                                                         error={errors.total_siblings}
                                                         placeholder="0"
                                                     />
@@ -494,7 +482,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                 </Card>
                             </div>
                             {/* Column 2 */}
-                            <div className="flex flex-col gap-8 h-full">
+                            <div className="flex h-full flex-col gap-8">
                                 {/* Father's Information */}
                                 <Card>
                                     <CardHeader>
@@ -506,7 +494,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="father_name"
                                                 label="Full Name"
                                                 value={fatherData.name}
-                                                onChange={value => handleDataChange('father_name', value)}
+                                                onChange={(value) => handleDataChange('father_name', value)}
                                                 error={errors['father_name']}
                                                 placeholder="Father's full name"
                                             />
@@ -515,7 +503,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 label="Age"
                                                 type="number"
                                                 value={fatherData.age?.toString() || ''}
-                                                onChange={value => handleDataChange('father_age', value === '' ? 0 : parseInt(value))}
+                                                onChange={(value) => handleDataChange('father_age', value === '' ? 0 : parseInt(value))}
                                                 error={errors['father_age']}
                                                 placeholder="Age"
                                             />
@@ -523,7 +511,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="father_address"
                                                 label="Address"
                                                 value={fatherData.address}
-                                                onChange={value => handleDataChange('father_address', value)}
+                                                onChange={(value) => handleDataChange('father_address', value)}
                                                 error={errors['father_address']}
                                                 placeholder="Home address"
                                             />
@@ -531,7 +519,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="father_telephone"
                                                 label="Telephone"
                                                 value={fatherData.telephone}
-                                                onChange={value => handleDataChange('father_telephone', value)}
+                                                onChange={(value) => handleDataChange('father_telephone', value)}
                                                 error={errors['father_telephone']}
                                                 placeholder="(02) 123-4567"
                                             />
@@ -539,7 +527,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="father_mobile"
                                                 label="Mobile Number"
                                                 value={fatherData.mobile}
-                                                onChange={value => handleDataChange('father_mobile', value)}
+                                                onChange={(value) => handleDataChange('father_mobile', value)}
                                                 error={errors['father_mobile']}
                                                 placeholder="+639123456789"
                                             />
@@ -548,7 +536,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 label="Email Address"
                                                 type="email"
                                                 value={fatherData.email}
-                                                onChange={value => handleDataChange('father_email', value)}
+                                                onChange={(value) => handleDataChange('father_email', value)}
                                                 error={errors['father_email']}
                                                 placeholder="father@email.com"
                                             />
@@ -556,7 +544,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="father_occupation"
                                                 label="Occupation"
                                                 value={fatherData.occupation}
-                                                onChange={value => handleDataChange('father_occupation', value)}
+                                                onChange={(value) => handleDataChange('father_occupation', value)}
                                                 error={errors['father_occupation']}
                                                 placeholder="Job title"
                                             />
@@ -564,7 +552,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="father_company"
                                                 label="Company"
                                                 value={fatherData.company}
-                                                onChange={value => handleDataChange('father_company', value)}
+                                                onChange={(value) => handleDataChange('father_company', value)}
                                                 error={errors['father_company']}
                                                 placeholder="Company name"
                                             />
@@ -573,7 +561,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 label="Monthly Income"
                                                 type="number"
                                                 value={fatherData.monthly_income?.toString() || ''}
-                                                onChange={value => handleDataChange('father_monthly_income', value === '' ? 0 : parseFloat(value))}
+                                                onChange={(value) => handleDataChange('father_monthly_income', value === '' ? 0 : parseFloat(value))}
                                                 error={errors['father_monthly_income']}
                                                 placeholder="0.00"
                                             />
@@ -581,7 +569,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="father_education"
                                                 label="Education"
                                                 value={fatherData.education}
-                                                onChange={value => handleDataChange('father_education', value)}
+                                                onChange={(value) => handleDataChange('father_education', value)}
                                                 error={errors['father_education']}
                                                 placeholder="Educational attainment"
                                             />
@@ -589,7 +577,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="father_school"
                                                 label="School"
                                                 value={fatherData.school}
-                                                onChange={value => handleDataChange('father_school', value)}
+                                                onChange={(value) => handleDataChange('father_school', value)}
                                                 error={errors['father_school']}
                                                 placeholder="School attended"
                                             />
@@ -598,7 +586,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                 </Card>
                             </div>
                             {/* Column 3 */}
-                            <div className="flex flex-col gap-8 h-full">
+                            <div className="flex h-full flex-col gap-8">
                                 {/* Mother's Information */}
                                 <Card>
                                     <CardHeader>
@@ -610,7 +598,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="mother_name"
                                                 label="Full Name"
                                                 value={motherData.name}
-                                                onChange={value => handleDataChange('mother_name', value)}
+                                                onChange={(value) => handleDataChange('mother_name', value)}
                                                 error={errors['mother_name']}
                                                 placeholder="Mother's full name"
                                             />
@@ -619,7 +607,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 label="Age"
                                                 type="number"
                                                 value={motherData.age?.toString() || ''}
-                                                onChange={value => handleDataChange('mother_age', value === '' ? 0 : parseInt(value))}
+                                                onChange={(value) => handleDataChange('mother_age', value === '' ? 0 : parseInt(value))}
                                                 error={errors['mother_age']}
                                                 placeholder="Age"
                                             />
@@ -627,7 +615,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="mother_address"
                                                 label="Address"
                                                 value={motherData.address}
-                                                onChange={value => handleDataChange('mother_address', value)}
+                                                onChange={(value) => handleDataChange('mother_address', value)}
                                                 error={errors['mother_address']}
                                                 placeholder="Home address"
                                             />
@@ -635,7 +623,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="mother_telephone"
                                                 label="Telephone"
                                                 value={motherData.telephone}
-                                                onChange={value => handleDataChange('mother_telephone', value)}
+                                                onChange={(value) => handleDataChange('mother_telephone', value)}
                                                 error={errors['mother_telephone']}
                                                 placeholder="(02) 123-4567"
                                             />
@@ -643,7 +631,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="mother_mobile"
                                                 label="Mobile Number"
                                                 value={motherData.mobile}
-                                                onChange={value => handleDataChange('mother_mobile', value)}
+                                                onChange={(value) => handleDataChange('mother_mobile', value)}
                                                 error={errors['mother_mobile']}
                                                 placeholder="+639123456789"
                                             />
@@ -652,7 +640,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 label="Email Address"
                                                 type="email"
                                                 value={motherData.email}
-                                                onChange={value => handleDataChange('mother_email', value)}
+                                                onChange={(value) => handleDataChange('mother_email', value)}
                                                 error={errors['mother_email']}
                                                 placeholder="mother@email.com"
                                             />
@@ -660,7 +648,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="mother_occupation"
                                                 label="Occupation"
                                                 value={motherData.occupation}
-                                                onChange={value => handleDataChange('mother_occupation', value)}
+                                                onChange={(value) => handleDataChange('mother_occupation', value)}
                                                 error={errors['mother_occupation']}
                                                 placeholder="Job title"
                                             />
@@ -668,7 +656,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="mother_company"
                                                 label="Company"
                                                 value={motherData.company}
-                                                onChange={value => handleDataChange('mother_company', value)}
+                                                onChange={(value) => handleDataChange('mother_company', value)}
                                                 error={errors['mother_company']}
                                                 placeholder="Company name"
                                             />
@@ -677,7 +665,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 label="Monthly Income"
                                                 type="number"
                                                 value={motherData.monthly_income?.toString() || ''}
-                                                onChange={value => handleDataChange('mother_monthly_income', value === '' ? 0 : parseFloat(value))}
+                                                onChange={(value) => handleDataChange('mother_monthly_income', value === '' ? 0 : parseFloat(value))}
                                                 error={errors['mother_monthly_income']}
                                                 placeholder="0.00"
                                             />
@@ -685,7 +673,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="mother_education"
                                                 label="Education"
                                                 value={motherData.education}
-                                                onChange={value => handleDataChange('mother_education', value)}
+                                                onChange={(value) => handleDataChange('mother_education', value)}
                                                 error={errors['mother_education']}
                                                 placeholder="Educational attainment"
                                             />
@@ -693,7 +681,7 @@ export default function EditStudentProfile({ user }: EditStudentProfileProps) {
                                                 id="mother_school"
                                                 label="School"
                                                 value={motherData.school}
-                                                onChange={value => handleDataChange('mother_school', value)}
+                                                onChange={(value) => handleDataChange('mother_school', value)}
                                                 error={errors['mother_school']}
                                                 placeholder="School attended"
                                             />

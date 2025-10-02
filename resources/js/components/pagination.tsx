@@ -1,21 +1,15 @@
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Table } from "@tanstack/react-table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table } from '@tanstack/react-table';
 // Import the UI Pagination primitives
 import {
-    Pagination as UiPagination,
     PaginationContent,
+    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
-    PaginationPrevious,
     PaginationNext,
-    PaginationEllipsis,
-} from "@/components/ui/pagination";
+    PaginationPrevious,
+    Pagination as UiPagination,
+} from '@/components/ui/pagination';
 
 interface PaginationProps<TData> {
     table: Table<TData>;
@@ -28,23 +22,23 @@ export function Pagination<TData>({ table, filteredDataLength }: PaginationProps
 
     // Generate page numbers for display (simple version, now for 5 max)
     const getPageNumbers = () => {
-        const pages: (number | "ellipsis")[] = [];
+        const pages: (number | 'ellipsis')[] = [];
         if (pageCount <= 5) {
             for (let i = 0; i < pageCount; i++) pages.push(i);
         } else {
             if (pageIndex <= 2) {
-                pages.push(0, 1, 2, "ellipsis", pageCount - 1);
+                pages.push(0, 1, 2, 'ellipsis', pageCount - 1);
             } else if (pageIndex >= pageCount - 3) {
-                pages.push(0, "ellipsis", pageCount - 3, pageCount - 2, pageCount - 1);
+                pages.push(0, 'ellipsis', pageCount - 3, pageCount - 2, pageCount - 1);
             } else {
-                pages.push(0, "ellipsis", pageIndex, "ellipsis", pageCount - 1);
+                pages.push(0, 'ellipsis', pageIndex, 'ellipsis', pageCount - 1);
             }
         }
         return pages;
     };
 
     return (
-        <UiPagination className="w-full flex items-center justify-between">
+        <UiPagination className="flex w-full items-center justify-between">
             {/* Left side: Rows per page and page info */}
             <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
@@ -65,9 +59,7 @@ export function Pagination<TData>({ table, filteredDataLength }: PaginationProps
                     >
                         <SelectTrigger className="h-8 w-[70px]">
                             <SelectValue>
-                                {table.getState().pagination.pageSize >= filteredDataLength
-                                    ? "All"
-                                    : table.getState().pagination.pageSize}
+                                {table.getState().pagination.pageSize >= filteredDataLength ? 'All' : table.getState().pagination.pageSize}
                             </SelectValue>
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -89,18 +81,18 @@ export function Pagination<TData>({ table, filteredDataLength }: PaginationProps
                 <PaginationItem>
                     <PaginationPrevious
                         href="#"
-                        onClick={e => {
+                        onClick={(e) => {
                             e.preventDefault();
                             table.previousPage();
                         }}
                         aria-disabled={!table.getCanPreviousPage()}
                         tabIndex={!table.getCanPreviousPage() ? -1 : 0}
-                        style={!table.getCanPreviousPage() ? { pointerEvents: "none", opacity: 0.5 } : {}}
+                        style={!table.getCanPreviousPage() ? { pointerEvents: 'none', opacity: 0.5 } : {}}
                     />
                 </PaginationItem>
                 {getPageNumbers().map((page, idx) =>
-                    page === "ellipsis" ? (
-                        <PaginationItem key={"ellipsis-" + idx}>
+                    page === 'ellipsis' ? (
+                        <PaginationItem key={'ellipsis-' + idx}>
                             <PaginationEllipsis />
                         </PaginationItem>
                     ) : (
@@ -108,7 +100,7 @@ export function Pagination<TData>({ table, filteredDataLength }: PaginationProps
                             <PaginationLink
                                 isActive={pageIndex === page}
                                 href="#"
-                                onClick={e => {
+                                onClick={(e) => {
                                     e.preventDefault();
                                     table.setPageIndex(page as number);
                                 }}
@@ -116,18 +108,18 @@ export function Pagination<TData>({ table, filteredDataLength }: PaginationProps
                                 {(page as number) + 1}
                             </PaginationLink>
                         </PaginationItem>
-                    )
+                    ),
                 )}
                 <PaginationItem>
                     <PaginationNext
                         href="#"
-                        onClick={e => {
+                        onClick={(e) => {
                             e.preventDefault();
                             table.nextPage();
                         }}
                         aria-disabled={!table.getCanNextPage()}
                         tabIndex={!table.getCanNextPage() ? -1 : 0}
-                        style={!table.getCanNextPage() ? { pointerEvents: "none", opacity: 0.5 } : {}}
+                        style={!table.getCanNextPage() ? { pointerEvents: 'none', opacity: 0.5 } : {}}
                     />
                 </PaginationItem>
             </PaginationContent>

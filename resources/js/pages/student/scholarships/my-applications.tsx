@@ -1,13 +1,11 @@
-import React from 'react';
-import { Head, usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/layouts/app-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, Search, Filter, Calendar, DollarSign } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import AuthenticatedLayout from '@/layouts/app-layout';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Calendar, DollarSign, Eye, Filter, Search } from 'lucide-react';
 import { useState } from 'react';
 
 interface Application {
@@ -59,7 +57,7 @@ export default function MyApplications() {
     };
 
     const getStatusText = (status: string) => {
-        return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return status.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase());
     };
 
     const getProgressColor = (progress: number) => {
@@ -73,7 +71,7 @@ export default function MyApplications() {
         const params = new URLSearchParams();
         if (searchTerm) params.set('search', searchTerm);
         if (statusFilter) params.set('status', statusFilter);
-        
+
         window.location.href = route('student.scholarships.my-applications') + '?' + params.toString();
     };
 
@@ -88,17 +86,15 @@ export default function MyApplications() {
             <Head title="My Scholarship Applications" />
 
             <div className="py-6">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-8">
                         <h1 className="text-2xl font-bold text-gray-900">My Scholarship Applications</h1>
-                        <p className="text-gray-600 mt-2">
-                            Track the status of your scholarship applications and view detailed progress
-                        </p>
+                        <p className="mt-2 text-gray-600">Track the status of your scholarship applications and view detailed progress</p>
                     </div>
 
                     {/* Statistics Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-4">
                         <Card>
                             <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
@@ -140,12 +136,12 @@ export default function MyApplications() {
                     <Card className="mb-6">
                         <CardHeader>
                             <CardTitle className="flex items-center">
-                                <Filter className="h-5 w-5 mr-2" />
+                                <Filter className="mr-2 h-5 w-5" />
                                 Filter Applications
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex flex-col gap-4 md:flex-row">
                                 <div className="flex-1">
                                     <Input
                                         placeholder="Search by scholarship name..."
@@ -173,7 +169,7 @@ export default function MyApplications() {
                                 </div>
                                 <div className="flex gap-2">
                                     <Button onClick={handleSearch} className="flex items-center">
-                                        <Search className="h-4 w-4 mr-2" />
+                                        <Search className="mr-2 h-4 w-4" />
                                         Search
                                     </Button>
                                     <Button variant="outline" onClick={handleFilterReset}>
@@ -188,14 +184,12 @@ export default function MyApplications() {
                     <div className="space-y-4">
                         {applications.length === 0 ? (
                             <Card>
-                                <CardContent className="text-center py-12">
-                                    <p className="text-gray-500 text-lg">No scholarship applications found.</p>
-                                    <p className="text-gray-400 text-sm mt-2">
-                                        You haven't submitted any scholarship applications yet.
-                                    </p>
+                                <CardContent className="py-12 text-center">
+                                    <p className="text-lg text-gray-500">No scholarship applications found.</p>
+                                    <p className="mt-2 text-sm text-gray-400">You haven't submitted any scholarship applications yet.</p>
                                     <Link
                                         href={route('student.scholarships.index')}
-                                        className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 mt-4"
+                                        className="mt-4 inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase hover:bg-blue-700"
                                     >
                                         Browse Scholarships
                                     </Link>
@@ -203,35 +197,31 @@ export default function MyApplications() {
                             </Card>
                         ) : (
                             applications.map((application) => (
-                                <Card key={application.id} className="hover:shadow-md transition-shadow">
+                                <Card key={application.id} className="transition-shadow hover:shadow-md">
                                     <CardContent className="p-6">
-                                        <div className="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
+                                        <div className="flex flex-col justify-between space-y-4 md:flex-row md:items-center md:space-y-0">
                                             <div className="flex-1">
-                                                <div className="flex items-center space-x-3 mb-2">
-                                                    <h3 className="text-lg font-semibold text-gray-900">
-                                                        {application.scholarship_name}
-                                                    </h3>
-                                                    <Badge className={getStatusColor(application.status)}>
-                                                        {getStatusText(application.status)}
-                                                    </Badge>
+                                                <div className="mb-2 flex items-center space-x-3">
+                                                    <h3 className="text-lg font-semibold text-gray-900">{application.scholarship_name}</h3>
+                                                    <Badge className={getStatusColor(application.status)}>{getStatusText(application.status)}</Badge>
                                                 </div>
-                                                
+
                                                 <div className="space-y-2">
                                                     <div className="flex items-center text-sm text-gray-600">
-                                                        <Calendar className="h-4 w-4 mr-2" />
+                                                        <Calendar className="mr-2 h-4 w-4" />
                                                         Applied on: {new Date(application.submitted_at).toLocaleDateString()}
                                                     </div>
-                                                    
+
                                                     {application.amount && (
                                                         <div className="flex items-center text-sm text-gray-600">
-                                                            <DollarSign className="h-4 w-4 mr-2" />
+                                                            <DollarSign className="mr-2 h-4 w-4" />
                                                             Monthly Stipend: ₱{application.amount.toLocaleString()}
                                                         </div>
                                                     )}
 
                                                     {application.deadline && (
                                                         <div className="flex items-center text-sm text-gray-600">
-                                                            <Calendar className="h-4 w-4 mr-2" />
+                                                            <Calendar className="mr-2 h-4 w-4" />
                                                             Deadline: {new Date(application.deadline).toLocaleDateString()}
                                                         </div>
                                                     )}
@@ -239,11 +229,11 @@ export default function MyApplications() {
 
                                                 {/* Progress Bar */}
                                                 <div className="mt-4">
-                                                    <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+                                                    <div className="mb-1 flex items-center justify-between text-sm text-gray-600">
                                                         <span>Application Progress</span>
                                                         <span>{application.progress}%</span>
                                                     </div>
-                                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                                    <div className="h-2 w-full rounded-full bg-gray-200">
                                                         <div
                                                             className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(application.progress)}`}
                                                             style={{ width: `${application.progress}%` }}
@@ -252,12 +242,12 @@ export default function MyApplications() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-col sm:flex-row gap-2">
+                                            <div className="flex flex-col gap-2 sm:flex-row">
                                                 <Link
                                                     href={route('student.applications.show', application.id)}
-                                                    className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 transition-colors"
+                                                    className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase transition-colors hover:bg-blue-700"
                                                 >
-                                                    <Eye className="h-4 w-4 mr-2" />
+                                                    <Eye className="mr-2 h-4 w-4" />
                                                     View Details
                                                 </Link>
                                             </div>
@@ -272,7 +262,7 @@ export default function MyApplications() {
                     <div className="mt-8 flex justify-center">
                         <Link
                             href={route('student.scholarships.index')}
-                            className="inline-flex items-center px-6 py-3 bg-green-600 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-green-700"
+                            className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-6 py-3 text-sm font-semibold tracking-widest text-white uppercase hover:bg-green-700"
                         >
                             Apply for More Scholarships
                         </Link>

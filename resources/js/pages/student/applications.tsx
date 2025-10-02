@@ -1,17 +1,10 @@
-import { Head, Link } from '@inertiajs/react';
-import { type BreadcrumbItem } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -49,16 +42,18 @@ export default function MyApplications({ applications }: MyApplicationsProps) {
             </Head>
             <div className="flex h-full flex-1 flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 lg:space-y-8 lg:p-8">
                 {/* Header Section */}
-                <div className="border-b border-border pb-6 lg:pb-8">
+                <div className="border-border border-b pb-6 lg:pb-8">
                     <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                         <div className="min-w-0 flex-1">
-                            <h1 className="text-2xl font-semibold text-foreground sm:text-3xl lg:text-4xl">Applications</h1>
-                            <p className="mt-2 text-sm text-muted-foreground sm:text-base lg:text-lg">Track and manage your scholarship applications</p>
+                            <h1 className="text-foreground text-2xl font-semibold sm:text-3xl lg:text-4xl">Applications</h1>
+                            <p className="text-muted-foreground mt-2 text-sm sm:text-base lg:text-lg">
+                                Track and manage your scholarship applications
+                            </p>
                         </div>
                         <div className="flex-shrink-0">
                             <Button asChild>
                                 <Link href={route('student.scholarships.index')}>
-                                    <Plus className="h-4 w-4 mr-2 lg:h-5 lg:w-5" />
+                                    <Plus className="mr-2 h-4 w-4 lg:h-5 lg:w-5" />
                                     Apply for Scholarship
                                 </Link>
                             </Button>
@@ -68,7 +63,7 @@ export default function MyApplications({ applications }: MyApplicationsProps) {
 
                 {/* Applications Table */}
                 <div className="mb-4">
-                    <div className="rounded-md border mt-0">
+                    <div className="mt-0 rounded-md border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -86,38 +81,48 @@ export default function MyApplications({ applications }: MyApplicationsProps) {
                                     applications.map((app) => (
                                         <TableRow key={app.id}>
                                             <TableCell>
-                                                <div className="font-medium text-foreground">#{app.id}</div>
+                                                <div className="text-foreground font-medium">#{app.id}</div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="font-medium text-foreground">{app.scholarship_name}</div>
+                                                <div className="text-foreground font-medium">{app.scholarship_name}</div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="text-sm text-muted-foreground">{app.scholarship_type}</div>
+                                                <div className="text-muted-foreground text-sm">{app.scholarship_type}</div>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant={app.status === 'approved' ? 'default' : app.status === 'rejected' ? 'destructive' : 'secondary'}>
+                                                <Badge
+                                                    variant={
+                                                        app.status === 'approved'
+                                                            ? 'default'
+                                                            : app.status === 'rejected'
+                                                              ? 'destructive'
+                                                              : 'secondary'
+                                                    }
+                                                >
                                                     {app.status.charAt(0).toUpperCase() + app.status.slice(1).replace(/_/g, ' ')}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell>
-                                                {app.amount}
-                                            </TableCell>
+                                            <TableCell>{app.amount}</TableCell>
                                             <TableCell>
                                                 <div className="flex flex-col gap-1">
                                                     <span>{app.progress}%</span>
-                                                    <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                                                        <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${app.progress}%` }}></div>
+                                                    <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                                                        <div className="h-1.5 rounded-full bg-blue-600" style={{ width: `${app.progress}%` }}></div>
                                                     </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                {new Date(app.submitted_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                                {new Date(app.submitted_at).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                })}
                                             </TableCell>
                                         </TableRow>
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="h-24 text-center text-base text-muted-foreground">
+                                        <TableCell colSpan={7} className="text-muted-foreground h-24 text-center text-base">
                                             No applications found
                                         </TableCell>
                                     </TableRow>
