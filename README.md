@@ -352,7 +352,7 @@ For technical support or system inquiries:
 - **Technical Issues**: Create an issue in the repository
 - **OSAS Office**: Office of Student Affairs and Services, MinSU
 - **Email**: osas@minsu.edu.ph
-- **Documentation**: See `/docs` directory for detailed guides
+- **Documentation**: See [docs/README.md](docs/README.md) for detailed guides
 
 ## License
 

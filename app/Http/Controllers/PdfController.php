@@ -353,8 +353,11 @@ class PdfController extends Controller
     ];
 
     /**
-     * Get the local file path for an image stored in storage
-     * Downloads CloudCube images temporarily for PDF processing
+     * Get the local file path for an image stored in storage.
+     * 
+     * This method handles both local and CloudCube (S3-based) storage.
+     * CloudCube images are downloaded temporarily to the storage/app/temp
+     * directory to facilitate PDF filling with pdftk.
      */
     private function getImagePathForPdf(string $photoId): string
     {
@@ -403,6 +406,13 @@ class PdfController extends Controller
         return '';
     }
 
+    /**
+     * Main entry point for generating the standard scholarship application PDF.
+     * 
+     * This method loads the student profile with all necessary relationships,
+     * verifies the template exists, and orchestrates the temp file preparation
+     * and PDF filling process.
+     */
     public function generatePdf(Request $request, User $user)
     {
         try {
@@ -748,6 +758,15 @@ class PdfController extends Controller
         ];
     }
 
+    /**
+     * Logic for generating a PDF file using pdftk.
+     * 
+     * It performs the following steps:
+     * 1. Verifies pdftk availability.
+     * 2. Initializes the pdftk command.
+     * 3. Fills the form fields, flattens, and compresses the output.
+     * 4. Returns a BinaryFileResponse that automatically deletes the temp file after sending.
+     */
     private function generatePdfFile(string $templatePath, string $tempOutput, User $user): BinaryFileResponse
     {
         try {

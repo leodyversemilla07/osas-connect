@@ -1320,7 +1320,11 @@ class OsasStaffController extends Controller
     }
 
     /**
-     * Export applications to CSV/Excel
+     * Export applications to CSV/Excel.
+     * 
+     * This method applies the same filtering logic as the index view to ensure
+     * that administrative staff can download exactly what they see on screen.
+     * It uses a streamed response to handle potentially large datasets efficiently.
      */
     public function exportApplications(Request $request)
     {
@@ -1414,6 +1418,13 @@ class OsasStaffController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    /**
+     * Build a chronological timeline of application statuses.
+     * 
+     * This helper method constructs an array of events that define the 
+     * application's journey, from creation to final approval or rejection.
+     * It is used primarily in the application review interface.
+     */
     private function buildApplicationTimeline($application): array
     {
         $timeline = [
