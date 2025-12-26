@@ -6,6 +6,7 @@ use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OsasStaffController;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\RenewalController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentManagementController;
 use App\Http\Controllers\UnifiedScholarshipController;
@@ -167,7 +168,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::prefix('osas-staff/analytics')->name('osas.analytics.')->group(function () {
             Route::get('/', [\App\Http\Controllers\ReportingController::class, 'index'])->name('index');
             Route::get('/reports', [\App\Http\Controllers\ReportingController::class, 'reports'])->name('reports');
-            
+
             // Export endpoints
             Route::get('/export/applications', [\App\Http\Controllers\ReportingController::class, 'exportApplications'])->name('export.applications');
         });
@@ -176,6 +177,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/osas-staff/scholarships/applications/{application}/stipend', [UnifiedScholarshipController::class, 'recordStipend'])->name(
             'osas.scholarships.stipend.record',
         );
+
+        // Renewal routes (staff)
+        Route::prefix('osas-staff/renewals')->name('renewal.staff.')->group(function () {
+            Route::get('/', [RenewalController::class, 'index'])->name('index');
+            Route::get('/statistics', [RenewalController::class, 'statistics'])->name('statistics');
+            Route::get('/{renewal}/review', [RenewalController::class, 'review'])->name('review');
+            Route::post('/{renewal}/approve', [RenewalController::class, 'approve'])->name('approve');
+            Route::post('/{renewal}/reject', [RenewalController::class, 'reject'])->name('reject');
+        });
     });
 
     // Student routes
@@ -244,6 +254,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('student/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name(
             'student.notifications.unread-count',
         );
+
+        // Renewal routes (student)
+        Route::get('student/renewals/check/{application}', [RenewalController::class, 'checkEligibility'])->name('renewal.check-eligibility');
+        Route::get('student/renewals/create/{application}', [RenewalController::class, 'create'])->name('renewal.create');
+        Route::post('student/renewals/store/{application}', [RenewalController::class, 'store'])->name('renewal.store');
+        Route::get('student/renewals/{renewal}', [RenewalController::class, 'show'])->name('renewal.show');
+        Route::post('student/renewals/{renewal}/documents', [RenewalController::class, 'uploadDocuments'])->name('renewal.documents.upload');
     });
 
     // Only allow users to generate their own PDFs, or staff/admin to generate any user's PDF

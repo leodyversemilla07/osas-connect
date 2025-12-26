@@ -6,10 +6,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { useForm } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
 import { Clock, Info, Loader2, Mail, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { route } from 'ziggy-js';
 
 interface InviteStaffDialogProps {
     open: boolean;
@@ -17,28 +16,6 @@ interface InviteStaffDialogProps {
 }
 
 export default function InviteStaffDialog({ open, onOpenChange }: InviteStaffDialogProps) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        role: 'osas_staff',
-    });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('admin.invitations.store'), {
-            onSuccess: () => {
-                onOpenChange(false);
-                reset();
-                toast.success('Invitation sent successfully!', {
-                    description: `An invitation has been sent to ${data.email}`,
-                });
-            },
-            onError: () => {
-                toast.error('Failed to send invitation', {
-                    description: 'Please try again later.',
-                });
-            },
-        });
-    };
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[480px]">
@@ -58,83 +35,106 @@ export default function InviteStaffDialog({ open, onOpenChange }: InviteStaffDia
                     <Separator />
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-4">
-                        {/* Email Input Section */}
-                        <div className="space-y-2">
-                            <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
-                                <Mail className="h-4 w-4" />
-                                Email Address
-                                <Badge variant="outline" className="text-xs">
-                                    Required
-                                </Badge>
-                            </Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                autoComplete="email"
-                                value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                                placeholder="Enter staff member's email address"
-                                className={errors.email ? 'border-destructive focus-visible:ring-destructive/20' : ''}
-                                aria-invalid={errors.email ? 'true' : undefined}
-                                required
-                                disabled={processing}
-                            />
-                            {errors.email && <InputError message={errors.email} />}
-                        </div>
+                <Form
+                    action={route('admin.invitations.store')}
+                    method="post"
+                    resetOnSuccess
+                    onSuccess={() => {
+                        onOpenChange(false);
+                        toast.success('Invitation sent successfully!', {
+                            description: 'An invitation has been sent to the staff member',
+                        });
+                    }}
+                    onError={() => {
+                        toast.error('Failed to send invitation', {
+                            description: 'Please try again later.',
+                        });
+                    }}
+                >
+                    {({ errors, processing }) => (
+                        <>
+                            <div className="space-y-6">
+                                <div className="space-y-4">
+                                    {/* Hidden role field */}
+                                    <input type="hidden" name="role" value="osas_staff" />
 
-                        {/* Information Alert */}
-                        <Alert>
-                            <Info className="h-4 w-4" />
-                            <AlertDescription className="text-sm">
-                                <div className="space-y-1">
-                                    <p>The invitation will include:</p>
-                                    <ul className="text-muted-foreground list-inside list-disc space-y-0.5 text-xs">
-                                        <li>A secure link to create their account</li>
-                                        <li>Instructions to complete setup</li>
-                                        <li>Access to OSAS staff features</li>
-                                    </ul>
+                                    {/* Email Input Section */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
+                                            <Mail className="h-4 w-4" />
+                                            Email Address
+                                            <Badge variant="outline" className="text-xs">
+                                                Required
+                                            </Badge>
+                                        </Label>
+                                        <Input
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            autoComplete="email"
+                                            placeholder="Enter staff member's email address"
+                                            className={errors.email ? 'border-destructive focus-visible:ring-destructive/20' : ''}
+                                            aria-invalid={errors.email ? 'true' : undefined}
+                                            required
+                                            disabled={processing}
+                                        />
+                                        {errors.email && <InputError message={errors.email} />}
+                                    </div>
+
+                                    {/* Information Alert */}
+                                    <Alert>
+                                        <Info className="h-4 w-4" />
+                                        <AlertDescription className="text-sm">
+                                            <div className="space-y-1">
+                                                <p>The invitation will include:</p>
+                                                <ul className="text-muted-foreground list-inside list-disc space-y-0.5 text-xs">
+                                                    <li>A secure link to create their account</li>
+                                                    <li>Instructions to complete setup</li>
+                                                    <li>Access to OSAS staff features</li>
+                                                </ul>
+                                            </div>
+                                        </AlertDescription>
+                                    </Alert>
+
+                                    {/* Expiry Notice */}
+                                    <div className="text-muted-foreground bg-muted/30 flex items-center gap-2 rounded-md p-3 text-sm">
+                                        <Clock className="h-4 w-4 flex-shrink-0" />
+                                        <span>
+                                            Invitation link expires in <strong>48 hours</strong>
+                                        </span>
+                                    </div>
                                 </div>
-                            </AlertDescription>
-                        </Alert>
 
-                        {/* Expiry Notice */}
-                        <div className="text-muted-foreground bg-muted/30 flex items-center gap-2 rounded-md p-3 text-sm">
-                            <Clock className="h-4 w-4 flex-shrink-0" />
-                            <span>
-                                Invitation link expires in <strong>48 hours</strong>
-                            </span>
-                        </div>
-                    </div>
+                                <Separator />
 
-                    <Separator />
-
-                    <DialogFooter className="flex gap-3">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => onOpenChange(false)}
-                            disabled={processing}
-                            className="flex-1 sm:flex-none"
-                        >
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={processing || !data.email} className="flex-1 sm:flex-none">
-                            {processing ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Sending Invitation...
-                                </>
-                            ) : (
-                                <>
-                                    <Mail className="mr-2 h-4 w-4" />
-                                    Send Invitation
-                                </>
-                            )}
-                        </Button>
-                    </DialogFooter>
-                </form>
+                                <DialogFooter className="flex gap-3">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => onOpenChange(false)}
+                                        disabled={processing}
+                                        className="flex-1 sm:flex-none"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit" disabled={processing} className="flex-1 sm:flex-none">
+                                        {processing ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Sending Invitation...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Mail className="mr-2 h-4 w-4" />
+                                                Send Invitation
+                                            </>
+                                        )}
+                                    </Button>
+                                </DialogFooter>
+                            </div>
+                        </>
+                    )}
+                </Form>
             </DialogContent>
         </Dialog>
     );

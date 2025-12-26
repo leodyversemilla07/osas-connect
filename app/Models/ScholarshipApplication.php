@@ -64,12 +64,14 @@ class ScholarshipApplication extends Model
         'scholarship_id',
         'user_id',
         'status',
+        'is_renewal',
         'priority',
         'reviewer_id',
         'applied_at',
         'verified_at',
         'approved_at',
         'rejected_at',
+        'last_renewed_at',
         'current_step',
         'purpose_letter',
         'application_data',
@@ -95,11 +97,13 @@ class ScholarshipApplication extends Model
         'verified_at' => 'datetime',
         'approved_at' => 'datetime',
         'rejected_at' => 'datetime',
+        'last_renewed_at' => 'datetime',
         'interview_schedule' => 'datetime',
         'last_stipend_date' => 'datetime',
         'evaluation_score' => 'decimal:2',
         'amount_received' => 'decimal:2',
         'academic_year' => 'integer',
+        'is_renewal' => 'boolean',
     ];
 
     // Status constants for easier reference
@@ -800,5 +804,13 @@ class ScholarshipApplication extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewer_id');
+    }
+
+    /**
+     * Get the renewal applications for this scholarship.
+     */
+    public function renewals(): HasMany
+    {
+        return $this->hasMany(RenewalApplication::class, 'original_application_id');
     }
 }

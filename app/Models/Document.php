@@ -38,6 +38,7 @@ class Document extends Model
 
     protected $fillable = [
         'application_id',
+        'renewal_application_id',
         'type',
         'file_path',
         'original_name',
@@ -56,6 +57,11 @@ class Document extends Model
     public function application(): BelongsTo
     {
         return $this->belongsTo(ScholarshipApplication::class);
+    }
+
+    public function renewalApplication(): BelongsTo
+    {
+        return $this->belongsTo(RenewalApplication::class);
     }
 
     public function verifiedBy(): BelongsTo

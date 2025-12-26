@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useForm } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -31,25 +31,7 @@ interface DeleteScholarshipDialogProps {
 }
 
 export default function DeleteScholarshipDialog({ isOpen, onClose, scholarship }: DeleteScholarshipDialogProps) {
-    const { post, processing } = useForm();
-
-    const handleDelete = () => {
-        if (scholarship) {
-            post(route('osas.scholarships.destroy', scholarship.id), {
-                onSuccess: () => {
-                    onClose();
-                    toast.success('Scholarship deleted successfully!', {
-                        description: `${scholarship.name} has been removed from the scholarship programs.`,
-                    });
-                },
-                onError: () => {
-                    toast.error('Failed to delete scholarship', {
-                        description: 'Please try again later.',
-                    });
-                },
-            });
-        }
-    };
+    if (!scholarship) return null;
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -61,25 +43,43 @@ export default function DeleteScholarshipDialog({ isOpen, onClose, scholarship }
 
                 <div className="mt-4">
                     <p className="text-sm">
-                        Are you sure you want to delete <span className="font-medium">{scholarship?.name}</span>?
+                        Are you sure you want to delete <span className="font-medium">{scholarship.name}</span>?
                     </p>
                 </div>
 
-                <DialogFooter className="gap-2">
-                    <Button type="button" variant="ghost" onClick={onClose}>
-                        Cancel
-                    </Button>
-                    <Button type="button" variant="destructive" onClick={handleDelete} disabled={processing}>
-                        {processing ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Deleting...
-                            </>
-                        ) : (
-                            'Delete'
-                        )}
-                    </Button>
-                </DialogFooter>
+                <Form
+                    action={route('osas.scholarships.destroy', scholarship.id)}
+                    method="post"
+                    onSuccess={() => {
+                        onClose();
+                        toast.success('Scholarship deleted successfully!', {
+                            description: `${scholarship.name} has been removed from the scholarship programs.`,
+                        });
+                    }}
+                    onError={() => {
+                        toast.error('Failed to delete scholarship', {
+                            description: 'Please try again later.',
+                        });
+                    }}
+                >
+                    {({ processing }) => (
+                        <DialogFooter className="gap-2">
+                            <Button type="button" variant="ghost" onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" variant="destructive" disabled={processing}>
+                                {processing ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    'Delete'
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    )}
+                </Form>
             </DialogContent>
         </Dialog>
     );
