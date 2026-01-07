@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Document;
 use App\Models\OsasStaffProfile;
 use App\Models\Scholarship;
+use App\Models\ScholarshipApplication;
 use App\Models\StaffInvitation;
 use App\Models\User;
 use Carbon\Carbon;
@@ -24,79 +26,64 @@ class OsasStaffController extends Controller
      */
     public function index(): Response
     {
-        // Sample announcements - replace with actual data from database
+        // Get pending applications from database
+        $pendingApplications = ScholarshipApplication::with(['user.studentProfile', 'scholarship'])
+            ->whereIn('status', ['submitted', 'under_verification'])
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($application) {
+                return [
+                    'id' => $application->id,
+                    'studentName' => $application->user->name ?? 'Unknown',
+                    'scholarshipName' => $application->scholarship->name ?? 'Unknown Scholarship',
+                    'dateSubmitted' => $application->created_at->format('Y-m-d'),
+                    'status' => $application->status,
+                    'studentId' => $application->user->studentProfile->student_id ?? 'N/A',
+                ];
+            });
+
+        // Get recent documents pending verification
+        $recentDocuments = Document::with(['application.user'])
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($document) {
+                return [
+                    'id' => $document->id,
+                    'studentName' => $document->application->user->name ?? 'Unknown',
+                    'documentType' => ucwords(str_replace('_', ' ', $document->type)),
+                    'submissionDate' => $document->created_at->format('Y-m-d'),
+                    'status' => $document->status,
+                ];
+            });
+
+        // System announcements (these could come from a CMS or settings table in the future)
         $announcements = [
             [
                 'id' => 1,
-                'title' => 'Staff Meeting',
-                'date' => '2025-04-10',
-                'content' => 'Monthly staff meeting at 2:00 PM in the Conference Room.',
-            ],
-            [
-                'id' => 2,
-                'title' => 'Upcoming Training',
-                'date' => '2025-04-18',
-                'content' => 'Mandatory training session on the new student support system.',
+                'title' => 'Application Review Reminder',
+                'date' => now()->format('Y-m-d'),
+                'content' => 'Please review all pending applications within 5 business days.',
             ],
         ];
 
-        // Sample pending applications - replace with actual data from database
-        $pendingApplications = [
-            [
-                'id' => 1,
-                'studentName' => 'Maria Santos',
-                'scholarshipName' => 'Academic Merit Scholarship',
-                'dateSubmitted' => '2025-04-05',
-                'status' => 'pending',
-                'studentId' => 'ST-2025-1001',
-            ],
-            [
-                'id' => 2,
-                'studentName' => 'Juan Cruz',
-                'scholarshipName' => 'Need-Based Financial Aid',
-                'dateSubmitted' => '2025-04-03',
-                'status' => 'pending',
-                'studentId' => 'ST-2025-1042',
-            ],
-            [
-                'id' => 3,
-                'studentName' => 'Ana Reyes',
-                'scholarshipName' => 'Student Assistantship Program',
-                'dateSubmitted' => '2025-04-01',
-                'status' => 'pending',
-                'studentId' => 'ST-2025-1089',
-            ],
-        ];
-
-        // Sample document submissions - replace with actual data from database
-        $recentDocuments = [
-            [
-                'id' => 1,
-                'studentName' => 'Pedro Garcia',
-                'documentType' => 'Transcript of Records',
-                'submissionDate' => '2025-04-07',
-                'status' => 'pending',
-            ],
-            [
-                'id' => 2,
-                'studentName' => 'Sofia Lopez',
-                'documentType' => 'Certificate of Registration',
-                'submissionDate' => '2025-04-06',
-                'status' => 'approved',
-            ],
-            [
-                'id' => 3,
-                'studentName' => 'Carlo Tan',
-                'documentType' => 'Income Tax Return',
-                'submissionDate' => '2025-04-05',
-                'status' => 'rejected',
-            ],
+        // Add dynamic stats
+        $stats = [
+            'pending_applications' => ScholarshipApplication::whereIn('status', ['submitted', 'under_verification'])->count(),
+            'pending_documents' => Document::where('status', 'pending')->count(),
+            'approved_this_month' => ScholarshipApplication::where('status', 'approved')
+                ->whereMonth('approved_at', now()->month)
+                ->count(),
+            'total_scholars' => ScholarshipApplication::where('status', 'approved')->distinct('user_id')->count(),
         ];
 
         return Inertia::render('osas_staff/dashboard', [
             'announcements' => $announcements,
             'pendingApplications' => $pendingApplications,
             'recentDocuments' => $recentDocuments,
+            'stats' => $stats,
         ]);
     }
 

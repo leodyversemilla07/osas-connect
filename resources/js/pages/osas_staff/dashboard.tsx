@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
-import { BookOpen, ClipboardList, Eye, FileCheck, FileText, MoreHorizontal } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { BookOpen, ClipboardList, Eye, FileCheck, FileText, MoreHorizontal, Users } from 'lucide-react';
 
 // Import Shadcn UI components
 import { Badge } from '@/components/ui/badge';
@@ -27,14 +27,24 @@ const breadcrumbs: BreadcrumbItem[] = [
 const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
     const variants: { [key: string]: 'default' | 'secondary' | 'destructive' | 'outline' } = {
         pending: 'outline',
+        submitted: 'outline',
+        under_verification: 'secondary',
         approved: 'default',
         rejected: 'destructive',
+        verified: 'default',
     };
     return variants[status] || 'secondary';
 };
 
+interface DashboardStats {
+    pending_applications: number;
+    pending_documents: number;
+    approved_this_month: number;
+    total_scholars: number;
+}
+
 export default function StaffDashboard() {
-    const { pendingApplications = [], recentDocuments = [] } = usePage<
+    const { pendingApplications = [], recentDocuments = [], stats } = usePage<
         SharedData & {
             pendingApplications: Array<{
                 id: number;
@@ -51,6 +61,7 @@ export default function StaffDashboard() {
                 submissionDate: string;
                 status: string;
             }>;
+            stats?: DashboardStats;
         }
     >().props;
 
@@ -69,38 +80,38 @@ export default function StaffDashboard() {
                             <ClipboardList className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{pendingApplications?.length || 0}</div>
-                            <p className="text-muted-foreground text-xs">+20.1% from last month</p>
+                            <div className="text-2xl font-bold">{stats?.pending_applications ?? pendingApplications?.length ?? 0}</div>
+                            <p className="text-muted-foreground text-xs">Awaiting review</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Active Scholarships</CardTitle>
-                            <BookOpen className="text-muted-foreground h-4 w-4" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">24</div>
-                            <p className="text-muted-foreground text-xs">+180.1% from last month</p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Recent Documents</CardTitle>
+                            <CardTitle className="text-sm font-medium">Pending Documents</CardTitle>
                             <FileCheck className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{recentDocuments?.length || 0}</div>
-                            <p className="text-muted-foreground text-xs">+19% from last month</p>
+                            <div className="text-2xl font-bold">{stats?.pending_documents ?? recentDocuments?.length ?? 0}</div>
+                            <p className="text-muted-foreground text-xs">Awaiting verification</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
-                            <FileText className="text-muted-foreground h-4 w-4" />
+                            <CardTitle className="text-sm font-medium">Approved This Month</CardTitle>
+                            <BookOpen className="text-muted-foreground h-4 w-4" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">12</div>
-                            <p className="text-muted-foreground text-xs">+201 since last hour</p>
+                            <div className="text-2xl font-bold">{stats?.approved_this_month ?? 0}</div>
+                            <p className="text-muted-foreground text-xs">Applications approved</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Scholars</CardTitle>
+                            <Users className="text-muted-foreground h-4 w-4" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats?.total_scholars ?? 0}</div>
+                            <p className="text-muted-foreground text-xs">Active scholarship recipients</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -172,28 +183,28 @@ export default function StaffDashboard() {
                         <CardContent className="space-y-4">
                             <div className="grid gap-3">
                                 <Button variant="outline" className="justify-start" asChild>
-                                    <a href="/applications">
+                                    <Link href={route('osas.applications')}>
                                         <ClipboardList className="mr-2 h-4 w-4" />
                                         Review Applications
-                                    </a>
+                                    </Link>
                                 </Button>
                                 <Button variant="outline" className="justify-start" asChild>
-                                    <a href="/documents">
-                                        <FileCheck className="mr-2 h-4 w-4" />
-                                        Manage Documents
-                                    </a>
-                                </Button>
-                                <Button variant="outline" className="justify-start" asChild>
-                                    <a href="/scholarships">
+                                    <Link href={route('osas.manage.scholarships')}>
                                         <BookOpen className="mr-2 h-4 w-4" />
                                         Manage Scholarships
-                                    </a>
+                                    </Link>
                                 </Button>
                                 <Button variant="outline" className="justify-start" asChild>
-                                    <a href="/reports">
+                                    <Link href={route('osas.renewals.index')}>
+                                        <FileCheck className="mr-2 h-4 w-4" />
+                                        Review Renewals
+                                    </Link>
+                                </Button>
+                                <Button variant="outline" className="justify-start" asChild>
+                                    <Link href={route('osas.reports')}>
                                         <FileText className="mr-2 h-4 w-4" />
-                                        Generate Reports
-                                    </a>
+                                        View Reports
+                                    </Link>
                                 </Button>
                             </div>
                         </CardContent>
