@@ -341,12 +341,28 @@ class ScholarshipApplication extends Model
     }
 
     /**
-     * Helper: Are funds available for renewal? (Stub, to be implemented with finance logic)
+     * Helper: Are funds available for renewal?
+     * Checks if there are available funds in the current academic year/semester.
      */
     public function isFundsAvailable(): bool
     {
-        // TODO: Integrate with fund management system
-        return true;
+        // Get the fund source based on scholarship type
+        $fundSource = in_array($this->scholarship->type ?? '', [
+            Scholarship::TYPE_ACADEMIC_FULL,
+            Scholarship::TYPE_ACADEMIC_PARTIAL,
+        ]) ? FundTracking::FUND_SPECIAL_TRUST : FundTracking::FUND_STUDENT_DEVELOPMENT;
+
+        // Check if there are funds with remaining budget
+        $fund = FundTracking::where('fund_source', $fundSource)
+            ->where('status', 'active')
+            ->where('remaining_budget', '>', 0)
+            ->where(function ($query) {
+                $query->whereNull('budget_end_date')
+                    ->orWhere('budget_end_date', '>=', now());
+            })
+            ->first();
+
+        return $fund !== null;
     }
 
     /**
