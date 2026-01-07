@@ -978,8 +978,47 @@ class OsasStaffController extends Controller
 
     public function events(): Response
     {
-        // You can load events data here as needed
-        $events = [];
+        // Get upcoming interviews as events
+        $upcomingInterviews = \App\Models\Interview::with(['scholarshipApplication.user', 'scholarshipApplication.scholarship'])
+            ->where('scheduled_at', '>=', now())
+            ->where('status', 'scheduled')
+            ->orderBy('scheduled_at')
+            ->take(20)
+            ->get()
+            ->map(function ($interview) {
+                return [
+                    'id' => $interview->id,
+                    'type' => 'interview',
+                    'title' => 'Interview: ' . ($interview->scholarshipApplication->user->name ?? 'Student'),
+                    'description' => ($interview->scholarshipApplication->scholarship->name ?? 'Scholarship') . ' Interview',
+                    'date' => $interview->scheduled_at->format('Y-m-d'),
+                    'time' => $interview->scheduled_at->format('H:i'),
+                    'location' => $interview->location ?? 'TBD',
+                    'status' => $interview->status,
+                ];
+            });
+
+        // Get renewal deadlines as events
+        $renewalDeadlines = \App\Models\RenewalApplication::with(['scholarshipApplication.scholarship'])
+            ->where('deadline', '>=', now())
+            ->where('status', 'pending')
+            ->orderBy('deadline')
+            ->take(10)
+            ->get()
+            ->map(function ($renewal) {
+                return [
+                    'id' => 'renewal-' . $renewal->id,
+                    'type' => 'deadline',
+                    'title' => 'Renewal Deadline',
+                    'description' => ($renewal->scholarshipApplication->scholarship->name ?? 'Scholarship') . ' Renewal Due',
+                    'date' => $renewal->deadline->format('Y-m-d'),
+                    'time' => '23:59',
+                    'location' => null,
+                    'status' => 'pending',
+                ];
+            });
+
+        $events = $upcomingInterviews->merge($renewalDeadlines)->sortBy('date')->values();
 
         return Inertia::render('osas_staff/events', [
             'events' => $events,
@@ -991,11 +1030,11 @@ class OsasStaffController extends Controller
      */
     public function reports(): Response
     {
-        // You can load reports data here as needed
-        $reports = [];
+        $reportingService = app(\App\Services\ReportingService::class);
+        $statistics = $reportingService->getDashboardStatistics();
 
         return Inertia::render('osas_staff/reports', [
-            'reports' => $reports,
+            'statistics' => $statistics,
         ]);
     }
 
