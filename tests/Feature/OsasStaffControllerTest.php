@@ -15,7 +15,7 @@ describe('OsasStaffController Dashboard', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('osas_staff/dashboard')
+            ->component('osas-staff/dashboard')
             ->has('stats')
             ->has('pendingApplications')
             ->has('recentDocuments')
@@ -113,7 +113,7 @@ describe('OsasStaffController Events', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('osas_staff/events')
+            ->component('osas-staff/events')
             ->has('events')
         );
     });

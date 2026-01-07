@@ -20,7 +20,7 @@ class ReportingController extends Controller
         $year = $request->input('year', date('Y'));
         $statistics = $this->reportingService->getDashboardStatistics();
 
-        return Inertia::render('osas_staff/analytics-dashboard', [
+        return Inertia::render('osas-staff/analytics-dashboard', [
             'statistics' => $statistics,
             'current_year' => $year,
             'available_years' => $this->getAvailableYears(),
@@ -36,7 +36,7 @@ class ReportingController extends Controller
         $filters = $request->only(['year', 'scholarship_type']);
         $year = $filters['year'] ?? date('Y');
         
-        return Inertia::render('osas_staff/reports', [
+        return Inertia::render('osas-staff/reports', [
             'scholarship_distribution' => $this->reportingService->getScholarshipDistributionReport($filters),
             'fund_utilization' => $this->reportingService->getFundUtilizationReport($year),
             'available_years' => $this->getAvailableYears(),

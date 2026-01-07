@@ -46,7 +46,7 @@ class InterviewController extends Controller
             ->orderBy('schedule', 'desc')
             ->paginate(15);
 
-        return Inertia::render('osas_staff/interviews', [
+        return Inertia::render('osas-staff/interviews', [
             'interviews' => $interviews,
         ]);
     }
@@ -60,7 +60,7 @@ class InterviewController extends Controller
         $upcomingInterviews = $this->interviewService->getUpcomingInterviews(Auth::user(), 10);
         $todayInterviews = $this->interviewService->getTodayInterviews();
 
-        return Inertia::render('osas_staff/interview-dashboard', [
+        return Inertia::render('osas-staff/interview-dashboard', [
             'statistics' => $statistics,
             'upcomingInterviews' => $upcomingInterviews,
             'todayInterviews' => $todayInterviews,
@@ -77,7 +77,7 @@ class InterviewController extends Controller
             ->whereDoesntHave('interview')
             ->get();
 
-        return Inertia::render('osas_staff/interview-create', [
+        return Inertia::render('osas-staff/interview-create', [
             'applications' => $applications,
         ]);
     }
@@ -114,7 +114,7 @@ class InterviewController extends Controller
             ]);
         }
 
-        return Inertia::render('osas_staff/interview-details', [
+        return Inertia::render('osas-staff/interview-details', [
             'interview' => $interview,
         ]);
     }
@@ -126,7 +126,7 @@ class InterviewController extends Controller
     {
         $interview->load(['application.student.studentProfile', 'application.scholarship', 'interviewer']);
 
-        return Inertia::render('osas_staff/interview-edit', [
+        return Inertia::render('osas-staff/interview-edit', [
             'interview' => $interview,
         ]);
     }

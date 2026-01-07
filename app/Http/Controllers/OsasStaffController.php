@@ -79,7 +79,7 @@ class OsasStaffController extends Controller
             'total_scholars' => ScholarshipApplication::where('status', 'approved')->distinct('user_id')->count(),
         ];
 
-        return Inertia::render('osas_staff/dashboard', [
+        return Inertia::render('osas-staff/dashboard', [
             'announcements' => $announcements,
             'pendingApplications' => $pendingApplications,
             'recentDocuments' => $recentDocuments,
@@ -242,7 +242,7 @@ class OsasStaffController extends Controller
 
         $yearLevels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
-        return Inertia::render('osas_staff/student-records', [
+        return Inertia::render('osas-staff/student-records', [
             'students' => $students,
             'filters' => [
                 'search' => $request->search,
@@ -567,7 +567,7 @@ class OsasStaffController extends Controller
             ]);
         }
 
-        return Inertia::render('osas_staff/student-details', [
+        return Inertia::render('osas-staff/student-details', [
             'user' => $userData,
         ]);
     }
@@ -656,7 +656,7 @@ class OsasStaffController extends Controller
 
         $userData['studentProfile'] = $studentProfileData;
 
-        return Inertia::render('osas_staff/student-edit', [
+        return Inertia::render('osas-staff/student-edit', [
             'user' => $userData,
         ]);
     }
@@ -854,7 +854,7 @@ class OsasStaffController extends Controller
             'total_beneficiaries' => $totalBeneficiaries,
         ];
 
-        return Inertia::render('osas_staff/manage-scholarships', [
+        return Inertia::render('osas-staff/manage-scholarships', [
             'scholarships' => $scholarships,
             'statistics' => $statistics,
             'filters' => [
@@ -1020,7 +1020,7 @@ class OsasStaffController extends Controller
 
         $events = $upcomingInterviews->merge($renewalDeadlines)->sortBy('date')->values();
 
-        return Inertia::render('osas_staff/events', [
+        return Inertia::render('osas-staff/events', [
             'events' => $events,
         ]);
     }
@@ -1033,7 +1033,7 @@ class OsasStaffController extends Controller
         $reportingService = app(\App\Services\ReportingService::class);
         $statistics = $reportingService->getDashboardStatistics();
 
-        return Inertia::render('osas_staff/reports', [
+        return Inertia::render('osas-staff/reports', [
             'statistics' => $statistics,
         ]);
     }
@@ -1149,7 +1149,7 @@ class OsasStaffController extends Controller
             'completion_rate' => round($completionRate, 1),
         ];
 
-        return Inertia::render('osas_staff/applications', [
+        return Inertia::render('osas-staff/applications', [
             'applications' => $applications,
             'statistics' => $statistics,
             'filters' => [
@@ -1173,7 +1173,7 @@ class OsasStaffController extends Controller
         // Get application history/timeline
         $timeline = $this->buildApplicationTimeline($application);
 
-        return Inertia::render('osas_staff/application-review', [
+        return Inertia::render('osas-staff/application-review', [
             'application' => [
                 'id' => $application->id,
                 'status' => $application->status,
@@ -1540,7 +1540,7 @@ class OsasStaffController extends Controller
                 ->with('error', 'Interview can only be scheduled for verified or approved applications.');
         }
 
-        return Inertia::render('osas_staff/interview-schedule', [
+        return Inertia::render('osas-staff/interview-schedule', [
             'application' => [
                 'id' => $application->id,
                 'status' => $application->status,
