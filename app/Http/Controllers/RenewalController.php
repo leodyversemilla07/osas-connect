@@ -30,7 +30,7 @@ class RenewalController extends Controller
             $deadlines['current_semester']['year']
         );
 
-        return Inertia::render('Student/Renewal/CheckEligibility', [
+        return Inertia::render('student/renewals/check-eligibility', [
             'application' => $application->load('scholarship', 'student.studentProfile'),
             'eligibility' => $eligibility,
             'deadlines' => $deadlines,
@@ -58,7 +58,7 @@ class RenewalController extends Controller
                 ->with('error', 'You are not eligible for renewal at this time.');
         }
 
-        return Inertia::render('Student/Renewal/Create', [
+        return Inertia::render('student/renewals/create', [
             'application' => $application->load('scholarship', 'student.studentProfile'),
             'eligibility' => $eligibility,
             'deadlines' => $deadlines,
@@ -73,7 +73,7 @@ class RenewalController extends Controller
         $validated = $request->validate([
             'semester' => 'required|string',
             'year' => 'required|integer',
-            'cgpa' => 'required|numeric|min:0|max:4',
+            'current_gwa' => 'required|numeric|min:0|max:4',
             'notes' => 'nullable|string|max:1000',
         ]);
 
@@ -83,7 +83,7 @@ class RenewalController extends Controller
                 $validated['semester'],
                 $validated['year'],
                 [
-                    'cgpa' => $validated['cgpa'],
+                    'current_gwa' => $validated['current_gwa'],
                     'notes' => $validated['notes'] ?? null,
                 ]
             );
@@ -100,7 +100,7 @@ class RenewalController extends Controller
      */
     public function show(RenewalApplication $renewal): Response
     {
-        return Inertia::render('Student/Renewal/Show', [
+        return Inertia::render('student/renewals/show', [
             'renewal' => $renewal->load([
                 'originalApplication.scholarship',
                 'student.studentProfile',
@@ -140,7 +140,7 @@ class RenewalController extends Controller
             $deadlines['current_semester']['year']
         );
 
-        return Inertia::render('Staff/Renewal/Index', [
+        return Inertia::render('osas_staff/renewals/index', [
             'renewals' => $renewals,
             'statistics' => $statistics,
             'deadlines' => $deadlines,
@@ -153,7 +153,7 @@ class RenewalController extends Controller
      */
     public function review(RenewalApplication $renewal): Response
     {
-        return Inertia::render('Staff/Renewal/Review', [
+        return Inertia::render('osas_staff/renewals/review', [
             'renewal' => $renewal->load([
                 'originalApplication.scholarship',
                 'student.studentProfile',
@@ -257,7 +257,7 @@ class RenewalController extends Controller
         $statistics = $this->renewalService->getRenewalStatistics($semester, $year);
         $statisticsByType = $this->renewalService->getRenewalStatisticsByType($semester, $year);
 
-        return Inertia::render('Staff/Renewal/Statistics', [
+        return Inertia::render('osas_staff/renewals/statistics', [
             'statistics' => $statistics,
             'statisticsByType' => $statisticsByType,
             'deadlines' => $deadlines,

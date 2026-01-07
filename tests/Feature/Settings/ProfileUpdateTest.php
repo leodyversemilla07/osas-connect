@@ -3,7 +3,7 @@
 use App\Models\User;
 
 it('displays the profile page', function () {
-    $user = User::factory()->student()->create();
+    $user = User::factory()->withProfile()->student()->create();
 
     $response = $this->actingAs($user)->get('/settings/profile');
 
@@ -11,7 +11,7 @@ it('displays the profile page', function () {
 });
 
 it('allows profile information updates', function () {
-    $user = User::factory()->student()->unverified()->create();
+    $user = User::factory()->withProfile()->student()->unverified()->create();
 
     $response = $this->actingAs($user)->patch('/settings/profile', [
         'first_name' => 'John',
@@ -52,6 +52,7 @@ it('allows profile information updates', function () {
 
 it('preserves email verification status when email unchanged', function () {
     $user = User::factory()
+        ->withProfile()
         ->student()
         ->create([
             'email' => 'test@minsu.edu.ph',
@@ -92,7 +93,7 @@ it('preserves email verification status when email unchanged', function () {
 });
 
 it('allows users to delete their account', function () {
-    $user = User::factory()->student()->create();
+    $user = User::factory()->withProfile()->student()->create();
 
     $response = $this->actingAs($user)->delete('/settings/profile', [
         'password' => 'password',
@@ -105,7 +106,7 @@ it('allows users to delete their account', function () {
 });
 
 it('requires correct password to delete account', function () {
-    $user = User::factory()->student()->create();
+    $user = User::factory()->withProfile()->student()->create();
 
     $response = $this->actingAs($user)
         ->from('/settings/profile')

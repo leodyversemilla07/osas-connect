@@ -23,6 +23,7 @@ class StudentProfile extends Model
         'year_level',
         'current_gwa',
         'enrollment_status',
+        'has_disciplinary_action',
         'units',
         'existing_scholarships',
 
@@ -153,6 +154,7 @@ class StudentProfile extends Model
         'is_pwd' => 'boolean',
         'current_gwa' => 'decimal:3',
         'units' => 'integer',
+        'has_disciplinary_action' => 'boolean',
 
         // Siblings Information
         'siblings' => 'array',

@@ -21,7 +21,9 @@ class RenewalApplication extends Model
         'reviewed_at',
         'reviewer_id',
         'renewal_notes',
-        'cgpa',
+        'current_gwa',
+        'is_renewal',
+        'last_renewed_at',
         'has_required_documents',
         'required_document_ids',
     ];
@@ -29,7 +31,9 @@ class RenewalApplication extends Model
     protected $casts = [
         'submitted_at' => 'datetime',
         'reviewed_at' => 'datetime',
-        'cgpa' => 'decimal:2',
+        'last_renewed_at' => 'datetime',
+        'current_gwa' => 'decimal:2',
+        'is_renewal' => 'boolean',
         'has_required_documents' => 'boolean',
         'required_document_ids' => 'array',
     ];

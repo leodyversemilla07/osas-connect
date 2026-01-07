@@ -291,14 +291,14 @@
             </div>
 
             <p style="margin-top: 20px;">
-                We look forward to continuing to support your academic journey at Mindanao State University.
+                We look forward to continuing to support your academic journey at Mindoro State University.
             </p>
 
             <p style="margin-top: 20px;">Best regards,<br><strong>OSAS Team</strong></p>
         </div>
 
         <div class="footer">
-            <p style="margin-bottom: 10px;"><strong>Mindanao State University</strong></p>
+            <p style="margin-bottom: 10px;"><strong>Mindoro State University</strong></p>
             <p style="margin-bottom: 10px;">Office of Student Affairs and Services</p>
             <p>
                 This is an automated reminder. Please do not reply directly to this email.<br>

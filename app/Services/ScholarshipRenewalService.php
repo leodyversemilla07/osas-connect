@@ -57,11 +57,11 @@ class ScholarshipRenewalService
             return $eligibilityResult;
         }
 
-        // Check CGPA requirement (must maintain minimum CGPA)
-        $minimumCgpa = $this->getMinimumCgpaForScholarship($scholarship);
-        if ($student->cgpa < $minimumCgpa) {
+        // Check GWA requirement (must maintain minimum GWA - lower is better in Philippine scale)
+        $maximumGwa = $this->getMaximumGwaForScholarship($scholarship);
+        if ($student->current_gwa > $maximumGwa) {
             $eligibilityResult['requirements_failed'][] = 'cgpa_below_minimum';
-            $eligibilityResult['messages'][] = "Your CGPA ({$student->cgpa}) is below the minimum required ({$minimumCgpa}).";
+            $eligibilityResult['messages'][] = "Your GWA ({$student->current_gwa}) exceeds the maximum allowed ({$maximumGwa}).";
         } else {
             $eligibilityResult['requirements_met'][] = 'cgpa_requirement';
         }
@@ -114,12 +114,12 @@ class ScholarshipRenewalService
         return DB::transaction(function () use ($originalApplication, $semester, $year, $additionalData) {
             $renewal = RenewalApplication::create([
                 'original_application_id' => $originalApplication->id,
-                'student_id' => $originalApplication->student_id,
+                'student_id' => $originalApplication->user_id,
                 'renewal_semester' => $semester,
                 'renewal_year' => $year,
                 'status' => 'pending',
                 'submitted_at' => now(),
-                'cgpa' => $additionalData['cgpa'] ?? $originalApplication->student->studentProfile->cgpa,
+                'current_gwa' => $additionalData['current_gwa'] ?? $originalApplication->student->studentProfile->current_gwa,
                 'renewal_notes' => $additionalData['notes'] ?? null,
             ]);
 
@@ -176,8 +176,8 @@ class ScholarshipRenewalService
                 'renewal_notes' => $notes ?? 'Renewal approved. Student meets all requirements.',
             ]);
 
-            // Update the original application's renewal status
-            $renewal->originalApplication->update([
+            // Update the renewal status and application tracking
+            $renewal->update([
                 'is_renewal' => true,
                 'last_renewed_at' => now(),
             ]);
@@ -292,18 +292,18 @@ class ScholarshipRenewalService
     }
 
     /**
-     * Get minimum CGPA requirement for a scholarship.
+     * Get maximum GWA requirement for a scholarship (Philippine scale - lower is better).
      */
-    protected function getMinimumCgpaForScholarship(Scholarship $scholarship): float
+    protected function getMaximumGwaForScholarship(Scholarship $scholarship): float
     {
         return match ($scholarship->type) {
-            Scholarship::TYPE_ACADEMIC_FULL => 3.5,
-            Scholarship::TYPE_ACADEMIC_PARTIAL => 3.0,
-            Scholarship::TYPE_PERFORMING_ARTS_FULL => 2.75,
-            Scholarship::TYPE_PERFORMING_ARTS_PARTIAL => 2.5,
-            Scholarship::TYPE_STUDENT_ASSISTANTSHIP => 2.5,
-            Scholarship::TYPE_ECONOMIC_ASSISTANCE => 2.0,
-            default => 2.0,
+            Scholarship::TYPE_ACADEMIC_FULL => 1.450,      // President's Lister (1.000-1.450)
+            Scholarship::TYPE_ACADEMIC_PARTIAL => 1.750,   // Dean's Lister (1.460-1.750)
+            Scholarship::TYPE_PERFORMING_ARTS_FULL => 2.00,
+            Scholarship::TYPE_PERFORMING_ARTS_PARTIAL => 2.25,
+            Scholarship::TYPE_STUDENT_ASSISTANTSHIP => 2.25,
+            Scholarship::TYPE_ECONOMIC_ASSISTANCE => 2.25, // Per scholarships.md
+            default => 2.25,
         };
     }
 

@@ -11,9 +11,9 @@ use Carbon\Carbon;
 beforeEach(function () {
     $this->reportingService = new ReportingService();
     
-    // Create test data
+    // Create test data with profiles
     $this->admin = User::factory()->create(['role' => 'admin']);
-    $this->student = User::factory()->create(['role' => 'student']);
+    $this->student = User::factory()->withProfile()->create(['role' => 'student']);
     
     $this->scholarship = Scholarship::factory()->create([
         'type' => 'academic_full',

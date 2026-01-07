@@ -43,9 +43,9 @@ describe('User Model', function () {
     });
     
     it('has correct profile relationships', function () {
-        $student = User::factory()->create(['role' => 'student']);
-        $osasStaff = User::factory()->create(['role' => 'osas_staff']);
-        $admin = User::factory()->create(['role' => 'admin']);
+        $student = User::factory()->withProfile()->create(['role' => 'student']);
+        $osasStaff = User::factory()->withProfile()->create(['role' => 'osas_staff']);
+        $admin = User::factory()->withProfile()->create(['role' => 'admin']);
 
         // UserFactory automatically creates profiles, so we just verify they exist and are correct type
         expect($student->studentProfile)->toBeInstanceOf(StudentProfile::class);
@@ -58,19 +58,19 @@ describe('User Model', function () {
         expect($admin->adminProfile->user_id)->toBe($admin->id);
     });
     it('returns correct profile based on role', function () {
-        $student = User::factory()->create(['role' => 'student']);
+        $student = User::factory()->withProfile()->create(['role' => 'student']);
 
         // UserFactory automatically creates the profile
         expect($student->profile())->toBeInstanceOf(StudentProfile::class);
         expect($student->profile()->user_id)->toBe($student->id);
 
         // Test OSAS staff profile
-        $osasStaff = User::factory()->create(['role' => 'osas_staff']);
+        $osasStaff = User::factory()->withProfile()->create(['role' => 'osas_staff']);
         expect($osasStaff->profile())->toBeInstanceOf(OsasStaffProfile::class);
         expect($osasStaff->profile()->user_id)->toBe($osasStaff->id);
 
         // Test admin profile
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->withProfile()->create(['role' => 'admin']);
         expect($admin->profile())->toBeInstanceOf(AdminProfile::class);
         expect($admin->profile()->user_id)->toBe($admin->id);
     });

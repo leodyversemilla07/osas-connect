@@ -29,7 +29,7 @@ class RenewalApplicationFactory extends Factory
             'reviewed_at' => fake()->optional(0.5)->dateTimeBetween('-2 months', 'now'),
             'reviewer_id' => fake()->optional(0.5)->randomElement(\App\Models\User::pluck('id')->toArray() ?: [null]),
             'renewal_notes' => fake()->optional(0.6)->sentence(),
-            'cgpa' => fake()->randomFloat(2, 2.0, 4.0),
+            'current_gwa' => fake()->randomFloat(2, 2.0, 4.0),
             'has_required_documents' => fake()->boolean(70),
             'required_document_ids' => fake()->optional(0.7)->randomElements([1, 2, 3, 4, 5], fake()->numberBetween(1, 3)),
         ];

@@ -14,10 +14,10 @@ beforeEach(function () {
 });
 
 test('checks renewal eligibility for approved application', function () {
-    $student = User::factory()->create();
+    $student = User::factory()->withoutProfile()->create();
     $studentProfile = StudentProfile::factory()->create([
         'user_id' => $student->id,
-        'cgpa' => 3.5,
+        'current_gwa' => 1.350, // Good GWA (Philippine scale - lower is better)
         'enrollment_status' => 'enrolled',
         'has_disciplinary_action' => false,
     ]);
@@ -45,10 +45,10 @@ test('checks renewal eligibility for approved application', function () {
 });
 
 test('rejects renewal eligibility for low CGPA', function () {
-    $student = User::factory()->create();
+    $student = User::factory()->withoutProfile()->create();
     $studentProfile = StudentProfile::factory()->create([
         'user_id' => $student->id,
-        'cgpa' => 2.0, // Too low for academic scholarship
+        'current_gwa' => 2.0, // Too high for academic full scholarship (max 1.450)
         'enrollment_status' => 'enrolled',
         'has_disciplinary_action' => false,
     ]);
@@ -74,11 +74,12 @@ test('rejects renewal eligibility for low CGPA', function () {
 });
 
 test('rejects renewal eligibility for unapproved application', function () {
-    $student = User::factory()->create();
+    $student = User::factory()->withoutProfile()->create();
     $studentProfile = StudentProfile::factory()->create([
         'user_id' => $student->id,
-        'cgpa' => 3.5,
+        'current_gwa' => 1.350,
         'enrollment_status' => 'enrolled',
+        'has_disciplinary_action' => false,
     ]);
 
     $scholarship = Scholarship::factory()->create();
@@ -86,7 +87,7 @@ test('rejects renewal eligibility for unapproved application', function () {
     $application = ScholarshipApplication::factory()->create([
         'user_id' => $student->id,
         'scholarship_id' => $scholarship->id,
-        'status' => 'pending', // Not approved yet
+        'status' => 'submitted', // Not approved yet
     ]);
 
     $eligibility = $this->renewalService->checkRenewalEligibility(
@@ -100,11 +101,12 @@ test('rejects renewal eligibility for unapproved application', function () {
 });
 
 test('rejects renewal eligibility if already renewed for period', function () {
-    $student = User::factory()->create();
+    $student = User::factory()->withoutProfile()->create();
     $studentProfile = StudentProfile::factory()->create([
         'user_id' => $student->id,
-        'cgpa' => 3.5,
+        'current_gwa' => 1.350,
         'enrollment_status' => 'enrolled',
+        'has_disciplinary_action' => false,
     ]);
 
     $scholarship = Scholarship::factory()->create();
@@ -134,10 +136,10 @@ test('rejects renewal eligibility if already renewed for period', function () {
 });
 
 test('creates renewal application successfully', function () {
-    $student = User::factory()->create();
+    $student = User::factory()->withoutProfile()->create();
     $studentProfile = StudentProfile::factory()->create([
         'user_id' => $student->id,
-        'cgpa' => 3.5,
+        'current_gwa' => 1.350,
         'enrollment_status' => 'enrolled',
         'has_disciplinary_action' => false,
     ]);
@@ -156,14 +158,14 @@ test('creates renewal application successfully', function () {
         $application,
         'First Semester',
         2025,
-        ['cgpa' => 3.6, 'notes' => 'Test renewal']
+        ['current_gwa' => 1.40, 'notes' => 'Test renewal']
     );
 
     expect($renewal)->toBeInstanceOf(RenewalApplication::class)
         ->and($renewal->status)->toBe('pending')
         ->and($renewal->renewal_semester)->toBe('First Semester')
         ->and($renewal->renewal_year)->toBe(2025)
-        ->and($renewal->cgpa)->toBe('3.60');
+        ->and($renewal->current_gwa)->toBe('1.40');
 });
 
 test('approves renewal application', function () {

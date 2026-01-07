@@ -35,9 +35,11 @@ return new class extends Migration
                 ->constrained('users')
                 ->nullOnDelete();
             $table->text('renewal_notes')->nullable();
-            $table->decimal('cgpa', 3, 2)->nullable(); // Current CGPA for renewal
+            $table->decimal('current_gwa', 3, 2)->nullable(); // Current GWA for renewal
             $table->boolean('has_required_documents')->default(false);
             $table->json('required_document_ids')->nullable(); // Store document IDs
+            $table->boolean('is_renewal')->default(false); // Move from application to renewal tracking
+            $table->timestamp('last_renewed_at')->nullable();
             $table->timestamps();
 
             // Indexes for performance (with custom names to avoid length limits)

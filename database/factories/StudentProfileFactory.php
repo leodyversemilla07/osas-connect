@@ -42,6 +42,10 @@ class StudentProfileFactory extends Factory
             'course' => $course,
             'major' => $major,
             'year_level' => fake()->randomElement(['1st Year', '2nd Year', '3rd Year', '4th Year']),
+            'current_gwa' => fake()->randomFloat(3, 1.0, 3.0), // Philippine GWA scale (1.0 is best)
+            'enrollment_status' => fake()->randomElement(['enrolled', 'not_enrolled', 'graduated', 'dropped_out']),
+            'has_disciplinary_action' => fake()->boolean(10), // 10% chance of having disciplinary action
+            'units' => fake()->numberBetween(15, 24),
             'existing_scholarships' => fake()
                 ->optional(0.4)
                 ->randomElement(['TES', 'ESGP-PA', 'Tulong Dunong', 'Municipal Scholarship', 'Provincial Scholarship', 'DOST Scholarship']),

@@ -122,7 +122,7 @@ interface Props {
     scholarship_types: string[];
 }
 
-export default function AnalyticsDashboard({ statistics, current_year, available_years, scholarship_types }: Props) {
+export default function AnalyticsDashboard({ statistics, current_year, available_years }: Props) {
     const [selectedYear, setSelectedYear] = useState<string>(current_year);
 
     const formatCurrency = (amount: number) => {

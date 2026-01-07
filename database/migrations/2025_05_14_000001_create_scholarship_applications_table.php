@@ -63,6 +63,8 @@ return new class extends Migration
             $table->enum('renewal_status', ['eligible', 'ineligible', 'pending', 'approved', 'rejected'])->nullable();
             $table->integer('academic_year')->nullable();
             $table->enum('semester', ['1st', '2nd', 'Summer'])->nullable();
+            $table->boolean('is_renewal')->default(false);
+            $table->timestamp('last_renewed_at')->nullable();
 
             // Metadata
             $table->timestamps();

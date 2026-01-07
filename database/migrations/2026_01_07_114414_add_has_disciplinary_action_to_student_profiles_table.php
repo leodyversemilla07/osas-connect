@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('scholarship_applications', function (Blueprint $table) {
-            // is_renewal already exists, just add last_renewed_at
-            $table->timestamp('last_renewed_at')->nullable()->after('approved_at');
+        Schema::table('student_profiles', function (Blueprint $table) {
+            $table->boolean('has_disciplinary_action')->default(false)->after('enrollment_status');
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('scholarship_applications', function (Blueprint $table) {
-            $table->dropColumn('last_renewed_at');
+        Schema::table('student_profiles', function (Blueprint $table) {
+            $table->dropColumn('has_disciplinary_action');
         });
     }
 };

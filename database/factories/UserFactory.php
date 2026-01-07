@@ -51,18 +51,25 @@ class UserFactory extends Factory
 
     public function configure()
     {
+        return $this;
+    }
+
+    /**
+     * Factory state for creating users with auto-generated profiles based on role.
+     * This is opt-in to avoid conflicts in tests where profiles are created manually.
+     */
+    public function withProfile(): static
+    {
         return $this->afterCreating(function ($user) {
             // Create appropriate profile based on role
             if ($user->role === 'student') {
                 \App\Models\StudentProfile::factory()->create(['user_id' => $user->id]);
             } elseif ($user->role === 'osas_staff') {
-                // Create OSAS staff profile manually if factory doesn't exist
                 \App\Models\OsasStaffProfile::create([
                     'user_id' => $user->id,
                     'staff_id' => 'STAFF'.str_pad(fake()->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT),
                 ]);
             } elseif ($user->role === 'admin') {
-                // Create admin profile manually if factory doesn't exist
                 \App\Models\AdminProfile::create([
                     'user_id' => $user->id,
                     'admin_id' => 'ADMIN'.str_pad(fake()->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT),
@@ -72,13 +79,11 @@ class UserFactory extends Factory
     }
 
     /**
-     * Factory state for creating users without auto-generated profiles
+     * @deprecated Use ->withProfile() when you need auto-generated profiles
      */
-    public function withoutProfile()
+    public function withoutProfile(): static
     {
-        return $this->afterCreating(function () {
-            // Do nothing - don't create profiles automatically
-        });
+        return $this;
     }
 
     public function unverified(): static

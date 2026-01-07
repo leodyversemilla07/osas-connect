@@ -1,6 +1,6 @@
 # OSAS Connect - Scholarship Management System
 
-A comprehensive web-based scholarship management system built for Mindanao State University (MinSU), serving the Office of Student Affairs and Services (OSAS). Built with Laravel 12.x and React using Inertia.js.
+A comprehensive web-based scholarship management system built for Mindoro State University (MinSU), serving the Office of Student Affairs and Services (OSAS). Built with Laravel 12.x and React using Inertia.js.
 
 ## Technology Stack
 
@@ -356,7 +356,7 @@ For technical support or system inquiries:
 
 ## License
 
-This project is proprietary software developed for Mindanao State University. All rights reserved.
+This project is proprietary software developed for Mindoro State University. All rights reserved.
 
 ---
 

@@ -243,7 +243,7 @@
         </div>
 
         <div class="footer">
-            <p style="margin-bottom: 10px;"><strong>Mindanao State University</strong></p>
+            <p style="margin-bottom: 10px;"><strong>Mindoro State University</strong></p>
             <p style="margin-bottom: 10px;">Office of Student Affairs and Services</p>
             <p>
                 This is an automated message. Please do not reply directly to this email.<br>
