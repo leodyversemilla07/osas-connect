@@ -110,6 +110,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // OSAS Staff routes - All consolidated under one middleware group
     Route::middleware(['role:osas_staff'])->group(function () {
         Route::get('/osas-staff/dashboard', [OsasStaffController::class, 'index'])->name('osas.dashboard');
+        Route::get('/osas-staff/events', [OsasStaffController::class, 'events'])->name('osas.events');
 
         // Student management
         Route::get('/osas-staff/students', [OsasStaffController::class, 'studentRecords'])->name('osas.students');
