@@ -347,6 +347,12 @@ class StudentController extends Controller
 
         $applications = $student->scholarshipApplications;
 
+        // Calculate total stipend received for the student
+        $approvedApplicationIds = $applications->where('status', 'approved')->pluck('id');
+        $totalStipendReceived = \App\Models\ScholarshipStipend::whereIn('application_id', $approvedApplicationIds)
+            ->where('status', 'released')
+            ->sum('amount');
+
         $stats = [
             'total_applications' => $applications->count(),
             'pending_applications' => $applications->whereIn('status', ['submitted', 'under_verification', 'under_evaluation'])->count(),
@@ -364,7 +370,7 @@ class StudentController extends Controller
                 ->count(),
             'current_gwa' => $student->current_gwa,
             'eligible_scholarships_count' => $this->getEligibleScholarshipsCount($student),
-            'total_stipend_received' => 0, // TODO: Implement stipend calculation when scholarship_stipends table is created
+            'total_stipend_received' => (float) $totalStipendReceived,
         ];
 
         return response()->json($stats);
