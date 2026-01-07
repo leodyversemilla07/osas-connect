@@ -222,7 +222,7 @@ class Scholarship extends Model
             case 'academic_partial':
                 $specific_criteria = [
                     'GWA of 1.460 - 1.750 (Dean\'s Lister)',
-                    'No grade below 2.00',
+                    'No grade below 1.75',
                     'No dropped, deferred, or failed subjects',
                     'Must be enrolled in at least 18 units',
                     'Must not be receiving any other scholarship',

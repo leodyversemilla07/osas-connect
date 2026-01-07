@@ -187,6 +187,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/{renewal}/approve', [RenewalController::class, 'approve'])->name('approve');
             Route::post('/{renewal}/reject', [RenewalController::class, 'reject'])->name('reject');
         });
+
+        // Student Assistantship Management Routes
+        Route::prefix('osas-staff/assistantship')->name('osas.assistantship.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\StudentAssistantshipController::class, 'staffDashboard'])->name('dashboard');
+            Route::get('/assignments', [\App\Http\Controllers\StudentAssistantshipController::class, 'assignments'])->name('assignments');
+            Route::get('/assignments/{assignment}', [\App\Http\Controllers\StudentAssistantshipController::class, 'showAssignment'])->name('assignments.show');
+            Route::post('/assignments/{assignment}/schedule-screening', [\App\Http\Controllers\StudentAssistantshipController::class, 'scheduleScreening'])->name('assignments.schedule-screening');
+            Route::post('/assignments/{assignment}/complete-screening', [\App\Http\Controllers\StudentAssistantshipController::class, 'completeScreening'])->name('assignments.complete-screening');
+            Route::post('/assignments/{assignment}/approve', [\App\Http\Controllers\StudentAssistantshipController::class, 'approveAssignment'])->name('assignments.approve');
+            Route::post('/assignments/{assignment}/activate', [\App\Http\Controllers\StudentAssistantshipController::class, 'activateAssignment'])->name('assignments.activate');
+
+            // Work hour approvals
+            Route::get('/pending-approvals', [\App\Http\Controllers\StudentAssistantshipController::class, 'pendingApprovals'])->name('pending-approvals');
+            Route::post('/work-hours/{log}/approve', [\App\Http\Controllers\StudentAssistantshipController::class, 'approveHours'])->name('hours.approve');
+            Route::post('/work-hours/{log}/reject', [\App\Http\Controllers\StudentAssistantshipController::class, 'rejectHours'])->name('hours.reject');
+
+            // Payments
+            Route::get('/payments', [\App\Http\Controllers\StudentAssistantshipController::class, 'payments'])->name('payments');
+            Route::post('/payments/generate', [\App\Http\Controllers\StudentAssistantshipController::class, 'generatePayments'])->name('payments.generate');
+            Route::post('/payments/{payment}/release', [\App\Http\Controllers\StudentAssistantshipController::class, 'releasePayment'])->name('payments.release');
+
+            // Office management
+            Route::get('/offices', [\App\Http\Controllers\StudentAssistantshipController::class, 'offices'])->name('offices');
+            Route::post('/offices', [\App\Http\Controllers\StudentAssistantshipController::class, 'createOffice'])->name('offices.store');
+            Route::put('/offices/{office}', [\App\Http\Controllers\StudentAssistantshipController::class, 'updateOffice'])->name('offices.update');
+        });
     });
 
     // Student routes
@@ -262,6 +288,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('student/renewals/store/{application}', [RenewalController::class, 'store'])->name('renewal.store');
         Route::get('student/renewals/{renewal}', [RenewalController::class, 'show'])->name('renewal.show');
         Route::post('student/renewals/{renewal}/documents', [RenewalController::class, 'uploadDocuments'])->name('renewal.documents.upload');
+
+        // Student Assistantship Routes (for students)
+        Route::prefix('student/assistantship')->name('student.assistantship.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\StudentAssistantshipController::class, 'studentDashboard'])->name('dashboard');
+            Route::get('/log-hours', [\App\Http\Controllers\StudentAssistantshipController::class, 'logHoursForm'])->name('log-hours');
+            Route::post('/log-hours', [\App\Http\Controllers\StudentAssistantshipController::class, 'storeHours'])->name('log-hours.store');
+            Route::get('/hours-history', [\App\Http\Controllers\StudentAssistantshipController::class, 'hoursHistory'])->name('hours-history');
+            Route::get('/payment-history', [\App\Http\Controllers\StudentAssistantshipController::class, 'paymentHistory'])->name('payment-history');
+        });
     });
 
     // Only allow users to generate their own PDFs, or staff/admin to generate any user's PDF

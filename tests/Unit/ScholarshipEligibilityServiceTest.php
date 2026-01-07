@@ -122,7 +122,7 @@ describe('ScholarshipEligibilityService', function () {
             'user_id' => $user->id,
             'enrollment_status' => 'enrolled',
             'units' => 18,
-            'current_gwa' => 1.50, // Too low (good) for economic assistance
+            'current_gwa' => 2.50, // Above 2.25 threshold - does not qualify
             'existing_scholarships' => null,
         ]);
 
@@ -135,6 +135,27 @@ describe('ScholarshipEligibilityService', function () {
 
         expect($eligibility['eligible'])->toBeFalse();
         expect($eligibility['requirements_failed'])->toContain('gwa_requirement');
+    });
+
+    it('passes eligibility for economic assistance with qualifying GWA', function () {
+        $user = User::factory()->create(['role' => 'student']);
+        $student = StudentProfile::factory()->create([
+            'user_id' => $user->id,
+            'enrollment_status' => 'enrolled',
+            'units' => 18,
+            'current_gwa' => 2.00, // Within 2.25 threshold - qualifies
+            'existing_scholarships' => null,
+        ]);
+
+        $scholarship = Scholarship::factory()->create([
+            'type' => Scholarship::TYPE_ECONOMIC_ASSISTANCE,
+            'status' => 'active',
+        ]);
+
+        $eligibility = $this->eligibilityService->checkEligibility($student, $scholarship);
+
+        expect($eligibility['eligible'])->toBeTrue();
+        expect($eligibility['requirements_met'])->toContain('gwa_requirement');
     });
 
     it('detects conflicting scholarships', function () {

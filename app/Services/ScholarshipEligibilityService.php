@@ -229,6 +229,7 @@ class ScholarshipEligibilityService
 
     /**
      * Check eligibility for Economic Assistance Program
+     * Per scholarships.md Section 16.5.d: Must have GWA of 2.25 or better
      */
     private function checkEconomicAssistanceEligibility(StudentProfile $student, Scholarship $scholarship): array
     {
@@ -238,13 +239,17 @@ class ScholarshipEligibilityService
             'messages' => [],
         ];
 
-        // Economic assistance is for students with GWA above 2.25 (who need financial help)
-        // Students with better grades should apply for academic scholarships instead
-        if (! $student->current_gwa || $student->current_gwa <= 2.25) {
+        // Economic assistance requires GWA ≤ 2.25 (Philippine scale: lower is better)
+        // Per scholarships.md: "Must have a General Weighted Average of 2.25"
+        if (! $student->current_gwa) {
             $result['requirements_failed'][] = 'gwa_requirement';
-            $result['messages'][] = 'Economic assistance is for students with GWA above 2.25. Consider applying for academic scholarships instead.';
+            $result['messages'][] = 'GWA information not available';
+        } elseif ($student->current_gwa > 2.25) {
+            $result['requirements_failed'][] = 'gwa_requirement';
+            $result['messages'][] = "GWA must be 2.25 or better for Economic Assistance. Current GWA: {$student->current_gwa}";
         } else {
             $result['requirements_met'][] = 'gwa_requirement';
+            $result['messages'][] = "Qualified for Economic Assistance with GWA: {$student->current_gwa}";
         }
 
         return $result;
