@@ -55,17 +55,17 @@ const pageContent = {
             {
                 name: 'Dr. Maria Santos',
                 position: 'Director, Office of Student Affairs',
-                image: 'https://via.placeholder.com/150x150/005a2d/ffffff?text=MS',
+                image: 'https://ui-avatars.com/api/?name=Maria+Santos&background=005a2d&color=fff&size=150',
             },
             {
                 name: 'Prof. Juan dela Cruz',
                 position: 'Scholarship Coordinator',
-                image: 'https://via.placeholder.com/150x150/005a2d/ffffff?text=JC',
+                image: 'https://ui-avatars.com/api/?name=Juan+dela+Cruz&background=005a2d&color=fff&size=150',
             },
             {
                 name: 'Ms. Ana Rodriguez',
                 position: 'Student Support Services',
-                image: 'https://via.placeholder.com/150x150/005a2d/ffffff?text=AR',
+                image: 'https://ui-avatars.com/api/?name=Ana+Rodriguez&background=005a2d&color=fff&size=150',
             },
         ],
     },

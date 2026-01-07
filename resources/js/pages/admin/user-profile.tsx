@@ -800,7 +800,7 @@ const StudentIDCard = ({ student }: { student: UserWithProfile }) => {
                     <div className="mr-4 h-20 w-20 flex-shrink-0">
                         <div className="flex h-full w-full items-center justify-center overflow-hidden">
                             <img
-                                src="https://www.minsu.edu.ph/template/images/logo.png"
+                                src="/images/logo.png"
                                 alt="Mindoro State University Logo"
                                 className="h-full w-full object-contain"
                             />
