@@ -1,7 +1,9 @@
 import SiteFooter from '@/components/site-footer';
 import SiteHeader from '@/components/site-header';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Head } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import { CheckCircle, Heart, Shield, Users } from 'lucide-react';
 
 // Hardcoded content from PageSeeder.php for the 'about' page
@@ -9,11 +11,11 @@ const pageContent = {
     hero: {
         badge: 'About Us',
         title: 'Empowering Students Through Education',
-        subtitle: 'Learn about our mission to make quality education accessible to all students.',
+        subtitle: 'Learn about our mission to make quality education accessible to all students at Mindoro State University.',
     },
     mission: {
         badge: 'Our Mission',
-        title: 'Our Mission',
+        title: 'Making Education Accessible',
         description:
             'To provide a streamlined, efficient, and transparent scholarship management system that connects deserving students with educational opportunities.',
         features: [
@@ -27,8 +29,8 @@ const pageContent = {
     },
     vision: {
         badge: 'Our Vision',
-        title: 'Our Vision',
-        subtitle: 'Building a future where every student can achieve their educational dreams.',
+        title: 'Building the Future',
+        subtitle: 'Building a future where every student can achieve their educational dreams without financial barriers.',
         values: [
             {
                 icon: 'Users',
@@ -49,8 +51,8 @@ const pageContent = {
     },
     team: {
         badge: 'Our Team',
-        title: 'Meet Our Team',
-        subtitle: 'Dedicated professionals working to make education accessible for all.',
+        title: 'Dedicated Professionals',
+        subtitle: 'Meet the team working tirelessly to support your educational journey.',
         members: [
             {
                 name: 'Dr. Maria Santos',
@@ -69,12 +71,6 @@ const pageContent = {
             },
         ],
     },
-    cta: {
-        title: 'Ready to Start Your Journey?',
-        description: 'Join thousands of students who have successfully received scholarships through OSAS Connect.',
-        button_text: 'Apply Now',
-        button_link: '/login',
-    },
 };
 
 const getIcon = (iconName: string) => {
@@ -88,141 +84,169 @@ const getIcon = (iconName: string) => {
 };
 
 export default function About() {
-    // All content is now hardcoded in pageContent above
     return (
         <>
-            <Head title="About - OSAS Connect">
-                <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-            </Head>
-            <div className="flex min-h-screen flex-col items-center bg-[#f3f2f2] text-[#010002] dark:bg-[#121212] dark:text-[#f3f2f2]">
-                {/* Header Component */}
+            <Head title="About - OSAS Connect" />
+
+            <div className="bg-background min-h-screen font-sans antialiased">
                 <SiteHeader />
 
-                {/* Main content with padding for the fixed header */}
-                <main className="mt-16 w-full flex-1">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        {/* Hero Section */}
-                        <div className="relative flex min-h-[60vh] items-center overflow-hidden">
-                            {/* Subtle background pattern */}
-                            <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
-                                <div
-                                    className="absolute inset-0"
-                                    style={{
-                                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                                    }}
-                                ></div>
-                            </div>
-
-                            <div className="relative mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-                                <div className="space-y-8 text-center">
-                                    <div className="inline-flex items-center gap-2 rounded-full bg-[#febd12]/20 px-4 py-2 dark:bg-[#febd12]/30">
-                                        <span className="text-sm font-medium text-[#010002] dark:text-[#febd12]">{pageContent.hero.badge}</span>
-                                    </div>
-
-                                    <h1 className="text-4xl leading-tight font-bold text-[#010002] sm:text-6xl lg:text-7xl dark:text-white">
-                                        {pageContent.hero.title}
-                                    </h1>
-
-                                    <p className="mx-auto max-w-3xl text-xl leading-relaxed text-[#010002]/70 dark:text-[#f3f2f2]/70">
-                                        {pageContent.hero.subtitle}
-                                    </p>
-                                </div>
-                            </div>
+                <main className="flex-1 overflow-hidden pt-20">
+                    {/* Hero Section */}
+                    <section className="relative overflow-hidden py-24">
+                        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-green-50 to-amber-50 dark:from-green-950/20 dark:to-amber-950/20" />
+                        <div className="absolute top-0 right-0 p-12 opacity-5">
+                            <Users className="text-primary h-96 w-96" />
                         </div>
 
-                        {/* Our Mission Section */}
-                        <section className="mt-16 py-8 sm:mt-24 sm:py-16">
-                            <div className="mb-8 text-center sm:mb-12">
-                                <Badge variant="secondary" className="mb-3">
-                                    {pageContent.mission.badge}
-                                </Badge>
-                                <h2 className="text-2xl font-bold text-[#005a2d] sm:text-3xl">{pageContent.mission.title}</h2>
-                                <p className="mx-auto mt-3 max-w-2xl px-4 text-base text-[#010002]/70 sm:mt-4 sm:text-lg dark:text-[#f3f2f2]/70">
-                                    {pageContent.mission.description}
-                                </p>
+                        <div className="relative z-10 container mx-auto px-4 md:px-6">
+                            <div className="mx-auto max-w-4xl space-y-6 text-center">
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                                    <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary mb-4 px-4 py-1.5">
+                                        {pageContent.hero.badge}
+                                    </Badge>
+                                    <h1 className="text-foreground mb-6 text-4xl font-bold tracking-tight md:text-6xl">{pageContent.hero.title}</h1>
+                                    <p className="text-muted-foreground mx-auto max-w-2xl text-xl leading-relaxed">{pageContent.hero.subtitle}</p>
+                                </motion.div>
                             </div>
+                        </div>
+                    </section>
 
-                            <div className="mx-auto mt-8 max-w-3xl px-4">
-                                <ul className="space-y-4">
-                                    {pageContent.mission.features.map((feature, index) => (
-                                        <li key={index} className="flex items-start gap-3">
-                                            <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#23b14d]" />
-                                            <span className="text-base text-[#010002]/80 dark:text-[#f3f2f2]/80">{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                    {/* Mission Section */}
+                    <section className="bg-background py-24">
+                        <div className="container mx-auto px-4 md:px-6">
+                            <div className="grid items-center gap-12 md:grid-cols-2">
+                                <motion.div
+                                    initial={{ opacity: 0, x: -50 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true }}
+                                    className="space-y-6"
+                                >
+                                    <Badge variant="secondary" className="text-primary bg-primary/10">
+                                        {pageContent.mission.badge}
+                                    </Badge>
+                                    <h2 className="text-3xl font-bold tracking-tight md:text-4xl">{pageContent.mission.title}</h2>
+                                    <p className="text-muted-foreground text-lg leading-relaxed">{pageContent.mission.description}</p>
+                                    <ul className="space-y-4 pt-4">
+                                        {pageContent.mission.features.map((feature, index) => (
+                                            <motion.li
+                                                key={index}
+                                                initial={{ opacity: 0, x: -20 }}
+                                                whileInView={{ opacity: 1, x: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: index * 0.1 }}
+                                                className="flex items-start gap-3"
+                                            >
+                                                <div className="mt-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
+                                                    <CheckCircle className="h-3.5 w-3.5" />
+                                                </div>
+                                                <span className="text-foreground/80">{feature}</span>
+                                            </motion.li>
+                                        ))}
+                                    </ul>
+                                </motion.div>
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    className="relative"
+                                >
+                                    <div className="absolute inset-0 rotate-3 transform rounded-3xl bg-gradient-to-tr from-green-500/20 to-amber-500/20 blur-2xl" />
+                                    <div className="border-border/50 relative overflow-hidden rounded-3xl border shadow-2xl">
+                                        <div className="bg-muted relative aspect-[4/3] w-full overflow-hidden">
+                                            {/* Placeholder pattern if image fails or is generic */}
+                                            <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-green-50 opacity-50 dark:from-green-950 dark:to-green-900" />
+                                            <div className="text-primary/10 absolute inset-0 flex items-center justify-center">
+                                                <Users className="h-32 w-32" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
                             </div>
-                        </section>
+                        </div>
+                    </section>
 
-                        {/* Our Vision Section */}
-                        <section className="py-8 sm:py-16">
-                            <div className="mb-8 text-center sm:mb-12">
-                                <Badge variant="outline" className="mb-3">
+                    {/* Vision Section */}
+                    <section className="bg-muted/30 py-24">
+                        <div className="container mx-auto px-4 md:px-6">
+                            <div className="mx-auto mb-16 max-w-3xl space-y-4 text-center">
+                                <Badge variant="outline" className="border-primary/20 text-primary">
                                     {pageContent.vision.badge}
                                 </Badge>
-                                <h2 className="px-4 text-2xl font-bold text-[#005a2d] sm:text-3xl">{pageContent.vision.title}</h2>
-                                <p className="mx-auto mt-3 max-w-2xl px-4 text-base text-[#010002]/70 sm:mt-4 sm:text-lg dark:text-[#f3f2f2]/70">
-                                    {pageContent.vision.subtitle}
-                                </p>
+                                <h2 className="text-3xl font-bold tracking-tight md:text-4xl">{pageContent.vision.title}</h2>
+                                <p className="text-muted-foreground text-lg">{pageContent.vision.subtitle}</p>
                             </div>
 
-                            <div className="grid gap-6 px-4 sm:grid-cols-2 sm:gap-8 sm:px-0 lg:grid-cols-3">
+                            <div className="grid gap-8 md:grid-cols-3">
                                 {pageContent.vision.values.map((value, index) => {
                                     const IconComponent = getIcon(value.icon);
                                     return (
-                                        <div key={index} className="rounded-lg p-6 transition-all hover:bg-[#febd12]/5 dark:hover:bg-[#febd12]/10">
-                                            <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#febd12]/10">
-                                                <IconComponent className="h-8 w-8 text-[#febd12]" />
-                                            </div>
-                                            <h3 className="mb-3 text-xl font-semibold text-[#005a2d]">{value.title}</h3>
-                                            <p className="text-base text-[#010002]/80 dark:text-[#f3f2f2]/80">{value.description}</p>
-                                        </div>
+                                        <motion.div
+                                            key={index}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: index * 0.1 }}
+                                        >
+                                            <Card className="border-border/50 bg-background/50 hover:bg-background hover:shadow-primary/5 h-full transition-colors hover:shadow-lg">
+                                                <CardContent className="space-y-4 p-8 text-center">
+                                                    <div className="bg-primary/10 text-primary mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl">
+                                                        <IconComponent className="h-7 w-7" />
+                                                    </div>
+                                                    <h3 className="text-xl font-bold">{value.title}</h3>
+                                                    <p className="text-muted-foreground leading-relaxed">{value.description}</p>
+                                                </CardContent>
+                                            </Card>
+                                        </motion.div>
                                     );
                                 })}
                             </div>
-                        </section>
+                        </div>
+                    </section>
 
-                        {/* Team Section */}
-                        <section className="py-8 sm:py-16">
-                            <div className="mb-8 text-center sm:mb-12">
-                                <Badge variant="secondary" className="mb-3">
+                    {/* Team Section */}
+                    <section className="bg-background py-24">
+                        <div className="container mx-auto px-4 md:px-6">
+                            <div className="mx-auto mb-16 max-w-3xl space-y-4 text-center">
+                                <Badge variant="secondary" className="text-primary bg-primary/10">
                                     {pageContent.team.badge}
                                 </Badge>
-                                <h2 className="px-4 text-2xl font-bold text-[#005a2d] sm:text-3xl">{pageContent.team.title}</h2>
-                                <p className="mx-auto mt-3 max-w-2xl px-4 text-base text-[#010002]/70 sm:mt-4 sm:text-lg dark:text-[#f3f2f2]/70">
-                                    {pageContent.team.subtitle}
-                                </p>
+                                <h2 className="text-3xl font-bold tracking-tight md:text-4xl">{pageContent.team.title}</h2>
+                                <p className="text-muted-foreground text-lg">{pageContent.team.subtitle}</p>
                             </div>
-                            <div className="grid gap-6 px-4 sm:grid-cols-2 sm:gap-8 sm:px-0 lg:grid-cols-3">
+
+                            <div className="grid gap-8 md:grid-cols-3">
                                 {pageContent.team.members.map((member, index) => (
-                                    <div
+                                    <motion.div
                                         key={index}
-                                        className="rounded-lg p-6 text-center transition-all hover:bg-[#005a2d]/5 dark:hover:bg-[#23b14d]/5"
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        whileInView={{ opacity: 1, scale: 1 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: index * 0.1 }}
+                                        className="group"
                                     >
-                                        <div className="mx-auto mb-6 h-24 w-24">
+                                        <div className="bg-muted border-border/50 relative mb-6 aspect-[3/4] overflow-hidden rounded-3xl border">
                                             <img
                                                 src={member.image}
                                                 alt={member.name}
-                                                className="h-full w-full rounded-full object-cover"
+                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                 onError={(e) => {
-                                                    e.currentTarget.src = `https://via.placeholder.com/96x96/005a2d/ffffff?text=${member.name
-                                                        .split(' ')
-                                                        .map((n) => n[0])
-                                                        .join('')}`;
+                                                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=random&size=400`;
                                                 }}
                                             />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                                         </div>
-                                        <h3 className="mb-2 text-lg font-semibold text-[#005a2d]">{member.name}</h3>
-                                        <p className="text-sm text-[#010002]/70 dark:text-[#f3f2f2]/70">{member.position}</p>
-                                    </div>
+                                        <div className="text-center">
+                                            <h3 className="text-foreground mb-1 text-xl font-bold">{member.name}</h3>
+                                            <p className="text-primary text-sm font-medium tracking-wide">{member.position}</p>
+                                        </div>
+                                    </motion.div>
                                 ))}
                             </div>
-                        </section>
-                    </div>
+                        </div>
+                    </section>
                 </main>
 
-                {/* Footer Component */}
                 <SiteFooter />
             </div>
         </>

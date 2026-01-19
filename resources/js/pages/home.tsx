@@ -2,217 +2,286 @@ import SiteFooter from '@/components/site-footer';
 import SiteHeader from '@/components/site-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Head } from '@inertiajs/react';
-import { FileText, Send, Shield, TrendingUp, UserCheck } from 'lucide-react';
-
-const pageContent = {
-    hero: {
-        badge: 'Scholarship Management',
-        title: 'Your Gateway to Educational Excellence',
-        subtitle: 'OSAS Connect streamlines the scholarship application process, making educational opportunities accessible to all students.',
-        primary_button: 'Apply for Scholarships',
-        secondary_button: 'Learn More',
-    },
-    features: {
-        badge: 'Why Choose OSAS Connect',
-        title: 'Everything You Need',
-        subtitle: 'Comprehensive tools for scholarship management',
-        items: [
-            {
-                icon: 'FileText',
-                title: 'Easy Applications',
-                description: 'Streamlined application process with digital document submission.',
-            },
-            {
-                icon: 'TrendingUp',
-                title: 'Track Progress',
-                description: 'Real-time updates on your application status and progress.',
-            },
-            {
-                icon: 'Shield',
-                title: 'Secure & Reliable',
-                description: 'Your data is protected with enterprise-grade security.',
-            },
-        ],
-    },
-    guide: {
-        badge: 'How It Works',
-        title: 'Simple Steps to Success',
-        subtitle: 'Get started with your scholarship journey',
-        items: [
-            {
-                icon: 'UserCheck',
-                title: 'Create Account',
-                description: 'Register with your student credentials',
-            },
-            {
-                icon: 'FileText',
-                title: 'Browse Scholarships',
-                description: 'Explore available opportunities',
-            },
-            {
-                icon: 'Send',
-                title: 'Apply & Track',
-                description: 'Submit applications and monitor progress',
-            },
-        ],
-    },
-    cta: {
-        title: 'Ready to Apply?',
-        description: 'Start your scholarship journey today and unlock opportunities for your academic future.',
-        button_text: 'Get Started Now',
-        button_link: '/login',
-    },
-};
-
-const getIcon = (iconName: string) => {
-    const icons = {
-        FileText,
-        TrendingUp,
-        Shield,
-        UserCheck,
-        Send,
-    };
-    return icons[iconName as keyof typeof icons] || FileText;
-};
+import { Card, CardContent } from '@/components/ui/card';
+import { Head, Link } from '@inertiajs/react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, BookOpen, Clock, GraduationCap, LayoutDashboard, ShieldCheck, Sparkles, Trophy, Users, Zap } from 'lucide-react';
+import { useRef } from 'react';
 
 export default function Home() {
-    // All content is now hardcoded in pageContent above
+    const targetRef = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: targetRef,
+        offset: ['start start', 'end start'],
+    });
+
+    const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+    const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9]);
+    const y = useTransform(scrollYProgress, [0, 0.5], [0, 50]);
+
+    const fadeInUp = {
+        hidden: { opacity: 0, y: 30 },
+        visible: (i: number) => ({
+            opacity: 1,
+            y: 0,
+            transition: {
+                delay: i * 0.1,
+                duration: 0.8,
+                ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+            },
+        }),
+    };
+
     return (
         <>
-            <Head title="OSAS Connect - Scholarship Management System">
-                <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-            </Head>
-            <div className="flex min-h-screen flex-col items-center bg-[#f3f2f2] text-[#010002] dark:bg-[#121212] dark:text-[#f3f2f2]">
-                {/* Header Component */}
+            <Head title="OSAS Connect - Scholarship Management System" />
+
+            <div className="bg-background min-h-screen font-sans antialiased selection:bg-green-500/30 selection:text-green-900">
                 <SiteHeader />
 
-                {/* Main content with padding for the fixed header */}
-                <main className="mt-16 w-full flex-1">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        {/* Hero Section - Above the Fold */}
-                        <div className="relative flex min-h-[80vh] items-center overflow-hidden">
-                            {/* Subtle background pattern */}
-                            <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
-                                <div
-                                    className="absolute inset-0"
-                                    style={{
-                                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                                    }}
-                                ></div>
-                            </div>
+                <main className="flex-1 overflow-hidden">
+                    {/* Hero Section */}
+                    <section ref={targetRef} className="relative flex min-h-[90vh] items-center justify-center overflow-hidden pt-20">
+                        {/* Abstract Background */}
+                        <div className="via-background to-background dark:via-background dark:to-background absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-100 dark:from-green-950/30" />
+                        <div className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] bg-[size:14px_24px]" />
 
-                            <div className="relative mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-                                <div className="space-y-8 text-center">
-                                    <div className="inline-flex items-center gap-2 rounded-full bg-[#febd12]/20 px-4 py-2 dark:bg-[#febd12]/30">
-                                        <span className="text-sm font-medium text-[#010002] dark:text-[#febd12]">
-                                            Scholarship Management Made Simple
-                                        </span>
-                                    </div>
+                        {/* Floating Blobs */}
+                        <div className="absolute top-1/4 -left-20 h-72 w-72 animate-pulse rounded-full bg-green-400/20 blur-[100px]" />
+                        <div className="absolute -right-20 bottom-1/4 h-96 w-96 animate-pulse rounded-full bg-amber-400/20 blur-[100px] delay-1000" />
 
-                                    <h1 className="text-4xl leading-tight font-bold text-[#010002] sm:text-6xl lg:text-7xl dark:text-white">
-                                        Empowering
-                                        <br />
-                                        <span className="text-[#008040] dark:text-[#23b14d]">Future Leaders</span>
-                                    </h1>
+                        <div className="relative z-10 container mx-auto px-4 md:px-6">
+                            <motion.div style={{ opacity, scale, y }} className="mx-auto flex max-w-4xl flex-col items-center space-y-8 text-center">
+                                <motion.div custom={0} initial="hidden" animate="visible" variants={fadeInUp}>
+                                    <Badge
+                                        variant="outline"
+                                        className="rounded-full border-green-600/20 bg-green-50 px-4 py-1.5 text-sm font-semibold tracking-wide text-green-700 uppercase backdrop-blur-sm dark:border-green-500/30 dark:bg-green-900/30 dark:text-green-300"
+                                    >
+                                        <Sparkles className="mr-2 h-3.5 w-3.5 fill-green-500" />
+                                        Excellence in Education
+                                    </Badge>
+                                </motion.div>
 
-                                    <p className="mx-auto max-w-3xl text-xl leading-relaxed text-[#010002]/70 dark:text-[#f3f2f2]/70">
-                                        OSAS Connect transforms the scholarship application process into a seamless, transparent experience that
-                                        connects deserving students with life-changing opportunities.
-                                    </p>
+                                <motion.h1
+                                    custom={1}
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={fadeInUp}
+                                    className="text-foreground text-5xl font-bold tracking-tighter md:text-7xl lg:text-8xl"
+                                >
+                                    Your Future, <br className="hidden md:block" />
+                                    <span className="animate-gradient-x bg-gradient-to-r from-[#005a2d] via-green-600 to-amber-500 bg-clip-text text-transparent dark:from-green-400 dark:via-green-300 dark:to-amber-300">
+                                        Funded & Secure
+                                    </span>
+                                </motion.h1>
 
-                                    <div className="flex flex-col justify-center gap-4 pt-4 sm:flex-row">
-                                        <Button asChild size="lg" className="bg-[#005a2d] px-8 py-4 text-lg text-white hover:bg-[#008040]">
-                                            <a href="/login">Begin Your Journey</a>
-                                        </Button>
-                                        <Button
-                                            asChild
-                                            variant="outline"
-                                            size="lg"
-                                            className="border-[#005a2d]/20 px-8 py-4 text-lg hover:bg-[#005a2d]/5"
-                                        >
-                                            <a href="/about">Learn More</a>
-                                        </Button>
-                                    </div>
-                                </div>
+                                <motion.p
+                                    custom={2}
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={fadeInUp}
+                                    className="text-muted-foreground max-w-2xl text-xl leading-relaxed md:text-2xl"
+                                >
+                                    The official scholarship management portal for{' '}
+                                    <span className="text-foreground font-semibold">Mindoro State University</span>. Streamlined applications,
+                                    real-time tracking, and faster disbursements.
+                                </motion.p>
+
+                                <motion.div
+                                    custom={3}
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={fadeInUp}
+                                    className="flex w-full flex-col justify-center gap-4 pt-8 sm:flex-row"
+                                >
+                                    <Button
+                                        asChild
+                                        size="lg"
+                                        className="h-14 rounded-full bg-[#005a2d] px-8 text-lg font-semibold text-white shadow-xl shadow-green-900/20 transition-all hover:scale-105 hover:bg-[#006e38] hover:shadow-green-900/30"
+                                    >
+                                        <Link href={route('register')}>
+                                            Apply Now <ArrowRight className="ml-2 h-5 w-5" />
+                                        </Link>
+                                    </Button>
+                                    <Button
+                                        asChild
+                                        variant="outline"
+                                        size="lg"
+                                        className="border-foreground/10 hover:bg-foreground/5 h-14 rounded-full border-2 bg-white/50 px-8 text-lg font-semibold backdrop-blur-sm transition-all hover:scale-105 dark:bg-black/50"
+                                    >
+                                        <Link href={route('scholarships')}>View Programs</Link>
+                                    </Button>
+                                </motion.div>
+                            </motion.div>
+                        </div>
+                    </section>
+
+                    {/* Stats Section */}
+                    <section className="border-border/50 bg-muted/30 relative border-y py-12">
+                        <div className="container mx-auto px-4">
+                            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+                                {[
+                                    { label: 'Active Scholars', value: '2.5k+', icon: Users },
+                                    { label: 'Programs', value: '15+', icon: BookOpen },
+                                    { label: 'Disbursed', value: '₱12M+', icon: Trophy },
+                                    { label: 'Efficiency', value: '100%', icon: Zap },
+                                ].map((stat, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: i * 0.1 }}
+                                        className="group flex flex-col items-center space-y-2 text-center"
+                                    >
+                                        <div className="mb-2 rounded-2xl bg-green-100 p-3 text-green-700 transition-colors duration-300 group-hover:bg-green-600 group-hover:text-white dark:bg-green-900/20 dark:text-green-400">
+                                            <stat.icon className="h-6 w-6" />
+                                        </div>
+                                        <div className="text-foreground text-3xl font-bold tracking-tight">{stat.value}</div>
+                                        <div className="text-muted-foreground text-sm font-medium tracking-wider uppercase">{stat.label}</div>
+                                    </motion.div>
+                                ))}
                             </div>
                         </div>
+                    </section>
 
-                        {/* Enhanced Features Section with better visual hierarchy */}
-                        <section className="mt-16 py-8 sm:mt-24 sm:py-16">
-                            <div className="mb-8 text-center sm:mb-12">
-                                <Badge variant="secondary" className="mb-3">
-                                    {pageContent.features.badge}
-                                </Badge>
-                                <h2 className="text-2xl font-bold text-[#005a2d] sm:text-3xl">{pageContent.features.title}</h2>
-                                <p className="mx-auto mt-3 max-w-2xl px-4 text-base text-[#010002]/70 sm:mt-4 sm:text-lg dark:text-[#f3f2f2]/70">
-                                    {pageContent.features.subtitle}
+                    {/* Features Grid */}
+                    <section className="relative overflow-hidden py-24">
+                        <div className="container mx-auto px-4 md:px-6">
+                            <div className="mb-16 space-y-4 text-center">
+                                <h2 className="text-3xl font-bold tracking-tight md:text-5xl">Built for Student Success</h2>
+                                <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
+                                    Modernizing the scholarship experience with transparency and ease.
                                 </p>
                             </div>
 
-                            <div className="mt-8 grid gap-6 px-4 sm:mt-10 sm:grid-cols-2 sm:gap-8 sm:px-0 lg:grid-cols-3">
-                                {pageContent.features.items.map((feature, index) => {
-                                    const IconComponent = getIcon(feature.icon);
-                                    return (
-                                        <Card
-                                            key={index}
-                                            className="border-b-4 border-[#23b14d] transition-all hover:bg-[#005a2d]/5 dark:hover:bg-[#23b14d]/5"
-                                        >
-                                            <CardHeader>
-                                                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#23b14d]/10">
-                                                    <IconComponent className="h-8 w-8 text-[#23b14d]" />
+                            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+                                {[
+                                    {
+                                        title: 'Centralized Dashboard',
+                                        desc: 'Manage all your applications, documents, and interview schedules in one secure location.',
+                                        icon: LayoutDashboard,
+                                        gradient: 'from-blue-500/20 to-cyan-500/20',
+                                        text: 'text-blue-600 dark:text-blue-400',
+                                    },
+                                    {
+                                        title: 'Real-time Notifications',
+                                        desc: 'Get instant updates via email and in-app alerts whenever your status changes.',
+                                        icon: Clock,
+                                        gradient: 'from-amber-500/20 to-orange-500/20',
+                                        text: 'text-amber-600 dark:text-amber-400',
+                                    },
+                                    {
+                                        title: 'Secure Processing',
+                                        desc: 'Bank-grade encryption for your personal data and document submissions.',
+                                        icon: ShieldCheck,
+                                        gradient: 'from-green-500/20 to-emerald-500/20',
+                                        text: 'text-green-600 dark:text-green-400',
+                                    },
+                                ].map((feature, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: i * 0.2 }}
+                                        whileHover={{ y: -5 }}
+                                    >
+                                        <Card className="border-border/50 bg-background/50 group h-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-green-900/5">
+                                            <CardContent className="p-8">
+                                                <div
+                                                    className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${feature.gradient} mb-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
+                                                >
+                                                    <feature.icon className={`h-7 w-7 ${feature.text}`} />
                                                 </div>
-                                                <CardTitle className="text-xl text-[#005a2d]">{feature.title}</CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <p className="text-base text-[#010002]/80 dark:text-[#f3f2f2]/80">{feature.description}</p>
+                                                <h3 className="mb-3 text-xl font-bold transition-colors group-hover:text-[#005a2d] dark:group-hover:text-green-400">
+                                                    {feature.title}
+                                                </h3>
+                                                <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
                                             </CardContent>
                                         </Card>
-                                    );
-                                })}
+                                    </motion.div>
+                                ))}
                             </div>
-                        </section>
+                        </div>
+                    </section>
 
-                        {/* Resource Guide Section */}
-                        <section className="py-8 sm:py-16">
-                            <div className="mb-8 text-center sm:mb-12">
-                                <Badge variant="outline" className="mb-3">
-                                    {pageContent.guide.badge}
-                                </Badge>
-                                <h2 className="px-4 text-2xl font-bold text-[#005a2d] sm:text-3xl">{pageContent.guide.title}</h2>
-                                <p className="mx-auto mt-3 max-w-2xl px-4 text-base text-[#010002]/70 sm:mt-4 sm:text-lg dark:text-[#f3f2f2]/70">
-                                    {pageContent.guide.subtitle}
+                    {/* Scholarship Programs */}
+                    <section className="relative overflow-hidden bg-[#005a2d] py-24 text-white">
+                        <div className="absolute top-0 right-0 p-12 opacity-10">
+                            <Sparkles className="h-96 w-96 text-white" />
+                        </div>
+                        <div className="absolute bottom-0 left-0 p-12 opacity-10">
+                            <GraduationCap className="h-64 w-64 text-white" />
+                        </div>
+
+                        <div className="relative z-10 container mx-auto px-4 md:px-6">
+                            <div className="mb-12 flex flex-col items-end justify-between gap-6 md:flex-row">
+                                <div>
+                                    <Badge className="mb-4 border-none bg-white/10 text-white hover:bg-white/20">Scholarship Programs</Badge>
+                                    <h2 className="text-3xl font-bold tracking-tight md:text-5xl">Find Your Opportunity</h2>
+                                </div>
+                                <Button asChild variant="secondary" size="lg" className="rounded-full">
+                                    <Link href={route('scholarships')}>
+                                        View All Programs <ArrowRight className="ml-2 h-4 w-4" />
+                                    </Link>
+                                </Button>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                                {[
+                                    { title: 'Academic', sub: 'For top achievers', icon: BookOpen },
+                                    { title: 'Student Assistant', sub: 'Work-study program', icon: Users },
+                                    { title: 'Performing Arts', sub: 'For creative talents', icon: Sparkles },
+                                    { title: 'Sports Excellence', sub: 'For varsity athletes', icon: Trophy },
+                                ].map((prog, i) => (
+                                    <motion.div
+                                        key={i}
+                                        whileHover={{ scale: 1.03 }}
+                                        className="cursor-pointer rounded-3xl border border-white/10 bg-white/10 p-6 backdrop-blur-md transition-colors hover:bg-white/20"
+                                    >
+                                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+                                            <prog.icon className="h-6 w-6 text-white" />
+                                        </div>
+                                        <h3 className="mb-1 text-xl font-bold">{prog.title}</h3>
+                                        <p className="text-sm text-white/60">{prog.sub}</p>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Call to Action */}
+                    <section className="relative overflow-hidden py-32">
+                        <div className="relative z-10 container mx-auto px-4 text-center md:px-6">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5 }}
+                                className="mx-auto max-w-3xl space-y-8"
+                            >
+                                <h2 className="text-4xl font-bold tracking-tight md:text-6xl">Ready to shape your future?</h2>
+                                <p className="text-muted-foreground text-xl">
+                                    Join thousands of MinSU students who have secured their education through our scholarship programs.
                                 </p>
-                            </div>
-
-                            <div className="grid gap-6 px-4 sm:grid-cols-2 sm:gap-8 sm:px-0 lg:grid-cols-3">
-                                {pageContent.guide.items.map((item, index) => {
-                                    const IconComponent = getIcon(item.icon);
-                                    return (
-                                        <Card
-                                            key={index}
-                                            className="border-l-4 border-[#febd12] transition-all hover:bg-[#febd12]/5 dark:hover:bg-[#febd12]/10"
-                                        >
-                                            <CardHeader>
-                                                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#febd12]/10">
-                                                    <IconComponent className="h-8 w-8 text-[#febd12]" />
-                                                </div>
-                                                <CardTitle className="text-xl text-[#005a2d]">{item.title}</CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <p className="text-base text-[#010002]/80 dark:text-[#f3f2f2]/80">{item.description}</p>
-                                            </CardContent>
-                                        </Card>
-                                    );
-                                })}
-                            </div>
-                        </section>
-                    </div>
+                                <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                                    <Button
+                                        asChild
+                                        size="lg"
+                                        className="h-16 rounded-full bg-[#005a2d] px-10 text-lg text-white shadow-xl shadow-green-900/20 hover:bg-[#006e38]"
+                                    >
+                                        <Link href={route('register')}>Create Account</Link>
+                                    </Button>
+                                    <Button asChild variant="outline" size="lg" className="h-16 rounded-full px-10 text-lg">
+                                        <Link href={route('contact')}>Contact Support</Link>
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </section>
                 </main>
 
-                {/* Footer Component */}
                 <SiteFooter />
             </div>
         </>

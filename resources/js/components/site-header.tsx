@@ -1,155 +1,174 @@
-import { type SharedData } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Menu, X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ChevronRight, Menu, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import AppLogoIcon from './app-logo-icon';
 
 export default function SiteHeader() {
     const { auth } = usePage<SharedData>().props;
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
 
-    // Close mobile menu when clicking outside or on escape
+    // Handle scroll effect
     useEffect(() => {
-        const handleEscape = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                setIsMenuOpen(false);
-            }
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
         };
-
-        const handleClickOutside = (event: MouseEvent) => {
-            const target = event.target as Element;
-            if (isMenuOpen && !target.closest('[data-mobile-menu]')) {
-                setIsMenuOpen(false);
-            }
-        };
-
-        if (isMenuOpen) {
-            document.addEventListener('keydown', handleEscape);
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('keydown', handleEscape);
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isMenuOpen]);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const navItems = [
-        { label: 'Home', url: '/', active: true },
-        { label: 'About', url: '/about', active: false },
-        { label: 'Scholarships', url: '/scholarships', active: false },
-        { label: 'Contact', url: '/contact', active: false },
+        { label: 'Home', url: '/' },
+        { label: 'About', url: route('about') },
+        { label: 'Scholarships', url: route('scholarships') },
+        { label: 'Contact', url: route('contact') },
     ];
 
     return (
-        <header className="fixed top-0 z-50 w-full border-b border-[#005a2d]/10 bg-white/50 dark:border-[#f3f2f2]/10 dark:bg-[#121212]/50">
-            <div className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="flex h-14 w-full items-center justify-between">
+        <motion.header
+            className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
+                scrolled
+                    ? 'border-b border-[#005a2d]/10 bg-white/80 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-black/80'
+                    : 'border-transparent bg-transparent py-5'
+            }`}
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.5, ease: 'circOut' }}
+        >
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between">
                     {/* Logo */}
-                    <div className="flex flex-shrink-0 items-center">
-                        <Link href="/" className="text-lg font-semibold text-[#005a2d] dark:text-[#23b14d]">
-                            OSAS Connect
-                        </Link>
-                    </div>
+                    <Link href="/" className="group flex items-center space-x-2">
+                        <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#005a2d] to-[#008040] text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
+                            <AppLogoIcon className="h-6 w-6 text-white" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="font-display text-lg font-bold tracking-tight text-[#005a2d] transition-colors group-hover:text-[#008040] dark:text-white dark:group-hover:text-green-400">
+                                OSAS Connect
+                            </span>
+                            <span className="text-muted-foreground text-[10px] font-medium tracking-wider uppercase opacity-80">
+                                MinSU Scholarship Portal
+                            </span>
+                        </div>
+                    </Link>
 
-                    {/* Navigation */}
-                    <nav className="hidden items-center space-x-6 md:flex" aria-label="Primary navigation">
+                    {/* Desktop Navigation */}
+                    <nav className="hidden items-center space-x-1 md:flex">
                         {navItems.map((item, index) => (
                             <Link
                                 key={index}
                                 href={item.url}
-                                className="text-sm font-medium text-[#010002] transition-colors duration-200 hover:text-[#008040] dark:text-[#f3f2f2] dark:hover:text-[#23b14d]"
+                                className="text-foreground/80 dark:text-foreground/90 relative rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-[#005a2d]/5 hover:text-[#005a2d] dark:hover:bg-white/10 dark:hover:text-green-400"
                             >
                                 {item.label}
                             </Link>
                         ))}
                     </nav>
 
-                    {/* Auth */}
-                    <div className="flex items-center">
+                    {/* Auth & Actions */}
+                    <div className="hidden items-center space-x-4 md:flex">
                         {auth.user ? (
-                            <Link
-                                href={route('dashboard')}
-                                className="text-sm font-medium text-[#005a2d] transition-colors duration-200 hover:text-[#008040] dark:text-[#23b14d] dark:hover:text-[#008040]"
+                            <Button
+                                asChild
+                                className="rounded-full bg-[#005a2d] px-6 font-semibold text-white shadow-lg shadow-[#005a2d]/20 transition-all hover:-translate-y-0.5 hover:bg-[#006e38] hover:shadow-[#005a2d]/30"
                             >
-                                Dashboard
-                            </Link>
+                                <Link href={route('dashboard')}>
+                                    Dashboard
+                                    <ChevronRight className="ml-1 h-4 w-4" />
+                                </Link>
+                            </Button>
                         ) : (
                             <>
                                 <Link
                                     href={route('login')}
-                                    className="mr-4 text-sm font-medium text-[#010002] transition-colors duration-200 hover:text-[#008040] dark:text-[#f3f2f2] dark:hover:text-[#23b14d]"
+                                    className="text-foreground/80 dark:text-foreground text-sm font-semibold transition-colors hover:text-[#005a2d] dark:hover:text-green-400"
                                 >
                                     Log in
                                 </Link>
-                                <Link
-                                    href={route('register')}
-                                    className="rounded-md bg-[#005a2d] px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-[#008040]"
+                                <Button
+                                    asChild
+                                    className="rounded-full bg-[#005a2d] px-6 font-semibold text-white shadow-lg shadow-[#005a2d]/20 transition-all hover:-translate-y-0.5 hover:bg-[#006e38] hover:shadow-[#005a2d]/30"
                                 >
-                                    Register
-                                </Link>
+                                    <Link href={route('register')}>
+                                        Get Started
+                                        <Sparkles className="ml-2 h-3.5 w-3.5" />
+                                    </Link>
+                                </Button>
                             </>
                         )}
+                    </div>
 
-                        {/* Mobile menu button */}
-                        <button
-                            type="button"
-                            className="ml-4 rounded-md p-3 text-[#010002] transition-colors duration-200 hover:bg-[#005a2d]/5 hover:text-[#008040] focus:ring-2 focus:ring-[#008040] focus:ring-offset-2 focus:outline-none md:hidden dark:text-[#f3f2f2] dark:hover:bg-[#23b14d]/10 dark:hover:text-[#23b14d] dark:focus:ring-[#23b14d]"
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-                            aria-expanded={isMenuOpen}
-                        >
-                            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                        </button>
+                    {/* Mobile Menu */}
+                    <div className="md:hidden">
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full text-[#005a2d] dark:text-green-400">
+                                    <Menu className="h-6 w-6" />
+                                    <span className="sr-only">Open menu</span>
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="right" className="w-[300px] border-l-[#005a2d]/10 p-0 dark:border-white/10">
+                                <SheetTitle className="sr-only">Mobile Navigation</SheetTitle>
+                                <SheetDescription className="sr-only">Navigation menu for mobile devices</SheetDescription>
+                                <div className="flex h-full flex-col bg-white dark:bg-zinc-950">
+                                    <div className="flex items-center justify-between border-b border-dashed p-6">
+                                        <div className="flex items-center space-x-2">
+                                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#005a2d] text-white">
+                                                <AppLogoIcon className="h-5 w-5" />
+                                            </div>
+                                            <span className="font-display text-lg font-bold text-[#005a2d] dark:text-white">OSAS Connect</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto px-6 py-6">
+                                        <nav className="flex flex-col space-y-2">
+                                            {navItems.map((item, index) => (
+                                                <Link
+                                                    key={index}
+                                                    href={item.url}
+                                                    className="text-foreground/80 flex items-center rounded-xl px-4 py-3 text-base font-medium transition-colors hover:bg-[#005a2d]/5 hover:text-[#005a2d] dark:hover:bg-white/5 dark:hover:text-green-400"
+                                                >
+                                                    {item.label}
+                                                </Link>
+                                            ))}
+                                        </nav>
+                                    </div>
+
+                                    <div className="border-t border-dashed p-6">
+                                        {auth.user ? (
+                                            <Button
+                                                className="w-full rounded-xl bg-[#005a2d] py-6 text-base font-bold text-white shadow-lg hover:bg-[#006e38]"
+                                                asChild
+                                            >
+                                                <Link href={route('dashboard')}>Go to Dashboard</Link>
+                                            </Button>
+                                        ) : (
+                                            <div className="flex flex-col space-y-3">
+                                                <Button
+                                                    className="w-full rounded-xl bg-[#005a2d] py-6 text-base font-bold text-white shadow-lg hover:bg-[#006e38]"
+                                                    asChild
+                                                >
+                                                    <Link href={route('register')}>Create Account</Link>
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    className="w-full rounded-xl border-[#005a2d]/20 py-6 text-base font-bold text-[#005a2d] hover:bg-[#005a2d]/5 dark:border-white/20 dark:text-white"
+                                                    asChild
+                                                >
+                                                    <Link href={route('login')}>Log In</Link>
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
                     </div>
                 </div>
             </div>
-
-            {/* Mobile menu */}
-            {isMenuOpen && (
-                <div className="border-t border-[#005a2d]/10 bg-white md:hidden dark:border-[#f3f2f2]/10 dark:bg-[#121212]">
-                    <nav className="space-y-3 px-4 py-4">
-                        {navItems.map((item, index) => (
-                            <Link
-                                key={index}
-                                href={item.url}
-                                className="block text-sm font-medium text-[#010002] transition-colors duration-200 hover:text-[#008040] dark:text-[#f3f2f2] dark:hover:text-[#23b14d]"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                {item.label}
-                            </Link>
-                        ))}
-
-                        <div className="border-t border-[#005a2d]/10 pt-3 dark:border-[#f3f2f2]/10">
-                            {auth.user ? (
-                                <Link
-                                    href={route('dashboard')}
-                                    className="block text-sm font-medium text-[#005a2d] transition-colors duration-200 hover:text-[#008040] dark:text-[#23b14d] dark:hover:text-[#008040]"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    Dashboard
-                                </Link>
-                            ) : (
-                                <div className="space-y-3">
-                                    <Link
-                                        href={route('login')}
-                                        className="block text-sm font-medium text-[#010002] transition-colors duration-200 hover:text-[#008040] dark:text-[#f3f2f2] dark:hover:text-[#23b14d]"
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        Log in
-                                    </Link>
-                                    <Link
-                                        href={route('register')}
-                                        className="block rounded-md bg-[#005a2d] px-4 py-2 text-center text-sm font-medium text-white transition-colors duration-200 hover:bg-[#008040]"
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        Register
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
-                    </nav>
-                </div>
-            )}
-        </header>
+        </motion.header>
     );
 }
