@@ -13,10 +13,18 @@ use App\Http\Controllers\UnifiedScholarshipController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Laravel\Telescope\Telescope;
 
 Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
+
+// Telescope dashboard route (admin and OSAS staff only)
+Route::middleware(['auth', 'verified', 'role:admin|osas_staff'])
+    ->prefix('telescope')
+    ->group(function () {
+        Route::get('/', [Telescope::class, 'index'])->name('telescope');
+    });
 
 Route::get('/about', function () {
     return Inertia::render('about');
