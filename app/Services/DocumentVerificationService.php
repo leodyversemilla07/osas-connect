@@ -200,16 +200,22 @@ class DocumentVerificationService
     private function validateFile(UploadedFile $file, string $documentType): void
     {
         // Check file size (max 10MB)
-        if ($file->getSize() > 10 * 1024 * 1024) {
+        if ($file->getSize() > Document::MAX_FILE_SIZE_BYTES) {
             throw new InvalidArgumentException('File size must not exceed 10MB.');
         }
 
-        // Check file type
-        $allowedTypes = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+        // Check file extension
         $extension = strtolower($file->getClientOriginalExtension());
 
-        if (! in_array($extension, $allowedTypes)) {
-            throw new InvalidArgumentException('File type not allowed. Allowed types: '.implode(', ', $allowedTypes));
+        if (! in_array($extension, Document::ALLOWED_EXTENSIONS, true)) {
+            throw new InvalidArgumentException('File type not allowed. Allowed types: '.implode(', ', Document::ALLOWED_EXTENSIONS));
+        }
+
+        // Check detected MIME type from file contents
+        $mimeType = $file->getMimeType();
+
+        if (! in_array($mimeType, Document::ALLOWED_MIME_TYPES, true)) {
+            throw new InvalidArgumentException('File MIME type not allowed.');
         }
 
         // Additional validation based on document type

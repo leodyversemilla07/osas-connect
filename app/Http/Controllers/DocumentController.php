@@ -18,7 +18,13 @@ class DocumentController extends Controller
         $this->authorize('update', $application);
 
         $request->validate([
-            'document' => ['required', 'file', 'max:10240'], // 10MB max
+            'document' => [
+                'required',
+                'file',
+                'max:10240', // 10MB max
+                'mimes:'.implode(',', Document::ALLOWED_EXTENSIONS),
+                'mimetypes:'.implode(',', Document::ALLOWED_MIME_TYPES),
+            ],
             'type' => [
                 'required',
                 'string',
@@ -57,7 +63,13 @@ class DocumentController extends Controller
         $this->authorize('update', $document->application);
 
         $request->validate([
-            'document' => ['required', 'file', 'max:10240'],
+            'document' => [
+                'required',
+                'file',
+                'max:10240',
+                'mimes:'.implode(',', Document::ALLOWED_EXTENSIONS),
+                'mimetypes:'.implode(',', Document::ALLOWED_MIME_TYPES),
+            ],
         ]);
 
         // Delete old file

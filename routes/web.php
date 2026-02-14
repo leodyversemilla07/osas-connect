@@ -51,7 +51,9 @@ Route::inertia('cookies', 'cookies')->name('cookies');
 // Staff invitation acceptance (public route)
 Route::get('/accept-invitation/{token}', [OsasStaffController::class, 'showAcceptInvitationForm'])->name('staff.accept-invitation');
 
-Route::post('/accept-invitation', [OsasStaffController::class, 'acceptInvitation'])->name('staff.accept-invitation.store');
+Route::post('/accept-invitation', [OsasStaffController::class, 'acceptInvitation'])
+    ->middleware('throttle:10,1')
+    ->name('staff.accept-invitation.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Common dashboard route that redirects to role-specific dashboard
@@ -137,7 +139,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Application management routes
         Route::get('/osas-staff/applications', [OsasStaffController::class, 'scholarshipApplications'])->name('osas.applications');
-        Route::get('/osas-staff/applications/export', [OsasStaffController::class, 'exportApplications'])->name('osas.applications.export');
+        Route::get('/osas-staff/applications/export', [OsasStaffController::class, 'exportApplications'])
+            ->middleware('throttle:20,1')
+            ->name('osas.applications.export');
         Route::get('/osas-staff/applications/{application}/review', [OsasStaffController::class, 'reviewApplication'])->name(
             'osas.applications.review',
         );
@@ -179,7 +183,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/reports', [\App\Http\Controllers\ReportingController::class, 'reports'])->name('reports');
 
             // Export endpoints
-            Route::get('/export/applications', [\App\Http\Controllers\ReportingController::class, 'exportApplications'])->name('export.applications');
+            Route::get('/export/applications', [\App\Http\Controllers\ReportingController::class, 'exportApplications'])
+                ->middleware('throttle:20,1')
+                ->name('export.applications');
         });
 
         // Stipend recording
@@ -259,10 +265,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         );
 
         // Document management for students
-        Route::post('student/scholarships/applications/{application}/documents', [DocumentController::class, 'store'])->name(
+        Route::post('student/scholarships/applications/{application}/documents', [DocumentController::class, 'store'])->middleware('throttle:10,1')->name(
             'student.scholarships.documents.store',
         );
-        Route::patch('student/scholarships/applications/{application}/documents/{document}', [DocumentController::class, 'update'])->name(
+        Route::patch('student/scholarships/applications/{application}/documents/{document}', [DocumentController::class, 'update'])->middleware('throttle:10,1')->name(
             'student.scholarships.documents.update',
         );
         Route::delete('student/scholarships/applications/{application}/documents/{document}', [DocumentController::class, 'destroy'])->name(

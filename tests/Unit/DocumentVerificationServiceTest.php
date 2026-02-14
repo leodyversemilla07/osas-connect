@@ -95,6 +95,25 @@ describe('DocumentVerificationService', function () {
         })->toThrow(InvalidArgumentException::class);
     });
 
+    it('validates detected mime type', function () {
+        $user = User::factory()->create(['role' => 'student']);
+        $scholarship = Scholarship::factory()->create(['type' => Scholarship::TYPE_ACADEMIC_FULL]);
+        $application = ScholarshipApplication::factory()->create([
+            'user_id' => $user->id,
+            'scholarship_id' => $scholarship->id,
+        ]);
+
+        $file = UploadedFile::fake()->create('document.pdf', 100, 'application/x-msdownload');
+
+        expect(function () use ($application, $file) {
+            $this->documentService->uploadDocument(
+                $application,
+                Document::TYPE_GRADES,
+                $file
+            );
+        })->toThrow(InvalidArgumentException::class, 'File MIME type not allowed.');
+    });
+
     it('verifies document by authorized user', function () {
         $osas_staff = User::factory()->create(['role' => 'osas_staff']);
         $student = User::factory()->create(['role' => 'student']);

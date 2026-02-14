@@ -8,12 +8,15 @@ use App\Http\Requests\ScheduleInterviewRequest;
 use App\Models\Interview;
 use App\Models\ScholarshipApplication;
 use App\Services\InterviewManagementService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class InterviewController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly InterviewManagementService $interviewService
     ) {}
@@ -23,6 +26,7 @@ class InterviewController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Interview::class);
         $user = Auth::user();
 
         $interviews = Interview::whereHas('application', function ($query) use ($user) {
@@ -42,6 +46,7 @@ class InterviewController extends Controller
      */
     public function staffIndex()
     {
+        $this->authorize('create', Interview::class);
         $interviews = Interview::with(['application.student.studentProfile', 'application.scholarship', 'interviewer'])
             ->orderBy('schedule', 'desc')
             ->paginate(15);
@@ -56,6 +61,7 @@ class InterviewController extends Controller
      */
     public function dashboard()
     {
+        $this->authorize('create', Interview::class);
         $statistics = $this->interviewService->getStatistics();
         $upcomingInterviews = $this->interviewService->getUpcomingInterviews(Auth::user(), 10);
         $todayInterviews = $this->interviewService->getTodayInterviews();
@@ -72,6 +78,7 @@ class InterviewController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Interview::class);
         $applications = ScholarshipApplication::with(['student.studentProfile', 'scholarship'])
             ->where('status', 'verified')
             ->whereDoesntHave('interview')
@@ -87,6 +94,7 @@ class InterviewController extends Controller
      */
     public function store(ScheduleInterviewRequest $request)
     {
+        $this->authorize('create', Interview::class);
         $application = ScholarshipApplication::findOrFail($request->validated()['application_id']);
 
         $interview = $this->interviewService->scheduleInterview(
@@ -106,6 +114,7 @@ class InterviewController extends Controller
      */
     public function show(Interview $interview)
     {
+        $this->authorize('view', $interview);
         $interview->load(['application.student.studentProfile', 'application.scholarship', 'interviewer']);
 
         if (Auth::user()->role === 'student') {
@@ -124,6 +133,7 @@ class InterviewController extends Controller
      */
     public function edit(Interview $interview)
     {
+        $this->authorize('update', $interview);
         $interview->load(['application.student.studentProfile', 'application.scholarship', 'interviewer']);
 
         return Inertia::render('osas-staff/interview-edit', [
@@ -136,6 +146,7 @@ class InterviewController extends Controller
      */
     public function update(Request $request, Interview $interview)
     {
+        $this->authorize('update', $interview);
         $request->validate([
             'schedule' => ['required', 'date', 'after:now'],
             'location' => ['nullable', 'string', 'max:255'],
@@ -157,6 +168,7 @@ class InterviewController extends Controller
      */
     public function reschedule(RescheduleInterviewRequest $request, Interview $interview)
     {
+        $this->authorize('update', $interview);
         $rescheduledInterview = $this->interviewService->rescheduleInterview(
             $interview,
             $request->validated()['new_schedule'],
@@ -173,6 +185,7 @@ class InterviewController extends Controller
      */
     public function complete(CompleteInterviewRequest $request, Interview $interview)
     {
+        $this->authorize('update', $interview);
         $completedInterview = $this->interviewService->completeInterview(
             $interview,
             $request->validated()['scores'],
@@ -189,6 +202,7 @@ class InterviewController extends Controller
      */
     public function cancel(Request $request, Interview $interview)
     {
+        $this->authorize('update', $interview);
         $request->validate([
             'reason' => ['required', 'string', 'max:500'],
         ]);
@@ -207,6 +221,7 @@ class InterviewController extends Controller
      */
     public function markAsNoShow(Interview $interview)
     {
+        $this->authorize('update', $interview);
         $noShowInterview = $this->interviewService->markAsNoShow($interview);
 
         return redirect()->route('osas.interviews.show', $noShowInterview)
@@ -218,6 +233,7 @@ class InterviewController extends Controller
      */
     public function statisticsOverview()
     {
+        $this->authorize('create', Interview::class);
         $statistics = $this->interviewService->getStatistics();
 
         return response()->json($statistics);
@@ -228,6 +244,7 @@ class InterviewController extends Controller
      */
     public function requestReschedule(Request $request, Interview $interview)
     {
+        $this->authorize('requestReschedule', $interview);
         $request->validate([
             'reason' => ['required', 'string', 'max:500'],
         ]);
@@ -266,6 +283,7 @@ class InterviewController extends Controller
      */
     public function upcoming()
     {
+        $this->authorize('viewAny', Interview::class);
         $user = Auth::user();
 
         if ($user->role === 'student') {

@@ -70,6 +70,20 @@ describe('DocumentController Store', function () {
         $response->assertSessionHasErrors('document');
     });
 
+    it('rejects files with disallowed mime type', function () {
+        $file = UploadedFile::fake()->create('document.pdf', 500, 'application/x-msdownload');
+
+        $response = $this->actingAs($this->student)->post(
+            route('student.scholarships.documents.store', $this->application),
+            [
+                'document' => $file,
+                'type' => 'transcripts',
+            ]
+        );
+
+        $response->assertSessionHasErrors('document');
+    });
+
     it('prevents other students from uploading to application', function () {
         $otherStudent = User::factory()->withProfile()->create(['role' => 'student']);
         $file = UploadedFile::fake()->create('document.pdf', 500, 'application/pdf');
@@ -101,6 +115,25 @@ describe('DocumentController Store', function () {
 
             expect($response->status())->toBe(200);
         }
+    });
+
+    it('rate limits repeated document uploads', function () {
+        $lastResponse = null;
+
+        for ($i = 0; $i < 11; $i++) {
+            $file = UploadedFile::fake()->create("doc_{$i}.pdf", 500, 'application/pdf');
+
+            $lastResponse = $this->actingAs($this->student)->post(
+                route('student.scholarships.documents.store', $this->application),
+                [
+                    'document' => $file,
+                    'type' => 'transcripts',
+                ]
+            );
+        }
+
+        expect($lastResponse)->not->toBeNull();
+        $lastResponse->assertStatus(429);
     });
 });
 
