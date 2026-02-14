@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import student from '@/routes/student';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Clock, Save } from 'lucide-react';
@@ -36,7 +37,7 @@ export default function LogHours({ assignment }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('student.assistantship.log-hours.store'));
+        post(student.assistantship.logHours.store.url());
     };
 
     // Calculate estimated hours
@@ -62,7 +63,7 @@ export default function LogHours({ assignment }: Props) {
                 <div className="border-b pb-6">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" asChild>
-                            <Link href={route('student.assistantship.dashboard')}>
+                            <Link href={student.assistantship.dashboard.url()}>
                                 <ArrowLeft className="h-5 w-5" />
                             </Link>
                         </Button>
@@ -157,7 +158,7 @@ export default function LogHours({ assignment }: Props) {
                                         Submit Hours
                                     </Button>
                                     <Button type="button" variant="outline" asChild>
-                                        <Link href={route('student.assistantship.dashboard')}>Cancel</Link>
+                                        <Link href={student.assistantship.dashboard.url()}>Cancel</Link>
                                     </Button>
                                 </div>
                             </form>

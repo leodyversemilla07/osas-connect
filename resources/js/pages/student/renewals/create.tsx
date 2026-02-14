@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import renewal from '@/routes/renewal';
 import { BreadcrumbItem } from '@/types';
 import { RenewalDeadlines, RenewalEligibility, ScholarshipApplication } from '@/types/models';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -32,7 +33,7 @@ export default function Create({ application, eligibility, deadlines }: Props) {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        post(route('renewal.store', application.id));
+        post(renewal.store(application.id).url);
     };
 
     return (
@@ -160,7 +161,7 @@ export default function Create({ application, eligibility, deadlines }: Props) {
                                         {processing ? 'Submitting...' : 'Submit Renewal Application'}
                                     </Button>
                                     <Button type="button" variant="outline" asChild>
-                                        <Link href={route('renewal.check-eligibility', application.id)}>
+                                        <Link href={renewal.checkEligibility(application.id).url}>
                                             Back to Eligibility Check
                                         </Link>
                                     </Button>

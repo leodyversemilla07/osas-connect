@@ -1,4 +1,5 @@
 import { Dialog, DialogTitle } from '@/components/ui/dialog';
+import student from '@/routes/student';
 import { Textarea } from '@/components/ui/textarea';
 import { Interview } from '@/types/models';
 import { Form } from '@inertiajs/react';
@@ -13,7 +14,7 @@ export default function RescheduleModal({ isOpen, setIsOpen, interview }: Props)
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <Form
-                action={route('student.interviews.reschedule', interview.id)}
+                action={student.interviews.reschedule(interview.id).url}
                 method="post"
                 resetOnSuccess
                 onSuccess={() => {

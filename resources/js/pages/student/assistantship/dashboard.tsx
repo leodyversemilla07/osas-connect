@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import student from '@/routes/student';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import {
@@ -243,7 +244,7 @@ export default function Dashboard({ summary, recentLogs, recentPayments }: Props
                                     </div>
                                     {summary.assignment.status === 'active' && (
                                         <Button asChild>
-                                            <Link href={route('student.assistantship.log-hours')}>
+                                            <Link href={student.assistantship.logHours.url()}>
                                                 <Plus className="mr-2 h-4 w-4" />
                                                 Log Hours
                                             </Link>
@@ -289,7 +290,7 @@ export default function Dashboard({ summary, recentLogs, recentPayments }: Props
                                     )}
                                     <div className="mt-4">
                                         <Button variant="outline" className="w-full" asChild>
-                                            <Link href={route('student.assistantship.hours-history')}>
+                                            <Link href={student.assistantship.hoursHistory.url()}>
                                                 View All Hours
                                             </Link>
                                         </Button>
@@ -346,7 +347,7 @@ export default function Dashboard({ summary, recentLogs, recentPayments }: Props
                                 )}
                                 <div className="mt-4">
                                     <Button variant="outline" className="w-full" asChild>
-                                        <Link href={route('student.assistantship.payment-history')}>
+                                        <Link href={student.assistantship.paymentHistory.url()}>
                                             View All Payments
                                         </Link>
                                     </Button>
@@ -367,7 +368,7 @@ export default function Dashboard({ summary, recentLogs, recentPayments }: Props
                                 Student Assistantship Program to get started.
                             </p>
                             <Button className="mt-6" asChild>
-                                <Link href={route('student.scholarships.index')}>
+                                <Link href={student.scholarships.index.url()}>
                                     Browse Scholarships
                                 </Link>
                             </Button>

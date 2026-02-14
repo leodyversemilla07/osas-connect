@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AuthenticatedLayout from '@/layouts/app-layout';
+import student from '@/routes/student';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Calendar, DollarSign, Eye, Filter, Search } from 'lucide-react';
 import { useState } from 'react';
@@ -31,6 +32,7 @@ interface MyApplicationsProps {
         approved: number;
         rejected: number;
     };
+    [key: string]: unknown;
 }
 
 export default function MyApplications() {
@@ -72,13 +74,13 @@ export default function MyApplications() {
         if (searchTerm) params.set('search', searchTerm);
         if (statusFilter) params.set('status', statusFilter);
 
-        window.location.href = route('student.scholarships.my-applications') + '?' + params.toString();
+        window.location.href = student.applications.url() + '?' + params.toString();
     };
 
     const handleFilterReset = () => {
         setSearchTerm('');
         setStatusFilter('');
-        window.location.href = route('student.scholarships.my-applications');
+        window.location.href = student.applications.url();
     };
 
     return (
@@ -188,7 +190,7 @@ export default function MyApplications() {
                                     <p className="text-lg text-gray-500">No scholarship applications found.</p>
                                     <p className="mt-2 text-sm text-gray-400">You haven't submitted any scholarship applications yet.</p>
                                     <Link
-                                        href={route('student.scholarships.index')}
+                                        href={student.scholarships.index.url()}
                                         className="mt-4 inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase hover:bg-blue-700"
                                     >
                                         Browse Scholarships
@@ -244,7 +246,7 @@ export default function MyApplications() {
 
                                             <div className="flex flex-col gap-2 sm:flex-row">
                                                 <Link
-                                                    href={route('student.applications.show', application.id)}
+                                                    href={student.applications.status(application.id).url}
                                                     className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase transition-colors hover:bg-blue-700"
                                                 >
                                                     <Eye className="mr-2 h-4 w-4" />
@@ -261,7 +263,7 @@ export default function MyApplications() {
                     {/* Quick Actions */}
                     <div className="mt-8 flex justify-center">
                         <Link
-                            href={route('student.scholarships.index')}
+                            href={student.scholarships.index.url()}
                             className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-6 py-3 text-sm font-semibold tracking-widest text-white uppercase hover:bg-green-700"
                         >
                             Apply for More Scholarships

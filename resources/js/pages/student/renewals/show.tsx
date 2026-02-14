@@ -2,6 +2,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import renewalRoutes from '@/routes/renewal';
+import student from '@/routes/student';
 import { BreadcrumbItem } from '@/types';
 import { RenewalApplication } from '@/types/models';
 import { Head, Link } from '@inertiajs/react';
@@ -331,18 +333,13 @@ export default function Show({ renewal }: Props) {
                             </CardHeader>
                             <CardContent className="space-y-3">
                                 <Button variant="outline" className="w-full" asChild>
-                                    <Link href={route('student.scholarships.my-applications')}>
+                                    <Link href={student.applications.url()}>
                                         Back to My Applications
                                     </Link>
                                 </Button>
                                 {renewal.status === 'rejected' && renewal.original_application && (
                                     <Button variant="default" className="w-full" asChild>
-                                        <Link
-                                            href={route(
-                                                'renewal.check-eligibility',
-                                                renewal.original_application.id
-                                            )}
-                                        >
+                                        <Link href={renewalRoutes.checkEligibility(renewal.original_application.id).url}>
                                             Check Eligibility Again
                                         </Link>
                                     </Button>

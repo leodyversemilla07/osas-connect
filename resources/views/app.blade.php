@@ -32,6 +32,9 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
+        <link rel="icon" href="{{ secure_asset('favicon.ico') }}" sizes="any">
+        <link rel="shortcut icon" href="{{ secure_asset('favicon.ico') }}">
+
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 

@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import student from '@/routes/student';
 import { Interview } from '@/types/models';
 import { Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -24,7 +25,7 @@ export default function InterviewList({ interviews }: Props) {
     };
 
     const setRescheduleInterview = (interview: Interview) => {
-        router.visit(route('student.interviews.reschedule', interview.id), {
+        router.visit(student.interviews.reschedule(interview.id).url, {
             method: 'get',
             preserveState: true,
         });
@@ -45,12 +46,12 @@ export default function InterviewList({ interviews }: Props) {
                     {interviews.map((interview) => (
                         <tr key={interview.id}>
                             <td className="px-6 py-4 whitespace-nowrap">{format(new Date(interview.schedule), 'MMM d, yyyy h:mm a')}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{interview.application.scholarship.name}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{interview.scholarship?.name ?? '-'}</td>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <Badge color={getStatusColor(interview.status)}>{interview.status}</Badge>
                             </td>
                             <td className="px-6 py-4 text-sm whitespace-nowrap">
-                                <Link href={route('student.interviews.show', interview.id)} className="mr-4 text-indigo-600 hover:text-indigo-900">
+                                <Link href={student.interviews.show(interview.id).url} className="mr-4 text-indigo-600 hover:text-indigo-900">
                                     View Details
                                 </Link>
                                 {interview.status === 'scheduled' && (

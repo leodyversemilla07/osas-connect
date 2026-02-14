@@ -7,12 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import student from '@/routes/student';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle, Clock, DollarSign, Users } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { route } from 'ziggy-js';
 
 interface Scholarship {
     id: number;
@@ -131,10 +131,10 @@ export default function Apply({ scholarship, userProfile }: Props) {
 
         // Debug: Log the data being sent
         console.log('Form data being submitted:', data);
-        console.log('Route URL:', route('student.scholarships.store', scholarship.id));
+        console.log('Route URL:', student.scholarships.store(scholarship.id).url);
 
         // Use the correct route pattern that matches Laravel routes
-        post(route('student.scholarships.store', scholarship.id), {
+        post(student.scholarships.store(scholarship.id).url, {
             forceFormData: true,
             onSuccess: (page) => {
                 console.log('Form submitted successfully:', page);

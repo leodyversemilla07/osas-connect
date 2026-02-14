@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/utils';
+import student from '@/routes/student';
 import { BreadcrumbItem } from '@/types';
 import { Interview } from '@/types/models';
 import { Head, Link } from '@inertiajs/react';
@@ -102,11 +103,11 @@ const InterviewCard = ({ interview, isUpcoming }: { interview: Interview; isUpco
                         {/* Details Grid */}
                         <div className="grid gap-2 sm:grid-cols-2">
                             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <Calendar className="h-4 w-4 flex-shrink-0" />
+                                <Calendar className="h-4 w-4 shrink-0" />
                                 <span>{formatDate(interview.schedule)}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <Clock className="h-4 w-4 flex-shrink-0" />
+                                <Clock className="h-4 w-4 shrink-0" />
                                 <span>
                                     {new Date(interview.schedule).toLocaleTimeString('en-US', {
                                         hour: '2-digit',
@@ -115,11 +116,11 @@ const InterviewCard = ({ interview, isUpcoming }: { interview: Interview; isUpco
                                 </span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <MapPin className="h-4 w-4 flex-shrink-0" />
+                                <MapPin className="h-4 w-4 shrink-0" />
                                 <span>{interview.application?.location || 'OSAS Office'}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <User className="h-4 w-4 flex-shrink-0" />
+                                <User className="h-4 w-4 shrink-0" />
                                 <span>{interview.application?.interviewer?.name || 'To be assigned'}</span>
                             </div>
                         </div>
@@ -145,7 +146,7 @@ const InterviewCard = ({ interview, isUpcoming }: { interview: Interview; isUpco
                     {/* Actions */}
                     <div className="flex flex-col gap-2 sm:items-end">
                         <Button variant="outline" size="sm" asChild>
-                            <Link href={route('student.interviews.show', interview.id)}>
+                            <Link href={student.interviews.show(interview.id).url}>
                                 <Eye className="mr-1.5 h-4 w-4" />
                                 View Details
                             </Link>
@@ -203,7 +204,7 @@ export default function Index({ interviews }: Props) {
                                 application is verified, an interview may be scheduled.
                             </p>
                             <Button variant="outline" className="mt-4" asChild>
-                                <Link href={route('student.scholarships.my-applications')}>
+                                <Link href={student.applications.url()}>
                                     View My Applications
                                 </Link>
                             </Button>
@@ -244,7 +245,7 @@ export default function Index({ interviews }: Props) {
                                             </div>
                                             <div className="flex gap-2">
                                                 <Button size="sm" asChild>
-                                                    <Link href={route('student.interviews.show', nextInterview.id)}>
+                                                    <Link href={student.interviews.show(nextInterview.id).url}>
                                                         View Details & Prepare
                                                     </Link>
                                                 </Button>
@@ -306,23 +307,23 @@ export default function Index({ interviews }: Props) {
                                 <CardContent>
                                     <ul className="space-y-3 text-sm">
                                         <li className="flex items-start gap-2">
-                                            <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
+                                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
                                             <span>Arrive 15 minutes before your scheduled time</span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
+                                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
                                             <span>Bring a valid school ID and any required documents</span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
+                                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
                                             <span>Dress professionally and appropriately</span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
+                                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
                                             <span>Prepare to discuss your academic goals and financial need</span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
+                                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
                                             <span>Be honest and confident in your responses</span>
                                         </li>
                                     </ul>
@@ -339,19 +340,19 @@ export default function Index({ interviews }: Props) {
                                 <CardContent>
                                     <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
                                         <li className="flex items-start gap-2">
-                                            <span className="h-1.5 w-1.5 mt-2 rounded-full bg-gray-400 flex-shrink-0" />
+                                            <span className="h-1.5 w-1.5 mt-2 rounded-full bg-gray-400 shrink-0" />
                                             <span>
                                                 Request reschedule at least 24 hours before your interview
                                             </span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <span className="h-1.5 w-1.5 mt-2 rounded-full bg-gray-400 flex-shrink-0" />
+                                            <span className="h-1.5 w-1.5 mt-2 rounded-full bg-gray-400 shrink-0" />
                                             <span>
                                                 Missing your interview without notice may affect your application
                                             </span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <span className="h-1.5 w-1.5 mt-2 rounded-full bg-gray-400 flex-shrink-0" />
+                                            <span className="h-1.5 w-1.5 mt-2 rounded-full bg-gray-400 shrink-0" />
                                             <span>
                                                 Contact OSAS if you have any questions or concerns
                                             </span>

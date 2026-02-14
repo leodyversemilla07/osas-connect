@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AuthenticatedLayout from '@/layouts/app-layout';
+import student from '@/routes/student';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, Calendar, DollarSign, FileText, Users } from 'lucide-react';
 
@@ -74,7 +75,7 @@ export default function ScholarshipShow() {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="mb-6">
                         <Link
-                            href={route('student.scholarships.index')}
+                            href={student.scholarships.index.url()}
                             className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
                         >
                             <ArrowLeft className="mr-1 h-4 w-4" />
@@ -191,7 +192,7 @@ export default function ScholarshipShow() {
                                                     </Badge>
                                                 </div>
                                                 <Link
-                                                    href={route('student.applications.show', existing_application.id)}
+                                                    href={student.applications.status(existing_application.id).url}
                                                     className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase hover:bg-blue-700"
                                                 >
                                                     View Application
@@ -203,7 +204,7 @@ export default function ScholarshipShow() {
                                     <div className="text-center">
                                         {eligibility.can_apply ? (
                                             <Link
-                                                href={route('student.scholarships.apply', scholarship.id)}
+                                                href={student.scholarships.apply(scholarship.id).url}
                                                 className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-sm font-semibold tracking-widest text-white uppercase hover:bg-blue-700"
                                             >
                                                 Apply for this Scholarship

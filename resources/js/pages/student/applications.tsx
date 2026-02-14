@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import student from '@/routes/student';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
@@ -52,7 +53,7 @@ export default function MyApplications({ applications }: MyApplicationsProps) {
                         </div>
                         <div className="flex-shrink-0">
                             <Button asChild>
-                                <Link href={route('student.scholarships.index')}>
+                                <Link href={student.scholarships.index.url()}>
                                     <Plus className="mr-2 h-4 w-4 lg:h-5 lg:w-5" />
                                     Apply for Scholarship
                                 </Link>

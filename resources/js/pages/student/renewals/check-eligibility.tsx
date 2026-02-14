@@ -2,6 +2,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import renewal from '@/routes/renewal';
+import student from '@/routes/student';
 import { BreadcrumbItem } from '@/types';
 import { RenewalDeadlines, RenewalEligibility, ScholarshipApplication } from '@/types/models';
 import { Head, Link } from '@inertiajs/react';
@@ -157,7 +159,7 @@ export default function CheckEligibility({ application, eligibility, deadlines }
                             <div className="flex flex-col gap-3 pt-4 sm:flex-row">
                                 {eligibility.eligible ? (
                                     <Button asChild>
-                                        <Link href={route('renewal.create', application.id)}>
+                                        <Link href={renewal.create(application.id).url}>
                                             Proceed with Renewal Application
                                         </Link>
                                     </Button>
@@ -167,7 +169,7 @@ export default function CheckEligibility({ application, eligibility, deadlines }
                                     </Button>
                                 )}
                                 <Button variant="outline" asChild>
-                                    <Link href={route('student.scholarships.my-applications')}>
+                                    <Link href={student.applications.url()}>
                                         Back to My Applications
                                     </Link>
                                 </Button>

@@ -12,7 +12,8 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, PageProps } from '@/types';
+import student from '@/routes/student';
+import { BreadcrumbItem } from '@/types';
 import { Interview } from '@/types/models';
 import { Head, Link, useForm } from '@inertiajs/react';
 import {
@@ -36,7 +37,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Interview Details', href: '#' },
 ];
 
-interface Props extends PageProps {
+interface Props {
     interview: Interview;
 }
 
@@ -95,7 +96,7 @@ export default function Show({ interview }: Props) {
     });
 
     const handleRescheduleSubmit = () => {
-        rescheduleForm.post(route('student.interviews.reschedule', interview.id), {
+        rescheduleForm.post(student.interviews.reschedule(interview.id).url, {
             onSuccess: () => setIsRescheduleDialogOpen(false),
         });
     };
@@ -132,7 +133,7 @@ export default function Show({ interview }: Props) {
                 <div className="flex flex-col gap-4 border-b pb-6 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" asChild>
-                            <Link href={route('student.interviews.index')}>
+                            <Link href={student.interviews.index.url()}>
                                 <ArrowLeft className="h-5 w-5" />
                             </Link>
                         </Button>
@@ -416,13 +417,13 @@ export default function Show({ interview }: Props) {
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <Button variant="outline" className="w-full justify-start" asChild>
-                                    <Link href={route('student.interviews.index')}>
+                                    <Link href={student.interviews.index.url()}>
                                         <Calendar className="mr-2 h-4 w-4" />
                                         All My Interviews
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="w-full justify-start" asChild>
-                                    <Link href={route('student.scholarships.my-applications')}>
+                                    <Link href={student.applications.url()}>
                                         <FileText className="mr-2 h-4 w-4" />
                                         My Applications
                                     </Link>
