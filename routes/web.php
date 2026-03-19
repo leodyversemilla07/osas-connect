@@ -4,27 +4,21 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Osas\ScholarshipApplicationController as OsasScholarshipApplicationController;
 use App\Http\Controllers\OsasStaffController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\RenewalController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\Student\ScholarshipApplicationController as StudentScholarshipApplicationController;
+use App\Http\Controllers\Student\ScholarshipCatalogController;
 use App\Http\Controllers\StudentManagementController;
-use App\Http\Controllers\UnifiedScholarshipController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Telescope\Telescope;
 
 Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
-
-// Telescope dashboard route (admin and OSAS staff only)
-Route::middleware(['auth', 'verified', 'role:admin|osas_staff'])
-    ->prefix('telescope')
-    ->group(function () {
-        Route::get('/', [Telescope::class, 'index'])->name('telescope');
-    });
 
 Route::get('/about', function () {
     return Inertia::render('about');
@@ -138,26 +132,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         );
 
         // Application management routes
-        Route::get('/osas-staff/applications', [OsasStaffController::class, 'scholarshipApplications'])->name('osas.applications');
-        Route::get('/osas-staff/applications/export', [OsasStaffController::class, 'exportApplications'])
+        Route::get('/osas-staff/applications', [OsasScholarshipApplicationController::class, 'index'])->name('osas.applications');
+        Route::get('/osas-staff/applications/export', [OsasScholarshipApplicationController::class, 'export'])
             ->middleware('throttle:20,1')
             ->name('osas.applications.export');
-        Route::get('/osas-staff/applications/{application}/review', [OsasStaffController::class, 'reviewApplication'])->name(
+        Route::get('/osas-staff/applications/{application}/review', [OsasScholarshipApplicationController::class, 'review'])->name(
             'osas.applications.review',
         );
-        Route::patch('/osas-staff/applications/{application}/status', [OsasStaffController::class, 'updateApplicationStatus'])->name(
+        Route::patch('/osas-staff/applications/{application}/status', [OsasScholarshipApplicationController::class, 'updateStatus'])->name(
             'osas.applications.status',
         );
-        Route::post('/osas-staff/applications/{application}/comment', [OsasStaffController::class, 'addApplicationComment'])->name(
+        Route::post('/osas-staff/applications/{application}/comment', [OsasScholarshipApplicationController::class, 'addComment'])->name(
             'osas.applications.comment',
         );
-        Route::patch('/osas-staff/documents/{document}/verify', [OsasStaffController::class, 'verifyDocument'])->name('osas.documents.verify');
+        Route::patch('/osas-staff/documents/{document}/verify', [OsasScholarshipApplicationController::class, 'verifyDocument'])->name('osas.documents.verify');
 
         // Interview scheduling and management
-        Route::get('/osas-staff/applications/{application}/interview', [OsasStaffController::class, 'scheduleInterviewForm'])->name(
+        Route::get('/osas-staff/applications/{application}/interview', [OsasScholarshipApplicationController::class, 'scheduleInterviewForm'])->name(
             'osas.applications.interview',
         );
-        Route::post('/osas-staff/applications/{application}/interview', [UnifiedScholarshipController::class, 'scheduleInterview'])->name(
+        Route::post('/osas-staff/applications/{application}/interview', [OsasScholarshipApplicationController::class, 'scheduleInterview'])->name(
             'osas.scholarships.interview.store',
         );
 
@@ -189,7 +183,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         // Stipend recording
-        Route::post('/osas-staff/scholarships/applications/{application}/stipend', [UnifiedScholarshipController::class, 'recordStipend'])->name(
+        Route::post('/osas-staff/scholarships/applications/{application}/stipend', [OsasScholarshipApplicationController::class, 'recordStipend'])->name(
             'osas.scholarships.stipend.record',
         );
 
@@ -237,8 +231,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('student/dashboard/stats', [StudentController::class, 'getDashboardStats'])->name('student.dashboard.stats');
         Route::get('student/dashboard/activity', [StudentController::class, 'getRecentActivity'])->name('student.dashboard.activity');
 
-        Route::get('student/applications', [StudentController::class, 'applications'])->name('student.applications');
-        Route::get('student/applications/{application}/status', [StudentController::class, 'applicationStatus'])->name('student.applications.status');
+        Route::get('student/applications', [StudentScholarshipApplicationController::class, 'legacyIndex'])->name('student.applications');
+        Route::get('student/applications/{application}/status', [StudentScholarshipApplicationController::class, 'legacyShow'])->name('student.applications.status');
 
         // Scholarship browsing and search
         Route::get('student/scholarships/search', [StudentController::class, 'searchScholarships'])->name('student.scholarships.search');
@@ -247,22 +241,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         );
 
         // Scholarship application routes (student-specific)
-        Route::get('student/scholarships', [UnifiedScholarshipController::class, 'index'])->name('student.scholarships.index');
+        Route::get('student/scholarships', [ScholarshipCatalogController::class, 'index'])->name('student.scholarships.index');
 
-        // Application submission
-        Route::get('student/scholarships/{scholarship}/apply', [UnifiedScholarshipController::class, 'create'])->name('student.scholarships.apply');
-        Route::post('student/scholarships/{scholarship}/apply', [UnifiedScholarshipController::class, 'store'])->name('student.scholarships.store');
-
-        // Application status tracking
-        Route::get('student/scholarships/applications/{application}/status', [UnifiedScholarshipController::class, 'showStatus'])->name(
+        // Canonical scholarship application routes
+        Route::get('student/scholarships/applications', [StudentScholarshipApplicationController::class, 'index'])->name(
+            'student.scholarships.applications.index',
+        );
+        Route::get('student/scholarships/applications/{application}/status', [StudentScholarshipApplicationController::class, 'status'])->name(
             'student.scholarships.applications.status',
         );
-        Route::get('student/scholarships/applications/{application}', [UnifiedScholarshipController::class, 'showApplication'])->name(
+        Route::get('student/scholarships/applications/{application}', [StudentScholarshipApplicationController::class, 'show'])->name(
             'student.scholarships.applications.show',
         );
-        Route::get('student/scholarships/applications/{application}/complete', [UnifiedScholarshipController::class, 'edit'])->name(
+        Route::get('student/scholarships/applications/{application}/complete', [StudentScholarshipApplicationController::class, 'edit'])->name(
             'student.scholarships.applications.edit',
         );
+
+        // Scholarship browsing and application submission
+        Route::get('student/scholarships/{scholarship}', [ScholarshipCatalogController::class, 'show'])->name('student.scholarships.show');
+        Route::get('student/scholarships/{scholarship}/apply', [ScholarshipCatalogController::class, 'create'])->name('student.scholarships.apply');
+        Route::post('student/scholarships/{scholarship}/apply', [ScholarshipCatalogController::class, 'store'])->name('student.scholarships.store');
 
         // Document management for students
         Route::post('student/scholarships/applications/{application}/documents', [DocumentController::class, 'store'])->middleware('throttle:10,1')->name(
@@ -274,10 +272,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('student/scholarships/applications/{application}/documents/{document}', [DocumentController::class, 'destroy'])->name(
             'student.scholarships.documents.destroy',
         );
-        Route::patch('student/scholarships/applications/{application}/documents/{documentType}', [
-            UnifiedScholarshipController::class,
-            'updateDocument',
-        ])->name('student.scholarships.applications.documents.update');
+        Route::patch('student/scholarships/applications/{application}/documents/{documentType}', [StudentScholarshipApplicationController::class, 'updateDocument'])->name(
+            'student.scholarships.applications.documents.update',
+        );
 
         // Interview routes (student-specific)
         Route::get('student/interviews', [InterviewController::class, 'index'])->name('student.interviews.index');

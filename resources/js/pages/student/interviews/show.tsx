@@ -423,7 +423,7 @@ export default function Show({ interview }: Props) {
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="w-full justify-start" asChild>
-                                    <Link href={student.applications.url()}>
+                                    <Link href={student.scholarships.applications.index.url()}>
                                         <FileText className="mr-2 h-4 w-4" />
                                         My Applications
                                     </Link>

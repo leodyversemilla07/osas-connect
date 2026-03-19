@@ -98,6 +98,7 @@ class InterviewFactory extends Factory
             'total_score' => null,
             'recommendation' => null,
             'interviewer_notes' => null,
+            'reschedule_history' => null,
         ]);
     }
 }

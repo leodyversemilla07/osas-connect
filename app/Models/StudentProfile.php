@@ -314,8 +314,12 @@ class StudentProfile extends Model
      */
     public function hasNoFailingGrades(): bool
     {
-        // Implement grade checking logic based on your grading system
-        return true; // Placeholder
+        return ! $this->grades()
+            ->where(function ($query) {
+                $query->where('grade', '>', 3.0)
+                    ->orWhereIn('status', ['failed', 'dropped', 'deferred', 'incomplete']);
+            })
+            ->exists();
     }
 
     /**
@@ -323,8 +327,7 @@ class StudentProfile extends Model
      */
     public function hasGradeBelow(float $threshold): bool
     {
-        // Implement minimum grade checking logic
-        return false; // Placeholder
+        return $this->grades()->where('grade', '>', $threshold)->exists();
     }
 
     /**
@@ -334,7 +337,7 @@ class StudentProfile extends Model
      */
     public function activeScholarshipApplications()
     {
-        return $this->scholarshipApplications()->whereIn('status', ['approved', 'under_review', 'interview_scheduled']);
+        return $this->scholarshipApplications()->whereIn('status', ['approved', 'under_evaluation']);
     }
 
     /**

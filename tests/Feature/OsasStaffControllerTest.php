@@ -89,6 +89,26 @@ describe('OsasStaffController Applications', function () {
 
         $response->assertStatus(200);
     });
+
+    it('renders the review page with canonical scholarship presenter data', function () {
+        $student = User::factory()->withProfile()->create(['role' => 'student']);
+        $scholarship = Scholarship::factory()->create(['status' => 'active']);
+        $application = ScholarshipApplication::factory()->create([
+            'user_id' => $student->id,
+            'scholarship_id' => $scholarship->id,
+            'status' => 'verified',
+        ]);
+
+        $response = $this->actingAs($this->staff)->get(route('osas.applications.review', $application));
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('osas-staff/application-review')
+            ->has('application.student')
+            ->has('application.document_summary')
+            ->has('application.progress_flags')
+            ->has('application.timeline')
+        );
+    });
 });
 
 describe('OsasStaffController Reports', function () {

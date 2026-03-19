@@ -11,6 +11,10 @@ use InvalidArgumentException;
 
 class DocumentVerificationService
 {
+    public function __construct(
+        private readonly ?ScholarshipWorkflowService $workflowService = null
+    ) {}
+
     /**
      * Required documents for each scholarship type based on MinSU requirements
      */
@@ -99,8 +103,7 @@ class DocumentVerificationService
             'verified_by' => $verifier->id,
         ]);
 
-        // Check if all required documents are verified
-        $this->checkApplicationDocumentCompleteness($document->application);
+        $this->getWorkflowService()->synchronizeAfterDocumentReview($document->application);
 
         return true;
     }
@@ -285,34 +288,11 @@ class DocumentVerificationService
      */
     private function checkApplicationDocumentCompleteness(ScholarshipApplication $application): void
     {
-        $completeness = $this->checkDocumentCompleteness($application);
+        $this->getWorkflowService()->synchronizeAfterDocumentReview($application);
+    }
 
-        if ($completeness['complete'] && $completeness['verified_count'] === $completeness['required_count']) {
-            // All documents uploaded and verified
-            if ($application->status === ScholarshipApplication::STATUS_UNDER_VERIFICATION) {
-                $application->update([
-                    'status' => ScholarshipApplication::STATUS_VERIFIED,
-                    'verified_at' => now(),
-                    'current_step' => 'evaluation',
-                ]);
-            }
-        } elseif ($completeness['uploaded_count'] === $completeness['required_count'] &&
-                  $completeness['verified_count'] < $completeness['required_count']) {
-            // All documents uploaded but not all verified
-            if ($application->status === ScholarshipApplication::STATUS_SUBMITTED) {
-                $application->update([
-                    'status' => ScholarshipApplication::STATUS_UNDER_VERIFICATION,
-                    'current_step' => 'document_verification',
-                ]);
-            }
-        } elseif ($completeness['uploaded_count'] < $completeness['required_count']) {
-            // Missing documents
-            if ($application->status !== ScholarshipApplication::STATUS_INCOMPLETE) {
-                $application->update([
-                    'status' => ScholarshipApplication::STATUS_INCOMPLETE,
-                    'current_step' => 'document_submission',
-                ]);
-            }
-        }
+    private function getWorkflowService(): ScholarshipWorkflowService
+    {
+        return $this->workflowService ?? app(ScholarshipWorkflowService::class);
     }
 }

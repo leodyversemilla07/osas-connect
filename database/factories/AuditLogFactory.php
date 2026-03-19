@@ -14,6 +14,13 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class AuditLogFactory extends Factory
 {
+    public function configure(): static
+    {
+        return $this->afterMaking(function (AuditLog $audit): void {
+            $this->synchronizeEntityForAction($audit);
+        });
+    }
+
     /**
      * Define the model's default state.
      *
@@ -21,32 +28,36 @@ class AuditLogFactory extends Factory
      */
     public function definition(): array
     {
+        $action = fake()->randomElement([
+            'scholarship_approval',
+            'stipend_release',
+            'user_management',
+            'document_verification',
+            'scholarship_rejection',
+            'stipend_cancellation',
+            'account_creation',
+            'account_deletion',
+        ]);
+
+        $entityType = match ($action) {
+            'scholarship_approval', 'scholarship_rejection' => Scholarship::class,
+            'stipend_release', 'stipend_cancellation' => ScholarshipStipend::class,
+            'document_verification' => Document::class,
+            default => User::class,
+        };
+
+        $entityId = match ($entityType) {
+            Scholarship::class => Scholarship::factory()->create()->getKey(),
+            ScholarshipStipend::class => ScholarshipStipend::factory()->create()->getKey(),
+            User::class => User::factory()->create()->getKey(),
+            Document::class => Document::factory()->create()->getKey(),
+        };
+
         return [
             'user_id' => User::factory(),
-            'action' => fake()->randomElement([
-                'scholarship_approval',
-                'stipend_release',
-                'user_management',
-                'document_verification',
-                'scholarship_rejection',
-                'stipend_cancellation',
-                'account_creation',
-                'account_deletion',
-            ]),
-            'entity_type' => fake()->randomElement([
-                Scholarship::class,
-                ScholarshipStipend::class,
-                User::class,
-                Document::class,
-            ]),
-            'entity_id' => function () {
-                $type = fake()->randomElement(['scholarship', 'user', 'document']);
-                return match ($type) {
-                    'scholarship' => Scholarship::factory()->create()->id,
-                    'user' => null, // User entity ID will be set when testing user management
-                    'document' => null, // Document entity ID will be set when testing document verification
-                };
-            },
+            'action' => $action,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
             'old_values' => null,
             'new_values' => fake()->randomElement([
                 ['status' => 'approved'],
@@ -59,5 +70,28 @@ class AuditLogFactory extends Factory
             'description' => fake()->sentence(),
         ];
     }
-}
+
+    private function synchronizeEntityForAction(AuditLog $audit): void
+    {
+        $entityType = match ($audit->action) {
+            'scholarship_approval', 'scholarship_rejection' => Scholarship::class,
+            'stipend_release', 'stipend_cancellation' => ScholarshipStipend::class,
+            'document_verification' => Document::class,
+            default => User::class,
+        };
+
+        if ($audit->entity_type === $entityType && $audit->entity_id) {
+            return;
+        }
+
+        $entityId = match ($entityType) {
+            Scholarship::class => Scholarship::factory()->create()->getKey(),
+            ScholarshipStipend::class => ScholarshipStipend::factory()->create()->getKey(),
+            User::class => User::factory()->create()->getKey(),
+            Document::class => Document::factory()->create()->getKey(),
+        };
+
+        $audit->entity_type = $entityType;
+        $audit->entity_id = $entityId;
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Scholarship;
+use App\Services\ScholarshipApplicationPresenter;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,10 @@ use Inertia\Response;
 class StudentController extends Controller
 {
     use AuthorizesRequests;
+
+    public function __construct(
+        private readonly ScholarshipApplicationPresenter $applicationPresenter
+    ) {}
 
     /**
      * Display the student dashboard.
@@ -54,25 +59,19 @@ class StudentController extends Controller
         // Get recent applications
         $recentApplications = $student
             ->scholarshipApplications()
-            ->with('scholarship')
+            ->with(['scholarship', 'documents', 'interview', 'reviewer'])
             ->latest()
             ->take(3)
             ->get()
             ->map(function ($application) {
-                $progress = $this->getApplicationProgress($application->status);
+                $presented = $this->applicationPresenter->presentStudentList($application);
 
                 return [
-                    'id' => $application->id,
-                    'scholarship_name' => $application->scholarship->name,
-                    'status' => $application->status,
-                    'submitted_at' => $application->applied_at
-                        ? (is_string($application->applied_at)
-                            ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d')
-                            : $application->applied_at->format('Y-m-d'))
-                        : (is_string($application->created_at)
-                            ? \Carbon\Carbon::parse($application->created_at)->format('Y-m-d')
-                            : $application->created_at->format('Y-m-d')),
-                    'progress' => $progress,
+                    'id' => $presented['id'],
+                    'scholarship_name' => $presented['scholarship']['name'],
+                    'status' => $presented['status'],
+                    'submitted_at' => $presented['submitted_at'],
+                    'progress' => $presented['progress'],
                 ];
             });
 
@@ -87,251 +86,6 @@ class StudentController extends Controller
             'totalApplications' => $totalApplications,
             'approvedScholarships' => $approvedScholarships,
         ]);
-    }
-
-    /**
-     * Get application progress percentage based on status
-     */
-    private function getApplicationProgress(string $status): int
-    {
-        $progressMap = [
-            'draft' => 10,
-            'submitted' => 25,
-            'under_verification' => 40,
-            'verified' => 60,
-            'under_evaluation' => 80,
-            'approved' => 100,
-            'rejected' => 100,
-            'incomplete' => 30,
-        ];
-
-        return $progressMap[$status] ?? 0;
-    }
-
-    public function applications(): Response
-    {
-        $student = Auth::user()->studentProfile;
-
-        if (! $student) {
-            return Inertia::render('errors/404', [
-                'message' => 'Student profile not found',
-            ]);
-        }
-
-        // Get all applications with scholarship details
-        $applications = $student
-            ->scholarshipApplications()
-            ->with('scholarship')
-            ->latest()
-            ->get()
-            ->map(function ($application) {
-                $progress = $this->getApplicationProgress($application->status);
-
-                return [
-                    'id' => $application->id,
-                    'scholarship_name' => $application->scholarship->name,
-                    'scholarship_type' => $application->scholarship->type,
-                    'status' => $application->status,
-                    'submitted_at' => $application->applied_at
-                        ? (is_string($application->applied_at)
-                            ? \Carbon\Carbon::parse($application->applied_at)->format('Y-m-d')
-                            : $application->applied_at->format('Y-m-d'))
-                        : (is_string($application->created_at)
-                            ? \Carbon\Carbon::parse($application->created_at)->format('Y-m-d')
-                            : $application->created_at->format('Y-m-d')),
-                    'updated_at' => is_string($application->updated_at)
-                        ? \Carbon\Carbon::parse($application->updated_at)->format('Y-m-d')
-                        : $application->updated_at->format('Y-m-d'),
-                    'progress' => $progress,
-                    'amount' => $application->scholarship->getStipendAmount()
-                        ? '₱' . number_format($application->scholarship->getStipendAmount(), 0) . '/month'
-                        : 'Amount TBD',
-                    'deadline' => $application->scholarship->deadline->format('Y-m-d'),
-                    'can_edit' => in_array($application->status, ['draft', 'incomplete']),
-                ];
-            });
-
-        return Inertia::render('student/applications', [
-            'applications' => $applications,
-        ]);
-    }
-
-    public function applicationStatus($applicationId): Response
-    {
-        $student = Auth::user()->studentProfile;
-
-        if (! $student) {
-            return Inertia::render('errors/404', [
-                'message' => 'Student profile not found',
-            ]);
-        }
-
-        // Get the specific application and authorize access
-        $application = $student
-            ->scholarshipApplications()
-            ->with(['scholarship', 'documents'])
-            ->findOrFail($applicationId);
-
-        // Additional authorization check using policy - applications belong to user, not student profile
-        $this->authorize('view', $application);
-
-        // Build timeline based on application status
-        $timeline = $this->buildApplicationTimeline($application);
-
-        // Get required documents status - format for React component
-        $requiredDocuments = [];
-
-        $documentTypes = [
-            'transcripts' => 'Official Transcripts',
-            'recommendation_letter' => 'Letter of Recommendation',
-            'financial_statement' => 'Financial Statement',
-        ];
-
-        foreach ($documentTypes as $type => $displayName) {
-            $document = $application->documents->where('type', $type)->first();
-            if ($document || $type !== 'financial_statement' || in_array($application->scholarship->type, ['need_based', 'both'])) {
-                $requiredDocuments[$type] = [
-                    'name' => $displayName,
-                    'uploaded_at' => $document ? $document->created_at->format('Y-m-d H:i:s') : null,
-                    'verified' => $document ? $document->status === 'approved' : false,
-                ];
-            }
-        }
-
-        $applicationData = [
-            'id' => $application->id,
-            'scholarship' => [
-                'id' => $application->scholarship->id,
-                'name' => $application->scholarship->name,
-                'type' => $application->scholarship->type,
-                'amount' => $application->scholarship->getStipendAmount()
-                    ? '₱' . number_format($application->scholarship->getStipendAmount(), 0) . '/month'
-                    : 'Amount TBD',
-                'description' => $application->scholarship->description ?? '',
-            ],
-            'status' => $application->status,
-            'submitted_at' => $application->applied_at
-                ? (is_string($application->applied_at)
-                    ? \Carbon\Carbon::parse($application->applied_at)->format('F j, Y')
-                    : $application->applied_at->format('F j, Y'))
-                : null,
-            'created_at' => is_string($application->created_at)
-                ? \Carbon\Carbon::parse($application->created_at)->format('F j, Y')
-                : $application->created_at->format('F j, Y'),
-            'progress' => $this->getApplicationProgress($application->status),
-            'purpose_letter' => $application->purpose_statement,
-            'verifier_comments' => $application->feedback,
-            'next_steps' => $this->getNextSteps($application->status),
-            'documents' => $requiredDocuments,
-        ];
-
-        return Inertia::render('student/scholarships/application-status', [
-            'application' => $applicationData,
-            'timeline' => $timeline,
-        ]);
-    }
-
-    private function buildApplicationTimeline($application): array
-    {
-        $timeline = [
-            [
-                'title' => 'Application Started',
-                'description' => 'You began your scholarship application.',
-                'date' => is_string($application->created_at)
-                    ? \Carbon\Carbon::parse($application->created_at)->format('F j, Y')
-                    : $application->created_at->format('F j, Y'),
-                'status' => 'completed',
-                'icon' => 'document-plus',
-            ],
-        ];
-
-        if ($application->applied_at) {
-            $timeline[] = [
-                'title' => 'Application Submitted',
-                'description' => 'Your application has been submitted for review.',
-                'date' => is_string($application->applied_at)
-                    ? \Carbon\Carbon::parse($application->applied_at)->format('F j, Y')
-                    : $application->applied_at->format('F j, Y'),
-                'status' => 'completed',
-                'icon' => 'check-circle',
-            ];
-        }
-
-        if (in_array($application->status, ['under_verification', 'verified', 'under_evaluation', 'approved', 'rejected'])) {
-            $timeline[] = [
-                'title' => 'Under Review',
-                'description' => 'OSAS staff is reviewing your application and documents.',
-                'date' => null,
-                'status' => $application->status === 'under_verification' ? 'current' : 'completed',
-                'icon' => 'eye',
-            ];
-        }
-
-        if (in_array($application->status, ['verified', 'under_evaluation', 'approved', 'rejected'])) {
-            $timeline[] = [
-                'title' => 'Documents Verified',
-                'description' => 'All required documents have been verified.',
-                'date' => null,
-                'status' => $application->status === 'verified' ? 'current' : 'completed',
-                'icon' => 'document-check',
-            ];
-        }
-
-        if (in_array($application->status, ['under_evaluation', 'approved', 'rejected'])) {
-            $timeline[] = [
-                'title' => 'Under Evaluation',
-                'description' => 'Your application is being evaluated by the scholarship committee.',
-                'date' => null,
-                'status' => $application->status === 'under_evaluation' ? 'current' : 'completed',
-                'icon' => 'academic-cap',
-            ];
-        }
-
-        if ($application->status === 'approved') {
-            $timeline[] = [
-                'title' => 'Application Approved',
-                'description' => 'Congratulations! Your scholarship application has been approved.',
-                'date' => null,
-                'status' => 'completed',
-                'icon' => 'check-badge',
-            ];
-        } elseif ($application->status === 'rejected') {
-            $timeline[] = [
-                'title' => 'Application Not Approved',
-                'description' => 'Your application was not approved at this time.',
-                'date' => null,
-                'status' => 'completed',
-                'icon' => 'x-circle',
-            ];
-        }
-
-        return $timeline;
-    }
-
-    /**
-     * Get next steps for application status
-     */
-    private function getNextSteps(string $status): array
-    {
-        $nextSteps = [
-            'draft' => ['Complete your application form.', 'Upload all required documents.', 'Submit your application before the deadline.'],
-            'submitted' => ['Wait for document verification.', 'Check your email for updates.', 'Be prepared for potential document requests.'],
-            'under_verification' => ['Wait for document verification to complete.', 'Respond promptly to any additional document requests.'],
-            'verified' => ['Wait for application evaluation.', 'Prepare for potential interview scheduling.'],
-            'under_evaluation' => ['Wait for evaluation results.', 'Be available for interview if required.'],
-            'approved' => [
-                'Congratulations! Check for scholarship guidelines.',
-                'Maintain required academic performance.',
-                'Attend orientation sessions if applicable.',
-            ],
-            'rejected' => [
-                'Review feedback if provided.',
-                'Consider applying for other available scholarships.',
-                'Contact OSAS if you have questions about the decision.',
-            ],
-        ];
-
-        return $nextSteps[$status] ?? [];
     }
 
     /**

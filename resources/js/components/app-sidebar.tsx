@@ -102,7 +102,7 @@ const studentNavItems: NavItem[] = [
     },
     {
         title: 'My Applications',
-        href: route('student.applications'),
+        href: route('student.scholarships.applications.index'),
         icon: FileText,
         roles: ['student'],
     },

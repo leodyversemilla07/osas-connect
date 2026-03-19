@@ -6,6 +6,7 @@ use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
 use App\Models\StaffInvitation;
 use App\Models\User;
+use App\Services\ScholarshipApplicationPresenter;
 use App\Services\UserAgentParser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,6 +17,10 @@ use Inertia\Response;
 
 class AdminController extends Controller
 {
+    public function __construct(
+        private readonly ScholarshipApplicationPresenter $applicationPresenter
+    ) {}
+
     /**
      * Display the admin dashboard.
      */
@@ -273,9 +278,10 @@ class AdminController extends Controller
     public function scholarshipApplications(Request $request)
     {
         $query = ScholarshipApplication::with([
-            'user.studentProfile', // Fix: Should be 'user.studentProfile' not 'user.user.studentProfile'
+            'user.studentProfile',
             'scholarship',
-            'documents',
+            'documents.verifiedBy',
+            'interview.interviewer',
             'reviewer',
         ]);
 
@@ -316,39 +322,9 @@ class AdminController extends Controller
         // Use proper pagination like applications.tsx
         $applications = $query->paginate(15);
 
-        // Transform the data for the frontend
-        $applications->getCollection()->transform(function ($application) {
-            return [
-                'id' => $application->id,
-                'student' => [
-                    'id' => $application->user->id,
-                    'name' => $application->user->full_name, // Changed from name to full_name
-                    'email' => $application->user->email,
-                    'student_id' => $application->user->studentProfile->student_id ?? 'N/A',
-                    'course' => $application->user->studentProfile->course ?? 'N/A',
-                    'year_level' => $application->user->studentProfile->year_level ?? 'N/A',
-                ],
-                'scholarship' => [
-                    'id' => $application->scholarship->id,
-                    'name' => $application->scholarship->name,
-                    'type' => $application->scholarship->type,
-                    'amount' => $application->scholarship->amount,
-                ],
-                'status' => $application->status,
-                'applied_at' => $application->applied_at ?? $application->created_at->toISOString(),
-                'approved_at' => $application->approved_at,
-                'rejected_at' => $application->rejected_at,
-                'amount_received' => $application->amount_received,
-                'reviewer' => $application->reviewer
-                    ? [
-                        'name' => $application->reviewer->full_name, // Changed from name to full_name
-                        'email' => $application->reviewer->email,
-                    ]
-                    : null,
-                'created_at' => $application->created_at->toISOString(),
-                'updated_at' => $application->updated_at->toISOString(),
-            ];
-        });
+        $applications->getCollection()->transform(
+            fn ($application) => $this->applicationPresenter->presentAdminList($application)
+        );
 
         // Get statistics
         $thisMonth = now()->startOfMonth();
@@ -467,62 +443,17 @@ class AdminController extends Controller
      */
     public function showScholarshipApplication(ScholarshipApplication $application): Response
     {
-        // Fix: Load the correct relationships
         $application->load([
-            'user.studentProfile', // Fix: Use 'user' instead of 'student.user'
+            'user.studentProfile',
             'scholarship',
             'reviewer',
-            'documents',
+            'documents.verifiedBy',
+            'comments.user',
+            'interview.interviewer',
         ]);
 
         return Inertia::render('admin/scholarship-applications/show', [
-            'application' => [
-                'id' => $application->id,
-                'status' => $application->status,
-                'applied_at' => $application->applied_at,
-                'verified_at' => $application->verified_at,
-                'approved_at' => $application->approved_at,
-                'rejected_at' => $application->rejected_at,
-                'amount_received' => $application->amount_received,
-                'last_stipend_date' => $application->last_stipend_date,
-                'stipend_status' => $application->stipend_status,
-                'interview_schedule' => $application->interview_schedule,
-                'interview_notes' => $application->interview_notes,
-                'verifier_comments' => $application->verifier_comments,
-                'purpose_letter' => $application->purpose_letter,
-                'application_data' => $application->application_data,
-                'documents' => $application->documents,
-                'uploaded_documents' => $application->uploaded_documents,
-                // Fix: Access student data through the 'user' relationship
-                'student' => [
-                    'id' => $application->user->id,
-                    'student_id' => $application->user->studentProfile->student_id ?? 'N/A',
-                    'name' => $application->user->name, // Use 'name' instead of 'full_name'
-                    'email' => $application->user->email,
-                    'course' => $application->user->studentProfile->course ?? 'N/A',
-                    'year_level' => $application->user->studentProfile->year_level ?? 'N/A',
-                    'current_gwa' => $application->user->studentProfile->current_gwa ?? null,
-                    'units' => $application->user->studentProfile->units ?? null,
-                ],
-                'scholarship' => [
-                    'id' => $application->scholarship->id,
-                    'name' => $application->scholarship->name,
-                    'type' => $application->scholarship->type,
-                    'description' => $application->scholarship->description,
-                    'amount' => $application->scholarship->amount,
-                    'eligibility_criteria' => $application->scholarship->eligibility_criteria,
-                    'required_documents' => $application->scholarship->required_documents,
-                ],
-                'reviewer' => $application->reviewer
-                    ? [
-                        'id' => $application->reviewer->id,
-                        'name' => $application->reviewer->name, // Use 'name' instead of 'full_name'
-                        'email' => $application->reviewer->email,
-                    ]
-                    : null,
-                'created_at' => $application->created_at,
-                'updated_at' => $application->updated_at,
-            ],
+            'application' => $this->applicationPresenter->presentAdminDetail($application),
         ]);
     }
 

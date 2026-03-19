@@ -43,6 +43,11 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    formatScholarshipDate,
+    getScholarshipStatusBadgeClass,
+    getScholarshipTypeLabel,
+} from '@/lib/scholarship-application';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import {
@@ -67,6 +72,7 @@ import {
     X,
     XCircle,
 } from 'lucide-react';
+import { ScholarshipApplicationListItem } from '@/types/scholarship-application';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -80,35 +86,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 // Types
-interface Application {
-    id: number;
-    student: {
-        id: number;
-        name: string;
-        student_id: string;
-        email: string;
-        course: string;
-        year_level: string;
-    };
-    scholarship: {
-        id: number;
-        name: string;
-        type: string;
-        amount: string;
-    };
-    status: 'draft' | 'submitted' | 'under_verification' | 'incomplete' | 'verified' | 'under_evaluation' | 'approved' | 'rejected' | 'end';
-    submitted_at: string;
-    updated_at: string;
-    priority: 'high' | 'medium' | 'low';
-    documents_count: number;
-    verified_documents_count: number;
-    interview_scheduled: boolean;
-    deadline: string;
-    reviewer?: {
-        name: string;
-        id: number;
-    };
-}
+type Application = ScholarshipApplicationListItem;
 
 interface ApplicationsPageProps {
     applications: Application[];
@@ -160,71 +138,6 @@ interface ApplicationData {
     };
 }
 
-// Updated comprehensive status configuration (removed extra statuses)
-const statusConfig = {
-    // Backend status values (matching ScholarshipApplication model)
-    draft: {
-        label: 'Draft',
-        color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
-        icon: FileText,
-    },
-    submitted: {
-        label: 'Submitted',
-        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-        icon: CheckCircle,
-    },
-    under_verification: {
-        label: 'Under Verification',
-        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-        icon: Eye,
-    },
-    verified: {
-        label: 'Verified',
-        color: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-        icon: ShieldCheck,
-    },
-    under_evaluation: {
-        label: 'Under Evaluation',
-        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
-        icon: GraduationCap,
-    },
-    approved: {
-        label: 'Approved',
-        color: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-        icon: CheckCircle,
-    },
-    rejected: {
-        label: 'Rejected',
-        color: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
-        icon: XCircle,
-    },
-    incomplete: {
-        label: 'Incomplete',
-        color: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
-        icon: AlertTriangle,
-    },
-    end: {
-        label: 'Completed',
-        color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
-        icon: CheckCircle,
-    },
-} as const;
-
-// Scholarship type mappings for better display
-const SCHOLARSHIP_TYPES = {
-    academic_full: 'Academic (Full)',
-    academic_partial: 'Academic (Partial)',
-    student_assistantship: 'Student Assistantship',
-    performing_arts_full: 'Performing Arts (Full)',
-    performing_arts_partial: 'Performing Arts (Partial)',
-    economic_assistance: 'Economic Assistance',
-    others: 'Custom Type',
-} as const;
-
-const getScholarshipTypeDisplay = (type: string): string => {
-    return SCHOLARSHIP_TYPES[type as keyof typeof SCHOLARSHIP_TYPES] || type;
-};
-
 const getScholarshipTypeColor = (type: string): string => {
     const colors = {
         academic_full: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
@@ -258,27 +171,9 @@ const formatCurrency = (amount: string): string => {
     return amount;
 };
 
-// Safe status component with fallback
-const StatusCell = ({ status }: { status: string }) => {
-    const config = statusConfig[status as keyof typeof statusConfig];
-
-    // Fallback configuration for unknown statuses
-    const fallbackConfig = {
-        label: status ? status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' ') : 'Unknown',
-        color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
-        icon: HelpCircle,
-    };
-
-    const finalConfig = config || fallbackConfig;
-    const StatusIcon = finalConfig.icon;
-
-    return (
-        <Badge className={cn(finalConfig.color)}>
-            <StatusIcon className="mr-1 h-3 w-3" />
-            {finalConfig.label}
-        </Badge>
-    );
-};
+const StatusCell = ({ application }: { application: Application }) => (
+    <Badge className={cn(getScholarshipStatusBadgeClass(application.status))}>{application.status_label}</Badge>
+);
 
 // Mobile-friendly Card Component
 const ApplicationCard = ({
@@ -288,8 +183,11 @@ const ApplicationCard = ({
     application: Application;
     onQuickAction: (action: 'approve' | 'reject' | 'schedule', app: Application) => void;
 }) => {
+    const student = application.student!;
     const isOverdue =
-        application.deadline && new Date(application.deadline) < new Date() && ['submitted', 'under_verification'].includes(application.status);
+        application.scholarship.deadline &&
+        new Date(application.scholarship.deadline) < new Date() &&
+        ['submitted', 'under_verification'].includes(application.status);
 
     return (
         <Card
@@ -308,13 +206,13 @@ const ApplicationCard = ({
                     <div className="space-y-1">
                         <div className="flex items-center gap-2">
                             <User className="text-muted-foreground h-4 w-4" />
-                            <span className="font-semibold">{application.student.name}</span>
+                            <span className="font-semibold">{student.name}</span>
                             <Badge variant="outline" className="text-xs">
                                 #{application.id}
                             </Badge>
                         </div>
                         <div className="text-muted-foreground text-sm">
-                            {application.student.student_id} • {application.student.course} {application.student.year_level}
+                            {student.student_id} • {student.course} {student.year_level}
                         </div>
                     </div>
                     <DropdownMenu>
@@ -331,7 +229,7 @@ const ApplicationCard = ({
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href={route('osas.students.details', application.student.id)}>
+                                <Link href={route('osas.students.details', student.id)}>
                                     <User className="mr-2 h-4 w-4" />
                                     View Profile
                                 </Link>
@@ -345,18 +243,24 @@ const ApplicationCard = ({
                     <div className="text-sm font-medium">{application.scholarship.name}</div>
                     <div className="flex items-center gap-2">
                         <Badge className={cn(getScholarshipTypeColor(application.scholarship.type))}>
-                            {getScholarshipTypeDisplay(application.scholarship.type)}
+                            {application.scholarship.type_label}
                         </Badge>
-                        <span className="text-sm font-medium text-green-600">{formatCurrency(application.scholarship.amount)}</span>
+                        <span className="text-sm font-medium text-green-600">{application.scholarship.amount_display}</span>
                     </div>
                 </div>
 
                 {/* Status and Priority */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <StatusCell status={application.status} />
+                        <StatusCell application={application} />
                         <Badge
-                            variant={application.priority === 'high' ? 'destructive' : application.priority === 'medium' ? 'default' : 'secondary'}
+                            variant={
+                                application.priority === 'high' || application.priority === 'urgent'
+                                    ? 'destructive'
+                                    : application.priority === 'medium'
+                                      ? 'default'
+                                      : 'secondary'
+                            }
                             className="text-xs"
                         >
                             {application.priority}
@@ -375,11 +279,15 @@ const ApplicationCard = ({
                     <div className="flex items-center justify-between text-sm">
                         <span>Documents</span>
                         <span>
-                            {application.verified_documents_count}/{application.documents_count} verified
+                            {application.document_summary.verified_count}/{application.document_summary.required_count} verified
                         </span>
                     </div>
                     <Progress
-                        value={application.documents_count > 0 ? (application.verified_documents_count / application.documents_count) * 100 : 0}
+                        value={
+                            application.document_summary.required_count > 0
+                                ? (application.document_summary.verified_count / application.document_summary.required_count) * 100
+                                : 0
+                        }
                         className="h-2"
                     />
                 </div>
@@ -394,7 +302,7 @@ const ApplicationCard = ({
                                     variant="outline"
                                     className="flex-1 border-green-200 text-green-600 hover:bg-green-50"
                                     onClick={() => onQuickAction('approve', application)}
-                                    disabled={!['verified', 'under_evaluation'].includes(application.status)}
+                                    disabled={application.status !== 'under_evaluation'}
                                 >
                                     <CheckCircle className="mr-1 h-4 w-4" />
                                     Approve
@@ -449,8 +357,7 @@ const ApplicationCard = ({
 
                 {/* Timestamp */}
                 <div className="text-muted-foreground border-t pt-2 text-xs">
-                    Submitted {new Date(application.submitted_at).toLocaleDateString()} • Updated{' '}
-                    {new Date(application.updated_at).toLocaleDateString()}
+                    Submitted {formatScholarshipDate(application.submitted_at)} • Updated {formatScholarshipDate(application.updated_at)}
                 </div>
             </div>
         </Card>
@@ -502,7 +409,7 @@ const columns: ColumnDef<Application>[] = [
             );
         },
         cell: ({ row }) => {
-            const student = row.original.student;
+            const student = row.original.student!;
             return (
                 <div className="flex items-center space-x-2">
                     <User className="text-muted-foreground h-4 w-4" />
@@ -517,7 +424,7 @@ const columns: ColumnDef<Application>[] = [
         },
         accessorFn: (row) => {
             // Create a searchable string for the student column
-            const student = row.student;
+            const student = row.student!;
             return `${student.name} ${student.student_id} ${student.email} ${student.course} ${student.year_level}`;
         },
     },
@@ -530,8 +437,8 @@ const columns: ColumnDef<Application>[] = [
                 <div>
                     <div className="font-medium">{scholarship.name}</div>
                     <div className="mt-1 flex items-center gap-2">
-                        <Badge className={cn(getScholarshipTypeColor(scholarship.type))}>{getScholarshipTypeDisplay(scholarship.type)}</Badge>
-                        <span className="text-sm font-medium text-green-600 dark:text-green-400">{formatCurrency(scholarship.amount)}</span>
+                        <Badge className={cn(getScholarshipTypeColor(scholarship.type))}>{scholarship.type_label}</Badge>
+                        <span className="text-sm font-medium text-green-600 dark:text-green-400">{scholarship.amount_display}</span>
                     </div>
                 </div>
             );
@@ -548,8 +455,7 @@ const columns: ColumnDef<Application>[] = [
             );
         },
         cell: ({ row }) => {
-            const status = row.original.status;
-            return <StatusCell status={status} />;
+            return <StatusCell application={row.original} />;
         },
         accessorFn: (row) => row.status,
     },
@@ -565,7 +471,11 @@ const columns: ColumnDef<Application>[] = [
         },
         cell: ({ row }) => {
             const priority = row.original.priority;
-            return <Badge variant={priority === 'high' ? 'destructive' : priority === 'medium' ? 'default' : 'secondary'}>{priority}</Badge>;
+            return (
+                <Badge variant={priority === 'high' || priority === 'urgent' ? 'destructive' : priority === 'medium' ? 'default' : 'secondary'}>
+                    {priority}
+                </Badge>
+            );
         },
         accessorFn: (row) => row.priority,
     },
@@ -573,8 +483,8 @@ const columns: ColumnDef<Application>[] = [
         id: 'documents',
         header: 'Documents',
         cell: ({ row }) => {
-            const documentsCount = row.original.documents_count;
-            const verifiedCount = row.original.verified_documents_count;
+            const documentsCount = row.original.document_summary.required_count;
+            const verifiedCount = row.original.document_summary.verified_count;
             const percentage = documentsCount > 0 ? (verifiedCount / documentsCount) * 100 : 0;
 
             return (
@@ -600,8 +510,7 @@ const columns: ColumnDef<Application>[] = [
             );
         },
         cell: ({ row }) => {
-            const date = new Date(row.original.submitted_at);
-            return <div className="text-sm">{date.toLocaleDateString()}</div>;
+            return <div className="text-sm">{formatScholarshipDate(row.original.submitted_at)}</div>;
         },
         accessorFn: (row) => row.submitted_at,
     },
@@ -616,7 +525,7 @@ const columns: ColumnDef<Application>[] = [
             );
         },
         cell: ({ row }) => {
-            const deadlineValue = row.original.deadline;
+            const deadlineValue = row.original.scholarship.deadline;
 
             // Handle null/undefined deadline
             if (!deadlineValue) {
@@ -628,12 +537,12 @@ const columns: ColumnDef<Application>[] = [
 
             return (
                 <div className={cn('text-sm', isOverdue ? 'font-medium text-red-600' : '')}>
-                    {deadline.toLocaleDateString()}
+                    {formatScholarshipDate(deadlineValue)}
                     {isOverdue && <div className="text-xs">(Overdue)</div>}
                 </div>
             );
         },
-        accessorFn: (row) => row.deadline,
+        accessorFn: (row) => row.scholarship.deadline,
     },
     {
         id: 'actions',
@@ -664,7 +573,7 @@ const columns: ColumnDef<Application>[] = [
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                            <Link href={route('osas.students.details', application.student.id)}>
+                            <Link href={route('osas.students.details', application.student!.id)}>
                                 <User className="mr-2 h-4 w-4" />
                                 View Student Profile
                             </Link>
@@ -1457,11 +1366,11 @@ function DataTable<TData, TValue>({ columns, data, searchPlaceholder = 'Search a
                             {quickActionDialog.application && (
                                 <>
                                     {quickActionDialog.action === 'approve' &&
-                                        `Are you sure you want to approve ${quickActionDialog.application.student.name}'s application?`}
+                                        `Are you sure you want to approve ${quickActionDialog.application.student!.name}'s application?`}
                                     {quickActionDialog.action === 'reject' &&
-                                        `Are you sure you want to reject ${quickActionDialog.application.student.name}'s application?`}
+                                        `Are you sure you want to reject ${quickActionDialog.application.student!.name}'s application?`}
                                     {quickActionDialog.action === 'schedule' &&
-                                        `Schedule an interview for ${quickActionDialog.application.student.name}'s application.`}
+                                        `Schedule an interview for ${quickActionDialog.application.student!.name}'s application.`}
                                 </>
                             )}
                         </DialogDescription>

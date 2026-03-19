@@ -147,7 +147,7 @@ class ScholarshipApplication extends Model
         self::STATUS_UNDER_VERIFICATION => [self::STATUS_VERIFIED, self::STATUS_INCOMPLETE, self::STATUS_REJECTED],
         self::STATUS_INCOMPLETE => [self::STATUS_SUBMITTED, self::STATUS_REJECTED],
         self::STATUS_VERIFIED => [self::STATUS_UNDER_EVALUATION, self::STATUS_REJECTED],
-        self::STATUS_UNDER_EVALUATION => [self::STATUS_APPROVED, self::STATUS_REJECTED],
+        self::STATUS_UNDER_EVALUATION => [self::STATUS_VERIFIED, self::STATUS_APPROVED, self::STATUS_REJECTED],
         self::STATUS_APPROVED => [self::STATUS_END],
         self::STATUS_REJECTED => [self::STATUS_END],
         self::STATUS_END => [],
@@ -205,7 +205,7 @@ class ScholarshipApplication extends Model
      */
     public function areDocumentsComplete(): bool
     {
-        $requiredDocs = $this->scholarship->required_documents ?? [];
+        $requiredDocs = array_keys($this->scholarship->getRequiredDocuments());
         $uploadedDocs = $this->uploaded_documents ?? [];
 
         return empty(array_diff($requiredDocs, array_keys($uploadedDocs)));

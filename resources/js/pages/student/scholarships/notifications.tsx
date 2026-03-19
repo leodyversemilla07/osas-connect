@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
+import student from '@/routes/student';
 import { Head, router } from '@inertiajs/react';
 import { AlertCircle, Bell, Calendar, CheckCircle2, Clock, DollarSign, Eye, FileText, RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -153,7 +154,7 @@ export default function Notifications({ notifications, unreadCount }: Notificati
 
         // Navigate to related item if applicable
         if (notification.data?.application_id) {
-            router.visit(`/student/applications/${notification.data.application_id}/status`);
+            router.visit(student.scholarships.applications.show(notification.data.application_id).url);
         }
     };
 

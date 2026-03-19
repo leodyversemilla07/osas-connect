@@ -2,41 +2,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { formatScholarshipCurrency, formatScholarshipDateTime, getScholarshipStatusBadgeClass } from '@/lib/scholarship-application';
 import AppLayout from '@/layouts/app-layout';
+import { ScholarshipApplicationDetail } from '@/types/scholarship-application';
 import { Head, router } from '@inertiajs/react';
 import { Download, Eye, FileText, GraduationCap, User } from 'lucide-react';
 
-interface Application {
-    id: number;
-    student: {
-        id: number;
-        name: string;
-        email: string;
-        student_id: string;
-        course: string;
-        year_level: string;
-    };
-    scholarship: {
-        id: number;
-        name: string;
-        type: string;
-        amount: number;
-    };
-    status: string;
-    applied_at: string;
-    approved_at: string | null;
-    rejected_at: string | null;
-    amount_received: number | null;
-    reviewer: {
-        name: string;
-        email: string;
-    } | null;
-    created_at: string;
-    updated_at: string;
-}
-
 interface Props {
-    application: Application;
+    application: ScholarshipApplicationDetail;
 }
 
 const breadcrumbs = [
@@ -46,43 +19,7 @@ const breadcrumbs = [
 ];
 
 export default function ScholarshipApplicationShow({ application }: Props) {
-    const formatStatus = (status: string) => {
-        return status.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
-    };
-
-    const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
-        switch (status) {
-            case 'approved':
-                return 'default';
-            case 'rejected':
-                return 'destructive';
-            case 'submitted':
-            case 'under_verification':
-            case 'under_evaluation':
-                return 'secondary';
-            default:
-                return 'outline';
-        }
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amount);
-    };
+    const student = application.student;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -94,13 +31,11 @@ export default function ScholarshipApplicationShow({ application }: Props) {
                     <div className="flex items-center gap-4">
                         <div>
                             <h1 className="text-3xl font-bold">Application #{application.id}</h1>
-                            <p className="text-muted-foreground">Submitted on {formatDate(application.applied_at)}</p>
+                            <p className="text-muted-foreground">Submitted on {formatScholarshipDateTime(application.submitted_at)}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Badge variant={getStatusVariant(application.status)} className="text-sm">
-                            {formatStatus(application.status)}
-                        </Badge>
+                        <Badge className={getScholarshipStatusBadgeClass(application.status)}>{application.status_label}</Badge>
                     </div>
                 </div>
 
@@ -116,26 +51,26 @@ export default function ScholarshipApplicationShow({ application }: Props) {
                         <CardContent className="space-y-4">
                             <div>
                                 <label className="text-muted-foreground text-sm font-medium">Name</label>
-                                <p className="font-medium">{application.student.name}</p>
+                                <p className="font-medium">{student?.name ?? 'Unknown Student'}</p>
                             </div>
                             <div>
                                 <label className="text-muted-foreground text-sm font-medium">Student ID</label>
-                                <p className="font-medium">{application.student.student_id}</p>
+                                <p className="font-medium">{student?.student_id ?? 'N/A'}</p>
                             </div>
                             <div>
                                 <label className="text-muted-foreground text-sm font-medium">Email</label>
-                                <p className="font-medium">{application.student.email}</p>
+                                <p className="font-medium">{student?.email ?? 'N/A'}</p>
                             </div>
                             <div>
                                 <label className="text-muted-foreground text-sm font-medium">Course</label>
-                                <p className="font-medium">{application.student.course}</p>
+                                <p className="font-medium">{student?.course ?? 'N/A'}</p>
                             </div>
                             <div>
                                 <label className="text-muted-foreground text-sm font-medium">Year Level</label>
-                                <p className="font-medium">{application.student.year_level}</p>
+                                <p className="font-medium">{student?.year_level ?? 'N/A'}</p>
                             </div>
                             <Separator />
-                            <Button variant="outline" className="w-full" onClick={() => router.visit(`/admin/students/${application.student.id}`)}>
+                            <Button variant="outline" className="w-full" onClick={() => router.visit(`/admin/students/${student?.id ?? 0}`)}>
                                 <Eye className="mr-2 h-4 w-4" />
                                 View Student Profile
                             </Button>
@@ -157,11 +92,11 @@ export default function ScholarshipApplicationShow({ application }: Props) {
                             </div>
                             <div>
                                 <label className="text-muted-foreground text-sm font-medium">Type</label>
-                                <p className="font-medium">{application.scholarship.type}</p>
+                                <p className="font-medium">{application.scholarship.type_label}</p>
                             </div>
                             <div>
                                 <label className="text-muted-foreground text-sm font-medium">Amount</label>
-                                <p className="font-medium">{formatCurrency(application.scholarship.amount)}</p>
+                                <p className="font-medium">{application.scholarship.amount_display}</p>
                             </div>
                             <Separator />
                             <Button
@@ -187,29 +122,29 @@ export default function ScholarshipApplicationShow({ application }: Props) {
                             <div>
                                 <label className="text-muted-foreground text-sm font-medium">Current Status</label>
                                 <p className="font-medium">
-                                    <Badge variant={getStatusVariant(application.status)}>{formatStatus(application.status)}</Badge>
+                                    <Badge className={getScholarshipStatusBadgeClass(application.status)}>{application.status_label}</Badge>
                                 </p>
                             </div>
                             <div>
                                 <label className="text-muted-foreground text-sm font-medium">Applied Date</label>
-                                <p className="font-medium">{formatDate(application.applied_at)}</p>
+                                <p className="font-medium">{formatScholarshipDateTime(application.submitted_at)}</p>
                             </div>
                             {application.approved_at && (
                                 <div>
                                     <label className="text-muted-foreground text-sm font-medium">Approved Date</label>
-                                    <p className="font-medium">{formatDate(application.approved_at)}</p>
+                                    <p className="font-medium">{formatScholarshipDateTime(application.approved_at)}</p>
                                 </div>
                             )}
                             {application.rejected_at && (
                                 <div>
                                     <label className="text-muted-foreground text-sm font-medium">Rejected Date</label>
-                                    <p className="font-medium">{formatDate(application.rejected_at)}</p>
+                                    <p className="font-medium">{formatScholarshipDateTime(application.rejected_at)}</p>
                                 </div>
                             )}
                             {application.amount_received && (
                                 <div>
                                     <label className="text-muted-foreground text-sm font-medium">Amount Received</label>
-                                    <p className="font-medium">{formatCurrency(application.amount_received)}</p>
+                                    <p className="font-medium">{formatScholarshipCurrency(application.amount_received)}</p>
                                 </div>
                             )}
                             {application.reviewer && (

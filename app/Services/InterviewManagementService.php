@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Log;
 
 class InterviewManagementService
 {
+    public function __construct(
+        private readonly ?ScholarshipWorkflowService $workflowService = null
+    ) {}
+
     /**
      * Schedule a new interview for an application
      */
@@ -20,7 +24,8 @@ class InterviewManagementService
         User $interviewer,
         Carbon $schedule,
         ?string $location = null,
-        string $type = 'in_person'
+        string $type = 'in_person',
+        ?string $remarks = null
     ): Interview {
         DB::beginTransaction();
 
@@ -33,10 +38,10 @@ class InterviewManagementService
                 'interview_type' => $type,
                 'status' => 'scheduled',
                 'reschedule_history' => [],
+                'remarks' => $remarks,
             ]);
 
-            // Update application status
-            $application->update(['status' => 'under_evaluation']);
+            $this->getWorkflowService()->markInterviewScheduled($application);
 
             DB::commit();
 
@@ -66,6 +71,7 @@ class InterviewManagementService
         Interview $interview,
         Carbon $newSchedule,
         ?string $reason = null,
+        ?string $location = null,
         ?User $rescheduledBy = null
     ): Interview {
         if (! $interview->canBeRescheduled()) {
@@ -89,6 +95,7 @@ class InterviewManagementService
 
             $interview->update([
                 'schedule' => $newSchedule,
+                'location' => $location ?? $interview->location,
                 'status' => 'rescheduled',
                 'reschedule_history' => $rescheduleHistory,
             ]);
@@ -140,15 +147,7 @@ class InterviewManagementService
                 'completed_at' => now(),
             ]);
 
-            // Update application status based on recommendation
-            $applicationStatus = match ($recommendation) {
-                'approved' => 'approved',
-                'rejected' => 'rejected',
-                'pending' => 'under_review',
-                default => 'under_review',
-            };
-
-            $interview->application->update(['status' => $applicationStatus]);
+            $this->getWorkflowService()->applyInterviewRecommendation($interview->application, $recommendation);
 
             DB::commit();
 
@@ -186,8 +185,7 @@ class InterviewManagementService
                 'remarks' => $reason ? "Cancelled: {$reason}" : 'Cancelled',
             ]);
 
-            // Update application status back to pending
-            $interview->application->update(['status' => 'submitted']);
+            $this->getWorkflowService()->resetAfterInterviewCancellation($interview->application);
 
             DB::commit();
 
@@ -224,8 +222,7 @@ class InterviewManagementService
                 'remarks' => 'Student did not attend the scheduled interview',
             ]);
 
-            // Update application status
-            $interview->application->update(['status' => 'rejected']);
+            $this->getWorkflowService()->applyInterviewRecommendation($interview->application, 'rejected');
 
             DB::commit();
 
@@ -336,5 +333,10 @@ class InterviewManagementService
             ->whereIn('status', ['scheduled', 'rescheduled'])
             ->orderBy('schedule')
             ->get();
+    }
+
+    private function getWorkflowService(): ScholarshipWorkflowService
+    {
+        return $this->workflowService ?? app(ScholarshipWorkflowService::class);
     }
 }

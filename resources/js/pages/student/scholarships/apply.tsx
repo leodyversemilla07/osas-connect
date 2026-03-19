@@ -52,6 +52,11 @@ interface Props {
     userProfile: UserProfile;
 }
 
+interface RequiredDocument {
+    key: string;
+    label: string;
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -68,10 +73,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Apply({ scholarship, userProfile }: Props) {
-    // Debug: Log the userProfile to see what data we're receiving
-    console.log('userProfile:', userProfile);
-    console.log('userProfile.student_profile:', userProfile.student_profile);
-
     const { data, setData, post, processing, errors } = useForm({
         personal_statement: '',
         academic_goals: '',
@@ -122,35 +123,25 @@ export default function Apply({ scholarship, userProfile }: Props) {
         }
 
         if (validationErrors.length > 0) {
-            console.log('Client-side validation errors:', validationErrors);
             toast.error('Please fix the following errors', {
                 description: validationErrors.join('. '),
             });
             return;
         }
 
-        // Debug: Log the data being sent
-        console.log('Form data being submitted:', data);
-        console.log('Route URL:', student.scholarships.store(scholarship.id).url);
-
         // Use the correct route pattern that matches Laravel routes
         post(student.scholarships.store(scholarship.id).url, {
             forceFormData: true,
-            onSuccess: (page) => {
-                console.log('Form submitted successfully:', page);
+            onSuccess: () => {
                 toast.success('Application submitted successfully!', {
                     description: 'Your scholarship application has been submitted and is under review.',
                 });
             },
             onError: (errors) => {
-                console.log('Form submission errors:', errors);
                 const errorMessages = Object.values(errors).flat();
                 toast.error('Failed to submit application', {
                     description: errorMessages.length > 0 ? errorMessages.join('. ') : 'Please check your form and try again.',
                 });
-            },
-            onFinish: () => {
-                console.log('Form submission finished');
             },
         });
     };
@@ -160,12 +151,18 @@ export default function Apply({ scholarship, userProfile }: Props) {
         return `₱${amount.toLocaleString()}/month`;
     };
 
-    const formatDocuments = (documents?: Record<string, string> | string[]) => {
+    const formatDocuments = (documents?: Record<string, string> | string[]): RequiredDocument[] => {
         if (Array.isArray(documents)) {
-            return documents;
+            return documents.map((document) => ({
+                key: document,
+                label: document,
+            }));
         }
         if (documents && typeof documents === 'object') {
-            return Object.values(documents);
+            return Object.entries(documents).map(([key, label]) => ({
+                key,
+                label,
+            }));
         }
         return [];
     };
@@ -525,7 +522,7 @@ export default function Apply({ scholarship, userProfile }: Props) {
                                                             htmlFor={`document_${index}`}
                                                             className="text-foreground text-sm font-medium lg:text-base"
                                                         >
-                                                            {doc} *
+                                                            {doc.label} *
                                                         </Label>
                                                         <Input
                                                             id={`document_${index}`}
@@ -534,20 +531,20 @@ export default function Apply({ scholarship, userProfile }: Props) {
                                                             onChange={(e) => {
                                                                 const file = e.target.files?.[0];
                                                                 if (file) {
-                                                                    handleFileUpload(doc, file);
+                                                                    handleFileUpload(doc.key, file);
                                                                 }
                                                             }}
                                                             className="border-border focus:border-ring file:bg-muted file:text-foreground min-h-[44px] file:mr-4 file:rounded-md file:border-0 file:px-4 file:py-2 file:text-sm file:font-medium lg:text-base"
                                                         />
-                                                        {uploadedFiles[doc] && (
+                                                        {uploadedFiles[doc.key] && (
                                                             <p className="mt-2 flex items-center text-sm text-emerald-600 lg:text-base dark:text-emerald-400">
                                                                 <CheckCircle className="mr-2 h-4 w-4 lg:h-5 lg:w-5" />
-                                                                {uploadedFiles[doc]} uploaded
+                                                                {uploadedFiles[doc.key]} uploaded
                                                             </p>
                                                         )}
-                                                        {formErrors[`documents.${doc}`] && (
+                                                        {formErrors[`documents.${doc.key}`] && (
                                                             <p className="text-destructive mt-2 text-sm lg:text-base">
-                                                                {formErrors[`documents.${doc}`]}
+                                                                {formErrors[`documents.${doc.key}`]}
                                                             </p>
                                                         )}
                                                     </div>

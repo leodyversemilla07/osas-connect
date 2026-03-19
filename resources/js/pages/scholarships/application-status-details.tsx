@@ -66,7 +66,7 @@ interface ApplicationStatusPageProps {
 const ApplicationStatusPage: React.FC<ApplicationStatusPageProps> = ({ application, can }) => {
     const breadcrumbs = [
         { title: 'Dashboard', href: '/dashboard' },
-        { title: 'Applications', href: '/student/applications' },
+        { title: 'Applications', href: '/student/scholarships/applications' },
         { title: `Application #${application.id}`, href: '#' },
     ];
 
@@ -130,7 +130,7 @@ const ApplicationStatusPage: React.FC<ApplicationStatusPageProps> = ({ applicati
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 {/* Header Actions */}
                 <div className="mb-6 flex items-center justify-between">
-                    <Button variant="outline" onClick={() => router.visit('/student/applications')} className="flex items-center gap-2">
+                    <Button variant="outline" onClick={() => router.visit('/student/scholarships/applications')} className="flex items-center gap-2">
                         <ArrowLeft className="h-4 w-4" />
                         Back to Applications
                     </Button>

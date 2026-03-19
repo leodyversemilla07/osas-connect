@@ -6,7 +6,9 @@ use App\Http\Requests\CompleteInterviewRequest;
 use App\Http\Requests\RescheduleInterviewRequest;
 use App\Http\Requests\ScheduleInterviewRequest;
 use App\Models\Interview;
+use App\Models\ScholarshipNotification;
 use App\Models\ScholarshipApplication;
+use App\Models\User;
 use App\Services\InterviewManagementService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -95,14 +97,17 @@ class InterviewController extends Controller
     public function store(ScheduleInterviewRequest $request)
     {
         $this->authorize('create', Interview::class);
-        $application = ScholarshipApplication::findOrFail($request->validated()['application_id']);
+        $validated = $request->validated();
+        $application = ScholarshipApplication::findOrFail($validated['application_id']);
+        $interviewer = User::findOrFail($validated['interviewer_id']);
 
         $interview = $this->interviewService->scheduleInterview(
             $application,
-            Auth::user(),
-            $request->validated()['schedule'],
-            $request->validated()['location'],
-            $request->validated()['notes'] ?? null
+            $interviewer,
+            $validated['schedule'],
+            $validated['location'] ?? null,
+            $validated['interview_type'],
+            $validated['notes'] ?? null
         );
 
         return redirect()->route('osas.interviews.show', $interview)
@@ -156,7 +161,7 @@ class InterviewController extends Controller
         $interview->update([
             'schedule' => $request->schedule,
             'location' => $request->location,
-            'notes' => $request->notes,
+            'remarks' => $request->notes,
         ]);
 
         return redirect()->route('osas.interviews.show', $interview)
@@ -173,7 +178,8 @@ class InterviewController extends Controller
             $interview,
             $request->validated()['new_schedule'],
             $request->validated()['reason'],
-            $request->validated()['location'] ?? null
+            $request->validated()['location'] ?? null,
+            $request->user()
         );
 
         return redirect()->route('osas.interviews.show', $rescheduledInterview)
@@ -269,11 +275,25 @@ class InterviewController extends Controller
             'reschedule_history' => $rescheduleHistory,
         ]);
 
-        // Create notification for staff
-        $interview->application->notifications()->create([
-            'type' => 'interview_reschedule_request',
-            'message' => "Student requested interview reschedule: {$request->reason}",
-        ]);
+        User::query()
+            ->whereIn('role', ['admin', 'osas_staff'])
+            ->get()
+            ->each(function (User $staffUser) use ($interview, $request): void {
+                ScholarshipNotification::create([
+                    'user_id' => $staffUser->id,
+                    'title' => 'Interview Reschedule Request',
+                    'message' => "Student requested interview reschedule: {$request->reason}",
+                    'type' => ScholarshipNotification::TYPE_INTERVIEW_SCHEDULE,
+                    'data' => [
+                        'application_id' => $interview->application_id,
+                        'interview_id' => $interview->id,
+                        'requested_by' => Auth::id(),
+                        'reason' => $request->reason,
+                    ],
+                    'notifiable_type' => Interview::class,
+                    'notifiable_id' => $interview->id,
+                ]);
+            });
 
         return back()->with('success', 'Reschedule request submitted successfully.');
     }

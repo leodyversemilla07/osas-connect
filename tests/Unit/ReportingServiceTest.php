@@ -10,36 +10,44 @@ use Carbon\Carbon;
 
 beforeEach(function () {
     $this->reportingService = new ReportingService();
-    
+    $this->currentYear = Carbon::now()->year;
+    $this->januaryDate = Carbon::create($this->currentYear, 1, 5, 9);
+
     // Create test data with profiles
     $this->admin = User::factory()->create(['role' => 'admin']);
-    $this->student = User::factory()->withProfile()->create(['role' => 'student']);
-    
+    $this->student = User::factory()->withProfile()->create([
+        'role' => 'student',
+        'first_name' => 'Juan',
+        'last_name' => 'Dela Cruz',
+    ]);
+
     $this->scholarship = Scholarship::factory()->create([
         'type' => 'academic_full',
         'status' => 'active',
         'amount' => 100000,
     ]);
-    
+
     $this->application = ScholarshipApplication::factory()->create([
         'user_id' => $this->student->id,
         'scholarship_id' => $this->scholarship->id,
         'status' => 'approved',
-        'created_at' => Carbon::now()->startOfYear(),
+        'created_at' => $this->januaryDate,
     ]);
-    
+
     $this->interview = Interview::factory()->create([
         'application_id' => $this->application->id,
         'status' => 'completed',
         'interview_scores' => [85, 90, 88],
-        'created_at' => Carbon::now()->startOfYear(),
+        'created_at' => $this->januaryDate,
     ]);
-    
+
     $this->stipend = ScholarshipStipend::factory()->create([
         'application_id' => $this->application->id,
         'amount' => 5000,
         'status' => 'released',
-        'created_at' => Carbon::now()->startOfYear(),
+        'created_at' => $this->januaryDate,
+        'updated_at' => $this->januaryDate,
+        'released_at' => $this->januaryDate,
     ]);
 });
 
@@ -176,7 +184,7 @@ it('can generate fund utilization report', function () {
 });
 
 it('can export applications data', function () {
-    $filters = ['year' => Carbon::now()->year];
+    $filters = ['year' => $this->currentYear];
     $data = $this->reportingService->exportApplicationsData($filters);
     
     expect($data)->toBeArray();
@@ -193,6 +201,8 @@ it('can export applications data', function () {
         'Total Stipend',
         'Disbursed Amount',
     ]);
+    expect($data[0]['Student Name'])->toBe('Juan Dela Cruz')
+        ->and($data[0]['Student ID'])->toBe($this->student->email);
 });
 
 it('calculates approval rate correctly', function () {
@@ -301,24 +311,52 @@ it('generates monthly trends correctly', function () {
         'user_id' => User::factory()->create(['role' => 'student'])->id,
         'scholarship_id' => $this->scholarship->id,
         'status' => 'approved',
-        'created_at' => Carbon::now()->month(3)->startOfMonth(),
+        'created_at' => Carbon::create($this->currentYear, 3, 1, 9),
     ]);
     
     ScholarshipApplication::factory()->create([
         'user_id' => User::factory()->create(['role' => 'student'])->id,
         'scholarship_id' => $this->scholarship->id,
         'status' => 'submitted',
-        'created_at' => Carbon::now()->month(6)->startOfMonth(),
+        'created_at' => Carbon::create($this->currentYear, 6, 1, 9),
     ]);
     
-    $year = Carbon::now()->year;
-    $statistics = $this->reportingService->getApplicationStatistics($year);
+    $statistics = $this->reportingService->getApplicationStatistics($this->currentYear);
     
     expect($statistics['monthly_trend'])->toBeArray();
     expect(count($statistics['monthly_trend']))->toBe(12); // All 12 months
     
     // Should have data for January (from beforeEach), March, and June
-    expect($statistics['monthly_trend']['Jan'])->toBeGreaterThan(0);
-    expect($statistics['monthly_trend']['Mar'])->toBeGreaterThan(0);
-    expect($statistics['monthly_trend']['Jun'])->toBeGreaterThan(0);
+    expect($statistics['monthly_trend']['Jan'])->toBe(1);
+    expect($statistics['monthly_trend']['Mar'])->toBe(1);
+    expect($statistics['monthly_trend']['Jun'])->toBe(1);
+});
+
+it('groups released stipends by release month', function () {
+    $marchRelease = Carbon::create($this->currentYear, 3, 10, 10);
+    $juneRelease = Carbon::create($this->currentYear, 6, 20, 10);
+
+    ScholarshipStipend::factory()->create([
+        'application_id' => $this->application->id,
+        'amount' => 3000,
+        'status' => 'released',
+        'created_at' => $marchRelease,
+        'updated_at' => $marchRelease,
+        'released_at' => $marchRelease,
+    ]);
+
+    ScholarshipStipend::factory()->create([
+        'application_id' => $this->application->id,
+        'amount' => 4500,
+        'status' => 'released',
+        'created_at' => $juneRelease,
+        'updated_at' => $juneRelease,
+        'released_at' => $juneRelease,
+    ]);
+
+    $statistics = $this->reportingService->getStipendStatistics($this->currentYear);
+
+    expect($statistics['monthly_disbursements']['Jan'])->toBe(5000.0)
+        ->and($statistics['monthly_disbursements']['Mar'])->toBe(3000.0)
+        ->and($statistics['monthly_disbursements']['Jun'])->toBe(4500.0);
 });

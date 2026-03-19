@@ -150,6 +150,34 @@ describe('AdminController Applications', function () {
 
         $response->assertStatus(200);
     });
+
+    it('renders canonical scholarship application fields in list and detail views', function () {
+        $student = User::factory()->withProfile()->create(['role' => 'student']);
+        $scholarship = Scholarship::factory()->create();
+        $application = ScholarshipApplication::factory()->create([
+            'user_id' => $student->id,
+            'scholarship_id' => $scholarship->id,
+            'status' => 'under_evaluation',
+        ]);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.scholarship.applications'))
+            ->assertInertia(fn ($page) => $page
+                ->component('admin/scholarship-applications/index')
+                ->has('applications.data', 1)
+                ->has('applications.data.0.status_label')
+                ->has('applications.data.0.scholarship')
+            );
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.scholarship.applications.show', $application))
+            ->assertInertia(fn ($page) => $page
+                ->component('admin/scholarship-applications/show')
+                ->has('application.student')
+                ->has('application.document_summary')
+                ->has('application.timeline')
+            );
+    });
 });
 
 describe('AdminController Recent Logins', function () {

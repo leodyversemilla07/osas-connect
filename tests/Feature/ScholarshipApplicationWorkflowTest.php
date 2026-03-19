@@ -3,15 +3,32 @@
 use App\Models\Document;
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
-use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
+function buildScholarshipApplicationPayload(Scholarship $scholarship): array
+{
+    $documents = [];
+
+    foreach (array_keys($scholarship->getRequiredDocuments()) as $documentKey) {
+        $documents[$documentKey] = UploadedFile::fake()->create("{$documentKey}.pdf", 256, 'application/pdf');
+    }
+
+    return [
+        'personal_statement' => str_repeat('I am committed to academic excellence and service. ', 4),
+        'academic_goals' => str_repeat('I plan to finish my degree and contribute to the university. ', 2),
+        'financial_need_statement' => str_repeat('This scholarship would help me continue my studies without interruption. ', 2),
+        'additional_comments' => 'Prepared for full application review.',
+        'documents' => $documents,
+    ];
+}
+
 describe('Scholarship Application Workflow', function () {
     beforeEach(function () {
         Storage::fake('public');
-        
+        Storage::fake('private');
+
         // Create a student with profile
         $this->student = User::factory()->withProfile()->create(['role' => 'student']);
         $this->student->studentProfile->update([
@@ -19,6 +36,7 @@ describe('Scholarship Application Workflow', function () {
             'enrollment_status' => 'enrolled',
             'has_disciplinary_action' => false,
             'units' => 21,
+            'existing_scholarships' => null,
         ]);
         
         // Create an active scholarship
@@ -26,28 +44,55 @@ describe('Scholarship Application Workflow', function () {
             'type' => Scholarship::TYPE_ACADEMIC_FULL,
             'status' => 'active',
             'deadline' => now()->addDays(30),
+            'slots' => 10,
+            'beneficiaries' => 0,
+            'slots_available' => 10,
         ]);
-        
+
         // Create OSAS staff
         $this->staff = User::factory()->create(['role' => 'osas_staff']);
     });
 
     it('allows student to create application via controller', function () {
-        $response = $this->actingAs($this->student)->post(route('student.scholarships.store', $this->scholarship), [
-            'academic_year' => '2025-2026',
-            'semester' => 'First',
-        ]);
+        $payload = buildScholarshipApplicationPayload($this->scholarship);
 
-        // For debugging - if 500, the controller or Inertia render might fail
-        // Either redirects on success, validation error, or server error
-        expect($response->status())->toBeIn([200, 302, 422, 500]);
-        
-        // The important thing is that application was created or attempted
-        $applicationCount = ScholarshipApplication::where('user_id', $this->student->id)
+        $response = $this->actingAs($this->student)
+            ->post(route('student.scholarships.store', $this->scholarship), $payload);
+
+        $response
+            ->assertRedirect(route('student.scholarships.index'))
+            ->assertSessionHas('success', 'Application submitted successfully!');
+
+        $application = ScholarshipApplication::where('user_id', $this->student->id)
             ->where('scholarship_id', $this->scholarship->id)
-            ->count();
-        expect($applicationCount)->toBeGreaterThanOrEqual(0);
-    })->skip('Skipping due to potential Vite manifest issue in test environment');
+            ->first();
+
+        expect($application)->not->toBeNull()
+            ->and($application->status)->toBe('submitted');
+    });
+
+    it('stores uploaded documents using canonical required-document keys', function () {
+        $payload = buildScholarshipApplicationPayload($this->scholarship);
+
+        $this->actingAs($this->student)
+            ->post(route('student.scholarships.store', $this->scholarship), $payload)
+            ->assertRedirect(route('student.scholarships.index'));
+
+        $application = ScholarshipApplication::where('user_id', $this->student->id)
+            ->where('scholarship_id', $this->scholarship->id)
+            ->firstOrFail();
+
+        $storedKeys = array_keys($application->uploaded_documents);
+        $requiredKeys = array_keys($this->scholarship->getRequiredDocuments());
+        sort($storedKeys);
+        sort($requiredKeys);
+
+        expect($storedKeys)->toBe($requiredKeys);
+
+        foreach ($application->uploaded_documents as $document) {
+            Storage::disk('private')->assertExists($document['path']);
+        }
+    });
 
     it('prevents student from applying to same scholarship twice', function () {
         // Create existing application
@@ -57,12 +102,15 @@ describe('Scholarship Application Workflow', function () {
             'status' => 'submitted',
         ]);
 
-        $response = $this->actingAs($this->student)->post(route('student.scholarships.store', $this->scholarship), [
-            'academic_year' => '2025-2026',
-            'semester' => 'First',
-        ]);
+        $response = $this->actingAs($this->student)
+            ->from(route('student.scholarships.apply', $this->scholarship))
+            ->post(route('student.scholarships.store', $this->scholarship), buildScholarshipApplicationPayload($this->scholarship));
 
-        // Should redirect with error or be rejected
+        $response->assertRedirect(route('student.scholarships.apply', $this->scholarship))
+            ->assertSessionHasErrors([
+                'error' => 'User already has an application for this scholarship',
+            ]);
+
         $this->assertDatabaseCount('scholarship_applications', 1);
     });
 
@@ -87,6 +135,7 @@ describe('Document Upload Workflow', function () {
         
         $this->scholarship = Scholarship::factory()->create([
             'status' => 'active',
+            'type' => Scholarship::TYPE_ACADEMIC_FULL,
         ]);
         
         $this->application = ScholarshipApplication::factory()->create([
@@ -132,6 +181,7 @@ describe('Document Upload Workflow', function () {
     it('allows staff to verify documents', function () {
         $document = Document::factory()->create([
             'application_id' => $this->application->id,
+            'type' => 'grades',
             'status' => 'pending',
         ]);
 
@@ -150,6 +200,7 @@ describe('Document Upload Workflow', function () {
     it('allows staff to reject documents with reason', function () {
         $document = Document::factory()->create([
             'application_id' => $this->application->id,
+            'type' => 'grades',
             'status' => 'pending',
         ]);
 
@@ -207,7 +258,7 @@ describe('Application Review Workflow', function () {
     });
 
     it('allows staff to approve application', function () {
-        $this->application->update(['status' => 'verified']);
+        $this->application->update(['status' => 'under_evaluation']);
 
         $response = $this->actingAs($this->staff)->patch(route('osas.applications.status', $this->application), [
             'status' => 'approved',
@@ -269,8 +320,8 @@ describe('Application Status Transitions', function () {
         ]);
 
         $application->refresh();
-        // Status might change or remain draft depending on business rules
-        expect(in_array($application->status, ['draft', 'approved']))->toBeTrue();
+        expect($response->status())->toBe(302);
+        expect($application->status)->toBe('draft');
     });
 
     it('tracks status updates', function () {

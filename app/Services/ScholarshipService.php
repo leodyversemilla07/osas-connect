@@ -12,41 +12,17 @@ use InvalidArgumentException;
 
 class ScholarshipService
 {
+    public function __construct(
+        private readonly ScholarshipWorkflowService $workflowService,
+        private readonly ScholarshipApplicationPresenter $applicationPresenter
+    ) {}
+
     public function createApplication(int $scholarshipId, int $userId, array $data): ScholarshipApplication
     {
-        return DB::transaction(function () use ($scholarshipId, $userId, $data) {
-            $scholarship = Scholarship::findOrFail($scholarshipId);
-            $user = User::with('studentProfile')->findOrFail($userId);
+        $scholarship = Scholarship::findOrFail($scholarshipId);
+        $user = User::findOrFail($userId);
 
-            // Process documents
-            $documents = $this->processDocuments($data['documents'] ?? []);
-
-            // Create application (not yet final, for eligibility check)
-            $application = new ScholarshipApplication([
-                'scholarship_id' => $scholarshipId,
-                'user_id' => $userId,
-                'application_data' => $this->sanitizeApplicationData($data),
-                'status' => 'submitted',
-                'applied_at' => now(),
-                'uploaded_documents' => $documents,
-            ]);
-            $application->setRelation('studentProfile', $user->studentProfile);
-            $application->setRelation('scholarship', $scholarship);
-
-            // Validate eligibility using model logic
-            $issues = $application->getEligibilityIssues();
-            if (count($issues) > 0) {
-                throw new InvalidArgumentException(implode("\n", $issues));
-            }
-
-            // Save application
-            $application->save();
-
-            // Trigger notifications
-            $this->notifyApplicationSubmitted($application);
-
-            return $application;
-        });
+        return $this->workflowService->submitApplication($scholarship, $user, $data);
     }
 
     public function updateApplicationStatus(
@@ -55,17 +31,10 @@ class ScholarshipService
         ?string $notes = null,
         ?int $reviewerId = null
     ): bool {
-        if (! $application->canTransitionTo($status)) {
-            throw new InvalidArgumentException("Cannot transition from {$application->status} to {$status}");
-        }
+        $reviewer = $reviewerId ? User::find($reviewerId) : null;
+        $this->workflowService->transitionApplicationStatus($application, $status, $reviewer, $notes);
 
-        $updated = $application->updateStatus($status, $notes, $reviewerId);
-
-        if ($updated) {
-            $this->notifyStatusChanged($application);
-        }
-
-        return $updated;
+        return true;
     }
 
     public function getApplicationsForUser(int $userId): array
@@ -74,7 +43,7 @@ class ScholarshipService
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(fn ($app) => $this->formatApplicationForFrontend($app))
+            ->map(fn ($app) => $this->applicationPresenter->presentStudentList($app))
             ->toArray();
     }
 
@@ -94,16 +63,19 @@ class ScholarshipService
     public function isUserEligible(Scholarship $scholarship, User $user): bool
     {
         $student = $user->studentProfile;
-        if (! $student) return false;
-        $application = new ScholarshipApplication([
-            'scholarship_id' => $scholarship->id,
-            'user_id' => $user->id,
-            'application_data' => [],
-            'status' => 'submitted',
-        ]);
-        $application->setRelation('studentProfile', $student);
-        $application->setRelation('scholarship', $scholarship);
-        return $application->meetsEligibilityCriteria();
+        if (! $student || ! $scholarship->isAcceptingApplications() || $this->hasActiveScholarship($user)) {
+            return false;
+        }
+
+        return match ($scholarship->type) {
+            Scholarship::TYPE_ACADEMIC_FULL => $this->checkAcademicFullEligibility($student),
+            Scholarship::TYPE_ACADEMIC_PARTIAL => $this->checkAcademicPartialEligibility($student),
+            Scholarship::TYPE_STUDENT_ASSISTANTSHIP => $this->checkStudentAssistantshipEligibility($student),
+            Scholarship::TYPE_PERFORMING_ARTS_FULL,
+            Scholarship::TYPE_PERFORMING_ARTS_PARTIAL => $this->checkPerformingArtsEligibility($student),
+            Scholarship::TYPE_ECONOMIC_ASSISTANCE => $this->checkEconomicAssistanceEligibility($student),
+            default => true,
+        };
     }
 
     /**
@@ -154,7 +126,7 @@ class ScholarshipService
     private function hasActiveScholarship(User $user): bool
     {
         return ScholarshipApplication::where('user_id', $user->id)
-            ->whereIn('status', ['approved', 'under_review', 'interview_scheduled'])
+            ->whereIn('status', ['approved', 'under_evaluation'])
             ->exists();
     }
 
@@ -163,12 +135,9 @@ class ScholarshipService
         if (! $this->isUserEligible($scholarship, $user)) {
             throw new InvalidArgumentException('User is not eligible for this scholarship');
         }
-        if (! $scholarship->isAcceptingApplications()) {
-            throw new InvalidArgumentException('Scholarship is not accepting applications');
-        }
         $existingApplication = ScholarshipApplication::where('scholarship_id', $scholarship->id)
             ->where('user_id', $user->id)
-            ->whereNotIn('status', ['rejected', 'cancelled'])
+            ->whereNotIn('status', ['rejected', 'end'])
             ->exists();
         if ($existingApplication) {
             throw new InvalidArgumentException('User already has an application for this scholarship');
@@ -197,50 +166,24 @@ class ScholarshipService
     private function sanitizeApplicationData(array $data): array
     {
         $applicationData = [
-            'personal_statement' => $data['personalStatement'] ?? '',
-            'academic_year' => $data['academicYear'] ?? date('Y'),
+            'personal_statement' => $data['personal_statement'] ?? '',
+            'academic_goals' => $data['academic_goals'] ?? '',
+            'financial_need_statement' => $data['financial_need_statement'] ?? '',
+            'additional_comments' => $data['additional_comments'] ?? '',
+            'academic_year' => $data['academic_year'] ?? date('Y'),
             'semester' => $data['semester'] ?? '1st',
         ];
 
-        // Add scholarship-specific data
-        if (isset($data['membershipDuration'])) {
-            $applicationData['membership_duration'] = $data['membershipDuration'];
+        if (isset($data['application_data']) && is_array($data['application_data'])) {
+            $applicationData = array_merge($applicationData, $data['application_data']);
         }
 
-        if (isset($data['majorPerformances'])) {
-            $applicationData['major_performances'] = $data['majorPerformances'];
-        }
-
-        if (isset($data['majorActivitiesCount'])) {
-            $applicationData['major_activities_count'] = $data['majorActivitiesCount'];
-        }
-
-        if (isset($data['familyIncome'])) {
-            $applicationData['family_income'] = $data['familyIncome'];
-        }
-
-        if (isset($data['preHiringCompleted'])) {
-            $applicationData['pre_hiring_completed'] = $data['preHiringCompleted'];
-        }
-
-        return $applicationData;
+        return array_filter($applicationData, static fn ($value) => $value !== null);
     }
 
     private function formatApplicationForFrontend(ScholarshipApplication $application): array
     {
-        return [
-            'id' => $application->id,
-            'scholarshipName' => $application->scholarship->name,
-            'scholarshipType' => $application->scholarship->type,
-            'status' => $application->status,
-            'statusLabel' => $this->getStatusLabel($application->status),
-            'submittedAt' => ($application->submitted_at ?: $application->applied_at)?->format('Y-m-d H:i:s'),
-            'reviewedAt' => $application->reviewed_at?->format('Y-m-d H:i:s'),
-            'interviewScheduledAt' => $application->interview_scheduled_at?->format('Y-m-d H:i:s'),
-            'documents' => $this->formatDocumentsForFrontend($application->documents),
-            'canEdit' => in_array($application->status, ['draft']),
-            'canCancel' => in_array($application->status, ['draft', 'submitted', 'under_review']),
-        ];
+        return $this->applicationPresenter->presentStudentList($application);
     }
 
     private function formatScholarshipForFrontend(Scholarship $scholarship): array
@@ -248,7 +191,7 @@ class ScholarshipService
         $stipendAmount = $scholarship->stipend_amount ?: $scholarship->getStipendAmount();
         $hasApplied = ScholarshipApplication::where('scholarship_id', $scholarship->id)
             ->where('user_id', Auth::id())
-            ->whereNotIn('status', ['rejected', 'cancelled'])
+            ->whereNotIn('status', ['rejected', 'end'])
             ->exists();
 
         // Calculate available slots properly
@@ -332,93 +275,7 @@ class ScholarshipService
      */
     public function formatApplicationData(ScholarshipApplication $application): array
     {
-        // Ensure we have the necessary relationships loaded
-        if (! $application->relationLoaded('scholarship')) {
-            $application->load('scholarship');
-        }
-        if (! $application->relationLoaded('interview')) {
-            $application->load('interview');
-        }
-        if (! $application->relationLoaded('comments')) {
-            $application->load('comments.user');
-        }
-
-        // Safely handle null/missing data with comprehensive fallbacks
-        $applicationData = $application->application_data ?? [];
-        $uploadedDocuments = $application->uploaded_documents ?? [];
-        $disbursementRecords = $application->disbursement_records ?? [];
-
-        return [
-            'id' => $application->id ?? 0,
-            'status' => $application->status ?? 'unknown',
-            'submitted_at' => ($application->submitted_at ?: $application->applied_at) ?
-                (is_string($application->submitted_at ?: $application->applied_at) ?
-                    \Carbon\Carbon::parse($application->submitted_at ?: $application->applied_at)->format('Y-m-d H:i:s') :
-                    ($application->submitted_at ?: $application->applied_at)->format('Y-m-d H:i:s')) : null,
-            'created_at' => $application->created_at ?
-                (is_string($application->created_at) ?
-                    \Carbon\Carbon::parse($application->created_at)->format('Y-m-d H:i:s') :
-                    $application->created_at->format('Y-m-d H:i:s')) : null,
-            'progress' => $this->calculateApplicationProgress($application),
-            'purpose_letter' => $applicationData['purpose_letter'] ?? $application->purpose_letter ?? '',
-            'documents' => $this->formatRequiredDocuments($application),
-            'verifier_comments' => $application->reviewer_notes ?? null,
-            'interview_schedule' => $application->interview && $application->interview->schedule ?
-                (is_string($application->interview->schedule) ?
-                    \Carbon\Carbon::parse($application->interview->schedule)->format('Y-m-d H:i:s') :
-                    $application->interview->schedule->format('Y-m-d H:i:s')) : null,
-            'committee_recommendation' => $application->committee_recommendation ?? null,
-            'evaluation_score' => $application->evaluation_score ?? null,
-            // Flattened scholarship data to match frontend expectations
-            'scholarship_name' => $application->scholarship->name ?? 'Unknown Scholarship',
-            'scholarship_type' => $application->scholarship->type ?? 'Unknown Type',
-            'scholarship_amount' => $application->scholarship->amount ?? 'Not specified',
-            // Keep nested structure for backwards compatibility
-            'scholarship' => [
-                'id' => $application->scholarship->id ?? 0,
-                'name' => $application->scholarship->name ?? 'Unknown Scholarship',
-                'type' => $application->scholarship->type ?? 'Unknown Type',
-                'amount' => $application->scholarship->amount ?? 'Not specified',
-            ],
-            'timeline' => [
-                'submitted' => ($application->submitted_at ?: $application->applied_at) ?
-                    (is_string($application->submitted_at ?: $application->applied_at) ?
-                        \Carbon\Carbon::parse($application->submitted_at ?: $application->applied_at)->format('Y-m-d H:i:s') :
-                        ($application->submitted_at ?: $application->applied_at)->format('Y-m-d H:i:s')) : null,
-                'verification' => null,
-                'evaluation' => null,
-                'decision' => null,
-            ],
-            'interview' => $application->interview ? [
-                'schedule' => $application->interview->schedule ?
-                    (is_string($application->interview->schedule) ?
-                        \Carbon\Carbon::parse($application->interview->schedule)->format('Y-m-d H:i:s') :
-                        $application->interview->schedule->format('Y-m-d H:i:s')) : null,
-                'status' => $application->interview->status ?? 'pending',
-                'remarks' => $application->interview->remarks ?? null,
-            ] : null,
-            'disbursement_records' => is_array($disbursementRecords) ? $disbursementRecords : [],
-            'comments' => $application->comments ? $application->comments->map(function ($comment) {
-                return [
-                    'id' => $comment->id ?? 0,
-                    'content' => $comment->comment ?? '',
-                    'type' => $comment->type ?? 'general',
-                    'created_at' => $comment->created_at ?
-                        (is_string($comment->created_at) ?
-                            \Carbon\Carbon::parse($comment->created_at)->format('Y-m-d H:i:s') :
-                            $comment->created_at->format('Y-m-d H:i:s')) : null,
-                    'user' => [
-                        'id' => $comment->user->id ?? 0,
-                        'name' => $comment->user->name ?? 'Unknown User',
-                        'role' => $comment->user->role ?? 'user',
-                    ],
-                ];
-            }) : collect([]),
-            'updated_at' => $application->updated_at ?
-                (is_string($application->updated_at) ?
-                    \Carbon\Carbon::parse($application->updated_at)->format('Y-m-d H:i:s') :
-                    $application->updated_at->format('Y-m-d H:i:s')) : null,
-        ];
+        return $this->applicationPresenter->presentStudentDetail($application);
     }
 
     /**
@@ -427,7 +284,7 @@ class ScholarshipService
     public function scheduleInterview(ScholarshipApplication $application, array $data): void
     {
         // Ensure application is in a proper state for interview
-        if (! in_array($application->status, ['submitted', 'under_review', 'documents_verified'])) {
+        if (! in_array($application->status, ['verified', 'under_evaluation'], true)) {
             throw new InvalidArgumentException("Cannot schedule interview for application in {$application->status} status");
         }
 
@@ -436,23 +293,24 @@ class ScholarshipService
         // Create or update interview
         if ($application->interview) {
             $application->interview->update([
-                'scheduled_date' => $data['interview_date'],
-                'scheduled_time' => $data['interview_time'],
+                'schedule' => $interviewDateTime,
                 'location' => $data['location'],
-                'notes' => $data['notes'] ?? null,
+                'remarks' => $data['notes'] ?? null,
+                'interview_type' => $data['interview_type'] ?? $application->interview->interview_type ?? 'in_person',
                 'status' => 'scheduled',
             ]);
         } else {
             $application->interview()->create([
-                'scheduled_date' => $data['interview_date'],
-                'scheduled_time' => $data['interview_time'],
+                'schedule' => $interviewDateTime,
                 'location' => $data['location'],
-                'notes' => $data['notes'] ?? null,
+                'remarks' => $data['notes'] ?? null,
+                'interview_type' => $data['interview_type'] ?? 'in_person',
                 'status' => 'scheduled',
             ]);
-        }        // Update application status if needed
-        if ($application->status === 'submitted' || $application->status === 'documents_verified') {
-            $application->update(['status' => 'interview_scheduled']);
+        }
+
+        if ($application->status === 'verified') {
+            $application->update(['status' => 'under_evaluation']);
         }
 
         // Notify the applicant
@@ -467,7 +325,7 @@ class ScholarshipService
                 'interview_date' => $data['interview_date'],
                 'interview_time' => $data['interview_time'],
                 'location' => $data['location'],
-                'notes' => $data['notes'] ?? null,
+                'remarks' => $data['notes'] ?? null,
             ],
             'notifiable_type' => ScholarshipApplication::class,
             'notifiable_id' => $application->id,
@@ -522,8 +380,8 @@ class ScholarshipService
     public function updateDocument(ScholarshipApplication $application, string $documentType, $file): void
     {
         // Ensure documentType is valid for this scholarship type
-        $requiredDocuments = $application->scholarship->getRequiredDocuments();
-        if (! in_array($documentType, $requiredDocuments)) {
+        $requiredDocuments = array_keys($application->scholarship->getRequiredDocuments());
+        if (! in_array($documentType, $requiredDocuments, true)) {
             throw new InvalidArgumentException("Document type '{$documentType}' is not required for this scholarship");
         }
 
@@ -555,7 +413,7 @@ class ScholarshipService
         \App\Models\ScholarshipNotification::create([
             'user_id' => $application->user_id,
             'title' => 'Application Submitted Successfully',
-            'message' => "Your application for {$application->scholarship->name} has been submitted and is now under review.",
+            'message' => "Your application for {$application->scholarship->name} has been submitted and is awaiting verification.",
             'type' => \App\Models\ScholarshipNotification::TYPE_APPLICATION_STATUS,
             'data' => [
                 'application_id' => $application->id,
@@ -575,13 +433,12 @@ class ScholarshipService
     {
         $statusMessages = [
             'submitted' => 'Your scholarship application has been submitted successfully.',
-            'under_review' => 'Your scholarship application is now under review.',
-            'documents_verified' => 'Your documents have been verified successfully.',
-            'interview_scheduled' => 'An interview has been scheduled for your scholarship application.',
-            'interview_completed' => 'Your scholarship interview has been completed.',
+            'under_verification' => 'Your scholarship application is currently under verification.',
+            'verified' => 'Your documents have been verified successfully.',
+            'under_evaluation' => 'Your scholarship application is now under evaluation.',
             'approved' => 'Congratulations! Your scholarship application has been approved.',
             'rejected' => 'Your scholarship application was not approved at this time.',
-            'cancelled' => 'Your scholarship application has been cancelled.',
+            'end' => 'Your scholarship application has completed processing.',
         ];
 
         $message = $statusMessages[$application->status] ?? 'Your scholarship application status has been updated.';
@@ -622,13 +479,12 @@ class ScholarshipService
         $labels = [
             'draft' => 'Draft',
             'submitted' => 'Submitted',
-            'under_review' => 'Under Review',
-            'documents_verified' => 'Documents Verified',
-            'interview_scheduled' => 'Interview Scheduled',
-            'interview_completed' => 'Interview Completed',
+            'under_verification' => 'Under Verification',
+            'verified' => 'Verified',
+            'under_evaluation' => 'Under Evaluation',
             'approved' => 'Approved',
             'rejected' => 'Rejected',
-            'cancelled' => 'Cancelled',
+            'end' => 'End',
         ];
 
         return $labels[$status] ?? ucfirst(str_replace('_', ' ', $status));
@@ -687,14 +543,11 @@ class ScholarshipService
             'incomplete' => 10,
             'submitted' => 25,
             'under_verification' => 40,
-            'documents_verified' => 50,
-            'under_review' => 60,
+            'verified' => 55,
             'under_evaluation' => 75,
-            'interview_scheduled' => 80,
-            'interview_completed' => 85,
             'approved' => 100,
             'rejected' => 100,
-            'withdrawn' => 0,
+            'end' => 100,
         ];
 
         return $statusProgressMap[$application->status] ?? 0;
@@ -706,7 +559,7 @@ class ScholarshipService
     private function formatRequiredDocuments(ScholarshipApplication $application): array
     {
         $scholarship = $application->scholarship;
-        $requiredDocuments = $scholarship->required_documents ?? [];
+        $requiredDocuments = array_keys($scholarship->getRequiredDocuments());
         $uploadedDocuments = $application->uploaded_documents ?? [];
         $relatedDocuments = $application->documents ?? collect();
 

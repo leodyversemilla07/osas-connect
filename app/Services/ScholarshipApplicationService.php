@@ -14,8 +14,10 @@ class ScholarshipApplicationService
 {
     protected ScholarshipEligibilityService $eligibilityService;
 
-    public function __construct(ScholarshipEligibilityService $eligibilityService)
-    {
+    public function __construct(
+        ScholarshipEligibilityService $eligibilityService,
+        private readonly ScholarshipWorkflowService $workflowService
+    ) {
         $this->eligibilityService = $eligibilityService;
     }
 
@@ -24,92 +26,12 @@ class ScholarshipApplicationService
      */
     public function submit(StudentProfile $student, Scholarship $scholarship, array $data, array $documents): ScholarshipApplication
     {
-        // Validate that scholarship is accepting applications
-        if (! $scholarship->isAcceptingApplications()) {
-            throw new InvalidArgumentException('This scholarship is not accepting applications at this time.');
-        }
+        $student->loadMissing('user');
 
-        // Enhanced eligibility checking using the eligibility service
-        $eligibilityResult = $this->eligibilityService->checkEligibility($student, $scholarship);
-
-        if (! $eligibilityResult['eligible']) {
-            $failureReasons = implode('; ', $eligibilityResult['messages']);
-            throw new InvalidArgumentException("You are not eligible for this scholarship: {$failureReasons}");
-        }
-
-        // Check if student already has a pending or approved application
-        $existingApplication = $student
-            ->scholarshipApplications()
-            ->where('scholarship_id', $scholarship->id)
-            ->whereIn('status', [
-                ScholarshipApplication::STATUS_SUBMITTED,
-                ScholarshipApplication::STATUS_UNDER_VERIFICATION,
-                ScholarshipApplication::STATUS_VERIFIED,
-                ScholarshipApplication::STATUS_UNDER_EVALUATION,
-                ScholarshipApplication::STATUS_APPROVED,
-                ScholarshipApplication::STATUS_ACTIVE,
-            ])
-            ->first();
-
-        if ($existingApplication) {
-            throw new InvalidArgumentException('You already have a pending or approved application for this scholarship.');
-        }
-
-        DB::beginTransaction();
-        try {
-            // Create the application with eligibility data
-            $application = ScholarshipApplication::create([
-                'user_id' => $student->user_id,
-                'scholarship_id' => $scholarship->id,
-                'status' => ScholarshipApplication::STATUS_SUBMITTED,
-                'purpose_letter' => $data['purpose_letter'],
-                'current_step' => 'document_verification',
-                'academic_year' => $data['academic_year'],
-                'semester' => $data['semester'],
-                'applied_at' => now(),
-                'application_data' => [
-                    'eligibility_check' => $eligibilityResult,
-                    'student_gwa' => $student->current_gwa,
-                    'student_units' => $student->units,
-                    'submission_data' => $data,
-                ],
-            ]);
-
-            // Handle document uploads
-            $uploadedDocuments = [];
-            foreach ($documents as $type => $file) {
-                $path = $file->store('scholarship-documents/'.$student->user_id, 'public');
-                $uploadedDocuments[$type] = [
-                    'path' => $path,
-                    'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toDateTimeString(),
-                ];
-            }
-            $application->uploaded_documents = $uploadedDocuments;
-            $application->save();
-
-            // Create notification for OSAS staff
-            ScholarshipNotification::create([
-                'user_id' => $student->user_id,
-                'title' => 'New Scholarship Application',
-                'message' => "A new application for {$scholarship->name} has been submitted.",
-                'type' => ScholarshipNotification::TYPE_APPLICATION_STATUS,
-                'data' => [
-                    'application_id' => $application->id,
-                    'scholarship_name' => $scholarship->name,
-                    'student_name' => $student->user->full_name,
-                ],
-                'notifiable_type' => ScholarshipApplication::class,
-                'notifiable_id' => $application->id,
-            ]);
-
-            DB::commit();
-
-            return $application;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
+        return $this->workflowService->submitApplication($scholarship, $student->user, [
+            ...$data,
+            'documents' => $documents,
+        ]);
     }
 
     /**
@@ -159,6 +81,7 @@ class ScholarshipApplicationService
 
         $application->interview_schedule = $scheduleDate;
         $application->save();
+        $this->workflowService->markInterviewScheduled($application);
 
         // Notify student
         ScholarshipNotification::create([
@@ -214,24 +137,9 @@ class ScholarshipApplicationService
      */
     public function createApplication(StudentProfile $student, Scholarship $scholarship, array $data): ScholarshipApplication
     {
-        // Validate eligibility
-        $this->validateEligibility($student, $scholarship);
+        $student->loadMissing('user');
 
-        return DB::transaction(function () use ($student, $scholarship, $data) {
-            $application = new ScholarshipApplication([
-                'user_id' => $student->user_id, // Fixed: use user_id from student profile
-                'scholarship_id' => $scholarship->id,
-                'status' => ScholarshipApplication::STATUS_SUBMITTED,
-                'applied_at' => now(),
-                'semester' => $data['semester'] ?? null,
-                'academic_year' => $data['academic_year'] ?? null,
-                'uploaded_documents' => $data['documents'] ?? [],
-            ]);
-
-            $application->save();
-
-            return $application;
-        });
+        return $this->workflowService->submitApplication($scholarship, $student->user, $data);
     }
 
     /**
@@ -293,7 +201,7 @@ class ScholarshipApplicationService
             return;
         }
 
-        $studentGwa = $student->gwa;
+        $studentGwa = $student->current_gwa;
 
         if (isset($gwaRequirement['min']) && $studentGwa < $gwaRequirement['min']) {
             throw new InvalidArgumentException('GWA is below the minimum requirement');

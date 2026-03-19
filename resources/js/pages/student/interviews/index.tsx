@@ -204,7 +204,7 @@ export default function Index({ interviews }: Props) {
                                 application is verified, an interview may be scheduled.
                             </p>
                             <Button variant="outline" className="mt-4" asChild>
-                                <Link href={student.applications.url()}>
+                                <Link href={student.scholarships.applications.index.url()}>
                                     View My Applications
                                 </Link>
                             </Button>

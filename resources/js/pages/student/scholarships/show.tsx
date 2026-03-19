@@ -192,7 +192,7 @@ export default function ScholarshipShow() {
                                                     </Badge>
                                                 </div>
                                                 <Link
-                                                    href={student.applications.status(existing_application.id).url}
+                                                    href={student.scholarships.applications.show(existing_application.id).url}
                                                     className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase hover:bg-blue-700"
                                                 >
                                                     View Application

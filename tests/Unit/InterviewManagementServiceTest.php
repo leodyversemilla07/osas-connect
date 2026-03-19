@@ -10,7 +10,10 @@ beforeEach(function () {
     $this->service = app(InterviewManagementService::class);
     $this->interviewer = User::factory()->create(['role' => 'osas_staff']);
     $this->student = User::factory()->create(['role' => 'student']);
-    $this->application = ScholarshipApplication::factory()->create(['user_id' => $this->student->id]);
+    $this->application = ScholarshipApplication::factory()->create([
+        'user_id' => $this->student->id,
+        'status' => 'verified',
+    ]);
 });
 
 it('can schedule an interview', function () {
@@ -21,7 +24,8 @@ it('can schedule an interview', function () {
         $this->interviewer,
         $schedule,
         'Conference Room A',
-        'in_person'
+        'in_person',
+        'Bring original documents.'
     );
 
     expect($interview)
@@ -31,6 +35,7 @@ it('can schedule an interview', function () {
         ->and($interview->schedule->format('Y-m-d H:i'))->toBe($schedule->format('Y-m-d H:i'))
         ->and($interview->location)->toBe('Conference Room A')
         ->and($interview->interview_type)->toBe('in_person')
+        ->and($interview->remarks)->toBe('Bring original documents.')
         ->and($interview->status)->toBe('scheduled');
 
     expect($this->application->fresh()->status)->toBe('under_evaluation');
@@ -49,13 +54,17 @@ it('can reschedule an interview', function () {
     $rescheduledInterview = $this->service->rescheduleInterview(
         $interview,
         $newSchedule,
-        'Student request'
+        'Student request',
+        'Conference Room B',
+        $this->interviewer
     );
 
     expect($rescheduledInterview->schedule->format('Y-m-d H:i'))->toBe($newSchedule->format('Y-m-d H:i'))
+        ->and($rescheduledInterview->location)->toBe('Conference Room B')
         ->and($rescheduledInterview->status)->toBe('rescheduled')
         ->and($rescheduledInterview->reschedule_history)->toHaveCount(1)
-        ->and($rescheduledInterview->reschedule_history[0]['reason'])->toBe('Student request');
+        ->and($rescheduledInterview->reschedule_history[0]['reason'])->toBe('Student request')
+        ->and($rescheduledInterview->reschedule_history[0]['rescheduled_by'])->toBe($this->interviewer->id);
 });
 
 it('cannot reschedule a completed interview', function () {
@@ -123,7 +132,7 @@ it('can cancel an interview', function () {
     expect($cancelledInterview->status)->toBe('cancelled')
         ->and($cancelledInterview->remarks)->toBe('Cancelled: Student withdrew');
 
-    expect($this->application->fresh()->status)->toBe('submitted');
+    expect($this->application->fresh()->status)->toBe('verified');
 });
 
 it('can mark interview as no-show', function () {
@@ -171,7 +180,7 @@ it('can get upcoming interviews for interviewer', function () {
     // Create interviews
     $this->service->scheduleInterview($this->application, $this->interviewer, $tomorrow);
 
-    $anotherApplication = ScholarshipApplication::factory()->create();
+    $anotherApplication = ScholarshipApplication::factory()->create(['status' => 'verified']);
     $this->service->scheduleInterview($anotherApplication, $this->interviewer, $nextWeek);
 
     $upcomingInterviews = $this->service->getUpcomingInterviews($this->interviewer);
@@ -187,11 +196,11 @@ it('calculates interview statistics correctly', function () {
     // Create various interviews
     $interview1 = $this->service->scheduleInterview($this->application, $this->interviewer, $tomorrow);
 
-    $application2 = ScholarshipApplication::factory()->create();
+    $application2 = ScholarshipApplication::factory()->create(['status' => 'verified']);
     $interview2 = $this->service->scheduleInterview($application2, $this->interviewer, $yesterday);
     $this->service->completeInterview($interview2, ['score' => 85], 'approved');
 
-    $application3 = ScholarshipApplication::factory()->create();
+    $application3 = ScholarshipApplication::factory()->create(['status' => 'verified']);
     $interview3 = $this->service->scheduleInterview($application3, $this->interviewer, $yesterday);
     $this->service->cancelInterview($interview3, 'Test cancellation');
 

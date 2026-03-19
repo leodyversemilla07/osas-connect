@@ -21,7 +21,7 @@ import {
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/student/dashboard' },
-    { title: 'My Applications', href: '/student/scholarships/my-applications' },
+    { title: 'My Applications', href: '/student/scholarships/applications' },
     { title: 'Renewal Status', href: '#' },
 ];
 
@@ -333,7 +333,7 @@ export default function Show({ renewal }: Props) {
                             </CardHeader>
                             <CardContent className="space-y-3">
                                 <Button variant="outline" className="w-full" asChild>
-                                    <Link href={student.applications.url()}>
+                                    <Link href={student.scholarships.applications.index.url()}>
                                         Back to My Applications
                                     </Link>
                                 </Button>

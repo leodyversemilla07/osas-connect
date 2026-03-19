@@ -252,3 +252,30 @@ describe('StudentController Scholarship Details', function () {
         expect($data['eligibility']['can_apply'])->toBe(false);
     });
 });
+
+describe('StudentController Legacy Application Routes', function () {
+    beforeEach(function () {
+        $this->student = User::factory()->withProfile()->create(['role' => 'student']);
+        $this->scholarship = Scholarship::factory()->create([
+            'status' => 'active',
+            'deadline' => now()->addDays(30),
+        ]);
+        $this->application = ScholarshipApplication::factory()->create([
+            'user_id' => $this->student->id,
+            'scholarship_id' => $this->scholarship->id,
+            'status' => 'under_verification',
+        ]);
+    });
+
+    it('redirects the legacy application list route to the canonical scholarship application list', function () {
+        $response = $this->actingAs($this->student)->get(route('student.applications'));
+
+        $response->assertRedirect(route('student.scholarships.applications.index'));
+    });
+
+    it('redirects the legacy application status route to the canonical scholarship application detail route', function () {
+        $response = $this->actingAs($this->student)->get(route('student.applications.status', $this->application));
+
+        $response->assertRedirect(route('student.scholarships.applications.show', $this->application));
+    });
+});

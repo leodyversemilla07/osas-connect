@@ -11,7 +11,7 @@ import { AlertCircle, BookOpen, Calendar, CheckCircle2, GraduationCap, XCircle }
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/student/dashboard' },
-    { title: 'My Applications', href: '/student/scholarships/my-applications' },
+    { title: 'My Applications', href: '/student/scholarships/applications' },
     { title: 'Check Renewal Eligibility', href: '#' },
 ];
 
@@ -169,7 +169,7 @@ export default function CheckEligibility({ application, eligibility, deadlines }
                                     </Button>
                                 )}
                                 <Button variant="outline" asChild>
-                                    <Link href={student.applications.url()}>
+                                    <Link href={student.scholarships.applications.index.url()}>
                                         Back to My Applications
                                     </Link>
                                 </Button>

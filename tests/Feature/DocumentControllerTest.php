@@ -143,7 +143,10 @@ describe('Document Verification by Staff', function () {
         
         $this->staff = User::factory()->create(['role' => 'osas_staff']);
         $this->student = User::factory()->withProfile()->create(['role' => 'student']);
-        $this->scholarship = Scholarship::factory()->create(['status' => 'active']);
+        $this->scholarship = Scholarship::factory()->create([
+            'status' => 'active',
+            'type' => Scholarship::TYPE_ACADEMIC_FULL,
+        ]);
         $this->application = ScholarshipApplication::factory()->create([
             'user_id' => $this->student->id,
             'scholarship_id' => $this->scholarship->id,
@@ -151,6 +154,7 @@ describe('Document Verification by Staff', function () {
         ]);
         $this->document = Document::factory()->create([
             'application_id' => $this->application->id,
+            'type' => Document::TYPE_GRADES,
             'status' => 'pending',
         ]);
     });

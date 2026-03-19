@@ -1,4 +1,3 @@
-import { type Application } from '@/components/scholarship-applications/columns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -14,12 +13,14 @@ import {
 } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatScholarshipCurrency, formatScholarshipDate, getScholarshipStatusBadgeClass } from '@/lib/scholarship-application';
 import AppLayout from '@/layouts/app-layout';
+import { ScholarshipApplicationListItem } from '@/types/scholarship-application';
 import { Head, Link, router } from '@inertiajs/react';
 import { Eye, FileText, MoreHorizontal, Search, Users } from 'lucide-react';
 
 interface ApplicationsData {
-    data: Application[];
+    data: ScholarshipApplicationListItem[];
     current_page: number;
     from: number;
     last_page: number;
@@ -51,47 +52,6 @@ const breadcrumbs = [
 ];
 
 export default function ScholarshipApplicationsIndex({ applications }: Props) {
-    // Format scholarship type for display
-    const formatScholarshipType = (type: string) => {
-        return type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
-    };
-    // Helper functions
-    const formatStatus = (status: string) => {
-        return status.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
-    };
-
-    const getStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
-        switch (status) {
-            case 'approved':
-                return 'default';
-            case 'rejected':
-                return 'destructive';
-            case 'submitted':
-            case 'under_verification':
-            case 'under_evaluation':
-                return 'secondary';
-            default:
-                return 'outline';
-        }
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        });
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amount);
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Scholarship Applications - Admin" />
@@ -184,20 +144,20 @@ export default function ScholarshipApplicationsIndex({ applications }: Props) {
                             <TableBody>
                                 {applications.data.map((application) => (
                                     <TableRow key={application.id}>
-                                        <TableCell>{application.student.student_id}</TableCell>
+                                        <TableCell>{application.student?.student_id ?? 'N/A'}</TableCell>
                                         <TableCell>
-                                            <div className="text-foreground font-medium">{application.student.name}</div>
+                                            <div className="text-foreground font-medium">{application.student?.name ?? 'Unknown Student'}</div>
                                         </TableCell>
-                                        <TableCell>{application.student.course}</TableCell>
+                                        <TableCell>{application.student?.course ?? 'N/A'}</TableCell>
                                         <TableCell>
                                             <div className="text-foreground font-medium">{application.scholarship.name}</div>
                                         </TableCell>
-                                        <TableCell>{formatScholarshipType(application.scholarship.type)}</TableCell>
+                                        <TableCell>{application.scholarship.type_label}</TableCell>
                                         <TableCell>
-                                            <Badge variant={getStatusVariant(application.status)}>{formatStatus(application.status)}</Badge>
+                                            <Badge className={getScholarshipStatusBadgeClass(application.status)}>{application.status_label}</Badge>
                                         </TableCell>
-                                        <TableCell>{formatDate(application.applied_at)}</TableCell>
-                                        <TableCell>{application.amount_received ? formatCurrency(application.amount_received) : '—'}</TableCell>
+                                        <TableCell>{formatScholarshipDate(application.submitted_at, { month: 'short', day: 'numeric' })}</TableCell>
+                                        <TableCell>{application.amount_received ? formatScholarshipCurrency(application.amount_received) : '—'}</TableCell>
                                         <TableCell>
                                             {application.reviewer ? (
                                                 <div>
@@ -223,7 +183,7 @@ export default function ScholarshipApplicationsIndex({ applications }: Props) {
                                                         </Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
-                                                        <Link href={`/admin/students/${application.student.id}`}>
+                                                        <Link href={`/admin/students/${application.student?.id ?? 0}`}>
                                                             <Users className="mr-2 h-4 w-4" />
                                                             View Student
                                                         </Link>

@@ -13,7 +13,7 @@ import { FormEvent } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/student/dashboard' },
-    { title: 'My Applications', href: '/student/scholarships/my-applications' },
+    { title: 'My Applications', href: '/student/scholarships/applications' },
     { title: 'Submit Renewal', href: '#' },
 ];
 

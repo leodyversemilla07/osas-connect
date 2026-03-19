@@ -58,11 +58,11 @@ class ReportingService
     public function getApplicationStatistics(int $year = null): array
     {
         $year = $year ?? Carbon::now()->year;
-        
-        $baseQuery = ScholarshipApplication::whereYear('scholarship_applications.created_at', $year);
-        
-        $total = $baseQuery->count();
-        $byStatus = $baseQuery->select('status', DB::raw('count(*) as count'))
+
+        $baseQuery = ScholarshipApplication::query()->whereYear('scholarship_applications.created_at', $year);
+
+        $total = (clone $baseQuery)->count();
+        $byStatus = (clone $baseQuery)->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status')
             ->toArray();
@@ -74,25 +74,11 @@ class ReportingService
             ->pluck('count', 'type')
             ->toArray();
 
-        // Use SQLite-compatible date functions
-        $monthlyTrend = ScholarshipApplication::whereYear('scholarship_applications.created_at', $year)
-            ->select(
-                DB::raw("CAST(strftime('%m', scholarship_applications.created_at) AS INTEGER) as month"),
-                DB::raw('count(*) as count')
-            )
-            ->groupBy(DB::raw("strftime('%m', scholarship_applications.created_at)"))
-            ->orderBy('month')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                return [Carbon::create()->month($item->month)->format('M') => $item->count];
-            })
-            ->toArray();
-
-        // Fill missing months with 0
-        $allMonths = collect(range(1, 12))->mapWithKeys(function ($month) {
-            return [Carbon::create()->month($month)->format('M') => 0];
-        });
-        $monthlyTrend = $allMonths->merge($monthlyTrend)->toArray();
+        $monthlyTrend = $this->countRecordsByMonth(
+            ScholarshipApplication::whereYear('scholarship_applications.created_at', $year)
+                ->get(['created_at']),
+            fn (ScholarshipApplication $application) => $application->created_at
+        );
 
         return [
             'total' => $total,
@@ -149,33 +135,18 @@ class ReportingService
     public function getInterviewStatistics(int $year = null): array
     {
         $year = $year ?? Carbon::now()->year;
-        
-        $query = Interview::whereYear('interviews.created_at', $year);
-        
-        $total = $query->count();
-        $byStatus = $query->select('status', DB::raw('count(*) as count'))
+
+        $query = Interview::query()->whereYear('interviews.created_at', $year);
+
+        $total = (clone $query)->count();
+        $byStatus = (clone $query)->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status')
             ->toArray();
-
-        // Use SQLite-compatible date functions
-        $monthlyTrend = $query->select(
-            DB::raw("CAST(strftime('%m', interviews.created_at) AS INTEGER) as month"),
-            DB::raw('count(*) as count')
-        )
-            ->groupBy('status', DB::raw("strftime('%m', interviews.created_at)"))
-            ->orderBy('month')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                return [Carbon::create()->month($item->month)->format('M') => $item->count];
-            })
-            ->toArray();
-
-        // Fill missing months with 0
-        $allMonths = collect(range(1, 12))->mapWithKeys(function ($month) {
-            return [Carbon::create()->month($month)->format('M') => 0];
-        });
-        $monthlyTrend = $allMonths->merge($monthlyTrend)->toArray();
+        $monthlyTrend = $this->countRecordsByMonth(
+            (clone $query)->get(['created_at']),
+            fn (Interview $interview) => $interview->created_at
+        );
 
         return [
             'total' => $total,
@@ -194,10 +165,10 @@ class ReportingService
     public function getStipendStatistics(int $year = null): array
     {
         $year = $year ?? Carbon::now()->year;
-        
-        $baseQuery = ScholarshipStipend::whereYear('scholarship_stipends.created_at', $year);
-        
-        $totalAmount = $baseQuery->sum('amount');
+
+        $baseQuery = ScholarshipStipend::query()->whereYear('scholarship_stipends.created_at', $year);
+
+        $totalAmount = (clone $baseQuery)->sum('amount');
         $disbursedAmount = ScholarshipStipend::whereYear('scholarship_stipends.created_at', $year)
             ->where('status', 'released')->sum('amount');
         $pendingAmount = ScholarshipStipend::whereYear('scholarship_stipends.created_at', $year)
@@ -212,25 +183,13 @@ class ReportingService
             ->pluck('total_amount', 'type')
             ->toArray();
 
-        $monthlyDisbursements = ScholarshipStipend::whereYear('scholarship_stipends.created_at', $year)
-            ->where('status', 'released')
-            ->select(
-                DB::raw("CAST(strftime('%m', scholarship_stipends.updated_at) AS INTEGER) as month"),
-                DB::raw('sum(amount) as total_amount')
-            )
-            ->groupBy(DB::raw("strftime('%m', scholarship_stipends.updated_at)"))
-            ->orderBy('month')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                return [Carbon::create()->month($item->month)->format('M') => $item->total_amount];
-            })
-            ->toArray();
-
-        // Fill missing months with 0
-        $allMonths = collect(range(1, 12))->mapWithKeys(function ($month) {
-            return [Carbon::create()->month($month)->format('M') => 0];
-        });
-        $monthlyDisbursements = $allMonths->merge($monthlyDisbursements)->toArray();
+        $monthlyDisbursements = $this->sumRecordsByMonth(
+            ScholarshipStipend::whereYear('scholarship_stipends.created_at', $year)
+                ->where('status', 'released')
+                ->get(['amount', 'released_at', 'updated_at']),
+            fn (ScholarshipStipend $stipend) => $stipend->released_at ?? $stipend->updated_at,
+            fn (ScholarshipStipend $stipend) => (float) $stipend->amount
+        );
 
         return [
             'total_amount' => $totalAmount,
@@ -512,10 +471,16 @@ class ReportingService
         }
 
         return $query->get()->map(function ($application) {
+            $studentName = trim(sprintf(
+                '%s %s',
+                $application->user->first_name,
+                $application->user->last_name
+            ));
+
             return [
                 'Application ID' => $application->id,
                 'Student ID' => $application->user->email, // Use email as student ID
-                'Student Name' => $application->user->studentProfile->first_name . ' ' . $application->user->studentProfile->last_name,
+                'Student Name' => $studentName,
                 'Course' => $application->user->studentProfile->course,
                 'Year Level' => $application->user->studentProfile->year_level,
                 'Scholarship' => $application->scholarship->name,
@@ -526,5 +491,35 @@ class ReportingService
                 'Disbursed Amount' => $application->stipends->where('status', 'released')->sum('amount'),
             ];
         })->toArray();
+    }
+
+    private function initializeMonthlyBuckets(): Collection
+    {
+        return collect(range(1, 12))->mapWithKeys(function (int $month) {
+            return [Carbon::create()->month($month)->format('M') => 0];
+        });
+    }
+
+    private function countRecordsByMonth(Collection $records, callable $dateResolver): array
+    {
+        return $this->initializeMonthlyBuckets()
+            ->merge(
+                $records->countBy(function ($record) use ($dateResolver) {
+                    return Carbon::parse($dateResolver($record))->format('M');
+                })
+            )
+            ->toArray();
+    }
+
+    private function sumRecordsByMonth(Collection $records, callable $dateResolver, callable $amountResolver): array
+    {
+        $buckets = $this->initializeMonthlyBuckets();
+
+        foreach ($records as $record) {
+            $month = Carbon::parse($dateResolver($record))->format('M');
+            $buckets[$month] += $amountResolver($record);
+        }
+
+        return $buckets->toArray();
     }
 }
