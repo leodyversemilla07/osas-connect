@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\AdminProfile;
+use App\Models\OsasStaffProfile;
+use App\Models\Scholarship;
+use App\Models\StudentProfile;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Str;
 
 return [
@@ -98,4 +104,24 @@ return [
     */
 
     'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache_'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Serializable Classes
+    |--------------------------------------------------------------------------
+    |
+    | Laravel 13 disables cache unserialization by default. This application
+    | intentionally caches Eloquent models and collections in CacheService,
+    | so those payload classes must be explicitly allow-listed.
+    |
+    */
+
+    'serializable_classes' => [
+        AdminProfile::class,
+        EloquentCollection::class,
+        OsasStaffProfile::class,
+        Scholarship::class,
+        StudentProfile::class,
+        User::class,
+    ],
 ];
