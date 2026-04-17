@@ -43,30 +43,21 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-    formatScholarshipDate,
-    getScholarshipStatusBadgeClass,
-    getScholarshipTypeLabel,
-} from '@/lib/scholarship-application';
+import { formatScholarshipDate, getScholarshipStatusBadgeClass } from '@/lib/scholarship-application';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import {
-    AlertTriangle,
     ArrowUpDown,
     Calendar,
     CheckCircle,
     Download,
     Eye,
-    FileText,
-    GraduationCap,
     Grid,
-    HelpCircle,
     Keyboard,
     List,
     MoreVertical,
     RefreshCw,
     Search,
-    ShieldCheck,
     Timer,
     User,
     X,
@@ -149,26 +140,6 @@ const getScholarshipTypeColor = (type: string): string => {
         others: 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300',
     };
     return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300';
-};
-
-// Format currency amount for display
-const formatCurrency = (amount: string): string => {
-    // Remove any existing currency symbols and clean the string
-    const cleanAmount = amount.replace(/[₱$,]/g, '');
-    const numericAmount = parseFloat(cleanAmount);
-
-    // Return formatted currency if it's a valid number
-    if (!isNaN(numericAmount)) {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2,
-        }).format(numericAmount);
-    }
-
-    // Return original amount if it's not a valid number (e.g., "Full Tuition", "Variable")
-    return amount;
 };
 
 const StatusCell = ({ application }: { application: Application }) => (

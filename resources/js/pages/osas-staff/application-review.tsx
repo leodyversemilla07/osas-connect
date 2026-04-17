@@ -18,7 +18,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { ScholarshipApplicationDetail, ScholarshipDocumentStatus } from '@/types/scholarship-application';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { Calendar, History, MessageSquare, Send } from 'lucide-react';
+import { Calendar, History, Send } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 

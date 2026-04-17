@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Check, Clock, Search, X } from 'lucide-react';
+import { ArrowLeft, Check, Clock, X } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -46,8 +45,8 @@ interface Office {
 interface Props {
     pendingLogs: {
         data: WorkLog[];
-        links: any;
-        meta?: any;
+        links: unknown;
+        meta?: unknown;
     };
     offices: Office[];
     filters: {

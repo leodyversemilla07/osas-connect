@@ -1,13 +1,18 @@
 import { readdirSync, statSync } from 'node:fs';
 import { join, parse } from 'node:path';
+import process from 'node:process';
 
 const root = 'resources/js';
 const kebabCase = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const reactExtensions = new Set(['.tsx', '.jsx']);
 const violations = [];
+const ignoredTopLevelDirs = new Set(['actions']);
 
 function walk(dir, relativeParts = []) {
   for (const entry of readdirSync(dir)) {
+    if (relativeParts.length === 0 && ignoredTopLevelDirs.has(entry)) {
+      continue;
+    }
     const fullPath = join(dir, entry);
     const stats = statSync(fullPath);
 
